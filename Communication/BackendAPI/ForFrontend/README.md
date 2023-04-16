@@ -1,7 +1,7 @@
 
-## Backend API for Frontend
+# Backend API for Frontend
 
-### Authentication
+## Authentication
 
 Authentication for a User requires:
 
@@ -14,7 +14,7 @@ Authentication for a User requires:
 }
 ```
 
-### Standard Error Resonses
+## Standard Error Resonses
 
 The following Responses can happen on any Endpoint if the given Condition is met:
 
@@ -45,11 +45,11 @@ The following Responses can happen on any Endpoint if the given Condition is met
                 }
             ```   
 
-### Public Endpoints
+# Public Endpoints
 
 > **No Authentication is needed for Public Endpoints.**
 
-##### Login User
+## Login User
 
 - Endpoint: /login
 - Methods: 
@@ -95,7 +95,7 @@ The following Responses can happen on any Endpoint if the given Condition is met
                 }
             ``` 
 
-##### Register
+## Register
 
 - Endpoint: /register
 - Methods: 
@@ -142,7 +142,7 @@ The following Responses can happen on any Endpoint if the given Condition is met
                 }
             ```
 
-##### Scan QR Code
+## Scan QR Code
 
 > Used by Frontend to get Plant Details when Guest scans a QR-Code on a Plant.  
 > The Frontend also calls the "/get-pictures"-Endpoint to get the Pictures of the Plant.
@@ -180,7 +180,7 @@ The following Responses can happen on any Endpoint if the given Condition is met
                 }
             ```    
 
-##### Get Plant Pictures
+## Get Plant Pictures
 
 <!-- TODO: Is it better to return Pictures one by one? -->
 <!-- TODO: Should the Pictures really be Base64 encoded? -->
@@ -249,7 +249,7 @@ The following Responses can happen on any Endpoint if the given Condition is met
                 }
             ```  
 
-##### Upload Plant Picture
+## Upload Plant Picture
 
 - Endpoint: /upload-picture
 - Methods: 
@@ -285,7 +285,7 @@ The following Responses can happen on any Endpoint if the given Condition is met
 
 > **User Endpoints require the querying User to have the Permission "USER"**
 
-###### Logout
+### Logout
 
 - Endpoint: /logout
 - Methods: 
@@ -299,7 +299,7 @@ The following Responses can happen on any Endpoint if the given Condition is met
         - 200 HTTP Status Code
         - No Body
 
-###### Update settings
+### Update settings
 
 - Endpoint: /update-settings
 - Methods: 
@@ -334,7 +334,7 @@ The following Responses can happen on any Endpoint if the given Condition is met
                 }
             ```
 
-###### Get Dashboard Data
+### Get Dashboard Data
 
 - Endpoint: /get-dashboard-data
 - Methods: 
@@ -398,7 +398,7 @@ The following Responses can happen on any Endpoint if the given Condition is met
                 }
             ``` 
 
-##### Get all Plants
+## Get all Plants
 
 - Endpoint: /get-all-plants
 - Methods: 
@@ -428,7 +428,7 @@ The following Responses can happen on any Endpoint if the given Condition is met
                 }
             ```
 
-##### Add Plant to Dashboard
+## Add Plant to Dashboard
 
 - Endpoint: /add-to-dashboard
 - Methods: 
@@ -455,7 +455,7 @@ The following Responses can happen on any Endpoint if the given Condition is met
                 }
             ``` 
 
-##### Remove Plant from Dashboard
+## Remove Plant from Dashboard
 
 - Endpoint: /remove-from-dashboard
 - Methods: 
@@ -493,7 +493,7 @@ The following Responses can happen on any Endpoint if the given Condition is met
 
 > **Gardener Endpoints require the querying User to have the Permission "GARDENER" and to be assigned to the Plant that they want to modify**
 
-###### Set Sensor Limits
+### Set Sensor Limits
 
 - Endpoint: /set-sensor-limits
 - Methods: 
@@ -533,7 +533,7 @@ The following Responses can happen on any Endpoint if the given Condition is met
                 }
             ``` 
 
-###### Set Transfer Interval
+### Set Transfer Interval
 
 - Endpoint: /set-transfer-interval
 - Methods: 
@@ -561,11 +561,11 @@ The following Responses can happen on any Endpoint if the given Condition is met
                 }
             ``` 
 
-###### Add Plant Picture
+### Add Plant Picture
 
 See "Upload Plant Picture" (/upload-picture)
 
-###### Delete Plant Picture
+### Delete Plant Picture
 
 - Endpoint: /delete-picture
 - Methods: 
@@ -598,7 +598,7 @@ See "Upload Plant Picture" (/upload-picture)
 
 > **Admin Endpoints require the querying User to have the Permission "ADMIN"**
 
-###### Get Access Points
+### Get Access Points
 
 - Endpoint: /get-access-points
 - Methods: 
@@ -628,7 +628,7 @@ See "Upload Plant Picture" (/upload-picture)
                 }
             ```
 
-###### Get Sensor Stations
+### Get Sensor Stations
 
 - Endpoint: /get-sensor-stations
 - Methods: 
@@ -658,7 +658,7 @@ See "Upload Plant Picture" (/upload-picture)
                 }
             ```
 
-###### Scan for SensorStations
+### Scan for SensorStations
 
 > This Endpoint might take a while to finish.  
 > First the "pairing-mode"-Flag in the given Access Point's Config is set.  
@@ -707,7 +707,7 @@ See "Upload Plant Picture" (/upload-picture)
                 }
             ``` 
 
-###### Lock/Unlock Access Point
+### Lock/Unlock Access Point
 
 - Endpoint: /set-lock-access-point
 - Methods: 
@@ -735,7 +735,7 @@ See "Upload Plant Picture" (/upload-picture)
                 }
             ``` 
 
-###### Lock/Unlock SensorStation
+### Lock/Unlock SensorStation
 
 - Endpoint: /set-lock-sensor-station
 - Methods: 
@@ -763,7 +763,7 @@ See "Upload Plant Picture" (/upload-picture)
                 }
             ``` 
 
-###### Create Plant QR-Code
+### Create Plant QR-Code
 
 - Endpoint: /create-plant-qr-code
 - Methods: 
@@ -792,7 +792,7 @@ See "Upload Plant Picture" (/upload-picture)
                 }
             ``` 
 
-###### Get all Users
+### Get all Users
 
 - Endpoint: /get-all-users
 - Methods: 
@@ -827,7 +827,7 @@ See "Upload Plant Picture" (/upload-picture)
         ]
     ```
 
-###### Get all Permissions
+### Get all Permissions
 
 > Returns a List of all known Permissions
 
@@ -846,7 +846,7 @@ See "Upload Plant Picture" (/upload-picture)
         ]
     ```
 
-###### Add User
+### Add User
 
 - Endpoint: /create-user
 - Methods: 
@@ -880,7 +880,7 @@ See "Upload Plant Picture" (/upload-picture)
                 }
             ```
 
-###### Update User
+### Update User
 
 > NOTE: The Username cannot be updated.
 
@@ -923,7 +923,7 @@ See "Upload Plant Picture" (/upload-picture)
                 }
             ```
 
-###### Delete User
+### Delete User
 
 - Endpoint: /delete-user
 - Methods: 
@@ -949,7 +949,7 @@ See "Upload Plant Picture" (/upload-picture)
                 }
             ```
 
-###### Get Logs
+### Get Logs
 - Endpoint: /get-logs
 - Methods: 
     - GET

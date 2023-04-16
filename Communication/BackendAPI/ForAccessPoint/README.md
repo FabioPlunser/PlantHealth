@@ -1,7 +1,7 @@
 
-## Backend API for Access Point
+# Backend API for Access Point
 
-### Authentication
+## Authentication
 
 Authentication for an Access Point requires:
 
@@ -15,7 +15,7 @@ Authentication for an Access Point requires:
 
 > This is done to be consistent with the User Authentication which is also sent in JSON-Format.
 
-### Response Status Code Behaviour
+## Response Status Code Behaviour
 
 Getting a 401 or 403 HTTP Status Code from any Endpoint indicates to the Access Point that it was locked.  
 Afterwards it should only keep trying to get it's Configuration in a specified Interval.
@@ -24,9 +24,9 @@ This should keep up until it gets a 200 HTTP Status Code from the Backend indica
 After getting a 5XX HTTP Status Code Response the Access Point should once retry querying.  
 If this Query also results in 5XX then it should behave like it just got a 401 HTTP Status Code. 
 
-### Endpoints
+# Endpoints
 
-##### Register Access Point
+## Register Access Point
 
 > Should be queried by the Access Point after Startup.  
 > The Access Point should create an ID for itself the first Time it starts, which it then stores permanently.
@@ -62,7 +62,7 @@ If this Query also results in 5XX then it should behave like it just got a 401 H
         - 5XX HTTP Status Code
         - No Body
 
-##### Get Configuration Endpoint
+## Get Configuration Endpoint
 
 > Should be queried in a regular Interval by the Access Point.
 
@@ -122,7 +122,7 @@ If this Query also results in 5XX then it should behave like it just got a 401 H
         - 5XX HTTP Status Code
         - No Body
 
-###### Remarks
+## Remarks
 
 The Sensor Stations that are returned in the "sensor-stations"-Array are the only ones that the Access Point should connect to.  
 Any other Sensor Stations that the Access Point may see are to be looked upon as "locked".  
@@ -202,7 +202,7 @@ If the Access Point finds a disconnected Sensor Station by scanning, Communicati
         - 5XX HTTP Status Code
         - No Body
 
-###### Remarks
+## Remarks
 
 The Data stored locally on the Access Point can safely be deleted  after a Response with a 2XX HTTP Status Code was received.    
 
