@@ -7,10 +7,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.swing.text.html.Option;
-
 import at.ac.uibk.plant_health.models.device.AccessPoint;
 import at.ac.uibk.plant_health.models.device.SensorStation;
+import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import at.ac.uibk.plant_health.repositories.AccessPointRepository;
 
 @Service
@@ -20,17 +19,12 @@ public class AccessPointService {
 	@Autowired
 	private SensorStationService sensorStationService;
 
+	/**
+	 * Get all AccessPoints.
+	 * @return List of AccessPoints
+	 */
 	public List<AccessPoint> findAllAccessPoints() {
 		return accessPointRepository.findAll();
-	}
-	private AccessPoint getAccessPoint(UUID accessPointId) {
-		Optional<AccessPoint> maybeAccessPoint =
-				accessPointRepository.findBySelfAssignedId(accessPointId);
-		if (maybeAccessPoint.isEmpty())
-			throw new IllegalArgumentException(
-					"AccessPoint with ID " + accessPointId + " does not exist."
-			);
-		return maybeAccessPoint.get();
 	}
 
 	/**
@@ -106,11 +100,33 @@ public class AccessPointService {
 		}
 	}
 
+	/**
+	 * Start a scan for SensorStations.
+	 * @param accessPointId
+	 * @return true if the scan flag was set, false otherwise
+	 */
+	public boolean startScan(UUID accessPointId) {
+		AccessPoint accessPoint = getAccessPoint(accessPointId);
+		accessPoint.setScanActive(true);
+		return save(accessPoint) != null;
+	}
+
+	/**
+	 * Get the AccessPoint's access token.
+	 * @param accessPointId
+	 * @return
+	 */
 	public UUID getAccessPointAccessToken(UUID accessPointId) {
 		AccessPoint accessPoint = getAccessPoint(accessPointId);
 		return accessPoint.getAccessToken();
 	}
 
+	/**
+	 *
+	 * @param unlocked
+	 * @param accessPointId
+	 * @return true if the AccessPoint was unlocked, false otherwise
+	 */
 	public boolean setUnlocked(boolean unlocked, UUID accessPointId) {
 		AccessPoint accessPoint = null;
 		try {
@@ -120,6 +136,8 @@ public class AccessPointService {
 		}
 
 		if (unlocked) {
+			accessPoint.setAccessToken(null);
+		} else {
 			UUID token = accessPoint.getAccessToken();
 
 			if (token == null) {
@@ -127,21 +145,24 @@ public class AccessPointService {
 			}
 
 			accessPoint.setAccessToken(token);
-		} else {
+		}
+		else {
 			accessPoint.setAccessToken(null);
 		}
-		accessPoint.setUnlocked(unlocked);
+		accessPoint.setUnlocked(!unlocked);
 		return save(accessPoint) != null;
 	}
 
 	public boolean foundNewSensorStation(
 			AccessPoint accessPoint, List<SensorStation> sensorStationList
 	) {
-		for (SensorStation sensorStation : sensorStationList) {
+		// TODO
+		sensorStationList.forEach(sensorStation -> {
 			sensorStation.setAccessPoint(accessPoint);
 			sensorStationService.save(sensorStation);
-		}
-		accessPoint.setSensorStations(sensorStationList);
+		});
+		accessPoint.setSensorStations(List.of(sensorStation));
+		accessPoint.setScanActive(false);
 		return save(accessPoint) != null;
 	}
 
@@ -155,5 +176,20 @@ public class AccessPointService {
 	public boolean lostSensorStation(AccessPoint accessPoint, SensorStation sensorStation) {
 		// TODO
 		return false;
+	}
+
+	/**
+	 * Find an AccessPoint by its ID.
+	 * @param accessPointId
+	 * @return AccessPoint
+	 */
+	private AccessPoint getAccessPoint(UUID accessPointId) {
+		Optional<AccessPoint> maybeAccessPoint =
+				accessPointRepository.findBySelfAssignedId(accessPointId);
+		if (maybeAccessPoint.isEmpty())
+			throw new IllegalArgumentException(
+					"AccessPoint with ID " + accessPointId + " does not exist."
+			);
+		return maybeAccessPoint.get();
 	}
 }

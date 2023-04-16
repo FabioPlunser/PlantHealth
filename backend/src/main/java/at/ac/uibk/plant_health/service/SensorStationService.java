@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.plant.PlantPicture;
+import at.ac.uibk.plant_health.models.plant.Sensor;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import at.ac.uibk.plant_health.repositories.*;
 
@@ -21,6 +22,15 @@ public class SensorStationService {
 
 	@Autowired
 	private PlantPersonReferenceRepository plantPersonReferenceRepository;
+
+	public SensorStation save(SensorStation sensorStation) {
+		try {
+			return sensorStationRepository.save(sensorStation);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	public List<SensorStation> findAll() {
 		return sensorStationRepository.findAll();
