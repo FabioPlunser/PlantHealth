@@ -2,14 +2,17 @@ package at.ac.uibk.plant_health.controllers;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
+import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.annotations.AnyPermission;
+import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
 import at.ac.uibk.plant_health.models.annotations.PublicEndpoint;
 import at.ac.uibk.plant_health.models.device.AccessPoint;
+import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.rest_responses.ListResponse;
 import at.ac.uibk.plant_health.models.rest_responses.MessageResponse;
 import at.ac.uibk.plant_health.models.rest_responses.RestResponseEntity;
@@ -55,14 +58,6 @@ public class AccessPointController {
 	}
 
 	@AnyPermission(Permission.ADMIN)
-	@PostMapping("/scan-for-sensor-stations")
-	public RestResponseEntity scanForSensorStations(
-			//            @RequestBody final UUID accessPointId
-	) {
-		throw new NotImplementedException();
-	}
-
-	@AnyPermission(Permission.ADMIN)
 	@RequestMapping(
 			value = "/set-lock-access-point", method = {RequestMethod.POST, RequestMethod.PUT}
 	)
@@ -71,7 +66,7 @@ public class AccessPointController {
 			@RequestParam(name = "accessPointId") final UUID accessPointId,
 			@RequestParam(name = "locked") final boolean locked
 	) {
-		if (!accessPointService.setLocked(locked, accessPointId)) {
+		if (!accessPointService.setUnlocked(locked, accessPointId)) {
 			return MessageResponse.builder()
 					.statusCode(404)
 					.message("Could not set lock state of AccessPoint")
@@ -92,6 +87,46 @@ public class AccessPointController {
 	createPlantQrCode(
 			//            @RequestBody final UUID plantId
 			@RequestBody final UUID qrCode
+	) {
+		throw new NotImplementedException();
+	}
+
+	@AnyPermission(Permission.ADMIN)
+	@PostMapping("/scan-for-sensor-stations")
+	public RestResponseEntity scanForSensorStations(@RequestParam(name = "accessPointId")
+													final UUID accessPointId) {
+		if (!accessPointService.isAccessPointRegistered(accessPointId))
+			return MessageResponse.builder()
+					.statusCode(404)
+					.message("AccessPoint not registered")
+					.toEntity();
+
+		if (!accessPointService.isUnlocked(accessPointId))
+			return MessageResponse.builder()
+					.statusCode(401)
+					.message("AccessPoint is locked")
+					.toEntity();
+
+		if (!accessPointService.startScan(accessPointId))
+			return MessageResponse.builder()
+					.statusCode(500)
+					.message("Could not start scan")
+					.toEntity();
+		throw new NotImplementedException();
+	}
+
+	@PostMapping("/found-sensor-stations")
+	@PrincipalRequired(AccessPoint.class)
+	public RestResponseEntity foundSensorStations(
+			final AccessPoint accessPoint, @RequestBody final List<SensorStation> sensorStationList
+	) {
+		throw new NotImplementedException();
+	}
+
+	@PostMapping("/transfer-data")
+	@PrincipalRequired(AccessPoint.class)
+	public RestResponseEntity transferData(
+			@P("accessPoint") final AccessPoint accessPoint, @RequestBody final String data
 	) {
 		throw new NotImplementedException();
 	}
