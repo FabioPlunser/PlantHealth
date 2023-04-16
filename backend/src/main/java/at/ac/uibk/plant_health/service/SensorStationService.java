@@ -23,15 +23,6 @@ public class SensorStationService {
 	@Autowired
 	private PlantPersonReferenceRepository plantPersonReferenceRepository;
 
-	public SensorStation save(SensorStation sensorStation) {
-		try {
-			return sensorStationRepository.save(sensorStation);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
 	public List<SensorStation> findAll() {
 		return sensorStationRepository.findAll();
 	}

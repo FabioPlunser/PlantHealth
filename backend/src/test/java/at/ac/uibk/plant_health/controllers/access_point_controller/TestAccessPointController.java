@@ -71,7 +71,7 @@ public class TestAccessPointController {
 				.andExpectAll(status().is(401));
 
 		// unlock access point and try again
-		accessPointService.setUnlocked(false, accessPointId);
+		accessPointService.setUnlocked(true, accessPointId);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/register-access-point")
 								.param("accessPointId", String.valueOf(accessPointId))
@@ -110,7 +110,7 @@ public class TestAccessPointController {
 	}
 
 	@Test
-	void testSetLockAccessPoint() throws Exception {
+	void testSetUnlockAccessPoint() throws Exception {
 		Person person = createUserAndLogin(true);
 		UUID accessPointId = UUID.randomUUID();
 		accessPointService.register(accessPointId, "Office1");

@@ -136,8 +136,6 @@ public class AccessPointService {
 		}
 
 		if (unlocked) {
-			accessPoint.setAccessToken(null);
-		} else {
 			UUID token = accessPoint.getAccessToken();
 
 			if (token == null) {
@@ -145,23 +143,21 @@ public class AccessPointService {
 			}
 
 			accessPoint.setAccessToken(token);
-		}
-		else {
+		} else {
 			accessPoint.setAccessToken(null);
 		}
-		accessPoint.setUnlocked(!unlocked);
+		accessPoint.setUnlocked(unlocked);
 		return save(accessPoint) != null;
 	}
 
 	public boolean foundNewSensorStation(
 			AccessPoint accessPoint, List<SensorStation> sensorStationList
 	) {
-		// TODO
 		sensorStationList.forEach(sensorStation -> {
 			sensorStation.setAccessPoint(accessPoint);
 			sensorStationService.save(sensorStation);
 		});
-		accessPoint.setSensorStations(List.of(sensorStation));
+		accessPoint.setSensorStations(sensorStationList);
 		accessPoint.setScanActive(false);
 		return save(accessPoint) != null;
 	}
