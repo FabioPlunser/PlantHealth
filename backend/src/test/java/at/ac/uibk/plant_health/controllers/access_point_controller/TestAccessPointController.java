@@ -4,6 +4,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,8 +24,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.device.AccessPoint;
-import at.ac.uibk.plant_health.models.device.SensorStation;
-import at.ac.uibk.plant_health.models.plant.Sensor;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.repositories.AccessPointRepository;
@@ -46,6 +48,8 @@ public class TestAccessPointController {
 	private MockMvc mockMvc;
 	@Autowired
 	private AccessPointRepository accessPointRepository;
+
+	private ObjectMapper mapper = new ObjectMapper();
 
 	private Person createUserAndLogin(boolean alsoAdmin) {
 		String username = StringGenerator.username();
@@ -160,6 +164,35 @@ public class TestAccessPointController {
 								.header(HttpHeaders.AUTHORIZATION,
 										"{ \"token\":\"" + accessPoint.getAccessToken().toString()
 												+ "\"}")
+								.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(
+						status().isOk(), jsonPath("$.roomName").value(accessPoint.getRoomName())
+				);
+	}
+
+	@Test
+	void testFoundSensorStations() throws Exception {
+		UUID accessPointId = UUID.randomUUID();
+		accessPointService.register(accessPointId, "Office1");
+		accessPointService.setUnlocked(true, accessPointId);
+
+		AccessPoint accessPoint = accessPointRepository.findBySelfAssignedId(accessPointId).get();
+
+		ArrayNode sensorStations = mapper.createArrayNode();
+
+		for (int i = 0; i < 10; i++) {
+			ObjectNode sensorStation = mapper.createObjectNode();
+			sensorStation.put("bdAddress", StringGenerator.macAddress());
+			sensorStation.put("dipSwitchId", 255 - i);
+			sensorStations.addPOJO(sensorStation);
+		}
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/found-sensor-stations")
+								.header(HttpHeaders.USER_AGENT, "AccessPoint")
+								.header(HttpHeaders.AUTHORIZATION,
+										"{ \"token\":\"" + accessPoint.getAccessToken().toString()
+												+ "\"}")
+								.content(sensorStations.toString())
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 	}
