@@ -42,7 +42,7 @@ If this Query also results in 5XX then it should behave like it just got a 401 H
 - Request Body:
     ```json
         {
-            "id": "[INSERT-ACCESS-POINT-ID-HERE]",
+            "accessPointId": "[INSERT-ACCESS-POINT-ID-HERE]",
             "room_name": "[INSERT-ACCESS-POINT-ROOM-NAME-HERE]"
         }
     ```
@@ -78,35 +78,35 @@ If this Query also results in 5XX then it should behave like it just got a 401 H
         - Response Body:
             ```json
                 {
-                    "access-point": {
-                        "room-name": "[INSERT-ROOM-NAME-HERE]", (optional)
-                        "pairing-mode": [true or false],
-                        "transfer-interval": [INSERT-TRANSFER-INTERVAL-HERE]
-                    }
-                    "sensor-stations": [
+                    
+                    "room-name": "[INSERT-ROOM-NAME-HERE]", (optional)
+                    "pairingMode": [true or false],
+                    "transferInterval": [INSERT-TRANSFER-INTERVAL-HERE]
+                    
+                    "sensorStations": [
                         {
-                            "id": "[INSERT-SENSOR-STATION-ID-HERE]",
+                            "bdAddress": "[INSERT-SENSOR-STATION-ID-HERE]",
                             "sensors": [
                                 {
-                                    "sensor-name": "[INSERT-SENSOR-NAME-HERE]",
+                                    "sensorName": "[INSERT-SENSOR-NAME-HERE]",
                                     "limits": { 
-                                        "upper-limit": [INSERT-UPPER-LIMIT-HERE],
-                                        "lower-limit": [INSERT-LOWER-LIMIT-HERE]
+                                        "upperLimit": [INSERT-UPPER-LIMIT-HERE],
+                                        "lowerLimit": [INSERT-LOWER-LIMIT-HERE]
                                     },
-                                    "alarm-threshold-time": "[INSERT-THRESHOLD-TIME-HERE]"
+                                    "thresholdTime": "[INSERT-THRESHOLD-TIME-HERE]"
                                 },{
                                     "sensor-name": "[INSERT-SENSOR-NAME-HERE]",
                                     "limits": { 
-                                        "upper-limit": [INSERT-UPPER-LIMIT-HERE],
-                                        "lower-limit": [INSERT-LOWER-LIMIT-HERE]
+                                        "upperLimit": [INSERT-UPPER-LIMIT-HERE],
+                                        "lowerLimit": [INSERT-LOWER-LIMIT-HERE]
                                     },
-                                    "alarm-threshold-time": "[INSERT-THRESHOLD-TIME-HERE]"
+                                    "thresholdTime": "[INSERT-THRESHOLD-TIME-HERE]"
                                 },
                                 ...
                             ]
                         },
                         {
-                            "id": "[INSERT-SENSOR-STATION-ID-HERE]",
+                            "bdAddress": "[INSERT-SENSOR-STATION-ID-HERE]",
                             "sensors": [
                                 ...   
                             ]
@@ -138,7 +138,7 @@ If the Access Point finds a disconnected Sensor Station by scanning, Communicati
 > Transfer all Sensor Data that was collected by the Access Point from the Sensor Stations to the Backend.  
 > The Access Point can safely delete the Sensor Data after getting the Response from the Backend.
 
-- Endpoint: /ap/transfer-data
+- Endpoint: /transfer-data
 - Type: 
     - POST
 - No additional Headers
@@ -146,11 +146,11 @@ If the Access Point finds a disconnected Sensor Station by scanning, Communicati
 - Body:
     ```json
         {
-            "sensor-stations": [
+            "sensorStations": [
                 {
-                    "id": "[INSERT-SENSOR-STATION-1-ID]",
-                    "connection-alive": [true or false],
-                    "dip-switch": "[INSERT-DIP-SWITCH-ID-HERE]",
+                    "bdAddress": "[INSERT-SENSOR-STATION-1-ID]",
+                    "connectionAlive": [true or false],
+                    "dipSwitchId": "[INSERT-DIP-SWITCH-ID-HERE]",
                     "values": [
                         {
                             "timestamp": "[INSERT_TIME_STAMP_HERE]",
@@ -180,9 +180,9 @@ If the Access Point finds a disconnected Sensor Station by scanning, Communicati
                     ]
                 },
                 {
-                    "id": "[INSERT-SENSOR-STATION-2-ID]",
-                    "connection-alive": [true or false],
-                    "dip-switch": "[INSERT-DIP-SWITCH-ID-HERE]",
+                    "bdAddress": "[INSERT-SENSOR-STATION-2-ID]",
+                    "connectionAlive": [true or false],
+                    "dipSwitch": "[INSERT-DIP-SWITCH-ID-HERE]",
                     "values": [
                         ...
                     ],
@@ -210,7 +210,7 @@ The Data stored locally on the Access Point can safely be deleted  after a Respo
 
 > Called by the Access Point in Pairing Mode after finding one or more Sensor Stations.  
 
-- Endpoint: /ap/found-sensor-stations
+- Endpoint: /found-sensor-stations
 - Type: 
     - PUT
 - No additional Headers
@@ -218,14 +218,14 @@ The Data stored locally on the Access Point can safely be deleted  after a Respo
 - Body: 
     ```json
         {
-            "sensor-stations": [
+            "sensorStations": [
                 {
-                    "id": "[INSERT-FIRST-SENSOR-STATION-UUID-HERE]",
-                    "dip-switch": "[INSERT-DIP-SWITCH-ID-HERE]",
+                    "bdAddress": "[INSERT-FIRST-SENSOR-STATION-UUID-HERE]",
+                    "dipSwitchId": "[INSERT-DIP-SWITCH-ID-HERE]",
                 },
                 {
-                    "id": "[INSERT-FIRST-SENSOR-STATION-UUID-HERE]",
-                    "dip-switch": "[INSERT-DIP-SWITCH-ID-HERE]",
+                    "bdAddress": "[INSERT-FIRST-SENSOR-STATION-UUID-HERE]",
+                    "dipSwitch": "[INSERT-DIP-SWITCH-ID-HERE]",
                 },
                 ...
             ]
