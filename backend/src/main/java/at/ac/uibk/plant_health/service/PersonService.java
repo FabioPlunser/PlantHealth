@@ -1,5 +1,6 @@
 package at.ac.uibk.plant_health.service;
 
+import at.ac.uibk.plant_health.models.SensorStationPersonReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -160,7 +161,8 @@ public class PersonService {
 			if (permissions != null) person.setPermissions(permissions);
 			if (password != null) person.setPassword(password);
 
-			return save(person) != null;
+			person = save(person);
+			return true;
 		}
 
 		return false;
@@ -214,11 +216,6 @@ public class PersonService {
 	public List<SensorStation> getDashboardPlants(Person person) {
 		// TODO
 		return List.of();
-	}
-
-	public boolean addPlantToDashboard(Person person, SensorStation sensorStation) {
-		// TODO
-		return false;
 	}
 
 	public boolean removePlantToDashboard(Person person, SensorStation sensorStation) {

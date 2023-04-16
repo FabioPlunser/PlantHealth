@@ -21,15 +21,10 @@ public class Sensor {
 	private UUID sensor_id;
 
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
-	@Column(name = "sensor_type", nullable = false)
-	private SensorType type;
+	@Column(name = "sensor_type", nullable = false, unique = true)
+	private String type;
 
-	public enum SensorType {
-		EARTH_HUMIDITY,
-		AIR_QUALITY,
-		AIR_HUMIDITY,
-		AIR_PRESSURE,
-		TEMPERATURE,
-		LIGHT_INTENSITY;
+	public Sensor(String type) {
+		this.type = type;
 	}
 }

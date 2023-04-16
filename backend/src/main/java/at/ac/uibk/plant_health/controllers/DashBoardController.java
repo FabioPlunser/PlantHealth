@@ -1,6 +1,10 @@
 package at.ac.uibk.plant_health.controllers;
 
+import at.ac.uibk.plant_health.models.rest_responses.DashBoardDataResponse;
+import at.ac.uibk.plant_health.models.rest_responses.ListResponse;
+import at.ac.uibk.plant_health.repositories.PersonRepository;
 import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
@@ -9,10 +13,13 @@ import at.ac.uibk.plant_health.models.user.Person;
 
 @RestController
 public class DashBoardController {
+	@Autowired
+	private PersonRepository personRepository;
+
 	@PrincipalRequired(Person.class)
 	@GetMapping("/get-dashboard-data")
 	public RestResponseEntity getDashboardData(Person person) {
-		throw new NotImplementedException();
+		return new DashBoardDataResponse(person).toEntity();
 	}
 
 	@PrincipalRequired(Person.class)

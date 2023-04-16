@@ -1,9 +1,11 @@
 package at.ac.uibk.plant_health.service;
 
+import at.ac.uibk.plant_health.models.plant.SensorData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
@@ -11,11 +13,16 @@ import at.ac.uibk.plant_health.models.plant.PlantPicture;
 import at.ac.uibk.plant_health.models.plant.Sensor;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import at.ac.uibk.plant_health.repositories.*;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SensorStationService {
 	@Autowired
 	private SensorStationRepository sensorStationRepository;
+	@Autowired
+	private SensorDataRepository sensorDataRepository;
+	@Autowired
+	private SensorRepository sensorRepository;
 
 	@Autowired
 	private PlantPictureRepository plantPictureRepository;
@@ -68,5 +75,26 @@ public class SensorStationService {
 	public boolean createQrCode(UUID qrCodeId) {
 		// TODO
 		return false;
+	}
+
+	@Transactional
+	public boolean addSensorData(SensorStation sensorStation, SensorData data) {
+		if (data == null || sensorStation == null)
+			return false;
+
+		Sensor sensor = data.getSensor();
+		Optional<Sensor> maybeSensor = sensorRepository.findByType(sensor.getType());
+		if (maybeSensor.isPresent()) {
+			sensor = maybeSensor.get();
+		} else {
+			sensor = sensorRepository.save(sensor);
+		}
+
+		data.setSensor(sensor);
+
+		data.setSensorStation(sensorStation);
+		this.sensorDataRepository.save(data);
+
+		return true;
 	}
 }
