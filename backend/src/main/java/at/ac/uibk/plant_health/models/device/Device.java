@@ -41,10 +41,6 @@ public abstract class Device implements UserDetails, IdentifiedEntity {
 	@JdbcTypeCode(SqlTypes.BOOLEAN)
 	@Column(name = "is_deleted", nullable = false)
 	private boolean isDeleted = false;
-
-	public Device(UUID deviceId) {
-		this.deviceId = deviceId;
-	}
 	// endregion
 
 	// region equals, hashCode, toString

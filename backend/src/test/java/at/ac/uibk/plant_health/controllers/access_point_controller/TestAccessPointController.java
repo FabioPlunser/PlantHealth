@@ -20,6 +20,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.device.AccessPoint;
+import at.ac.uibk.plant_health.models.device.SensorStation;
+import at.ac.uibk.plant_health.models.plant.Sensor;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.repositories.AccessPointRepository;
@@ -57,6 +59,7 @@ public class TestAccessPointController {
 		return (Person
 		) MockAuthContext.setLoggedInUser(personService.login(username, password).orElse(null));
 	}
+
 	@Test
 	void testAccessPointRegister() throws Exception {
 		UUID accessPointId = UUID.randomUUID();
@@ -68,7 +71,7 @@ public class TestAccessPointController {
 				.andExpectAll(status().is(401));
 
 		// unlock access point and try again
-		accessPointService.setLocked(false, accessPointId);
+		accessPointService.setUnlocked(true, accessPointId);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/register-access-point")
 								.param("accessPointId", String.valueOf(accessPointId))
@@ -114,12 +117,12 @@ public class TestAccessPointController {
 
 		// testing
 		// unlock access point
-		mockMvc.perform(MockMvcRequestBuilders.post("/set-lock-access-point")
+		mockMvc.perform(MockMvcRequestBuilders.post("/set-unlocked-access-point")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(person))
 								.param("accessPointId", String.valueOf(accessPointId))
-								.param("locked", "false")
+								.param("unlocked", "true")
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
@@ -142,5 +145,22 @@ public class TestAccessPointController {
 						status().isOk(), jsonPath("$.token").exists(),
 						jsonPath("$.token").value(accessPoint.getAccessToken().toString())
 				);
+	}
+
+	@Test
+	void testGetAccessPointConfig() throws Exception {
+		UUID accessPointId = UUID.randomUUID();
+		accessPointService.register(accessPointId, "Office1");
+		accessPointService.setUnlocked(true, accessPointId);
+
+		AccessPoint accessPoint = accessPointRepository.findBySelfAssignedId(accessPointId).get();
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/get-access-point-config")
+								.header(HttpHeaders.USER_AGENT, "AccessPoint")
+								.header(HttpHeaders.AUTHORIZATION,
+										"{ \"token\":\"" + accessPoint.getAccessToken().toString()
+												+ "\"}")
+								.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
 	}
 }

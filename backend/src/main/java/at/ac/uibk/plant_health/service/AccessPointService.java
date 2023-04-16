@@ -17,6 +17,8 @@ import at.ac.uibk.plant_health.repositories.AccessPointRepository;
 public class AccessPointService {
 	@Autowired
 	private AccessPointRepository accessPointRepository;
+	@Autowired
+	private SensorStationService sensorStationService;
 
 	public List<AccessPoint> findAllAccessPoints() {
 		return accessPointRepository.findAll();
@@ -104,17 +106,12 @@ public class AccessPointService {
 		}
 	}
 
-	public boolean startScan(AccessPoint accessPoint) {
-		// TODO
-		return false;
-	}
-
 	public UUID getAccessPointAccessToken(UUID accessPointId) {
 		AccessPoint accessPoint = getAccessPoint(accessPointId);
 		return accessPoint.getAccessToken();
 	}
 
-	public boolean setLocked(boolean locked, UUID accessPointId) {
+	public boolean setUnlocked(boolean unlocked, UUID accessPointId) {
 		AccessPoint accessPoint = null;
 		try {
 			accessPoint = getAccessPoint(accessPointId);
@@ -122,9 +119,7 @@ public class AccessPointService {
 			return false;
 		}
 
-		if (locked) {
-			accessPoint.setAccessToken(null);
-		} else {
+		if (unlocked) {
 			UUID token = accessPoint.getAccessToken();
 
 			if (token == null) {
@@ -132,15 +127,22 @@ public class AccessPointService {
 			}
 
 			accessPoint.setAccessToken(token);
+		} else {
+			accessPoint.setAccessToken(null);
 		}
-		accessPoint.setUnlocked(!locked);
-		// TODO: Save AccessPoint
+		accessPoint.setUnlocked(unlocked);
 		return save(accessPoint) != null;
 	}
 
-	public boolean foundNewSensorStation(AccessPoint accessPoint, SensorStation sensorStation) {
-		// TODO
-		return false;
+	public boolean foundNewSensorStation(
+			AccessPoint accessPoint, List<SensorStation> sensorStationList
+	) {
+		for (SensorStation sensorStation : sensorStationList) {
+			sensorStation.setAccessPoint(accessPoint);
+			sensorStationService.save(sensorStation);
+		}
+		accessPoint.setSensorStations(sensorStationList);
+		return save(accessPoint) != null;
 	}
 
 	public boolean reconnectedToSensorStation(

@@ -43,4 +43,11 @@ public class SensorData {
 	@JdbcTypeCode(SqlTypes.BOOLEAN)
 	@Column(name = "is_deleted", nullable = false)
 	private boolean isDeleted = false;
+
+	@Override
+	public String toString() {
+		return "SensorData [timeStamp=" + timeStamp + ", value=" + value
+				+ ", aboveLimit=" + aboveLimit + ", belowLimit=" + belowLimit + ", sensor=" + sensor
+				+ ", sensorStation=" + sensorStation + ", isDeleted=" + isDeleted + "]";
+	}
 }

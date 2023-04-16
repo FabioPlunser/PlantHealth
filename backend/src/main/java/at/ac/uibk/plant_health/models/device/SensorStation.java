@@ -1,5 +1,7 @@
 package at.ac.uibk.plant_health.models.device;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.security.core.GrantedAuthority;
@@ -38,17 +40,18 @@ public class SensorStation extends Device {
 	@Column(name = "dip_switch_id", nullable = false)
 	private int dipSwitchId;
 
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "access_point_id")
 	private AccessPoint accessPoint;
 
-	@OneToMany(mappedBy = "sensorStation")
+	@OneToMany(mappedBy = "sensorStation", fetch = FetchType.EAGER)
 	private List<SensorStationPersonReference> sensorStationPersonReferences = new ArrayList<>();
 
-	@OneToMany(mappedBy = "sensorStation")
+	@OneToMany(mappedBy = "sensorStation", fetch = FetchType.EAGER)
 	private List<SensorData> sensorData = new ArrayList<>();
 
-	@OneToMany(mappedBy = "sensorStation")
+	@OneToMany(mappedBy = "sensorStation", fetch = FetchType.EAGER)
 	private List<SensorLimits> sensorLimits = new ArrayList<>();
 
 	@Override
@@ -60,5 +63,13 @@ public class SensorStation extends Device {
 		super();
 		this.bdAddress = bdAddress;
 		this.dipSwitchId = dipSwitchId;
+	}
+
+	@Override
+	public String toString() {
+		return "SensorStation [bdAddress=" + bdAddress + ", name=" + name + ", qrCodeId=" + qrCodeId
+				+ ", dipSwitchId=" + dipSwitchId + ", accessPoint=" + accessPoint
+				+ ", sensorStationPersonReferences=" + sensorStationPersonReferences
+				+ ", sensorData=" + sensorData + ", sensorLimits=" + sensorLimits + "]";
 	}
 }
