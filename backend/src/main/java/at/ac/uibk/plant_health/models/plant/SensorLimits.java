@@ -1,5 +1,7 @@
 package at.ac.uibk.plant_health.models.plant;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -21,13 +23,20 @@ public class SensorLimits {
 	@JdbcTypeCode(SqlTypes.TIMESTAMP)
 	private LocalDateTime timeStamp;
 
-	@JdbcTypeCode(SqlTypes.BOOLEAN)
-	@Column(name = "above_limit", nullable = false)
-	private boolean aboveLimit;
+	@JdbcTypeCode(SqlTypes.FLOAT)
+	@Column(name = "upper_limit", nullable = false)
+	private float upperLimit;
 
-	@JdbcTypeCode(SqlTypes.BOOLEAN)
-	@Column(name = "below_limit", nullable = false)
-	private boolean belowLimit;
+	@JdbcTypeCode(SqlTypes.FLOAT)
+	@Column(name = "lower_limit", nullable = false)
+	private float lowerLimit;
+
+	/**
+	 * in seconds
+	 */
+	@JdbcTypeCode(SqlTypes.FLOAT)
+	@Column(name = "threshold_duration", nullable = false)
+	private int thresholdDuration;
 
 	@ManyToOne
 	@JoinColumn(name = "sensor_type", nullable = false)
@@ -37,6 +46,7 @@ public class SensorLimits {
 	@JoinColumn(name = "gardener_id", nullable = false)
 	private Person gardener;
 
+	@JsonIgnore
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "sensor_station_id", nullable = false)
 	private SensorStation sensorStation;
@@ -44,4 +54,11 @@ public class SensorLimits {
 	@JdbcTypeCode(SqlTypes.BOOLEAN)
 	@Column(name = "is_deleted", nullable = false)
 	private boolean isDeleted = false;
+
+	@Override
+	public String toString() {
+		return "SensorLimits [timeStamp=" + timeStamp + ", aboveLimit=" + upperLimit
+				+ ", belowLimit=" + lowerLimit + ", sensor=" + sensor + ", gardener=" + gardener
+				+ ", sensorStation=" + sensorStation + ", isDeleted=" + isDeleted + "]";
+	}
 }

@@ -7,12 +7,15 @@ import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+import java.util.*;
 
 import at.ac.uibk.plant_health.models.annotations.AnyPermission;
 import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
 import at.ac.uibk.plant_health.models.annotations.PublicEndpoint;
 import at.ac.uibk.plant_health.models.device.AccessPoint;
+import at.ac.uibk.plant_health.models.device.SensorStation;
+import at.ac.uibk.plant_health.models.plant.Sensor;
+import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.rest_responses.*;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.service.AccessPointService;
@@ -56,14 +59,14 @@ public class AccessPointController {
 
 	@AnyPermission(Permission.ADMIN)
 	@RequestMapping(
-			value = "/set-lock-access-point", method = {RequestMethod.POST, RequestMethod.PUT}
+			value = "/set-unlocked-access-point", method = {RequestMethod.POST, RequestMethod.PUT}
 	)
 	public RestResponseEntity
 	setLockAccessPoint(
 			@RequestParam(name = "accessPointId") final UUID accessPointId,
-			@RequestParam(name = "locked") final boolean locked
+			@RequestParam(name = "unlocked") final boolean unlocked
 	) {
-		if (!accessPointService.setLocked(locked, accessPointId)) {
+		if (!accessPointService.setUnlocked(unlocked, accessPointId)) {
 			return MessageResponse.builder()
 					.statusCode(404)
 					.message("Could not set lock state of AccessPoint")
@@ -79,17 +82,40 @@ public class AccessPointController {
 	@GetMapping("/get-access-point-config")
 	@PrincipalRequired(AccessPoint.class)
 	public RestResponseEntity getAccessPointConfig(AccessPoint accessPoint) {
+		if (accessPointService.isUnlocked(accessPoint.getSelfAssignedId())) {
+			System.out.println(accessPoint.getSensorStations());
+			return new AccessPointConfigResponse(accessPoint).toEntity();
+		}
+
 		return MessageResponse.builder()
 				.statusCode(200)
 				.message("Successfully send AccessPoint config")
 				.toEntity();
 	}
-	@AnyPermission(Permission.ADMIN)
-	@PostMapping("/scan-for-sensor-stations")
-	public RestResponseEntity scanForSensorStations(
-			//            @RequestBody final UUID accessPointId
+
+	@WriteOperation
+	@PutMapping("/found-sensor-stations")
+	@PrincipalRequired(AccessPoint.class)
+	public RestResponseEntity foundSensorStations(
+			AccessPoint accessPoint, @RequestBody final List<SensorStation> sensorStations
 	) {
-		throw new NotImplementedException();
+		if (!accessPointService.isUnlocked(accessPoint.getSelfAssignedId())) {
+			return MessageResponse.builder()
+					.statusCode(403)
+					.message("AccessPoint is locked")
+					.toEntity();
+		}
+		if (accessPointService.foundNewSensorStation(accessPoint, sensorStations)) {
+			return MessageResponse.builder()
+					.statusCode(200)
+					.message("Successfully found new SensorStations")
+					.toEntity();
+		}
+
+		return MessageResponse.builder()
+				.statusCode(500)
+				.message("Internal server Error")
+				.toEntity();
 	}
 
 	@AnyPermission(Permission.ADMIN)

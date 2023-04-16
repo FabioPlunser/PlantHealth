@@ -1,8 +1,5 @@
 package at.ac.uibk.plant_health.service;
 
-import at.ac.uibk.plant_health.models.plant.PlantPicture;
-import at.ac.uibk.plant_health.models.plant.SensorLimits;
-import at.ac.uibk.plant_health.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +7,9 @@ import java.util.List;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
+import at.ac.uibk.plant_health.models.plant.PlantPicture;
+import at.ac.uibk.plant_health.models.plant.SensorLimits;
+import at.ac.uibk.plant_health.repositories.*;
 
 @Service
 public class SensorStationService {
@@ -24,6 +24,14 @@ public class SensorStationService {
 
 	public List<SensorStation> findAll() {
 		return sensorStationRepository.findAll();
+	}
+
+	public SensorStation save(SensorStation sensorStation) {
+		try {
+			return sensorStationRepository.save(sensorStation);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public List<String> getPlantPictures(SensorStation plant) {
