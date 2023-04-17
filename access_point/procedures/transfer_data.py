@@ -21,7 +21,7 @@ def transfer_data(config: Config) -> None:
     # get data
     log.info('Collecting data for transfer to backend')
     try:
-        station_data = database.get_all_connection_states()
+        station_data = database.get_all_states()
         measurements = database.get_all_measurements()
     except DatabaseError as e:
         log.error(f'Unable to load data from database: {e}')

@@ -96,7 +96,7 @@ def get_config(config: Config) -> None:
                     # update limits for each sensor
                     log.info(f'Adjusting limits for sensor {sensor.get("sensor_name")}')
                     try:
-                        database.update_sensor_setting(sensor_station_address=address,
+                        database.update_limits(sensor_station_address=address,
                                                        **sensor)
                     except DatabaseError as e:
                         log.error(f'Unable to update setting for sensor {sensor} on sensor station {adr} in database: {e}')    

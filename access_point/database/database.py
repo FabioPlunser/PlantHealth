@@ -199,7 +199,7 @@ class Database:
         cursor.execute(query, (sensor_station_address,))
     
     @_with_connection
-    def update_sensor_setting(self,
+    def update_limits(self,
                               sensor_station_address: str,
                               sensor_name: str,
                               lower_limit: Optional[float] = None,
@@ -329,7 +329,7 @@ class Database:
                 s.lower_limit,
                 s.upper_limit,
                 s.alarm_tripping_time,
-                COALESCE(s.last_inside_limits, st.timestamp_added)
+                s.last_inside_limits
             FROM sensor_station st
                 LEFT OUTER JOIN (
                     SELECT *
@@ -343,19 +343,19 @@ class Database:
         cursor.execute(query, (sensor_name, sensor_station_address))
         (lower_limit, upper_limit, alarm_tripping_time, last_inside_limits) = cursor.fetchone()
         alarm_tripping_time = timedelta(seconds=alarm_tripping_time) if alarm_tripping_time else None
-        last_inside_limits = datetime.fromisoformat(last_inside_limits)
+        last_inside_limits = datetime.fromisoformat(last_inside_limits) if last_inside_limits else None
         return lower_limit, upper_limit, alarm_tripping_time, last_inside_limits
     
     @_with_connection
-    def get_all_connection_states(self) -> dict[str, dict[str, Union[bool, Optional[int]]]]:
+    def get_all_states(self) -> dict[str, dict[str, Union[bool, Optional[int]]]]:
         """
-        Gets the connection states of all known sensor stations and their currently set DIP ids
+        Gets the states of all known sensor stations
         :return: A dictionary with the sensor station addresses as keys and subordinated dictionaries:
             {
                 'connection_alive': 'True' if the connection is alive, 'False' if not -> bool
                 'dip_id': Integer encoded DIP switch position -> int
             }
-        :raises DatabaseError: If the connection states could not be retrieved from the database
+        :raises DatabaseError: If the states could not be retrieved from the database
         """
         query = """
             SELECT address, connection_alive, dip_id
