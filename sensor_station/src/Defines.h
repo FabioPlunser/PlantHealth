@@ -1,13 +1,38 @@
 #ifndef GENERAL_PURPOSE_DEFINITIONS
 #define GENERAL_PURPOSE_DEFINITIONS
 
-/* If DO_TEST is defined the hardware tests will be executet to test all the
- connected devices of the Arduino. Otherwise the main programm will be flashed
- onto the arduino.
-	DO_MAIN Will execute the main program.
+// ----- Functions ----- //
+
+#define ERROR_PRINT(text, value) \
+	Serial.print(__func__);      \
+	Serial.print(" -> ");        \
+	Serial.print(text);          \
+	Serial.println(value);
+
+// ----- Error handling functions ----- //
+
+#define TRUE  1
+#define FALSE 0
+
+/* If DO_HARDWARE_TEST is defined the hardware tests will be executet to test
+ all the connected devices of the Arduino. Otherwise the main programm will be
+ flashed onto the arduino. DO_MAIN will execute the main program. DO_BLE_TEST
+ will initialize a connection and send values to it
 */
 // #define DO_HARDWARE_TEST
 #define DO_MAIN
+// #define DO_BLE_TEST
+
+/* If USE_DESCRIPTORS is true ble.cpp will use descriptors. Otherwise it will
+ * use more services.
+ */
+#define USE_DESCRIPTORS				  FALSE
+
+/**
+ * If this value is true it will output the time it takes to read the sensor
+ * values to the Serial.
+ */
+#define PRINT_TIME_READ_SENSOR		  TRUE
 
 // Definition of boundary values
 #define ANALOG_READ_MAX_VALUE		  1023

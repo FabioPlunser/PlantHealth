@@ -34,5 +34,13 @@ void set_battery_level_status(battery_level_status_t);
 void set_dip_switch_id(uint8_t);
 
 string get_address();
+void setTestValues();
+void clearAllFlags();
+void set_sensorstation_locked_status(bool locked);
+void set_dip_switch_id(uint8_t id);
+void set_sensorstation_id(uint8_t id);
+void set_battery_level_status(battery_level_status_t battery_level_status);
+uint8_t get_sensor_data_read_flag();
+
 
 #endif
