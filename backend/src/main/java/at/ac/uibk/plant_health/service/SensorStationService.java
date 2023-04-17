@@ -61,8 +61,7 @@ public class SensorStationService {
 	}
 
 	public List<SensorStation> findAllPlants() {
-		// TODO
-		return List.of();
+		return this.sensorStationRepository.findByIsUnlockedAndIsDeleted(true, false);
 	}
 
 	public boolean setSensorLimits(List<SensorLimits> sensorLimits) {
