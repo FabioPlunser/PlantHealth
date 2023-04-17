@@ -101,7 +101,7 @@ bool setSensorValuesInBLE() {
 #if PRINT_TIME_READ_SENSOR
 	char buffer[16];
 	Serial.print("Time taken to read sensor values: ");
-	sprintf(buffer, "%.3f.", float(startTime - millis()) / 1000);
+	sprintf(buffer, "%.3f.", float(millis() - startTime) / 1000);
 	Serial.println(buffer);
 #endif
 
