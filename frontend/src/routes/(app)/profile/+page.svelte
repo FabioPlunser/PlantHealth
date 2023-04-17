@@ -19,7 +19,12 @@
 <h1>Profile</h1>
 
 <section class="w-full">
-  <form method="POST" class="flex justify-center" use:enhance>
+  <form
+    method="POST"
+    action="?/profile"
+    class="flex justify-center"
+    use:enhance
+  >
     <div class="w-full max-w-md">
       <Input
         type="text"

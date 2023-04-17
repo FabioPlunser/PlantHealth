@@ -1,3 +1,4 @@
+import type { Actions } from "./$types";
 import { fail } from "@sveltejs/kit";
 import { z } from "zod";
 
@@ -17,7 +18,7 @@ const schema = z.object({
 });
 
 export const actions = {
-  default: async ({ request }) => {
+  profile: async ({ request }) => {
     const formData = await request.formData();
     const zodData = schema.safeParse(Object.fromEntries(formData));
     if (!zodData.success) {
@@ -32,10 +33,10 @@ export const actions = {
       return fail(400, { error: true, errors });
     }
   },
-};
+} satisfies Actions;
 
 export async function load({ params, url }) {
-  //let userId = url.searchParams.get("userId");
+  let userId = url.searchParams.get("userId");
 
   // TODO: fetch proper backend endpoint
   let username: string = "Sakura";
