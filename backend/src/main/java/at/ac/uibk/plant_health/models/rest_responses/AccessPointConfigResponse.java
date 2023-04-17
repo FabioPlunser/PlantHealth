@@ -54,7 +54,7 @@ public class AccessPointConfigResponse extends RestResponse implements Serializa
 			private int alarmThresholdTime;
 
 			public SensorInfo(SensorLimits sensorLimits) {
-				this.sensorName = sensorLimits.getSensor().getType().name();
+				this.sensorName = sensorLimits.getSensor().getType();
 				this.limits =
 						new Limits(sensorLimits.getLowerLimit(), sensorLimits.getUpperLimit());
 				this.alarmThresholdTime = sensorLimits.getThresholdDuration();

@@ -15,4 +15,8 @@ public interface SensorStationRepository extends CrudRepository<SensorStation, U
 
 	@Override
 	Optional<SensorStation> findById(UUID deviceId);
+
+	List<SensorStation> findByIsUnlockedAndIsDeleted(boolean isUnlocked, boolean isDeleted);
+
+
 }

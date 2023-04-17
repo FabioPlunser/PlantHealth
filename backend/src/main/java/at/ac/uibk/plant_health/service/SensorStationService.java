@@ -34,6 +34,10 @@ public class SensorStationService {
 		return sensorStationRepository.findAll();
 	}
 
+	public List<SensorStation> findLocked() {
+		return sensorStationRepository.findByIsUnlockedAndIsDeleted(false, false);
+	}
+
 	public SensorStation save(SensorStation sensorStation) {
 		try {
 			return sensorStationRepository.save(sensorStation);
