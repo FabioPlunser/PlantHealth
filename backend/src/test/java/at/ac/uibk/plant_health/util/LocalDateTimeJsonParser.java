@@ -19,7 +19,7 @@ public class LocalDateTimeJsonParser extends BaseMatcher<LocalDateTime> {
     }
 
     public LocalDateTimeJsonParser(LocalDateTime from, TemporalAmount diff) {
-        this.from = from;
+        this.from = from.minus(diff);
         this.to = from.plus(diff);
     }
 
@@ -35,7 +35,7 @@ public class LocalDateTimeJsonParser extends BaseMatcher<LocalDateTime> {
 
     @Override
     public void describeTo(Description description) {
-        description.appendText(String.format("All DateTime fields from %s to %s, mismatch at index %d",
-                from, to, misMatchAtIndex));
+        description.appendText(String.format("LocalDateTime between %s and %s",
+                from, to));
     }
 }

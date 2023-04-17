@@ -1,5 +1,6 @@
 package at.ac.uibk.plant_health.controllers;
 
+import at.ac.uibk.plant_health.models.rest_responses.LogResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,9 +24,8 @@ public class LogController {
 			@RequestParam("start") final LocalDateTime start,
 			@RequestParam("end") final LocalDateTime end
 	) {
-		return ListResponse.<Log>builder()
-				.ok()
-				.items(logService.findBetween(start, end))
-				.toEntity();
+		return new LogResponse(logService.findBetween(start, end)).toEntity();
 	}
+
+
 }

@@ -47,6 +47,8 @@ public class TestDashBoardController {
     @Autowired
     private MockMvc mockMvc;
 
+    private static final int TIME_TOLERANCE = 1;
+
     private Person createUserAndLogin(boolean alsoAdmin) {
         String username = StringGenerator.username();
         String password = StringGenerator.password();
@@ -141,10 +143,10 @@ public class TestDashBoardController {
                         jsonPath("$.plants[0].values[2]").doesNotExist(),
 
                         jsonPath("$.plants[0].values[0].timestamp").value(
-                                LocalDateTimeJsonParser.equalsWithTolerance(data1.getTimeStamp(), Duration.ofSeconds(1))
+                                LocalDateTimeJsonParser.equalsWithTolerance(data1.getTimeStamp(), Duration.ofSeconds(TIME_TOLERANCE))
                         ),
                         jsonPath("$.plants[0].values[1].timestamp").value(
-                                LocalDateTimeJsonParser.equalsWithTolerance(data2.getTimeStamp(), Duration.ofSeconds(1))
+                                LocalDateTimeJsonParser.equalsWithTolerance(data2.getTimeStamp(), Duration.ofSeconds(TIME_TOLERANCE))
                         ),
 
                         jsonPath("$.plants[0].values[0].sensors").isArray(),

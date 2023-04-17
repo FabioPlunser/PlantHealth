@@ -15,11 +15,12 @@ public class LogService {
 	private LogRepository logRepository;
 
 	public List<Log> findBetween(LocalDateTime start, LocalDateTime end) {
-		return logRepository.findByTimeStampBetween(start, end);
+		return logRepository.findByTimeStampBetween(end, start);
 	}
 
 	public boolean log(Log log) {
 		try {
+			log.setTimeStamp(LocalDateTime.now());
 			this.logRepository.save(log);
 			return true;
 		} catch (Exception e) {
