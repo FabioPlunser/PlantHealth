@@ -1,0 +1,5 @@
+[run]
+command_line = -m pytest
+source = .
+branch = True
+omit = *test*,*__init__.py,./venv/*
