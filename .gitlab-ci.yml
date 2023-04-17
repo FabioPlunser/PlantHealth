@@ -1,22 +1,25 @@
-image: alpine:3.17
+
 
 stages: # List of stages for jobs, and their order of execution
   - test
   - sonarCheck
+  - deployBackend
 
 .before_script_template:
   before_script:
     - apk add --update maven
 
 unit-test-job: # This job runs in the test stage.
+  image: alpine:3.17
   extends: .before_script_template
   stage: test
   script:
     - echo "Running unit tests..."
     - cd backend && mvn test
-  allow_failure: true
+  allow_failure: false
 
 sonarqube-check:
+  image: alpine:3.17
   extends: .before_script_template
   stage: sonarCheck
   variables:
@@ -32,3 +35,17 @@ sonarqube-check:
     - echo Running sonar analysis for ${SONAR_PROJECT_KEY}
     - cd backend && mvn -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.projectName="${CI_PROJECT_NAME} ${GITLAB_USER_NAME}" --fail-at-end verify sonar:sonar
   allow_failure: true
+
+deploy-backend:
+  tags:
+    - java
+    - gradle
+  image: hmajid2301/dind-docker-compose
+  stage: deployBackend
+  script: 
+    - echo "Start with 'make prod'"
+    - make prod
+  allow_failure: false
+  only: 
+    refs:
+      - dev-backend 
