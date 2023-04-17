@@ -86,7 +86,7 @@ class Server:
         :param endpoint: The endpoint for which the full URL is wanted
         :return: Full URL of the endpoint
         """
-        return urljoin(self.address, f'api/{endpoint}')
+        return urljoin(self.address, f'ap/{endpoint}')
 
     def register(self, id: str, room_name: str) -> str:
         """
@@ -101,8 +101,8 @@ class Server:
         try:
             response = self._client.post(
                 self._get_endpoint_url('register'),
-                json={'id': id,
-                      'room_name': room_name}
+                json={'accessPointId': id,
+                      'roomName': room_name}
             )
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
             raise ConnectionError(f'Request timed out: {e}')
@@ -166,29 +166,26 @@ class Server:
         content =  response.json()
 
         # construct and validate config
-        raw_config = content.get('access-point')
-        if raw_config is None: raw_config = {}
-        if not isinstance(raw_config, dict): raise ConnectionError('Did not received a valid configuration')
         config = {}
-        if isinstance(raw_config.get('room-name'), str):
-            config['room_name'] = str(raw_config.pop('room-name'))
-        if isinstance(raw_config.get('pairing-mode'), bool):
-            config['scan_active'] = bool(raw_config.pop('pairing-mode'))
-        if isinstance(raw_config.get('transfer-interval'), int):
-            config['transfer_data_interval'] = int(raw_config.pop('transfer-interval'))
+        if isinstance(content.get('roomName'), str):
+            config['room_name'] = str(content.pop('roomName'))
+        if isinstance(content.get('pairingMode'), bool):
+            config['scan_active'] = bool(content.pop('pairingMode'))
+        if isinstance(content.get('transferInterval'), int):
+            config['transfer_data_interval'] = int(content.pop('transferInterval'))
 
         # construct and validate sensor station data
-        raw_sensor_stations = content.get('sensor-stations')
+        raw_sensor_stations = content.get('sensorStations')
         if raw_sensor_stations is None: raw_sensor_stations = []
         if not isinstance(raw_sensor_stations, list): raise ConnectionError('Did not receive a valid sensor station list')
         sensor_stations = []
         for raw_sensor_station in raw_sensor_stations:
             sensor_station = {}
             if not isinstance(raw_sensor_station, dict): raise ConnectionError('Sensor stations not described as expected')
-            if not isinstance(raw_sensor_station.get('id'), str):
+            if not isinstance(raw_sensor_station.get('bdAddress'), str):
                 raise ConnectionError('Sensor stations not described as expected')
             else:
-                sensor_station['address'] = raw_sensor_station.get('id')
+                sensor_station['address'] = raw_sensor_station.get('bdAddress')
             if not isinstance(raw_sensor_station.get('sensors'), list):
                 if raw_sensor_station.get('sensors'):
                     raw_sensor_station.pop('sensors')
@@ -197,17 +194,17 @@ class Server:
                 for raw_sensor in raw_sensor_station.get('sensors'):
                     sensor = {}
                     if not isinstance(raw_sensor, dict): continue
-                    if not isinstance(raw_sensor.get('sensor-name'), str):
+                    if not isinstance(raw_sensor.get('sensorName'), str):
                         continue
                     else:
-                        sensor['sensor_name'] = str(raw_sensor.get('sensor-name'))
+                        sensor['sensor_name'] = str(raw_sensor.get('sensorName'))
                     if isinstance(raw_sensor.get('limits'), dict):        
-                        if isinstance(raw_sensor['limits'].get('lower-limit'), float) or isinstance(raw_sensor['limits'].get('lower-limit'), int):
-                            sensor['lower_limit'] = int(raw_sensor['limits'].get('lower-limit'))
-                        if isinstance(raw_sensor['limits'].get('upper-limit'), float) or isinstance(raw_sensor['limits'].get('upper-limit'), int):
-                            sensor['upper_limit'] = int(raw_sensor['limits'].get('upper-limit'))
-                    if isinstance(raw_sensor.get('alarm-threshold-time'), int):
-                        sensor['alarm_tripping_time'] = int(raw_sensor.get('alarm-threshold-time'))
+                        if isinstance(raw_sensor['limits'].get('lowerLimit'), float) or isinstance(raw_sensor['limits'].get('lowerLimit'), int):
+                            sensor['lower_limit'] = int(raw_sensor['limits'].get('lowerLimit'))
+                        if isinstance(raw_sensor['limits'].get('upperLimit'), float) or isinstance(raw_sensor['limits'].get('upperLimit'), int):
+                            sensor['upper_limit'] = int(raw_sensor['limits'].get('upperLimit'))
+                    if isinstance(raw_sensor.get('thresholdTime'), int):
+                        sensor['alarm_tripping_time'] = int(raw_sensor.get('thresholdTime'))
                     sensor_station['sensors'].append(sensor)
             sensor_stations.append(sensor_station)
 
@@ -239,8 +236,8 @@ class Server:
         """
         # setup entries for each known sensor station
         data = [{'id': adr,
-                 'connection-alive': status.get('connection_alive'),
-                 'dip-switch': status.get('dip_id')}
+                 'connectionAlive': status.get('connection_alive'),
+                 'dipSwitch': status.get('dip_id')}
                  for adr, status in station_data.items()]
 
         # assign measurements to single sensor stations
@@ -265,7 +262,7 @@ class Server:
         try:
             response = self._client.post(
                 self._get_endpoint_url('transfer-data'),
-                json={'sensor-stations': data}
+                json={'sensorStations': data}
             )
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
             raise ConnectionError(f'Request timed out: {e}')
@@ -290,9 +287,9 @@ class Server:
         try:
             response = self._client.put(
                 self._get_endpoint_url('found-sensor-stations'),
-                json={
-                    'sensor-stations': sensor_stations
-                }
+                json={'sensorStations': [{'bdAddress': station.get('address'),
+                                          'dipSwitch': station.get('dip-switch')}
+                                          for station in sensor_stations]}
             )
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
             raise ConnectionError(f'Request timed out: {e}')
