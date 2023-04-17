@@ -43,8 +43,8 @@ deploy-backend:
   image: hmajid2301/dind-docker-compose
   stage: deployBackend
   script: 
-    - echo "Start with 'make prod'"
-    - make prod
+    - echo "Run docker-compose "
+    - docker compose up --build
   allow_failure: false
   only: 
     refs:
