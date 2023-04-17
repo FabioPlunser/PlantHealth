@@ -1,8 +1,8 @@
 package at.ac.uibk.plant_health.service;
 
-import at.ac.uibk.plant_health.models.plant.SensorData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,9 +11,9 @@ import java.util.UUID;
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.plant.PlantPicture;
 import at.ac.uibk.plant_health.models.plant.Sensor;
+import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import at.ac.uibk.plant_health.repositories.*;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SensorStationService {
@@ -87,8 +87,7 @@ public class SensorStationService {
 
 	@Transactional
 	public boolean addSensorData(SensorStation sensorStation, SensorData data) {
-		if (data == null || sensorStation == null)
-			return false;
+		if (data == null || sensorStation == null) return false;
 
 		Sensor sensor = data.getSensor();
 		Optional<Sensor> maybeSensor = sensorRepository.findByType(sensor.getType());

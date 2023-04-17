@@ -1,6 +1,5 @@
 package at.ac.uibk.plant_health.controllers;
 
-import at.ac.uibk.plant_health.models.rest_responses.LogResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,6 +8,7 @@ import java.time.LocalDateTime;
 import at.ac.uibk.plant_health.models.Log;
 import at.ac.uibk.plant_health.models.annotations.AnyPermission;
 import at.ac.uibk.plant_health.models.rest_responses.ListResponse;
+import at.ac.uibk.plant_health.models.rest_responses.LogResponse;
 import at.ac.uibk.plant_health.models.rest_responses.RestResponseEntity;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.service.LogService;
@@ -26,6 +26,4 @@ public class LogController {
 	) {
 		return new LogResponse(logService.findBetween(start, end)).toEntity();
 	}
-
-
 }
