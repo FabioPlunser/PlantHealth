@@ -38,6 +38,10 @@ public class SensorStationService {
 		return sensorStationRepository.findByIsUnlockedAndIsDeleted(false, false);
 	}
 
+	public Optional<SensorStation> findByQrCode(UUID qrCode) {
+		return sensorStationRepository.findByQrCodeId(qrCode);
+	}
+
 	public SensorStation save(SensorStation sensorStation) {
 		try {
 			return sensorStationRepository.save(sensorStation);

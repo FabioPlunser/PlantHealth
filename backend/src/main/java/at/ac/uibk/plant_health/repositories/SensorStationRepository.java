@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
-import at.ac.uibk.plant_health.models.user.Person;
 
 public interface SensorStationRepository extends CrudRepository<SensorStation, UUID> {
 	@Override
@@ -18,5 +17,5 @@ public interface SensorStationRepository extends CrudRepository<SensorStation, U
 
 	List<SensorStation> findByIsUnlockedAndIsDeleted(boolean isUnlocked, boolean isDeleted);
 
-
+	Optional<SensorStation> findByQrCodeId(UUID qrCodeId);
 }
