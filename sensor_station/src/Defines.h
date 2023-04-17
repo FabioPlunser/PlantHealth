@@ -26,8 +26,13 @@
 /* If USE_DESCRIPTORS is true ble.cpp will use descriptors. Otherwise it will
  * use more services.
  */
-
 #define USE_DESCRIPTORS				  FALSE
+
+/**
+ * If this value is true it will output the time it takes to read the sensor
+ * values to the Serial.
+ */
+#define PRINT_TIME_READ_SENSOR		  TRUE
 
 // Definition of boundary values
 #define ANALOG_READ_MAX_VALUE		  1023

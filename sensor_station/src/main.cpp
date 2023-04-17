@@ -15,7 +15,7 @@
 
 // ----- Prototypes ----- //
 
-void setSensorValuesInBLE();
+bool setSensorValuesInBLE();
 AirSensorClass::UPDATE_ERROR setSensorValuesFromSensors(sensor_data_t * str);
 uint16_t convertToGATT_soilHumidity(float humidity);
 uint16_t convertToGATT_soilHumidity_notKnown();
@@ -91,21 +91,34 @@ void loop() {
 
 // ----- Functions ----- //
 
-void setSensorValuesInBLE() {
+bool setSensorValuesInBLE() {
+	unsigned long startTime = millis();
 	sensor_data_t sensorData;
 	AirSensorClass::UPDATE_ERROR updateError =
 		setSensorValuesFromSensors(&sensorData);
+	uint8_t dipSwitchId = dipSwitch->getdipSwitchValue();
+
+#if PRINT_TIME_READ_SENSOR
+	char buffer[16];
+	Serial.print("Time taken to read sensor values: ");
+	sprintf(buffer, "%.3f.", float(startTime - millis()) / 1000);
+	Serial.println(buffer);
+#endif
+
 	if (updateError == AirSensorClass::UPDATE_ERROR::NOTHING) {
 		set_sensor_data(sensorData);
 	} else {
 		ERROR_PRINT("Got update Error ", updateError);
+		return false;
 	}
-	set_dip_switch_id(dipSwitch->getdipSwitchValue());
+	set_dip_switch_id(dipSwitchId);
 	clearAllFlags();
+
 	set_sensorstation_locked_status(false);
 	battery_level_status_t batteryStatus = {0};
 	set_battery_level_status(batteryStatus);
 	set_sensorstation_id(0);
+	return true;
 }
 
 AirSensorClass::UPDATE_ERROR setSensorValuesFromSensors(sensor_data_t * str) {
