@@ -18,7 +18,7 @@ const schema = z.object({
 });
 
 export const actions = {
-  profile: async ({ request }) => {
+  profile: async ({ request, locals }) => {
     const formData = await request.formData();
     const zodData = schema.safeParse(Object.fromEntries(formData));
     if (!zodData.success) {
