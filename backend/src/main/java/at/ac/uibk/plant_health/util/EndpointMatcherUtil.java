@@ -5,13 +5,14 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
+import at.ac.uibk.plant_health.models.user.Permission;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
  * Helper Class for keeping track of the Endpoints and their respective required {@link
- * at.ac.uibk.plant_health.models.Permission}s.
+ * Permission}s.
  *
  * @author David Rieser
  */

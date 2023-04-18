@@ -2,7 +2,7 @@ swa:
   token:
     expiration-duration: 1d
   api:
-    base: /api
+    base: /
 
 server:
   port: 8080
@@ -10,6 +10,8 @@ server:
     context-path: /
 
 logging:
+  #  datasource:
+  #    url: jdbc:mysql://db:3306?createDatabaseIfNotExist=true
   level:
     web: INFO
 
@@ -30,10 +32,14 @@ spring:
     url: jdbc:mysql://localhost/plant_health
     username: spring
     password: password
+  h2:
+    console:
+      enabled: false
   jpa:
     hibernate:
+      dialect: org.hibernate.dialect.MySQLDialect
       # Create Model Tables on Startup
-      ddl-auto: update
+      ddl-auto: create
   web:
     resources:
       # Disable static Resource Mapping

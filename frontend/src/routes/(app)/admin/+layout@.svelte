@@ -9,8 +9,7 @@
 
   import AdminNav from "$components/ui/adminNav.svelte";
   import Nav from "$components/ui/Nav.svelte";
-  import type { LayoutData } from "./$types";
-  export let data: LayoutData = null;
+  export let data;
 
   let links = [
     {

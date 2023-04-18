@@ -9,9 +9,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -19,13 +22,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import at.ac.uibk.plant_health.models.annotations.ApiRestController;
 import at.ac.uibk.plant_health.models.annotations.PublicEndpoint;
 import at.ac.uibk.plant_health.models.exceptions.TokenExpiredException;
 import at.ac.uibk.plant_health.models.rest_responses.MessageResponse;
 import at.ac.uibk.plant_health.models.rest_responses.RedirectResponse;
 import at.ac.uibk.plant_health.models.rest_responses.RestResponseEntity;
-import at.ac.uibk.plant_health.models.rest_responses.TokenExpiredResponse;
 import at.ac.uibk.plant_health.util.EndpointMatcherUtil;
 import at.ac.uibk.plant_health.util.SerializationUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,7 +37,7 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  * @author David Rieser
  */
-@ApiRestController
+@Controller
 @SuppressWarnings("unused")
 public class SwaErrorController implements ErrorController {
 	@Autowired
@@ -80,8 +81,8 @@ public class SwaErrorController implements ErrorController {
 			HttpServletRequest request, HttpServletResponse response,
 			TokenExpiredException tokenExpiredException
 	) {
-		return TokenExpiredResponse.builder()
-				.exception(tokenExpiredException)
+		return MessageResponse.builder()
+				.message(tokenExpiredException.getMessage())
 				.statusCode(HttpStatus.UNAUTHORIZED)
 				.toEntity();
 	}
@@ -124,8 +125,7 @@ public class SwaErrorController implements ErrorController {
 			HttpServletRequest request, HttpServletResponse response, Exception exception
 	) {
 		return MessageResponse.builder()
-				.success(false)
-				.message("Internal Server Error!")
+				.internal_error()
 				.statusCode(HttpStatus.UNAUTHORIZED)
 				.toEntity();
 	}
@@ -155,6 +155,7 @@ public class SwaErrorController implements ErrorController {
 			responseEntity.getHeaders().forEach(
 					(name, values) -> values.forEach(value -> response.addHeader(name, value))
 			);
+			response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
 
 			// Write the Body of the Request
 			String responseBody = SerializationUtil.serializeJSON(responseEntity.getBody());

@@ -8,6 +8,8 @@
   import Gardener from "$assets/icons/gardening-shears.svg?component";
   import Group from "$assets/icons/group.svg?component";
   import Settings from "$assets/icons/gear.svg?component";
+  import Wifi from "$assets/icons/wifi.svg?component";
+
   import { onMount } from "svelte";
 
   let rendered = false;
@@ -37,6 +39,11 @@
       name: "Users",
       path: "/admin/users",
       icon: Group,
+    },
+    {
+      name: "AccessPoints",
+      path: "/admin/accessPoints",
+      icon: Wifi,
     },
     {
       name: "Settings",

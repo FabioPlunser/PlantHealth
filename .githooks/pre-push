@@ -3,7 +3,7 @@
 
 echo "Running Pre-Push Hooks"
 
-BACKEND_DIR=swa
+BACKEND_DIR=backend
 BACKEND_TEST_CMD="gradle test"
 
 TRUE=0
@@ -21,7 +21,8 @@ abort_on_failure() {
 # Returns TRUE if the Command was run, FALSE otherwise
 run_cmd_if_changed() {
     # Git will check if any Files changed in the given Directory and return 0 if none did.
-    git diff HEAD --exit-code --quiet --relative=$1/
+	local current_branch="$(git branch --show-current)"
+	git diff $current_branch origin/$current_branch --exit-code --quiet --relative=$1/
     if [ $? -ne 0 ] ; then
         cd $1 && $2
         # If the Command fails abort the Commit
@@ -34,7 +35,7 @@ run_cmd_if_changed() {
 
 # Check if any Files changed in the Backend
 # If any Files changed run JUnit Tests for the Java Backend
-run_cmd_if_changed $BACKEND_DIR "$BACKEND_TEST_CMD"
+run_cmd_if_changed $BACKEND_DIR$BACKEND_TEST_CMD
 
 # Run Jester Tests for the Svelte Front-End
 # TODO

@@ -1,12 +1,11 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
-  import type { ActionData, PageData } from "./$types";
   import FormError from "$helper/formError.svelte";
   import Input from "$components/ui/Input.svelte";
   import Logo from "$assets/Logo.svg?url";
   import toast from "$components/toast";
   // export let data: PageData;
-  export let form: ActionData;
+  export let form;
   $: {
     if (form?.message) {
       toast.error(form?.message);

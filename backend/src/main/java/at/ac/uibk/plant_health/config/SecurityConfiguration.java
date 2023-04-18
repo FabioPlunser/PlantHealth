@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import at.ac.uibk.plant_health.config.exception_handling.RestAccessDeniedHandler;
-import at.ac.uibk.plant_health.config.filters.HeaderTokenAuthenticationFilter;
+import at.ac.uibk.plant_health.config.jwt_authentication.HeaderTokenAuthenticationFilter;
 import at.ac.uibk.plant_health.models.annotations.PublicEndpoint;
 import at.ac.uibk.plant_health.util.EndpointMatcherUtil;
 
@@ -127,8 +127,7 @@ public class SecurityConfiguration {
 			);
 		} else {
 			// NOTE: Creating an OrRequest using no Values results in a
-			// Runtime Error
-			//       WORKAROUND: Create a negated AnyRequestMatcher
+			// WORKAROUND: Create a negated AnyRequestMatcher
 			return new NegatedRequestMatcher(AnyRequestMatcher.INSTANCE);
 		}
 	}
