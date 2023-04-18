@@ -11,7 +11,9 @@ const schema = z.object({
 
   email: z
     .string({ required_error: "Email is required" })
+    .email({ message: "Email must be a valid email address" })
     .min(1, { message: "Email is required" })
+    .max(64, { message: "Email must be less than 64 characters" })
     .trim(),
 
   password: z
