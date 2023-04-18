@@ -1,5 +1,7 @@
 package at.ac.uibk.plant_health.models.plant;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -43,4 +45,26 @@ public class SensorData {
 	@JdbcTypeCode(SqlTypes.BOOLEAN)
 	@Column(name = "is_deleted", nullable = false)
 	private boolean isDeleted = false;
+
+	public SensorData(
+			LocalDateTime timeStamp, int value, boolean above, boolean below, Sensor sensor
+	) {
+		this.timeStamp = timeStamp;
+		this.value = value;
+		this.belowLimit = below;
+		this.aboveLimit = above;
+		this.sensor = sensor;
+	}
+
+	@JsonIgnore
+	public char getAlarm() {
+		return this.aboveLimit ? 'h' : this.belowLimit ? 'l' : 'n';
+	}
+
+	@Override
+	public String toString() {
+		return "SensorData [timeStamp=" + timeStamp + ", value=" + value
+				+ ", aboveLimit=" + aboveLimit + ", belowLimit=" + belowLimit + ", sensor=" + sensor
+				+ ", sensorStation=" + sensorStation + ", isDeleted=" + isDeleted + "]";
+	}
 }

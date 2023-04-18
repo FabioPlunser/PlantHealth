@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import at.ac.uibk.plant_health.config.jwt_authentication.AuthContext;
 import at.ac.uibk.plant_health.config.jwt_authentication.authentication_types.UserAuthentication;
+import at.ac.uibk.plant_health.models.SensorStationPersonReference;
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
@@ -160,7 +161,8 @@ public class PersonService {
 			if (permissions != null) person.setPermissions(permissions);
 			if (password != null) person.setPassword(password);
 
-			return save(person) != null;
+			person = save(person);
+			return true;
 		}
 
 		return false;
@@ -214,11 +216,6 @@ public class PersonService {
 	public List<SensorStation> getDashboardPlants(Person person) {
 		// TODO
 		return List.of();
-	}
-
-	public boolean addPlantToDashboard(Person person, SensorStation sensorStation) {
-		// TODO
-		return false;
 	}
 
 	public boolean removePlantToDashboard(Person person, SensorStation sensorStation) {

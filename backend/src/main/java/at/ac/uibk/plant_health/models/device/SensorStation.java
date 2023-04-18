@@ -1,5 +1,7 @@
 package at.ac.uibk.plant_health.models.device;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,7 +21,6 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Table(name = "sensor_station")
 // NOTE: This changes the name of the "id"-Column inherited from Device to "sensor_station_id"
-
 @AttributeOverride(name = "id", column = @Column(name = "sensor_station_id"))
 public class SensorStation extends Device {
 	@Column(name = "bd_address", unique = true)
@@ -38,18 +39,19 @@ public class SensorStation extends Device {
 	@Column(name = "dip_switch_id", nullable = false)
 	private int dipSwitchId;
 
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "access_point_id")
 	private AccessPoint accessPoint;
 
-	@OneToMany(mappedBy = "sensorStation")
-	private List<SensorStationPersonReference> sensorStationPersonReferences = new ArrayList<>();
-
-	@OneToMany(mappedBy = "sensorStation")
+	@OneToMany(mappedBy = "sensorStation", fetch = FetchType.EAGER)
 	private List<SensorData> sensorData = new ArrayList<>();
 
-	@OneToMany(mappedBy = "sensorStation")
+	@OneToMany(mappedBy = "sensorStation", fetch = FetchType.EAGER)
 	private List<SensorLimits> sensorLimits = new ArrayList<>();
+
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "sensorStation", orphanRemoval = true)
+	private List<SensorStationPersonReference> sensorStationPersonReferences = new ArrayList<>();
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -60,5 +62,17 @@ public class SensorStation extends Device {
 		super();
 		this.bdAddress = bdAddress;
 		this.dipSwitchId = dipSwitchId;
+	}
+
+	public void addSensorStationReference(SensorStationPersonReference s) {
+		this.sensorStationPersonReferences.add(s);
+	}
+
+	@Override
+	public String toString() {
+		return "SensorStation [bdAddress=" + bdAddress + ", name=" + name + ", qrCodeId=" + qrCodeId
+				+ ", dipSwitchId=" + dipSwitchId + ", accessPoint=" + accessPoint
+				+ ", sensorStationPersonReferences=" + sensorStationPersonReferences
+				+ ", sensorData=" + sensorData + ", sensorLimits=" + sensorLimits + "]";
 	}
 }

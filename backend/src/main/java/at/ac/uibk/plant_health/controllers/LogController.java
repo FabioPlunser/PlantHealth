@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import at.ac.uibk.plant_health.models.Log;
 import at.ac.uibk.plant_health.models.annotations.AnyPermission;
 import at.ac.uibk.plant_health.models.rest_responses.ListResponse;
+import at.ac.uibk.plant_health.models.rest_responses.LogResponse;
 import at.ac.uibk.plant_health.models.rest_responses.RestResponseEntity;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.service.LogService;
@@ -23,9 +24,6 @@ public class LogController {
 			@RequestParam("start") final LocalDateTime start,
 			@RequestParam("end") final LocalDateTime end
 	) {
-		return ListResponse.<Log>builder()
-				.ok()
-				.items(logService.findBetween(start, end))
-				.toEntity();
+		return new LogResponse(logService.findBetween(start, end)).toEntity();
 	}
 }

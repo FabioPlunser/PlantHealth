@@ -8,6 +8,7 @@ import org.hibernate.type.SqlTypes;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -52,9 +53,12 @@ public class Person extends Authenticable implements Serializable {
 	private String email;
 
 	@Builder.Default
-	@OneToMany(mappedBy = "person")
-	private List<SensorStationPersonReference> sensorStationPersonReferences =
-			new java.util.ArrayList<>();
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "person")
+	private List<SensorStationPersonReference> sensorStationPersonReferences = new ArrayList<>();
+
+	public void addSensorStationReference(SensorStationPersonReference s) {
+		this.sensorStationPersonReferences.add(s);
+	}
 
 	/**
 	 * Gets the Person's ID.

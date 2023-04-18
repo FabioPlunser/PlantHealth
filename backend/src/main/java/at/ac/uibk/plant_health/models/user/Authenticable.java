@@ -3,8 +3,6 @@ package at.ac.uibk.plant_health.models.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.security.core.CredentialsContainer;
@@ -21,6 +19,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.IdentifiedEntity;
+import at.ac.uibk.plant_health.util.GrantedAuthorityConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -97,14 +96,12 @@ public abstract class Authenticable implements UserDetails, IdentifiedEntity, Cr
 	@Column(name = "token_creation_date", nullable = true)
 	private LocalDateTime tokenCreationDate = null;
 
-	@Builder.Default
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	@Column(name = "name", nullable = false)
-	@Enumerated(EnumType.STRING)
-	@ElementCollection(targetClass = Permission.class, fetch = FetchType.EAGER)
+	@ElementCollection(targetClass = GrantedAuthority.class, fetch = FetchType.EAGER)
 	@CollectionTable(name = "permission", joinColumns = @JoinColumn(name = "auth_id"))
-	@Fetch(FetchMode.SELECT)
-	private Set<GrantedAuthority> permissions = Permission.defaultAuthorities();
+	@Column(name = "permission", nullable = false)
+	@Convert(converter = GrantedAuthorityConverter.class)
+	private Set<GrantedAuthority> permissions;
 
 	public void setPermissions(Set<Permission> permissions) {
 		// SAFETY: Permission implements GrantedAuthority

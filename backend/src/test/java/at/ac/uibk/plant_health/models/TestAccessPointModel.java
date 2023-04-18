@@ -146,5 +146,3 @@ public class TestAccessPointModel {
 		assertEquals(5, sensorStationRepository.findAll().size());
 	}
 }
-
-

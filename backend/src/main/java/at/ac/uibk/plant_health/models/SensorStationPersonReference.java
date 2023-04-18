@@ -24,16 +24,8 @@ public class SensorStationPersonReference {
 	private UUID id;
 
 	@ManyToOne
-	@MapsId("sensor_station_id")
-	@JoinColumn(name = "sensor_station_id", nullable = false)
-	@JdbcTypeCode(SqlTypes.NVARCHAR)
+	@JoinColumn(name = "sensor_station_id")
 	private SensorStation sensorStation;
-
-	@ManyToOne
-	@MapsId("person_id")
-	@JoinColumn(name = "person_id", nullable = false)
-	@JdbcTypeCode(SqlTypes.NVARCHAR)
-	private Person person;
 
 	@JdbcTypeCode(SqlTypes.BOOLEAN)
 	@Column(name = "is_assigned", nullable = false)
@@ -46,6 +38,18 @@ public class SensorStationPersonReference {
 	@JdbcTypeCode(SqlTypes.BOOLEAN)
 	@Column(name = "is_deleted", nullable = false)
 	private boolean isDeleted = false;
+
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "person_id", nullable = false)
+	private Person person;
+
+	public Person getPerson() {
+		return person;
+	}
+
+	public void setPerson(Person person) {
+		this.person = person;
+	}
 
 	public SensorStationPersonReference(
 			SensorStation sensorStation, Person person, boolean isAssigned, boolean inDashboard

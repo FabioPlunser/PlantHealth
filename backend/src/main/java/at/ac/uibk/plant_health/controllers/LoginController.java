@@ -61,7 +61,8 @@ public class LoginController {
 	@PublicEndpoint
 	@PostMapping(value = LOGIN_ENDPOINT)
 	public RestResponseEntity loginPost(
-			@RequestBody final String username, @RequestBody final String password
+			@RequestParam("username") final String username,
+			@RequestParam("password") final String password
 	) {
 		return login(username, password);
 	}

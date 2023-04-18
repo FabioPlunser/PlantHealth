@@ -31,7 +31,7 @@ public class LoginService {
 					userAuthentication.getUsername(), userAuthentication.getToken()
 			);
 		} else if (token instanceof AccessPointAuthentication accessPointAuthentication) {
-			return accessPointRepository.findById(accessPointAuthentication.getToken());
+			return accessPointRepository.findByAccessToken(accessPointAuthentication.getToken());
 		} else if (token instanceof SensorStationAuthentication sensorStationAuthentication) {
 			return sensorStationRepository.findById(sensorStationAuthentication.getToken());
 		} else {

@@ -104,6 +104,4 @@ public class AccessPoint extends Device {
 				+ ", transferInterval=" + transferInterval + ", pairingModeActive=" + scanActive
 				+ ", accessToken=" + accessToken + '}';
 	}
-
-
 }
