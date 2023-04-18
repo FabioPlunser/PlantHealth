@@ -9,9 +9,14 @@ const schema = z.object({
     .max(64, { message: "Username must be less than 64 characters" })
     .trim(),
 
+  email: z
+    .string({ required_error: "Email is required" })
+    .min(1, { message: "Email is required" })
+    .trim(),
+
   password: z
     .string({ required_error: "Password is required" })
-    .min(1, { message: "Password is required" })
+    .min(1, { message: " Password is required" })
     .min(6, { message: "Password must be at least 6 characters" })
     .max(32, { message: "Password must be less than 32 characters" })
     .trim(),
