@@ -1,5 +1,6 @@
 package at.ac.uibk.plant_health.controllers;
 
+import at.ac.uibk.plant_health.models.rest_responses.*;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,16 +12,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.annotations.AnyPermission;
-import at.ac.uibk.plant_health.models.rest_responses.LockedSensorStationResponse;
-import at.ac.uibk.plant_health.models.rest_responses.MessageResponse;
-import at.ac.uibk.plant_health.models.rest_responses.QrCodeResponse;
-import at.ac.uibk.plant_health.models.rest_responses.RestResponseEntity;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.service.SensorStationService;
 
 public class PlantController {
 	@Autowired
 	private SensorStationService sensorStationService;
+
+	@GetMapping("/get-all-plants")
+	public RestResponseEntity getAllPlants() {
+		return new PlantListResponse(sensorStationService.findAllPlants()).toEntity();
+	}
 
 	@GetMapping("/scan-qr-code")
 	public RestResponseEntity scanQrCode(@RequestParam("qr-code") final UUID qrCode) {
