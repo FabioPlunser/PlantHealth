@@ -38,9 +38,12 @@ class WriteError(Exception):
 
 def get_short_uuid(uuid: str) -> str:
     """
-    Extracts the relevant 4 half-bytes from the UUID to identify a characteristic type.
+    Extracts the relevant 4 half-bytes from the 32 digit UUID to identify a characteristic type.
     """
-    return uuid[4:8]
+    if len(uuid) == 32:
+        return uuid[4:8]
+    else:
+        return uuid
 
 class Sensor:
     """
@@ -51,6 +54,16 @@ class Sensor:
         'n': 0,
         'l': 1,
         'h': 2
+    }
+
+    # determined by GATT characteristic UUID
+    UNITS = {
+        '2a6f': (0.01, '%'),
+        '2a6d': (0.1, 'Pa'),
+        '2b0d': (0.5, '°C'),
+        '2b04': (0.5, '%'),
+        '2aff': (1, 'lm'),
+        '2bed': (1, '%')
     }
 
     def __init__(self, name: str, service_uuid: str, client: BleakClient, transform: Callable = lambda x: x ) -> None:
@@ -94,7 +107,11 @@ class Sensor:
                     if get_short_uuid(characteristic.uuid) != self.ALARM_CHARACTERISTIC_UUID:
                         try:
                             self.characteristic_uuid = characteristic.uuid
-                            return int.from_bytes(await self.client.read_gatt_char(characteristic), byteorder='big') * self.resolution
+                            if get_short_uuid(characteristic.uuid) in self.UNITS.keys():
+                                resolution = self.UNITS[get_short_uuid(characteristic.uuid)][0]
+                            else:
+                                resolution = 1
+                            return int.from_bytes(await self.client.read_gatt_char(characteristic), byteorder='big') * resolution
                         except Exception as e:
                             raise ReadError(f'Unable to read value of sensor {self.name}: {e}')        
                 raise ReadError(f'Unable to find characteristic for value of sensor {self.name} on service {self.service_uuid}')
@@ -119,28 +136,6 @@ class Sensor:
                             raise WriteError(f'Unable to set/reset alarm for sensor {self.name} on station {self.client.address}: {e}')        
                 raise WriteError(f'Unable to find characteristic for alarm of sensor {self.name} on station {self.client.address}')
         raise WriteError(f'Unable to find service {self.service_uuid} for sensor {self.name} on station {self.client.address}')
-    
-    @property
-    def resolution(self) -> float:
-        """
-        The resolution of the sensor.
-        Automatically determined by the assigned GATT characteristic UUID.
-        Defaults to 1 if characteristic is unknown.
-        :raises ReadError: If the sensor data has not been read yet.
-        """
-        if self.characteristic_uuid:
-            resolutions = {
-                '2a6f': 0.01,
-                '2a6d': 0.1,
-                '2b0d': 0.5,
-                '2b04': 0.5,
-                '2aff': 1,
-                '2bed': 1
-            }
-            resolution = resolutions.get(get_short_uuid(self.characteristic_uuid))
-            return resolution if resolution else 1
-        else:
-            raise ReadError(f'Unable to determine resolution of sensor {self.name} on station {self.client.address} - read sensor data first')
 
     @property
     def unit(self) -> str:
@@ -149,16 +144,8 @@ class Sensor:
         Defaults to None if unit is unknown.
         :raises ReadError: If the sensor data has not been read yet.
         """
-        if self.characteristic_uuid:
-            units = {
-                '2a6f': '%',
-                '2a6d': 'Pa',
-                '2b0d': '°C',
-                '2b04': '%',
-                '2aff': 'lm',
-                '2bed': '%'
-            }
-            return units.get(get_short_uuid(self.characteristic_uuid))
+        if self.characteristic_uuid and get_short_uuid(self.characteristic_uuid) in self.UNITS:
+            return self.UNITS[get_short_uuid(self.characteristic_uuid)][1]
         else:
             raise ReadError(f'Unable to determine unit of sensor {self.name} on station {self.client.address} - read sensor data first')
 
@@ -313,8 +300,8 @@ class SensorStation:
             'AdditionalStatusPresent':  bool((battery_level_state[0] >> 2) & 1)
         }
         if flags['BatteryLevelPresent']:
-            pos = 3 + 2 * flags['IdentifierPresent']
-            return int.from_bytes(battery_level_state[pos:pos+1], byteorder='big')
+            pos = 2 + 2 * flags['IdentifierPresent']
+            return int.from_bytes(battery_level_state[pos:pos+2], byteorder='big')
         else:
             return None
 
