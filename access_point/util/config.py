@@ -152,6 +152,8 @@ class Config(object):
             with open(self._filename, 'r') as f:
                 try:
                     data = yaml.load(f, Loader=yaml.loader.SafeLoader)
+                    if not data:
+                        raise ValueError('Config file empty')
                     try:
                         self.update(**data)
                     except (TypeError, ValueError) as e:
