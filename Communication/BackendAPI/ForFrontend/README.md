@@ -458,13 +458,9 @@ The following Responses can happen on any Endpoint if the given Condition is met
     - UPDATE
     - DELETE
 - No additional Headers
-- No Parameters
-- Body:
-    ```json
-        {
-            "id": "[INSERT-PLANT-ID-HERE]"
-        }
-    ```
+- Parameters:
+    - "plant-id" = "[INSERT-PLANT-ID-HERE]"
+- No Body
 - Response:
     - If successful:
         - 200 HTTP Status Code
