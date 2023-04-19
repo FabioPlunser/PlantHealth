@@ -90,7 +90,7 @@ public class TestAccessPointController {
 
 		for (int i = 0; i < 10; i++) {
 			UUID accessPointId = UUID.randomUUID();
-			accessPointService.register(accessPointId, "Office1");
+			accessPointService.register(accessPointId, "Office " + i);
 		}
 
 		List<AccessPoint> accessPointList = accessPointService.findAllAccessPoints();
@@ -101,12 +101,12 @@ public class TestAccessPointController {
 										AuthGenerator.generateToken(person))
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(
-						status().isOk(), jsonPath("$.items").isArray(),
-						jsonPath("$.items").value(Matchers.hasSize(accessPointList.size())),
-						jsonPath("$.items[*].selfAssignedId")
+						status().isOk(), jsonPath("$.access-points").isArray(),
+						jsonPath("$.access-points").value(Matchers.hasSize(accessPointList.size())),
+						jsonPath("$.access-points[*].id")
 								.value(Matchers.containsInAnyOrder(
 										accessPointList.stream()
-												.map(d -> d.getSelfAssignedId().toString())
+												.map(d -> d.getDeviceId().toString())
 												.toArray(String[] ::new)
 								))
 
