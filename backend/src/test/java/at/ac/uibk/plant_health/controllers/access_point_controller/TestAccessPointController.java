@@ -108,8 +108,19 @@ public class TestAccessPointController {
 										accessPointList.stream()
 												.map(d -> d.getDeviceId().toString())
 												.toArray(String[] ::new)
+								)),
+						jsonPath("$.access-points[*].locked")
+								.value(Matchers.containsInAnyOrder(
+										accessPointList.stream()
+												.map(d -> !d.isUnlocked())
+												.toArray(Boolean[] ::new)
+								)),
+						jsonPath("$.access-points[*].room-name")
+								.value(Matchers.containsInAnyOrder(
+										accessPointList.stream()
+												.map(d -> d.getRoomName())
+												.toArray(String[] ::new)
 								))
-
 				);
 	}
 
