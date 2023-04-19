@@ -759,7 +759,6 @@ See "Upload Plant Picture" (/upload-picture)
 
 - Endpoint: /create-plant-qr-code
 - Methods: 
-    - GET
     - POST
     - PUT
 - No additional Headers
