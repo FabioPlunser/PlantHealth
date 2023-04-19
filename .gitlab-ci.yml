@@ -33,17 +33,3 @@ sonarqube-check:
     - echo Running sonar analysis for ${SONAR_PROJECT_KEY}
     - cd backend && mvn -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.projectName="${CI_PROJECT_NAME} ${GITLAB_USER_NAME}" --fail-at-end verify sonar:sonar
   allow_failure: true
-
-deploy-backend:
-  tags:
-    - java
-    - gradle
-  image: hmajid2301/dind-docker-compose
-  stage: deployBackend
-  script:
-    - echo "Start with 'make prod'"
-    - make prod
-  allow_failure: false
-  only:
-    refs:
-      - dev-backend
