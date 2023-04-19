@@ -2,7 +2,6 @@
 #define ERROR_HANDLER_CLASS
 
 #include <Arduino.h>
-#include <LinkedList.h>
 #include <list>
 #include <queue>
 #include <stdlib.h>
