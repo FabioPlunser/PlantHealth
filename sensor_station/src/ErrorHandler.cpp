@@ -38,6 +38,8 @@ class Error {
 
 		uint8_t getPriority() const { return this->priority; }
 
+		SensorErrors::Type getErrorType() const { return this->type; }
+
 		bool operator==(const Error & other) const {
 			return this == &other && this->type == other.type &&
 				   this->status == other.status &&
@@ -74,7 +76,7 @@ class ErrorHandlerClass {
 			return queue.top();
 		}
 
-		const Error getTop() { return queue.top(); }
+		const Error getTop() const { return queue.top(); }
 
 		const Error removeTop() {
 			Error error = queue.top();
@@ -125,6 +127,29 @@ class ErrorHandlerClass {
 				queue.push(list.front());
 				list.pop_front();
 			}
+			return numDeleted;
+		}
+
+		/**
+		 * Deletes all errors of the provided type from the error queue
+		 * and returns the number of elements that got deleted.
+		 * @param errorType: The type of error to delete.
+		 * @return Number of errors deleted.
+		 */
+		uint8_t deleteErrorFromQueue(SensorErrors::Type errorType) {
+			// List to store the values we don't wand to delete.
+			std::priority_queue<Error> newQueue;
+			uint8_t numDeleted = 0;
+			while (queue.size() > 0) {
+				const Error & topError = queue.top();
+				if (topError.getErrorType() == errorType) {
+					numDeleted++;
+				} else {
+					newQueue.push(topError);
+				}
+				queue.pop();
+			}
+			queue = newQueue;
 			return numDeleted;
 		}
 };
