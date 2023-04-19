@@ -8,11 +8,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import at.ac.uibk.plant_health.models.SensorStationPersonReference;
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.plant.PlantPicture;
 import at.ac.uibk.plant_health.models.plant.Sensor;
 import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
+import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.repositories.*;
 
 @Service
@@ -23,12 +25,14 @@ public class SensorStationService {
 	private SensorDataRepository sensorDataRepository;
 	@Autowired
 	private SensorRepository sensorRepository;
-
 	@Autowired
 	private PlantPictureRepository plantPictureRepository;
-
 	@Autowired
 	private PlantPersonReferenceRepository plantPersonReferenceRepository;
+
+	public Optional<SensorStation> findById(UUID id) {
+		return this.sensorStationRepository.findById(id);
+	}
 
 	public List<SensorStation> findAll() {
 		return sensorStationRepository.findAll();

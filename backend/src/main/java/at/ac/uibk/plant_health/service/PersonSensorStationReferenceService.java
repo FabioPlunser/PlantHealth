@@ -26,11 +26,16 @@ public class PersonSensorStationReferenceService {
 	public boolean addPlantToDashboard(Person person, SensorStation sensorStation) {
 		if (person == null || sensorStation == null) return false;
 
-		person = personRepository.save(person);
-		sensorStation = sensorStationRepository.save(sensorStation);
+		var maybePerson = personRepository.findById(person.getPersonId());
+		if (maybePerson.isEmpty()) return false;
+		var maybeSensorStation = sensorStationRepository.findById(sensorStation.getDeviceId());
+		if (maybeSensorStation.isEmpty()) return false;
+
+		person = maybePerson.get();
+		sensorStation = maybeSensorStation.get();
 
 		SensorStationPersonReference s =
-				new SensorStationPersonReference(sensorStation, person, true, false);
+				new SensorStationPersonReference(sensorStation, person, false, true);
 
 		person.addSensorStationReference(s);
 		sensorStation.addSensorStationReference(s);

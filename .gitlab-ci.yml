@@ -1,5 +1,3 @@
-
-
 stages: # List of stages for jobs, and their order of execution
   - test
   - sonarCheck
@@ -42,10 +40,10 @@ deploy-backend:
     - gradle
   image: hmajid2301/dind-docker-compose
   stage: deployBackend
-  script: 
+  script:
     - echo "Start with 'make prod'"
     - make prod
   allow_failure: false
-  only: 
+  only:
     refs:
-      - dev-backend 
+      - dev-backend

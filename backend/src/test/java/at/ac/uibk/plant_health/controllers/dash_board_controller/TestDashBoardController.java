@@ -1,8 +1,11 @@
 package at.ac.uibk.plant_health.controllers.dash_board_controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.hamcrest.Matchers;
 import org.hamcrest.core.AnyOf;
@@ -64,7 +67,7 @@ public class TestDashBoardController {
 	}
 
 	@Test
-	public void addSensorStationsToDashboard() throws Exception {
+	public void getPlantsOnDashboard() throws Exception {
 		Person person = createUserAndLogin(false);
 		SensorStation s1 = new SensorStation(StringGenerator.macAddress(), 1);
 		SensorStation s2 = new SensorStation(StringGenerator.macAddress(), 2);
@@ -156,7 +159,7 @@ public class TestDashBoardController {
 								.value(Matchers.equalTo(sensor.getType())),
 						jsonPath("$.plants[0].values[0].sensors[0].value")
 								.value(Matchers.equalTo(data1.getValue())),
-						// TODO
+						// TODO: Units aren't being sent
 						// jsonPath("$.plants[0].values[0].sensors[0].unit").value(Matchers.equalTo(sensor.getUnit())),
 						jsonPath("$.plants[0].values[0].sensors[0].alarm")
 								.value(Matchers.equalTo(Character.toString(data1.getAlarm()))),
@@ -165,10 +168,35 @@ public class TestDashBoardController {
 								.value(Matchers.equalTo(sensor.getType())),
 						jsonPath("$.plants[0].values[1].sensors[0].value")
 								.value(Matchers.equalTo(data2.getValue())),
-						// TODO
+						// TODO: Units aren't being sent
 						// jsonPath("$.plants[0].values[1].sensors[0].unit").value(Matchers.equalTo(sensor.getUnit())),
 						jsonPath("$.plants[0].values[1].sensors[0].alarm")
 								.value(Matchers.equalTo(Character.toString(data1.getAlarm())))
 				);
+	}
+
+	@Test
+	public void addPlantToDashboard() throws Exception {
+		Person person = createUserAndLogin(false);
+		SensorStation s1 = new SensorStation(StringGenerator.macAddress(), 1);
+
+		s1.setName("SensorStation 1");
+		sensorStationService.save(s1);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/add-to-dashboard")
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(person))
+								.param("plant-id", s1.getDeviceId().toString())
+								.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
+
+		person = personService.findById(person.getPersonId()).get();
+
+		var references = person.getSensorStationPersonReferences();
+
+		assertEquals(1, references.size());
+		assertEquals(true, references.get(0).isInDashboard());
+		assertEquals(s1.getDeviceId(), references.get(0).getSensorStation().getDeviceId());
 	}
 }

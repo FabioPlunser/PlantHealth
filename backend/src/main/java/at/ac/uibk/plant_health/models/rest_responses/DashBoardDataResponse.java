@@ -15,6 +15,7 @@ import at.ac.uibk.plant_health.models.SensorStationPersonReference;
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.user.Person;
+import at.ac.uibk.plant_health.repositories.PlantPersonReferenceRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,7 @@ public class DashBoardDataResponse extends RestResponse implements Serializable 
 	public DashBoardDataResponse(Person person) {
 		this.plants = person.getSensorStationPersonReferences()
 							  .stream()
+							  .filter(SensorStationPersonReference::isInDashboard)
 							  .map(SensorStationPersonReference::getSensorStation)
 							  .map(DashboardPlant::new)
 							  .toList();
