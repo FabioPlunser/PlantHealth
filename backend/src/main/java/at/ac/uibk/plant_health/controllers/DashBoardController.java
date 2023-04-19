@@ -1,6 +1,5 @@
 package at.ac.uibk.plant_health.controllers;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,9 +8,7 @@ import java.util.UUID;
 import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
 import at.ac.uibk.plant_health.models.rest_responses.*;
 import at.ac.uibk.plant_health.models.user.Person;
-import at.ac.uibk.plant_health.repositories.PersonRepository;
-import at.ac.uibk.plant_health.repositories.PlantPersonReferenceRepository;
-import at.ac.uibk.plant_health.service.PersonSensorStationReferenceService;
+import at.ac.uibk.plant_health.service.SensorStationPersonReferenceService;
 import at.ac.uibk.plant_health.service.PersonService;
 import at.ac.uibk.plant_health.service.SensorStationService;
 
@@ -22,7 +19,7 @@ public class DashBoardController {
 	@Autowired
 	private SensorStationService sensorStationService;
 	@Autowired
-	private PersonSensorStationReferenceService personSensorStationReferenceService;
+	private SensorStationPersonReferenceService sensorStationPersonReferenceService;
 
 	@PrincipalRequired(Person.class)
 	@GetMapping("/get-dashboard-data")
@@ -37,21 +34,30 @@ public class DashBoardController {
 	) {
 		var maybeSensorStation = this.sensorStationService.findById(plantId);
 		if (maybeSensorStation.isPresent()) {
-			this.personSensorStationReferenceService.addPlantToDashboard(
+			if (this.sensorStationPersonReferenceService.addPlantToDashboard(
 					person, maybeSensorStation.get()
-			);
-
-			return MessageResponse.builder().ok().toEntity();
+			)) {
+				return MessageResponse.builder().ok().toEntity();
+			}
 		}
 
 		return MessageResponse.builder().not_found().message("Could not find Plant").toEntity();
 	}
 
 	@PrincipalRequired(Person.class)
-	@RequestMapping(value = "/remove-from-dashboard", method = RequestMethod.DELETE)
-	public RestResponseEntity removePlantFromDashboard(Person person
-													   //            @RequestBody final UUID id
+	@RequestMapping(value = "/remove-from-dashboard", method = {RequestMethod.DELETE})
+	public RestResponseEntity removeFromDashboard(
+			Person person, @RequestParam("plant-id") final UUID plantId
 	) {
-		throw new NotImplementedException();
+		var maybeSensorStation = this.sensorStationService.findById(plantId);
+		if (maybeSensorStation.isPresent()) {
+			if (this.sensorStationPersonReferenceService.removePlantFromDashboard(
+					person, maybeSensorStation.get()
+			)) {
+				return MessageResponse.builder().ok().toEntity();
+			}
+		}
+
+		return MessageResponse.builder().not_found().message("Could not find Plant").toEntity();
 	}
 }

@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import org.hamcrest.Matchers;
 import org.hamcrest.core.AnyOf;
 import org.junit.jupiter.api.Test;
@@ -29,7 +27,7 @@ import at.ac.uibk.plant_health.models.plant.Sensor;
 import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
-import at.ac.uibk.plant_health.service.PersonSensorStationReferenceService;
+import at.ac.uibk.plant_health.service.SensorStationPersonReferenceService;
 import at.ac.uibk.plant_health.service.PersonService;
 import at.ac.uibk.plant_health.service.SensorStationService;
 import at.ac.uibk.plant_health.util.AuthGenerator;
@@ -46,7 +44,7 @@ public class TestDashBoardController {
 	@Autowired
 	private SensorStationService sensorStationService;
 	@Autowired
-	private PersonSensorStationReferenceService personSensorStationReferenceService;
+	private SensorStationPersonReferenceService sensorStationPersonReferenceService;
 	@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 	@Autowired
 	private MockMvc mockMvc;
@@ -78,8 +76,8 @@ public class TestDashBoardController {
 		sensorStationService.save(s1);
 		sensorStationService.save(s2);
 
-		personSensorStationReferenceService.addPlantToDashboard(person, s1);
-		personSensorStationReferenceService.addPlantToDashboard(person, s2);
+		sensorStationPersonReferenceService.addPlantToDashboard(person, s1);
+		sensorStationPersonReferenceService.addPlantToDashboard(person, s2);
 
 		AnyOf<String> nameMatcher =
 				Matchers.anyOf(Matchers.equalTo(s1.getName()), Matchers.equalTo(s2.getName()));
@@ -113,7 +111,7 @@ public class TestDashBoardController {
 
 		s1.setName("SensorStation 1");
 		sensorStationService.save(s1);
-		personSensorStationReferenceService.addPlantToDashboard(person, s1);
+		sensorStationPersonReferenceService.addPlantToDashboard(person, s1);
 
 		Sensor sensor = new Sensor("Test");
 		SensorData data1 = new SensorData(LocalDateTime.now(), 1, false, false, sensor);
@@ -198,5 +196,30 @@ public class TestDashBoardController {
 		assertEquals(1, references.size());
 		assertEquals(true, references.get(0).isInDashboard());
 		assertEquals(s1.getDeviceId(), references.get(0).getSensorStation().getDeviceId());
+	}
+
+	@Test
+	public void removePlantFromDashboard() throws Exception {
+		Person person = createUserAndLogin(false);
+		SensorStation s1 = new SensorStation(StringGenerator.macAddress(), 1);
+
+		s1.setName("SensorStation 1");
+		sensorStationService.save(s1);
+
+		sensorStationPersonReferenceService.addPlantToDashboard(person, s1);
+
+		mockMvc.perform(MockMvcRequestBuilders.delete("/remove-from-dashboard")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("plant-id", s1.getDeviceId().toString())
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
+
+		person = personService.findById(person.getPersonId()).get();
+
+		var references = person.getSensorStationPersonReferences();
+
+		assertEquals(0, references.size());
 	}
 }

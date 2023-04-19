@@ -53,7 +53,7 @@ public class AccessPointController {
 	@AnyPermission(Permission.ADMIN)
 	@GetMapping("/get-access-points")
 	public RestResponseEntity getAccessPoints() {
-		return new ListResponse<>(accessPointService.findAllAccessPoints()).toEntity();
+		return new AccessPointListResponse(accessPointService.findAllAccessPoints()).toEntity();
 	}
 
 	@AnyPermission(Permission.ADMIN)

@@ -19,6 +19,14 @@ public class AccessPointService {
 	@Autowired
 	private SensorStationService sensorStationService;
 
+	public Optional<AccessPoint> findById(UUID id) {
+		return this.accessPointRepository.findById(id);
+	}
+
+	public Optional<AccessPoint> findBySelfAssignedId(UUID id) {
+		return this.accessPointRepository.findBySelfAssignedId(id);
+	}
+
 	/**
 	 * Get all AccessPoints.
 	 * @return List of AccessPoints
