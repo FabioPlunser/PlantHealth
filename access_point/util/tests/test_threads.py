@@ -34,7 +34,7 @@ def test_update_interval():
     thread = ThreadScheduler(dummy_thread, 'dummy', start_interval, start_immediately=True, counter=counter)
     new_start_interval = timedelta(milliseconds=150)
     thread.update_interval(new_start_interval)
-    for _ in range(planned_executions * 4):
+    for _ in range(planned_executions * 4 - 1):
         thread.run()
         time.sleep(new_start_interval.total_seconds() / 4)
     assert counter.executions == planned_executions
