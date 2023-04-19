@@ -39,7 +39,7 @@ public class PlantController {
 	@AnyPermission(Permission.ADMIN)
 	@RequestMapping(
 			value = "/create-plant-qr-code",
-			method = {RequestMethod.PUT, RequestMethod.GET, RequestMethod.POST}
+			method = {RequestMethod.PUT, RequestMethod.POST}
 	)
 	public RestResponseEntity
 	createQrCode(

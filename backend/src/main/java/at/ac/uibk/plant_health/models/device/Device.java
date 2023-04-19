@@ -11,7 +11,6 @@ import java.util.UUID;
 import at.ac.uibk.plant_health.models.IdentifiedEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter

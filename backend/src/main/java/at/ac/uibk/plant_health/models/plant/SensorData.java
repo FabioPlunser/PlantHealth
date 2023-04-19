@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
@@ -16,7 +17,7 @@ import lombok.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class SensorData {
+public class SensorData implements Serializable {
 	@Id
 	@Column(name = "time_stamp", nullable = false)
 	@JdbcTypeCode(SqlTypes.TIMESTAMP)
@@ -58,7 +59,12 @@ public class SensorData {
 
 	@JsonIgnore
 	public char getAlarm() {
-		return this.aboveLimit ? 'h' : this.belowLimit ? 'l' : 'n';
+		if (this.aboveLimit) {
+			return 'h';
+		} else if (this.belowLimit) {
+			return 'l';
+		}
+		return 'n';
 	}
 
 	@Override

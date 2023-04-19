@@ -16,11 +16,9 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-@NoArgsConstructor(access = AccessLevel.MODULE)
-@AllArgsConstructor
 public class LoginResponse extends TokenResponse implements Serializable {
-	private UUID personId;
-	private Set<GrantedAuthority> permissions;
+	private final UUID personId;
+	private final Set<GrantedAuthority> permissions;
 
 	public LoginResponse(Authenticable authenticable) {
 		super(authenticable.getToken());

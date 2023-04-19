@@ -22,10 +22,9 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-@NoArgsConstructor(access = AccessLevel.MODULE)
 public class DashBoardDataResponse extends RestResponse implements Serializable {
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private List<DashboardPlant> plants;
+	private final List<DashboardPlant> plants;
 
 	public DashBoardDataResponse(Person person) {
 		this.plants = person.getSensorStationPersonReferences()
@@ -37,11 +36,11 @@ public class DashBoardDataResponse extends RestResponse implements Serializable 
 	}
 
 	@Getter
-	private class DashboardPlant {
+	private class DashboardPlant implements Serializable {
 		@JsonProperty(value = "plant-name")
-		private String name;
+		private final String name;
 
-		private List<TimeStampedSensorData> values;
+		private final List<TimeStampedSensorData> values;
 
 		public DashboardPlant(SensorStation sensorStation) {
 			this.name = sensorStation.getName();
@@ -57,9 +56,9 @@ public class DashBoardDataResponse extends RestResponse implements Serializable 
 	}
 
 	@Getter
-	private class TimeStampedSensorData {
-		private LocalDateTime timestamp;
-		private List<InnerSensorData> sensors;
+	private class TimeStampedSensorData implements Serializable {
+		private final LocalDateTime timestamp;
+		private final List<InnerSensorData> sensors;
 		public TimeStampedSensorData(Map.Entry<LocalDateTime, List<SensorData>> e) {
 			this.timestamp = e.getKey();
 			this.sensors = e.getValue().stream().map(InnerSensorData::new).toList();
@@ -67,11 +66,11 @@ public class DashBoardDataResponse extends RestResponse implements Serializable 
 	}
 
 	@Getter
-	private class InnerSensorData {
-		private String sensor;
-		private int value;
-		private String unit;
-		private char alarm;
+	private class InnerSensorData implements Serializable {
+		private final String sensor;
+		private final int value;
+		private final String unit;
+		private final char alarm;
 
 		public InnerSensorData(SensorData sensorData) {
 			this.sensor = sensorData.getSensor().getType();

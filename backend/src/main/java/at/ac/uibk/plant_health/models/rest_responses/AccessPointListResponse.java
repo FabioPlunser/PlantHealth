@@ -7,26 +7,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
 @SuperBuilder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AccessPointListResponse extends RestResponse {
     @JsonProperty("access-points")
-    private List<InnerAccessPoint> accessPoints;
+    private final List<InnerAccessPoint> accessPoints;
 
     public AccessPointListResponse(List<AccessPoint> accessPoints) {
         this.accessPoints = accessPoints.stream().map(InnerAccessPoint::new).toList();
     }
 
     @Getter
-    private class InnerAccessPoint {
-        private UUID id;
+    private class InnerAccessPoint implements Serializable {
+        private final UUID id;
         @JsonProperty("room-name")
-        private String roomName;
-        private boolean locked;
+        private final String roomName;
+        private final boolean locked;
 
         public InnerAccessPoint(AccessPoint accessPoint ) {
             this.id = accessPoint.getDeviceId();

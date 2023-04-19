@@ -46,7 +46,6 @@ public class Person extends Authenticable implements Serializable {
 		this(username, email, passwdHash, null, Permission.defaultAuthorities());
 	}
 
-	@Setter(AccessLevel.PRIVATE)
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
 	@Column(name = "email", nullable = false)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)

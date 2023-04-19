@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity

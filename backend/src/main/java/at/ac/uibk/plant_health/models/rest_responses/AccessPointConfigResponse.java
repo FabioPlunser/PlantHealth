@@ -20,16 +20,14 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-@NoArgsConstructor(access = AccessLevel.MODULE)
 @AllArgsConstructor(access = AccessLevel.MODULE)
 public class AccessPointConfigResponse extends RestResponse implements Serializable {
-	private String roomName;
-	private boolean pairingMode;
-	private int transferInterval;
-	private List<SensorStationInfo> sensorStations;
+	private final String roomName;
+	private final boolean pairingMode;
+	private final int transferInterval;
+	private final List<SensorStationInfo> sensorStations;
 
 	public AccessPointConfigResponse(AccessPoint accessPoint) {
-		System.out.println(accessPoint);
 		this.roomName = accessPoint.getRoomName();
 		this.pairingMode = accessPoint.isScanActive();
 		this.transferInterval = accessPoint.getTransferInterval();
@@ -39,8 +37,8 @@ public class AccessPointConfigResponse extends RestResponse implements Serializa
 
 	@Getter
 	public static class SensorStationInfo implements Serializable {
-		private String bdAddress;
-		private List<SensorInfo> sensors;
+		private final String bdAddress;
+		private final List<SensorInfo> sensors;
 
 		public SensorStationInfo(SensorStation sensorStation) {
 			this.bdAddress = sensorStation.getBdAddress();
@@ -49,9 +47,9 @@ public class AccessPointConfigResponse extends RestResponse implements Serializa
 
 		@Getter
 		public static class SensorInfo implements Serializable {
-			private String sensorName;
-			private Limits limits;
-			private int alarmThresholdTime;
+			private final String sensorName;
+			private final Limits limits;
+			private final int alarmThresholdTime;
 
 			public SensorInfo(SensorLimits sensorLimits) {
 				this.sensorName = sensorLimits.getSensor().getType();
@@ -62,8 +60,8 @@ public class AccessPointConfigResponse extends RestResponse implements Serializa
 
 			@Getter
 			public static class Limits implements Serializable {
-				private double lowerLimit;
-				private double upperLimit;
+				private final double lowerLimit;
+				private final double upperLimit;
 
 				public Limits(double lowerLimit, double upperLimit) {
 					this.lowerLimit = lowerLimit;

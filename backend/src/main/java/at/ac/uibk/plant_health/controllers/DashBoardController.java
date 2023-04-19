@@ -33,31 +33,32 @@ public class DashBoardController {
 			Person person, @RequestParam("plant-id") final UUID plantId
 	) {
 		var maybeSensorStation = this.sensorStationService.findById(plantId);
-		if (maybeSensorStation.isPresent()) {
-			if (this.sensorStationPersonReferenceService.addPlantToDashboard(
-					person, maybeSensorStation.get()
-			)) {
-				return MessageResponse.builder().ok().toEntity();
-			}
+		if (
+			maybeSensorStation.isPresent() &&
+			this.sensorStationPersonReferenceService.addPlantToDashboard(
+				person, maybeSensorStation.get()
+		)) {
+			return MessageResponse.builder().ok().toEntity();
+
 		}
 
-		return MessageResponse.builder().not_found().message("Could not find Plant").toEntity();
+		return MessageResponse.builder().notFound().message("Could not find Plant").toEntity();
 	}
 
 	@PrincipalRequired(Person.class)
-	@RequestMapping(value = "/remove-from-dashboard", method = {RequestMethod.DELETE})
+	@DeleteMapping(value = "/remove-from-dashboard")
 	public RestResponseEntity removeFromDashboard(
 			Person person, @RequestParam("plant-id") final UUID plantId
 	) {
 		var maybeSensorStation = this.sensorStationService.findById(plantId);
-		if (maybeSensorStation.isPresent()) {
-			if (this.sensorStationPersonReferenceService.removePlantFromDashboard(
-					person, maybeSensorStation.get()
-			)) {
-				return MessageResponse.builder().ok().toEntity();
-			}
+		if (
+			maybeSensorStation.isPresent() &&
+			this.sensorStationPersonReferenceService.removePlantFromDashboard(
+				person, maybeSensorStation.get()
+		)) {
+			return MessageResponse.builder().ok().toEntity();
 		}
 
-		return MessageResponse.builder().not_found().message("Could not find Plant").toEntity();
+		return MessageResponse.builder().notFound().message("Could not find Plant").toEntity();
 	}
 }

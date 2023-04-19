@@ -157,14 +157,14 @@ public class PersonController {
 			final UUID personId, final String username, final String email,
 			final Set<Permission> permissions, final String password
 	) {
-		if (personService.update(personId, username, permissions, password))
+		if (personService.update(personId, username, email, permissions, password))
 			return MessageResponse.builder()
 					.ok()
 					.message("User " + personId + " updated successfully!")
 					.toEntity();
 
 		return MessageResponse.builder()
-				.not_found()
+				.notFound()
 				.message("Could not update User " + personId + " - User does not exist!")
 				.toEntity();
 	}
@@ -189,7 +189,7 @@ public class PersonController {
 					.toEntity();
 
 		return MessageResponse.builder()
-				.not_found()
+				.notFound()
 				.message("Could not delete User " + personId + " - User does not exist!")
 				.toEntity();
 	}
