@@ -125,7 +125,7 @@ class Server:
         :return: A tuple with a dictionary and a list of dictionaries
             The former for the configuration regarding the access point:
                 {
-                    (opt) "room_name": Name of the room in which the access point is located -> str
+                    "room_name": Name of the room in which the access point is located -> str
                     "scan_active": Flag that inidicates if the access point shall search for new sensor stations -> bool
                     "transfer_data_interval": Time in seconds between transfering sensor data to the backend -> int
                 }
@@ -226,7 +226,7 @@ class Server:
             {
                 "sensor_station_address": Address of the sensor station -> str,
                 "sensor_name": Name of the sensor -> str,
-                (opt) "unit": Unit of the measured value -> str,
+                "unit": Unit of the measured value -> str | None,
                 "timestamp": Timestamp of the measurement -> datetime,
                 "value": Measured value -> float,
                 "alarm": Alarm active at the time of the measurement -> str ['n' no alarm | 'l' below limit | 'h' above limit]
@@ -235,34 +235,31 @@ class Server:
         :raises ConnectionError: If the request fails
         """
         # setup entries for each known sensor station
-        data = [{'id': adr,
+        data = [{'bdAddress': adr,
                  'connectionAlive': status.get('connection_alive'),
                  'dipSwitch': status.get('dip_id')}
                  for adr, status in station_data.items()]
 
         # assign measurements to single sensor stations
         for index, entry in enumerate(data):
-            adr = entry.get('id')
-            station_measurements = [m for m in measurements if m.get('sensor_station_address') == adr]
-            timestamps: list[datetime] = sorted(list(set([m.get('timestamp') for m in station_measurements])), reverse=True)
-            # group measurements by timestamp
-            values = []
-            for t in timestamps:
-                filtered_station_measurements = [m for m in station_measurements if m.get('timestamp') == t]
-                values.append({'timestamp': t.isoformat(),
-                               'sensors': [{'sensor': m.get('sensor_name'),
-                                            'value': m.get('value'),
-                                            'unit': m.get('unit'),
-                                            'alarm': m.get('alarm')}
-                                            for m in filtered_station_measurements]})
+            adr = entry.get('bdAddress')
+            measurements_of_station = [m for m in measurements if m.get('sensor_station_address') == adr]
+            # construct sensor data for request
+            sensor_data = [{'timeStamp': m.get('timestamp').isoformat(),
+                            'value': round(m.get('value'), 2),
+                            'alarm': m.get('alarm'),
+                            'sensor': {'type': m.get('sensor_name'),
+                                       'unit': m.get('unit')}}
+                            for m in measurements_of_station]
+
             # update data structure
-            data[index]['values'] = values
+            data[index]['sensorData'] = sensor_data
 
         # send request
         try:
             response = self._client.post(
                 self._get_endpoint_url('transfer-data'),
-                json={'sensorStations': data}
+                json=data
             )
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
             raise ConnectionError(f'Request timed out: {e}')

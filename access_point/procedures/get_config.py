@@ -32,8 +32,12 @@ def get_config(config: Config) -> None:
         log.info('Not registered at backend yet')
         try:
             log.info(f'Trying to register at {backend.address}')
-            config.update(token=backend.register(str(config.uuid), config.room_name))
-            log.info(f'Received token')
+            token=backend.register(str(config.uuid), config.room_name)
+            if token:
+                config.update(token=token)
+                log.info(f'Received token')
+            else:
+                log.info(f'No token received')
         except ConnectionError as e:
             log.error(e)
             return
