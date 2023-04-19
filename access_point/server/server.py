@@ -40,7 +40,8 @@ class Server:
         """
         self.address = address
         self._client = requests.Session()
-        self._token = token
+        self._token = None  # necessary due to updating headers with setting token
+        self.token = token
         # setup default request timeout
         for method in ['get', 'options', 'head', 'post', 'put', 'patch', 'delete']:
             setattr(self._client, method, functools.partial(getattr(self._client, method), timeout=self._REQUEST_TIMEOUT))
@@ -112,10 +113,10 @@ class Server:
             self.token = None
         elif not response.ok:
             raise ConnectionError(describe_not_ok_response(response))
-        
-        # get content
-        content = response.json()
-        self.token = content.get('token')
+        else:    
+            # get content
+            content = response.json()
+            self.token = content.get('token')
         return self.token
         
     def get_config(self) -> tuple[dict[str, Union[str, bool, int]], list[dict[str, Union[str, list[dict[str, Union[str, int]]]]]]]:
@@ -135,11 +136,9 @@ class Server:
                         "address": Address of the sensor station
                         "sensors: [
                             {
-                                "name": Name of the sensor -> str
-                                "limits": {
-                                    "upper_limit": Upper limit for alarms -> float
-                                    "lower_limit": Lower limit for alarms -> float 
-                                }
+                                "sensor_name": Name of the sensor -> str
+                                "lower_limit": Lower limit for alarms -> float 
+                                "upper_limit": Upper limit for alarms -> float
                                 "alarm_tripping_time": Time in seconds until an alarm is tripped -> int
                             },
                             ...
@@ -199,10 +198,10 @@ class Server:
                     else:
                         sensor['sensor_name'] = str(raw_sensor.get('sensorName'))
                     if isinstance(raw_sensor.get('limits'), dict):        
-                        if isinstance(raw_sensor['limits'].get('lowerLimit'), float) or isinstance(raw_sensor['limits'].get('lowerLimit'), int):
-                            sensor['lower_limit'] = int(raw_sensor['limits'].get('lowerLimit'))
-                        if isinstance(raw_sensor['limits'].get('upperLimit'), float) or isinstance(raw_sensor['limits'].get('upperLimit'), int):
-                            sensor['upper_limit'] = int(raw_sensor['limits'].get('upperLimit'))
+                        if isinstance(raw_sensor['limits'].get('lowerLimit'), float):
+                            sensor['lower_limit'] = float(raw_sensor['limits'].get('lowerLimit'))
+                        if isinstance(raw_sensor['limits'].get('upperLimit'), float):
+                            sensor['upper_limit'] = float(raw_sensor['limits'].get('upperLimit'))
                     if isinstance(raw_sensor.get('thresholdTime'), int):
                         sensor['alarm_tripping_time'] = int(raw_sensor.get('thresholdTime'))
                     sensor_station['sensors'].append(sensor)
@@ -237,7 +236,7 @@ class Server:
         # setup entries for each known sensor station
         data = [{'bdAddress': adr,
                  'connectionAlive': status.get('connection_alive'),
-                 'dipSwitch': status.get('dip_id')}
+                 'dipSwitchId': status.get('dip_id')}
                  for adr, status in station_data.items()]
 
         # assign measurements to single sensor stations
@@ -285,7 +284,7 @@ class Server:
             response = self._client.put(
                 self._get_endpoint_url('found-sensor-stations'),
                 json={'sensorStations': [{'bdAddress': station.get('address'),
-                                          'dipSwitch': station.get('dip-switch')}
+                                          'dipSwitchId': station.get('dip-switch')}
                                           for station in sensor_stations]}
             )
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
