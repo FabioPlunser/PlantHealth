@@ -32,20 +32,15 @@ public class AccessPointController {
 			@RequestParam(name = "accessPointId") final UUID accessPointId,
 			@RequestParam(name = "roomName") final String roomName
 	) {
-		if (
-				!accessPointService.isAccessPointRegistered(accessPointId) &&
-				!accessPointService.register(accessPointId, roomName)
-		) {
+		if (!accessPointService.isAccessPointRegistered(accessPointId)
+			&& !accessPointService.register(accessPointId, roomName)) {
 			return MessageResponse.builder()
 					.statusCode(500)
 					.message("Could not register AccessPoint")
 					.toEntity();
 		}
 		if (!accessPointService.isUnlocked(accessPointId)) {
-			return MessageResponse.builder()
-					.statusCode(401)
-					.message(LOCKED_MESSAGE)
-					.toEntity();
+			return MessageResponse.builder().statusCode(401).message(LOCKED_MESSAGE).toEntity();
 		}
 		return TokenResponse.builder()
 				.statusCode(200)
@@ -101,10 +96,7 @@ public class AccessPointController {
 			AccessPoint accessPoint, @RequestBody final List<SensorStation> sensorStations
 	) {
 		if (!accessPointService.isUnlocked(accessPoint.getSelfAssignedId())) {
-			return MessageResponse.builder()
-					.statusCode(403)
-					.message(LOCKED_MESSAGE)
-					.toEntity();
+			return MessageResponse.builder().statusCode(403).message(LOCKED_MESSAGE).toEntity();
 		}
 		if (accessPointService.foundNewSensorStation(accessPoint, sensorStations)) {
 			return MessageResponse.builder()
@@ -130,10 +122,7 @@ public class AccessPointController {
 					.toEntity();
 
 		if (!accessPointService.isUnlocked(accessPointId))
-			return MessageResponse.builder()
-					.statusCode(401)
-					.message(LOCKED_MESSAGE)
-					.toEntity();
+			return MessageResponse.builder().statusCode(401).message(LOCKED_MESSAGE).toEntity();
 
 		if (!accessPointService.startScan(accessPointId))
 			return MessageResponse.builder()
@@ -146,8 +135,17 @@ public class AccessPointController {
 	@PostMapping("/transfer-data")
 	@PrincipalRequired(AccessPoint.class)
 	public RestResponseEntity transferData(
-			final AccessPoint accessPoint, @RequestBody final String data
+			final AccessPoint accessPoint, @RequestBody final List<SensorStation> sensorStationList
 	) {
-		throw new NotImplementedException();
+		if (!accessPointService.setSensorStationData(sensorStationList)) {
+			return MessageResponse.builder()
+					.statusCode(500)
+					.message("Could not transfer data")
+					.toEntity();
+		}
+		return MessageResponse.builder()
+				.statusCode(200)
+				.message("Successfully transfered data")
+				.toEntity();
 	}
 }

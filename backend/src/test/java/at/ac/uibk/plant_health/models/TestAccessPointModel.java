@@ -32,8 +32,8 @@ public class TestAccessPointModel {
 	// AccessPoint sends sensorstation data to backend
 	@BeforeEach
 	void setup() {
-		accessPointRepository.deleteAll();
 		sensorStationRepository.deleteAll();
+		accessPointRepository.deleteAll();
 	}
 
 	/*

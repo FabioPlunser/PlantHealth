@@ -44,6 +44,10 @@ public class SensorStationService {
 		return sensorStationRepository.findByQrCodeId(qrCode);
 	}
 
+	public Optional<SensorStation> findByBdAddress(String bdAddress) {
+		return sensorStationRepository.findByBdAddress(bdAddress);
+	}
+
 	public SensorStation save(SensorStation sensorStation) {
 		try {
 			return sensorStationRepository.save(sensorStation);
@@ -95,13 +99,26 @@ public class SensorStationService {
 		if (maybeSensor.isPresent()) {
 			sensor = maybeSensor.get();
 		} else {
+			System.out.println(sensor);
 			sensor = sensorRepository.save(sensor);
 		}
 
 		data.setSensor(sensor);
-
 		data.setSensorStation(sensorStation);
 		this.sensorDataRepository.save(data);
+
+		return true;
+	}
+
+	@Transactional
+	public boolean addSensorData(SensorStation sensorStation, List<SensorData> dataList) {
+		if (dataList == null || sensorStation == null) return false;
+
+		for (SensorData data : dataList) {
+			if (!this.addSensorData(sensorStation, data)) {
+				return false;
+			};
+		}
 
 		return true;
 	}
