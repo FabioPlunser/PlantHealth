@@ -31,6 +31,9 @@ dependencies {
 
 	// MySQL specific Driver
 	implementation 'mysql:mysql-connector-java'
+	// Database Logger
+	implementation 'ch.qos.logback:logback-classic'
+	implementation 'ch.qos.logback.db:logback-classic-db:1.2.11.1'
 
 	// Swagger UI
 	implementation 'org.springdoc:springdoc-openapi-starter-common:2.0.2'

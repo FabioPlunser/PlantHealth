@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import at.ac.uibk.plant_health.models.Person;
+import at.ac.uibk.plant_health.models.user.Person;
 
 public interface PersonRepository extends CrudRepository<Person, UUID> {
 	@Override

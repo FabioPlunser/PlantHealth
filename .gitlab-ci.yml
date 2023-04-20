@@ -1,22 +1,25 @@
-image: alpine:3.17
+
 
 stages: # List of stages for jobs, and their order of execution
   - test
   - sonarCheck
+  - deployBackend
 
 .before_script_template:
   before_script:
     - apk add --update maven
 
 unit-test-job: # This job runs in the test stage.
+  image: alpine:3.17
   extends: .before_script_template
   stage: test
   script:
     - echo "Running unit tests..."
     - cd backend && mvn test
-  allow_failure: true
+  allow_failure: false
 
 sonarqube-check:
+  image: alpine:3.17
   extends: .before_script_template
   stage: sonarCheck
   variables:

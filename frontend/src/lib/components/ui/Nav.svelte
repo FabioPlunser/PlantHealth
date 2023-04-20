@@ -43,8 +43,8 @@ Usage:
           {/if}
         {/each}
       </ul>
-      <div class="absolute top-0 right-0 mr-4">
-        <div class="flex my-auto items-center mx-2 gap-6">
+      <div class="absolute top-0 right-0 mr-4 -mt-4">
+        <div class="flex mx-2 gap-4">
           <label tabindex="-1" class="swap swap-rotate">
             <input
               type="checkbox"
@@ -52,7 +52,7 @@ Usage:
               bind:checked={$theme}
             />
             <svg
-              class="swap-on fill-current w-14 h-14"
+              class="swap-on fill-current w-10 h-10"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               ><path
@@ -60,7 +60,7 @@ Usage:
               /></svg
             >
             <svg
-              class="swap-off fill-current w-14 h-14"
+              class="swap-off fill-current w-10 h-10"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               ><path

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Optional;
 import java.util.UUID;
 
-import at.ac.uibk.plant_health.config.jwt_authentication.JwtToken;
+import at.ac.uibk.plant_health.config.jwt_authentication.authentication_types.UserAuthentication;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -37,10 +37,10 @@ public class ConversionUtil {
 	/**
 	 * Helper Method for parsing a JSON Web Token from a String.
 	 *
-	 * @param input The input to parse into a {@link JwtToken}.
-	 * @return The parsed {@link JwtToken}, or empty if the parsing failed.
+	 * @param input The input to parse into a {@link UserAuthentication}.
+	 * @return The parsed {@link UserAuthentication}, or empty if the parsing failed.
 	 */
-	public static Optional<JwtToken> tryConvertJwtTokenOptional(String input) {
+	public static Optional<UserAuthentication> tryConvertJwtTokenOptional(String input) {
 		return Optional.ofNullable(tryConvertJwtToken(input));
 	}
 
@@ -55,12 +55,12 @@ public class ConversionUtil {
 	/**
 	 * Helper Method for parsing a JSON Web Token from a String.
 	 *
-	 * @param input The input to parse into a {@link JwtToken}.
-	 * @return The parsed {@link JwtToken}, or null if the parsing failed.
+	 * @param input The input to parse into a {@link UserAuthentication}.
+	 * @return The parsed {@link UserAuthentication}, or null if the parsing failed.
 	 */
-	public static JwtToken tryConvertJwtToken(String input) {
+	public static UserAuthentication tryConvertJwtToken(String input) {
 		try {
-			return new ObjectMapper().readValue(input, JwtToken.class);
+			return new ObjectMapper().readValue(input, UserAuthentication.class);
 		} catch (JsonProcessingException e) {
 			return null;
 		}

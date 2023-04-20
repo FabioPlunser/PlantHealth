@@ -3,15 +3,15 @@ package at.ac.uibk.plant_health.config.controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import at.ac.uibk.plant_health.models.AccessPoint;
-import at.ac.uibk.plant_health.models.Authenticable;
-import at.ac.uibk.plant_health.models.Permission;
-import at.ac.uibk.plant_health.models.SensorStation;
 import at.ac.uibk.plant_health.models.annotations.AnyPermission;
 import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
 import at.ac.uibk.plant_health.models.annotations.PublicEndpoint;
+import at.ac.uibk.plant_health.models.device.AccessPoint;
+import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.rest_responses.MessageResponse;
 import at.ac.uibk.plant_health.models.rest_responses.RestResponseEntity;
+import at.ac.uibk.plant_health.models.user.Authenticable;
+import at.ac.uibk.plant_health.models.user.Permission;
 
 @RestController
 public class TestController {
