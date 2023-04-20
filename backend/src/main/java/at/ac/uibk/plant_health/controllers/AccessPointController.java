@@ -135,8 +135,17 @@ public class AccessPointController {
 	@PostMapping("/transfer-data")
 	@PrincipalRequired(AccessPoint.class)
 	public RestResponseEntity transferData(
-			final AccessPoint accessPoint, @RequestBody final String data
+			final AccessPoint accessPoint, @RequestBody final List<SensorStation> sensorStationList
 	) {
-		throw new NotImplementedException();
+		if (!accessPointService.setSensorStationData(sensorStationList)) {
+			return MessageResponse.builder()
+					.statusCode(500)
+					.message("Could not transfer data")
+					.toEntity();
+		}
+		return MessageResponse.builder()
+				.statusCode(200)
+				.message("Successfully transfered data")
+				.toEntity();
 	}
 }

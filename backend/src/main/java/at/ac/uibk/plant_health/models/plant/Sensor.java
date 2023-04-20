@@ -3,6 +3,8 @@ package at.ac.uibk.plant_health.models.plant;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
 import jakarta.persistence.*;
@@ -13,7 +15,7 @@ import lombok.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Sensor {
+public class Sensor implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
@@ -34,22 +36,22 @@ public class Sensor {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (obj == this) {
-			return true;
-		}
-		if (!(obj instanceof Sensor)) {
-			return false;
-		}
-		Sensor other = (Sensor) obj;
-		return this.sensorId.equals(other.sensorId);
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Sensor sensor = (Sensor) o;
+		return Objects.equals(sensorId, sensor.sensorId) && Objects.equals(type, sensor.type);
 	}
 
 	@Override
 	public int hashCode() {
-		return sensorId.hashCode();
+		return Objects.hash(sensorId, type);
+	}
+
+	@Override
+	public String toString() {
+		return "Sensor{"
+				+ "sensorId=" + sensorId + ", type='" + type + '\'' + ", unit='" + unit + '\''
+				+ '}';
 	}
 }

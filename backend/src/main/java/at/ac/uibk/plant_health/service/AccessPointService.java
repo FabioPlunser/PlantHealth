@@ -2,6 +2,7 @@ package at.ac.uibk.plant_health.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -79,13 +80,15 @@ public class AccessPointService {
 	/**
 	 * Save the given AccessPoint.
 	 * If the AccessPoint with the given ID already exists, don't save it and return false.
-	 *
+	 * returns false if accessPoint already exists
 	 * @param accessPointId
 	 * @param roomName
 	 */
 	public boolean create(UUID accessPointId, String roomName) {
-		// TODO
 		if (accessPointId == null && roomName == null) {
+			return false;
+		}
+		if (isAccessPointRegistered(accessPointId)) {
 			return false;
 		}
 		AccessPoint accessPoint = new AccessPoint(accessPointId, roomName, false);
@@ -100,7 +103,6 @@ public class AccessPointService {
 	 * @return the saved AccessPoint
 	 */
 	public AccessPoint save(AccessPoint accessPoint) {
-		// TODO
 		try {
 			return accessPointRepository.save(accessPoint);
 		} catch (Exception e) {
@@ -180,6 +182,27 @@ public class AccessPointService {
 	public boolean lostSensorStation(AccessPoint accessPoint, SensorStation sensorStation) {
 		// TODO
 		return false;
+	}
+
+	/**
+	 * Set data of list of SensorStations.
+	 * @param sensorStations
+	 * @return true if the data was set, false otherwise
+	 */
+	@Transactional
+	public boolean setSensorStationData(List<SensorStation> sensorStations) {
+		for (SensorStation sensorStation : sensorStations) {
+			Optional<SensorStation> maybeSensorStation =
+					sensorStationService.findByBdAddress(sensorStation.getBdAddress());
+			if (maybeSensorStation.isEmpty()) return false;
+			SensorStation dbSensorStation = maybeSensorStation.get();
+			if (!sensorStationService.addSensorData(
+						dbSensorStation, sensorStation.getSensorData()
+				)) {
+				return false;
+			};
+		}
+		return true;
 	}
 
 	/**

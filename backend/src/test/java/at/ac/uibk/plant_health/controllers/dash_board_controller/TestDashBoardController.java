@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.hamcrest.Matchers;
 import org.hamcrest.core.AnyOf;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -114,9 +115,9 @@ public class TestDashBoardController {
 		sensorStationPersonReferenceService.addPlantToDashboard(person, s1);
 
 		Sensor sensor = new Sensor("Test", "°C");
-		SensorData data1 = new SensorData(LocalDateTime.now(), 1, false, false, "n", sensor, s1);
+		SensorData data1 = new SensorData(LocalDateTime.now(), 1, false, false, 'n', sensor, s1);
 		SensorData data2 = new SensorData(
-				data1.getTimeStamp().plusMinutes(5), 2, false, false, "n", sensor, s1
+				data1.getTimeStamp().plusMinutes(5), 2, false, false, 'n', sensor, s1
 		);
 
 		sensorStationService.addSensorData(s1, data1);
