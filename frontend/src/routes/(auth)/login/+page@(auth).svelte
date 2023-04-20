@@ -40,8 +40,10 @@
           placeholder="Type here"
         />
         <FormError field="password" {form} />
-        <div class="flex justify-center mt-4">
+        <div class="flex justify-center mt-4 gap-4">
           <button class="btn btn-primary">Login</button>
+          <a href="/register" class="btn text-white">Register</a>
+          <a href="/guest" class="btn btn-info text-white">Guest</a>
         </div>
       </div>
     </form>
