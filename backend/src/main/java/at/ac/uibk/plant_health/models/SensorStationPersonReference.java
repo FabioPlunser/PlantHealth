@@ -3,6 +3,7 @@ package at.ac.uibk.plant_health.models;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
@@ -16,7 +17,7 @@ import lombok.*;
 @Table(name = "plant_person_reference")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class SensorStationPersonReference {
+public class SensorStationPersonReference implements Serializable {
 	@Id
 	@Column(name = "reference_id", nullable = false)
 	@GeneratedValue(strategy = GenerationType.AUTO)

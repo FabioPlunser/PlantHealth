@@ -18,7 +18,7 @@ public class Sensor {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
 	@Column(name = "sensor_id", nullable = false)
-	private UUID sensor_id;
+	private UUID sensorId;
 
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
 	@Column(name = "sensor_type", nullable = false, unique = true)

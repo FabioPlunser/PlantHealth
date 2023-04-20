@@ -6,6 +6,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.io.Serializable;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.SensorStationPersonReference;
@@ -22,7 +23,7 @@ import lombok.*;
 @Table(name = "sensor_station")
 // NOTE: This changes the name of the "id"-Column inherited from Device to "sensor_station_id"
 @AttributeOverride(name = "id", column = @Column(name = "sensor_station_id"))
-public class SensorStation extends Device {
+public class SensorStation extends Device implements Serializable {
 	@Column(name = "bd_address", unique = true)
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
 	private String bdAddress = null;
@@ -74,5 +75,15 @@ public class SensorStation extends Device {
 				+ ", dipSwitchId=" + dipSwitchId + ", accessPoint=" + accessPoint
 				+ ", sensorStationPersonReferences=" + sensorStationPersonReferences
 				+ ", sensorData=" + sensorData + ", sensorLimits=" + sensorLimits + "]";
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return super.equals(o);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), bdAddress);
 	}
 }

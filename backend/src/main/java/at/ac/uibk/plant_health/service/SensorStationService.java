@@ -23,12 +23,14 @@ public class SensorStationService {
 	private SensorDataRepository sensorDataRepository;
 	@Autowired
 	private SensorRepository sensorRepository;
-
 	@Autowired
 	private PlantPictureRepository plantPictureRepository;
-
 	@Autowired
-	private PlantPersonReferenceRepository plantPersonReferenceRepository;
+	private SensorStationPersonReferenceRepository sensorStationPersonReferenceRepository;
+
+	public Optional<SensorStation> findById(UUID id) {
+		return this.sensorStationRepository.findById(id);
+	}
 
 	public List<SensorStation> findAll() {
 		return sensorStationRepository.findAll();

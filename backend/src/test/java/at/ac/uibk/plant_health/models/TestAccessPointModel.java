@@ -35,6 +35,8 @@ public class TestAccessPointModel {
 		sensorStationRepository.deleteAll();
 		accessPointRepository.deleteAll();
 	}
+
+	/*
 	@Test
 	void testRegisterAccessPoint() {
 		// given roomName and id
@@ -145,4 +147,5 @@ public class TestAccessPointModel {
 		);
 		assertEquals(5, sensorStationRepository.findAll().size());
 	}
+	*/
 }

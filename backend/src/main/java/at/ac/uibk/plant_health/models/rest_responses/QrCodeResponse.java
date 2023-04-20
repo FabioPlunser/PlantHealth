@@ -10,9 +10,9 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 public class QrCodeResponse extends RestResponse {
-	private String name;
-	private String roomName;
-	private List<String> pictures;
+	private final String name;
+	private final String roomName;
+	private final List<String> pictures;
 
 	public QrCodeResponse(SensorStation sensorStation) {
 		this.name = sensorStation.getName();

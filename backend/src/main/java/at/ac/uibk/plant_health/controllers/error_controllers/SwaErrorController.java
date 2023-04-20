@@ -125,7 +125,7 @@ public class SwaErrorController implements ErrorController {
 			HttpServletRequest request, HttpServletResponse response, Exception exception
 	) {
 		return MessageResponse.builder()
-				.internal_error()
+				.internalError()
 				.statusCode(HttpStatus.UNAUTHORIZED)
 				.toEntity();
 	}

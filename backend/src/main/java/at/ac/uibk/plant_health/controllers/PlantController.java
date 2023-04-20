@@ -1,6 +1,5 @@
 package at.ac.uibk.plant_health.controllers;
 
-import at.ac.uibk.plant_health.models.rest_responses.*;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.annotations.AnyPermission;
+import at.ac.uibk.plant_health.models.rest_responses.*;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.service.SensorStationService;
 
@@ -39,7 +39,7 @@ public class PlantController {
 	@AnyPermission(Permission.ADMIN)
 	@RequestMapping(
 			value = "/create-plant-qr-code",
-			method = {RequestMethod.PUT, RequestMethod.GET, RequestMethod.POST}
+			method = {RequestMethod.PUT, RequestMethod.POST}
 	)
 	public RestResponseEntity
 	createQrCode(
