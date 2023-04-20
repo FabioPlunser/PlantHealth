@@ -27,8 +27,8 @@ import at.ac.uibk.plant_health.models.plant.Sensor;
 import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
-import at.ac.uibk.plant_health.service.SensorStationPersonReferenceService;
 import at.ac.uibk.plant_health.service.PersonService;
+import at.ac.uibk.plant_health.service.SensorStationPersonReferenceService;
 import at.ac.uibk.plant_health.service.SensorStationService;
 import at.ac.uibk.plant_health.util.AuthGenerator;
 import at.ac.uibk.plant_health.util.LocalDateTimeJsonParser;
@@ -113,10 +113,11 @@ public class TestDashBoardController {
 		sensorStationService.save(s1);
 		sensorStationPersonReferenceService.addPlantToDashboard(person, s1);
 
-		Sensor sensor = new Sensor("Test");
-		SensorData data1 = new SensorData(LocalDateTime.now(), 1, false, false, sensor);
-		SensorData data2 =
-				new SensorData(data1.getTimeStamp().plusMinutes(5), 2, false, false, sensor);
+		Sensor sensor = new Sensor("Test", "°C");
+		SensorData data1 = new SensorData(LocalDateTime.now(), 1, false, false, "n", sensor, s1);
+		SensorData data2 = new SensorData(
+				data1.getTimeStamp().plusMinutes(5), 2, false, false, "n", sensor, s1
+		);
 
 		sensorStationService.addSensorData(s1, data1);
 		sensorStationService.addSensorData(s1, data2);
@@ -209,11 +210,11 @@ public class TestDashBoardController {
 		sensorStationPersonReferenceService.addPlantToDashboard(person, s1);
 
 		mockMvc.perform(MockMvcRequestBuilders.delete("/remove-from-dashboard")
-						.header(HttpHeaders.USER_AGENT, "MockTests")
-						.header(HttpHeaders.AUTHORIZATION,
-								AuthGenerator.generateToken(person))
-						.param("plant-id", s1.getDeviceId().toString())
-						.contentType(MediaType.APPLICATION_JSON))
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(person))
+								.param("plant-id", s1.getDeviceId().toString())
+								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
 		person = personService.findById(person.getPersonId()).get();

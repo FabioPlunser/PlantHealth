@@ -17,15 +17,20 @@ import lombok.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@IdClass(SensorData.SensorDataId.class)
 public class SensorData implements Serializable {
+	static class SensorDataId implements Serializable {
+		private LocalDateTime timeStamp;
+		private Sensor sensor;
+	}
 	@Id
 	@Column(name = "time_stamp", nullable = false)
 	@JdbcTypeCode(SqlTypes.TIMESTAMP)
 	private LocalDateTime timeStamp;
 
-	@JdbcTypeCode(SqlTypes.INTEGER)
+	@JdbcTypeCode(SqlTypes.DOUBLE)
 	@Column(name = "sensor_value", nullable = false)
-	private int value;
+	private double value;
 
 	@JdbcTypeCode(SqlTypes.BOOLEAN)
 	@Column(name = "above_limit", nullable = false)
@@ -35,6 +40,11 @@ public class SensorData implements Serializable {
 	@Column(name = "below_limit", nullable = false)
 	private boolean belowLimit;
 
+	@JdbcTypeCode(SqlTypes.NVARCHAR)
+	@Column(name = "alarm", nullable = false)
+	private String alarm;
+
+	@Id
 	@ManyToOne
 	@JoinColumn(name = "sensor_id", nullable = false)
 	private Sensor sensor;
@@ -48,13 +58,16 @@ public class SensorData implements Serializable {
 	private boolean isDeleted = false;
 
 	public SensorData(
-			LocalDateTime timeStamp, int value, boolean above, boolean below, Sensor sensor
+			LocalDateTime timeStamp, double value, boolean above, boolean below, String alarm,
+			Sensor sensor, SensorStation sensorStation
 	) {
 		this.timeStamp = timeStamp;
 		this.value = value;
 		this.belowLimit = below;
 		this.aboveLimit = above;
+		this.alarm = alarm;
 		this.sensor = sensor;
+		this.sensorStation = sensorStation;
 	}
 
 	@JsonIgnore
@@ -68,9 +81,28 @@ public class SensorData implements Serializable {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (!(obj instanceof SensorData)) {
+			return false;
+		}
+		SensorData other = (SensorData) obj;
+		return this.timeStamp.equals(other.timeStamp) && this.sensor.equals(other.sensor);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.timeStamp.hashCode() + this.sensor.hashCode();
+	}
+	@Override
 	public String toString() {
 		return "SensorData [timeStamp=" + timeStamp + ", value=" + value
 				+ ", aboveLimit=" + aboveLimit + ", belowLimit=" + belowLimit + ", sensor=" + sensor
-				+ ", sensorStation=" + sensorStation + ", isDeleted=" + isDeleted + "]";
+				+ ", isDeleted=" + isDeleted + "]";
 	}
 }

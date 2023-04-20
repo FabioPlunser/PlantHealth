@@ -68,7 +68,7 @@ public class DashBoardDataResponse extends RestResponse implements Serializable 
 	@Getter
 	private class InnerSensorData implements Serializable {
 		private final String sensor;
-		private final int value;
+		private final double value;
 		private final String unit;
 		private final char alarm;
 
