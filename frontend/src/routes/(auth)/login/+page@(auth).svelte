@@ -24,7 +24,7 @@
     <br />
     <h1 class="flex justify-center text-4xl font-bold">Login</h1>
 
-    <form method="POST" action="?/login" use:enhance>
+    <form method="POST" use:enhance>
       <div class="mx-auto w-fit">
         <Input
           field="username"
@@ -41,9 +41,15 @@
         />
         <FormError field="password" {form} />
         <div class="flex justify-center mt-4 gap-4">
-          <button class="btn btn-primary">Login</button>
-          <a href="/register" class="btn text-white">Register</a>
-          <a href="/guest" class="btn btn-info text-white">Guest</a>
+          <button class="btn btn-primary" formaction="?/login">Login</button>
+          <a href="/register" data-sveltekit-preload-code class="btn text-white"
+            >Register</a
+          >
+          <a
+            href="/guest"
+            data-sveltekit-preload-code
+            class="btn btn-info text-white">Guest</a
+          >
         </div>
       </div>
     </form>

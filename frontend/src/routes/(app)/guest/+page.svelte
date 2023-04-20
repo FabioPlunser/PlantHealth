@@ -5,8 +5,7 @@
   import { getDeviceType } from "$helper/getDeviceType";
   import { fly } from "svelte/transition";
   import Input from "$components/ui/Input.svelte";
-
-  export let data;
+  import Mobile from "$lib/helper/Mobile.svelte";
 
   let scanning = false;
   let isMobile = false;
@@ -59,58 +58,39 @@
   function onScanFailure(error: any) {
     // alert(`Code scan error = ${error}`);
     // console.warn(`Code scan error = ${error}`);
-    // stop();
   }
 
-  onDestroy(() => {
-    if (html5Qrcode) {
-      html5Qrcode.stop();
-    }
-  });
+  // onDestroy(() => {
+  //   if (html5Qrcode) {
+  //     html5Qrcode.stop();
+  //   }
+  // });
 </script>
 
 <section class="mt-12">
-  <div class="mt-8">
-    {#if isMobile}
-      <h1 class="flex justify-center text-3xl font-bold">Scan QR-Code</h1>
-      {#if !scanning}
-        <button
-          class="btn btn-primary flex justify-center mx-auto"
-          on:click={() => start()}>Start</button
-        >
-      {/if}
-      <div
-        class={scanning ? "block" : "hidden"}
-        transition:fly={{ x: -200, duration: 200 }}
+  {#if isMobile}
+    <h1 class="flex justify-center text-3xl font-bold">Scan QR-Code</h1>
+    {#if !scanning}
+      <button
+        class="btn btn-primary flex justify-center mx-auto"
+        on:click={() => start()}>Start</button
       >
-        <div class="p-4 bg-base-100 rounded-2xl shadow-2xl">
-          <reader class="flex items-center justify-center" id="reader" />
-        </div>
-        <button
-          class="btn btn-error flex justify-center mx-auto mt-4"
-          on:click={() => stop()}>Stop</button
-        >
-      </div>
     {/if}
-  </div>
-
-  {#if !scanning}
-    <div
-      class="flex justify-center mt-8"
-      transition:fly={{ x: -200, duration: 200 }}
-    >
-      <div class="">
-        <h1 class="text-4xl flex justify-center">Type in Plant Code</h1>
-        <p class="text-2xl flex justify-center">
-          The code is located on the SensorStation under the QrCode
-        </p>
-        <form action="?/search">
-          <Input type="text" placeholder="123456789" />
-          <div class="flex justify-center mt-4">
-            <button class="btn btn-primary">Find</button>
-          </div>
-        </form>
+    <div class={scanning ? "block" : "hidden"}>
+      <div class="p-4 bg-base-100 rounded-2xl shadow-2xl">
+        <reader class="flex items-center justify-center" id="reader" />
       </div>
+    </div>
+  {/if}
+  {#if !scanning}
+    <div>
+      <form>
+        <h1 class="flex justify-center">Type in Plant Code</h1>
+        <Input type="text" placeholder="123456789" />
+        <div class="flex justify-center mt-4">
+          <button class="btn btn-primary">Find</button>
+        </div>
+      </form>
     </div>
   {/if}
 </section>
