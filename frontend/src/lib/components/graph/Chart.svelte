@@ -16,14 +16,14 @@
   // export let options: any = {};
   export let plugins: any = [];
 
-  export let width: number = 500;
-  export let height: number = 500;
+  export let width: number;
+  export let height: number;
 
   let options: any = null;
   // $: options = $theme === "dark" ? darkOptions : lightOptions;
   $: {
     options = $theme ? darkOptions : lightOptions;
-    if(chart){
+    if (chart) {
       chart.options = options;
       chart.update();
     }
@@ -34,23 +34,23 @@
     let ra = Math.random;
     let s = 255;
 
-    let r = o(ra()*s);
-    let g = o(ra()*s);
-    let b = o(ra()*s);
+    let r = o(ra() * s);
+    let g = o(ra() * s);
+    let b = o(ra() * s);
 
     let color = {
-      background: 'rgba(' + r + ',' + g + ',' + b + ',' + 0.75 + ')',
-      border: 'rgba(' + r + ',' + g + ',' + b + ',' + 1 + ')'
-    }
+      background: "rgba(" + r + "," + g + "," + b + "," + 0.75 + ")",
+      border: "rgba(" + r + "," + g + "," + b + "," + 1 + ")",
+    };
     return color;
   }
 
   $: {
     let color = random_rgba();
     console.log(data);
-    if(data?.datasets){
-      data.datasets[0].backgroundColor = color.background
-      data.datasets[0].borderColor = color.border
+    if (data?.datasets) {
+      data.datasets[0].backgroundColor = color.background;
+      data.datasets[0].borderColor = color.border;
     }
   }
 
@@ -77,10 +77,9 @@
   });
 </script>
 
-<div class="relative w-full h-full m-auto">
-  <canvas
-    bind:this={canvasRef}
-    {...props}
-  />
+<div
+  class="relative m-auto"
+  style="position: relative; height: {height}px; width: {width}px"
+>
+  <canvas bind:this={canvasRef} {...props} />
 </div>
-
