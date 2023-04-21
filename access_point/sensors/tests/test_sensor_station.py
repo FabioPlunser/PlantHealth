@@ -3,6 +3,7 @@ import asyncio
 
 from .mock_ble import MockBleakClient, MockGATTService, MockGATTCharacteristic
 from sensors import SensorStation
+from ..sensor_station import get_short_uuid
 
 
 ADR = 'adr'
@@ -32,6 +33,16 @@ SERVICES =[MockGATTService('dea07cc4-d084-11ed-a760-325096b39f47',  # sensor sta
            MockGATTService('dea07cc4-d084-11ed-a760-325096b39f4e',  # light intensity
                            [MockGATTCharacteristic('2aff', 6),
                             MockGATTCharacteristic('2a9a', 1)])]
+
+def test_get_short_uuid():
+    """A long uuid is correctly shortened"""
+    short_uuid = get_short_uuid('00002a9a-0000-1000-8000-00805f9b34fb')
+    assert short_uuid == '2a9a'
+
+def test_get_short_uuid_already_short():
+    """An alread short uuid is correctly parsed"""
+    short_uuid = get_short_uuid('2a9a')
+    assert short_uuid == '2a9a'
 
 @pytest.mark.asyncio
 async def test_read_dip_id():
