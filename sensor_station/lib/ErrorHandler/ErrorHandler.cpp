@@ -63,22 +63,32 @@ class Error {
 		}
 };
 
-class ErrorHandlerClass {
+class ErrorQueueClass {
 	private:
 		std::priority_queue<Error> queue;
+		ErrorQueueClass() {}
 
 	public:
+		ErrorQueueClass & operator=(ErrorQueueClass &) = delete;
+		ErrorQueueClass(ErrorQueueClass &)			   = delete;
+
+		static ErrorQueueClass & getErrorHandler() {
+			static ErrorQueueClass errorHandler;
+			return errorHandler;
+		}
+
+	private:
 		/**
 		 * @return: The error with top priority after adding the error.
 		 */
-		const Error & addError(Error error) {
+		const Error & addError(Error & error) {
 			queue.push(error);
 			return queue.top();
 		}
 
-		const Error getTop() const { return queue.top(); }
+		const Error getPrioritisedError() const { return queue.top(); }
 
-		const Error removeTop() {
+		const Error removePrioritisedError() {
 			Error error = queue.top();
 			queue.pop();
 			return error;
@@ -151,6 +161,110 @@ class ErrorHandlerClass {
 			}
 			queue = newQueue;
 			return numDeleted;
+		}
+};
+
+class ErrorOutputClass {
+	private:
+		uint8_t valueRed;
+		uint8_t valueGreen;
+		uint8_t valueBlue;
+
+		uint8_t pinRed;
+		uint8_t pinGreen;
+		uint8_t pinBlue;
+
+		uint16_t * durationOn;
+		uint16_t * durationOff;
+		uint8_t durationSize;
+		uint8_t durationIdx			 = 0;
+		unsigned long prevChangeTime = 0;
+		bool isOn					 = false;
+
+		ErrorOutputClass(
+			uint8_t valueRed, uint8_t valueGreen, uint8_t valueBlue,
+			uint16_t * durationOn, uint16_t * durationOff, uint8_t durationSize,
+			uint8_t pinRed, uint8_t pinGreen, uint8_t pinBlue
+		) {
+			this->durationOn   = durationOn;
+			this->durationOff  = durationOff;
+			this->durationSize = durationSize;
+			this->valueRed	   = valueRed;
+			this->valueGreen   = valueGreen;
+			this->valueBlue	   = valueBlue;
+			this->pinRed	   = pinRed;
+			this->pinGreen	   = pinGreen;
+			this->pinBlue	   = pinBlue;
+			setLEDStatus(true);
+			pinMode(pinRed, OUTPUT);
+			pinMode(pinGreen, OUTPUT);
+			pinMode(pinBlue, OUTPUT);
+		}
+
+	public:
+		ErrorOutputClass & operator=(ErrorOutputClass &) = delete;
+		ErrorOutputClass(ErrorOutputClass &)			 = delete;
+
+		static ErrorOutputClass & getErrorOutput(
+			uint8_t valueRed, uint8_t valueGreen, uint8_t valueBlue,
+			uint16_t * durationOn, uint16_t * durationOff, uint8_t durationSize,
+			uint8_t pinRed, uint8_t pinGreen, uint8_t pinBlue
+		) {
+			static ErrorOutputClass errorClass(
+				valueRed, valueGreen, valueBlue, durationOn, durationOff,
+				durationSize, pinRed, pinGreen, pinBlue
+			);
+			return errorClass;
+		}
+
+	private:
+		void setLEDStatus(bool on) {
+			if (on == this->isOn) {
+				return;
+			}
+			this->isOn			 = on;
+			this->prevChangeTime = millis();
+			if (isOn) {
+				analogWrite(this->pinRed, this->valueRed);
+				analogWrite(this->pinGreen, this->valueGreen);
+				analogWrite(this->pinBlue, this->valueBlue);
+			} else {
+				analogWrite(this->pinRed, 0);
+				analogWrite(this->pinGreen, 0);
+				analogWrite(this->pinBlue, 0);
+			}
+		}
+
+		void toggleLEDStatus() { setLEDStatus(!this->isOn); }
+
+	public:
+		uint16_t getMsTillNext() {
+			if (durationIdx >= durationSize) {
+				return 0;
+			}
+			uint16_t * timeArray	 = isOn ? durationOn : durationOff;
+			unsigned long passedTime = millis();
+			if (passedTime > timeArray[durationIdx]) {
+				return 0;
+			}
+			return timeArray[durationIdx] - passedTime;
+		}
+
+		uint16_t updateLEDStatus() {
+			uint16_t remainingTime = getMsTillNext();
+			if (remainingTime > 0) {
+				// Remaining time to wait
+				return remainingTime;
+			}
+			if (durationIdx >= durationSize) {
+				setLEDStatus(false);
+				return 0;
+			}
+			toggleLEDStatus();
+			if (this->isOn) {
+				durationIdx++;
+			}
+			return getMsTillNext();
 		}
 };
 
