@@ -1,4 +1,4 @@
-package at.ac.uibk.plant_health.models;
+package at.ac.uibk.plant_health.models.user;
 
 import org.springframework.security.core.GrantedAuthority;
 
@@ -6,6 +6,7 @@ import java.util.Set;
 
 public enum Permission implements GrantedAuthority {
 	USER,
+	GARDENER,
 	ADMIN;
 
 	public static Set<Permission> defaultPermissions() {

@@ -1,4 +1,4 @@
-package at.ac.uibk.plant_health.models;
+package at.ac.uibk.plant_health.models.device;
 
 import org.springframework.security.core.GrantedAuthority;
 

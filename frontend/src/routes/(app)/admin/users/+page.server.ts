@@ -69,10 +69,7 @@ export const actions = {
       body: formData,
     };
 
-    let res = await fetch(
-      `http://${BACKEND_URL}/api/create-user`,
-      requestOptions
-    );
+    let res = await fetch(`http://${BACKEND_URL}/create-user`, requestOptions);
     res = await res.json();
     console.log(res);
   },
@@ -90,10 +87,7 @@ export const actions = {
       body: formData,
     };
 
-    let res = await fetch(
-      `http://${BACKEND_URL}/api/delete-user`,
-      requestOptions
-    );
+    let res = await fetch(`http://${BACKEND_URL}/delete-user`, requestOptions);
 
     res = await res.json();
 

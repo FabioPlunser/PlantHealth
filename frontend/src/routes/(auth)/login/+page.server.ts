@@ -42,7 +42,7 @@ export const actions = {
 
     let res = null;
     try {
-      res = await fetch(`http://${BACKEND_URL}/api/login`, requestOptions);
+      res = await fetch(`http://${BACKEND_URL}/login`, requestOptions);
     } catch (error) {
       console.log("login", error);
       return fail(503, { message: "Server connection refused" });
@@ -51,6 +51,7 @@ export const actions = {
 
     if (res.status >= 200 && res.status < 300) {
       res = await res.json();
+      console.log("login", res);
       cookies.set(
         "token",
         JSON.stringify({

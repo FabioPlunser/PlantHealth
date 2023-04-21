@@ -1,4 +1,4 @@
-package at.ac.uibk.plant_health.models;
+package at.ac.uibk.plant_health.models.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,9 +8,12 @@ import org.hibernate.type.SqlTypes;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import at.ac.uibk.plant_health.models.SensorStationPersonReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -22,8 +25,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "person")
-// NOTE: This changes the name of the "id"-Column inherited from Authenticable
-// to "person_id"
+// NOTE: This changes the name of the "id"-Column inherited from Authenticable to "person_id"
 @AttributeOverride(name = "id", column = @Column(name = "person_id"))
 public class Person extends Authenticable implements Serializable {
 	public Person(
@@ -50,9 +52,17 @@ public class Person extends Authenticable implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	private String email;
 
+	@Builder.Default
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "person")
+	private List<SensorStationPersonReference> sensorStationPersonReferences = new ArrayList<>();
+
+	public void addSensorStationReference(SensorStationPersonReference s) {
+		this.sensorStationPersonReferences.add(s);
+	}
+
 	/**
 	 * Gets the Person's ID.
-	 * This method is a renamed version of {@link Authenticable#getId()} so
+	 * This method is a renamed version of {@link Authenticable#getId()} ()} so
 	 * the ID field will be included in the JSON-Serialization of a {@link
 	 * Person}.
 	 *

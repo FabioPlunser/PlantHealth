@@ -60,7 +60,7 @@ export const actions = {
     };
 
     let res = await fetch(
-      `http://${BACKEND_URL}/api/register`,
+      `http://${BACKEND_URL}/register`,
       requestOptions
     ).catch((error) => console.log("error", error));
 

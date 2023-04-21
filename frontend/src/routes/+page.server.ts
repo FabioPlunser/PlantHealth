@@ -15,9 +15,11 @@ export async function load({ locals, fetch }) {
       return { success: false };
     }
     // get user permissions from backend
-    let res = await fetch(`http://${BACKEND_URL}/api/get-user-permissions`);
+    let res = await fetch(`http://${BACKEND_URL}/get-user-permissions`);
+
     if (res.status >= 200 && res.status < 300) {
       res = await res.json();
+      console.log("get-user-permissions", res);
       if (locals.user.permissions.toString() !== res.permissions.toString()) {
         throw redirect(302, "/logout");
       }

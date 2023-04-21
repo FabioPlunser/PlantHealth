@@ -62,7 +62,7 @@
   </div>
 
   <div class="mt-20">
-    {#each {length: 3} as _, i}
+    {#each { length: 3 } as _, i}
       <div class="mt-4">
         <Graph data={null} />
       </div>
