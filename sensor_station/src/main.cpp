@@ -3,7 +3,7 @@
 
 #ifdef DO_MAIN
 
-#include "ErrorHandler.cpp"
+#include "../lib/ErrorHandler/SensorErrors.h"
 #include "SensorClasses/AirSensor.cpp"
 #include "SensorClasses/DipSwitch.cpp"
 #include "SensorClasses/Hydrometer.cpp"
