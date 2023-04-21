@@ -14,3 +14,6 @@ class StreamToLogger(object):
       for line in buf.rstrip().splitlines():
          if line != '^' and line != '~':
             self.logger.log(self.level, line.rstrip())
+
+   def flush(self):
+      pass

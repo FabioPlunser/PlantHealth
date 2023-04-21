@@ -87,7 +87,7 @@ class Server:
         :param endpoint: The endpoint for which the full URL is wanted
         :return: Full URL of the endpoint
         """
-        return urljoin(self.address, f'ap/{endpoint}')
+        return urljoin(self.address, f'{endpoint}')
 
     def register(self, id: str, room_name: str) -> str:
         """
@@ -101,8 +101,8 @@ class Server:
         # send request
         try:
             response = self._client.post(
-                self._get_endpoint_url('register'),
-                json={'accessPointId': id,
+                self._get_endpoint_url('register-access-point'),
+                params={'accessPointId': id,
                       'roomName': room_name}
             )
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
@@ -151,7 +151,7 @@ class Server:
         """
         # send request
         try:
-            response = self._client.get(self._get_endpoint_url('get-config'))
+            response = self._client.get(self._get_endpoint_url('get-access-point-config'))
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
             raise ConnectionError(f'Request timed out: {e}')
         
@@ -235,7 +235,7 @@ class Server:
         """
         # setup entries for each known sensor station
         data = [{'bdAddress': adr,
-                 'connectionAlive': status.get('connection_alive'),
+                 'isConnected': status.get('connection_alive'),
                  'dipSwitchId': status.get('dip_id')}
                  for adr, status in station_data.items()]
 
@@ -244,7 +244,7 @@ class Server:
             adr = entry.get('bdAddress')
             measurements_of_station = [m for m in measurements if m.get('sensor_station_address') == adr]
             # construct sensor data for request
-            sensor_data = [{'timeStamp': m.get('timestamp').isoformat(),
+            sensor_data = [{'timeStamp': m.get('timestamp').isoformat(timespec="seconds"),
                             'value': round(m.get('value'), 2),
                             'alarm': m.get('alarm'),
                             'sensor': {'type': m.get('sensor_name'),
@@ -283,9 +283,9 @@ class Server:
         try:
             response = self._client.put(
                 self._get_endpoint_url('found-sensor-stations'),
-                json={'sensorStations': [{'bdAddress': station.get('address'),
-                                          'dipSwitchId': station.get('dip-switch')}
-                                          for station in sensor_stations]}
+                json=[{'bdAddress': station.get('address'),
+                       'dipSwitchId': station.get('dip-switch')}
+                       for station in sensor_stations]
             )
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
             raise ConnectionError(f'Request timed out: {e}')
