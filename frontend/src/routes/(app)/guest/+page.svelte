@@ -59,12 +59,6 @@
     // alert(`Code scan error = ${error}`);
     // console.warn(`Code scan error = ${error}`);
   }
-
-  // onDestroy(() => {
-  //   if (html5Qrcode) {
-  //     html5Qrcode.stop();
-  //   }
-  // });
 </script>
 
 <section class="mt-12">
@@ -83,10 +77,10 @@
     </div>
   {/if}
   {#if !scanning}
-    <div>
+    <div class="w-fit flex justify-center mx-auto">
       <form>
-        <h1 class="flex justify-center">Type in Plant Code</h1>
-        <Input type="text" placeholder="123456789" />
+        <h1 class="flex justify-center text-2xl">Type in Plant Code</h1>
+        <Input name="plantId" type="text" placeholder="123456789" />
         <div class="flex justify-center mt-4">
           <button class="btn btn-primary">Find</button>
         </div>

@@ -1,7 +1,19 @@
 <script lang="ts">
-  import { browser } from "$app/environment";
-  import Carousel from "./Carousel.svelte";
+  type Picture = {
+    imageRef: string;
+    creationDate: Date;
+  };
+
+  import ImagesGrid from "./ImagesGrid.svelte";
   import Camera from "$lib/assets/icons/Camera.svg?component";
+  import { fade, fly, slide } from "svelte/transition";
+  import { onMount, onDestroy } from "svelte";
+
+  let isRendered = false;
+
+  onMount(() => {
+    isRendered = true;
+  });
 
   export let data;
 
@@ -13,38 +25,52 @@
     let reader = new FileReader();
     reader.readAsDataURL(image);
     reader.onload = (e) => {
+      // TODO: POST to endpoint and add image from response to data.pictures
+      // TODO: figure out how to do this on server side
       test = e?.target?.result;
+      let response: Picture = {
+        imageRef: "https://picsum.photos/200/300",
+        creationDate: new Date(),
+      };
+      data.pictures.unshift(response);
+      data.pictures = data.pictures;
     };
   }
 </script>
 
-<section class="mt-12">
-  <div class="flex justify-center gap-12">
-    <div>
-      <h1 class="text-2xl font-bold">Room: {data.roomName}</h1>
-      <h1 class="text-2xl font-bold">Plant: {data.plantName}</h1>
+{#if isRendered}
+  <section class="mt-4">
+    <div class="flex justify-between border-b-4 py-4">
+      <div class="text-2xl font-bold">
+        <h1>Room: {data.roomName}</h1>
+        <h1>Plant: {data.plantName}</h1>
+      </div>
+      <button
+        in:slide={{ duration: 400, axis: "x" }}
+        on:click={() => fileinput.click()}
+        class="btn btn-primary mt-3 hover:dark:fill-black hover:fill-white"
+      >
+        <Camera class="w-8 dark:fill-white" />
+        <!-- NOTE: it might make sence to change accept if there are restrictions from the backend-->
+        <input
+          class="hidden"
+          type="file"
+          accept="image/*"
+          capture="environment"
+          on:change={(e) => onFileSelected(e)}
+          bind:this={fileinput}
+        />
+      </button>
     </div>
-    <button
-      on:click={() => fileinput.click()}
-      class="btn btn-primary h-full w-fit hover:dark:fill-black hover:fill-white"
-    >
-      <Camera class="w-24 dark:fill-white" />
-      <input
-        class="hidden"
-        type="file"
-        accept=".jpg, .jpeg, .png"
-        on:change={(e) => onFileSelected(e)}
-        bind:this={fileinput}
-      />
-    </button>
-  </div>
 
-  <h1>Uploaded Picture</h1>
-  {#if test}
-    <img src={test} alt="uploaded image" />
-  {/if}
+    <div>
+      {#if test}
+        <img src={test} alt="plant" />
+      {/if}
+    </div>
 
-  <div class="mt-12">
-    <Carousel pictures={data.pictures} />
-  </div>
-</section>
+    <div class="mt-6" transition:fly={{ y: -200, duration: 200 }}>
+      <ImagesGrid pictures={data.pictures} />
+    </div>
+  </section>
+{/if}
