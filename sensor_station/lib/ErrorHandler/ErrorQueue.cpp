@@ -17,9 +17,9 @@ class ErrorQueue {
 		ErrorQueue & operator=(ErrorQueue &) = delete;
 		ErrorQueue(ErrorQueue &)			 = delete;
 
-		static ErrorQueue & getErrorHandler() {
-			static ErrorQueue errorHandler;
-			return errorHandler;
+		static ErrorQueue & getErrorQueue() {
+			static ErrorQueue errorQueue;
+			return errorQueue;
 		}
 
 	private:

@@ -8,14 +8,26 @@
 
 class ErrorHandler {
 	private:
-		ErrorQueue errorQueue;
-		ErrorLedHandler ledHandler;
+		ErrorQueue * errorQueue;
+		ErrorLedHandler * ledHandler;
 		ErrorHandler(
 			uint8_t ledPinRed, uint8_t ledPinGreen, uint8_t ledPinBlue
-		) {}
+		) {
+			errorQueue = &ErrorQueue::getErrorQueue();
+			ledHandler = &ErrorLedHandler::getErrorLedHandler(
+				ledPinRed, ledPinGreen, ledPinBlue
+			);
+		}
 
 	public:
-		static ErrorHandler & getErrorHandler
-}
+		static ErrorHandler & getErrorHandler(
+			uint8_t ledPinRed, uint8_t ledPinGreen, uint8_t ledPinBlue
+		) {
+			static ErrorHandler errorHandler(
+				ledPinRed, ledPinGreen, ledPinBlue
+			);
+			return errorHandler;
+		}
+};
 
 #endif

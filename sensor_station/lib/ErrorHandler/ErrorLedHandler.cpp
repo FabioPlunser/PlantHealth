@@ -40,7 +40,7 @@ class ErrorLedHandler {
 		ErrorLedHandler & operator=(ErrorLedHandler &) = delete;
 		ErrorLedHandler(ErrorLedHandler &)			   = delete;
 
-		static ErrorLedHandler & getErrorOutput(
+		static ErrorLedHandler & getErrorLedHandler(
 
 			uint8_t pinRed, uint8_t pinGreen, uint8_t pinBlue
 		) {
@@ -69,30 +69,11 @@ class ErrorLedHandler {
 		void toggleLEDStatus() { setLEDStatus(!this->isOn); }
 
 	public:
-		enum SetVisulisationError {
-			ValueRedError,
-			ValueGreenError,
-			ValueBlueError,
-			DurationSizeError,
-			Nothing
-		};
-		SetVisulisationError
-		setErrorVisualisation(uint8_t valueRed, uint8_t valueGreen,
-							  uint8_t valueBlue, uint16_t * durationOn,
-							  uint16_t * durationOff, uint8_t durationSize,
-							  bool loopError = false;) {
-			if (valueRed > 0xFF || valueRed < 0) {
-				return SetVisulisationError::ValueRedError;
-			}
-			if (valueGreen > 0xFF || valueGreen < 0) {
-				return SetVisulisationError::ValueGreenError;
-			}
-			if (valueBlue > 0xFF || valueBlue < 0) {
-				return SetVisulisationError::ValueBlueError;
-			}
-			if (durationSize <= 0) {
-				return SetVisulisationError::DurationSizeError;
-			}
+		void setErrorProperties(
+			uint8_t valueRed, uint8_t valueGreen, uint8_t valueBlue,
+			uint16_t * durationOn, uint16_t * durationOff, uint8_t durationSize,
+			bool loopError = false
+		) {
 			this->durationOn   = durationOn;
 			this->durationOff  = durationOff;
 			this->durationSize = durationSize;
@@ -103,7 +84,6 @@ class ErrorLedHandler {
 			this->isFinished   = false;
 			this->durationIdx  = 0;
 			setLEDStatus(true);
-			return SetVisulisationError::Nothing;
 		}
 
 		uint16_t getMsTillNext() {
