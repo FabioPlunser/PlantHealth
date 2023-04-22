@@ -14,6 +14,10 @@ public class StringGenerator {
 		return sb.toString();
 	}
 
+	public static String macAddress() {
+		int macAddressLength = 17;
+		return StringGenerator.base(SMALL_LETTERS + CAPITAL_LETTERS + NUMBERS, macAddressLength);
+	}
 	public static String username() {
 		int usernameLength = 30;
 		return "username-"

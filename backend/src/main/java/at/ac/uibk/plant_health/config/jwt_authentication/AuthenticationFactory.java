@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AuthenticationFactory {
-	public static TokenAuthentication create(String userAgent, String authorizationHeader) {
+	public static TokenAuthentication getAuthentication(
+			String userAgent, String authorizationHeader
+	) {
 		return switch (userAgent) {
 			case "SensorStation" -> ConversionUtil.tryConvertJson(authorizationHeader, SensorStationAuthentication.class);
             case "AccessPoint" -> ConversionUtil.tryConvertJson(authorizationHeader, AccessPointAuthentication.class);

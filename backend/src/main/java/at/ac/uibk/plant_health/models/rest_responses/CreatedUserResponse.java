@@ -8,8 +8,8 @@ import java.io.Serializable;
 import java.util.Set;
 import java.util.UUID;
 
-import at.ac.uibk.plant_health.models.Authenticable;
-import at.ac.uibk.plant_health.models.Person;
+import at.ac.uibk.plant_health.models.user.Authenticable;
+import at.ac.uibk.plant_health.models.user.Person;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,12 +19,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.MODULE)
 public class CreatedUserResponse extends RestResponse implements Serializable {
-	@Override
-	@JsonInclude
-	public String getType() {
-		return "CreatedUser";
-	}
-
 	private UUID id;
 	private String username;
 	@JsonInclude(JsonInclude.Include.NON_NULL)
@@ -32,7 +26,6 @@ public class CreatedUserResponse extends RestResponse implements Serializable {
 	private Set<GrantedAuthority> permissions;
 
 	public CreatedUserResponse(Authenticable authenticable) {
-		super.setSuccess(true);
 		this.id = authenticable.getId();
 		this.username = authenticable.getUsername();
 		this.token = authenticable.getToken();

@@ -1,75 +1,90 @@
 <script lang="ts">
-  type Picture = {
-    imageRef: string;
-    creationDate: Date;
-  };
+  import { Html5Qrcode } from "html5-qrcode";
+  import { onDestroy, onMount } from "svelte";
+  import { browser } from "$app/environment";
+  import { getDeviceType } from "$helper/getDeviceType";
+  import { fly } from "svelte/transition";
+  import Input from "$components/ui/Input.svelte";
+  import Mobile from "$lib/helper/Mobile.svelte";
 
-  import ImagesGrid from "./ImagesGrid.svelte";
-  import Camera from "$lib/assets/icons/Camera.svg?component";
-  import { fade, fly, slide } from "svelte/transition";
-  import { onMount, onDestroy } from "svelte";
+  let scanning = false;
+  let isMobile = false;
+  let found = false;
+  let rendered = false;
+  let html5Qrcode: any = null;
+  let device = null;
+  if (browser) {
+    device = getDeviceType();
+  }
 
-  let isRendered = false;
+  if (device === "mobile" || device === "tablet") {
+    isMobile = true;
+    onMount(() => {
+      init();
+      rendered = true;
+    });
+  }
 
-  onMount(() => {
-    isRendered = true;
-  });
+  function init() {
+    html5Qrcode = new Html5Qrcode("reader");
+  }
 
-  export let data;
+  function start() {
+    html5Qrcode.start(
+      { facingMode: "environment" },
+      {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+      },
+      onScanSuccess,
+      onScanFailure
+    );
+    scanning = true;
+  }
 
-  let test: any, fileinput: any;
+  async function stop() {
+    await html5Qrcode.stop();
+    scanning = false;
+  }
 
-  function onFileSelected(e: any) {
-    console.log(e);
-    let image = e.target.files[0];
-    let reader = new FileReader();
-    reader.readAsDataURL(image);
-    reader.onload = (e) => {
-      // TODO: POST to endpoint and add image from response to data.pictures
-      test = e?.target?.result;
-      let response: Picture = {
-        imageRef: "https://picsum.photos/200/300",
-        creationDate: new Date(),
-      };
-      data.pictures.unshift(response);
-      data.pictures = data.pictures;
-    };
+  function onScanSuccess(decodedText: any, decodedResult: any) {
+    alert(`Code matched = ${decodedText}`);
+    console.log(decodedText);
+    console.log(decodedResult);
+    // if found a plant stop scanning and redirect to plant photo page
+    stop();
+  }
+
+  function onScanFailure(error: any) {
+    // alert(`Code scan error = ${error}`);
+    // console.warn(`Code scan error = ${error}`);
   }
 </script>
 
-{#if isRendered}
-  <section class="mt-4">
-    <div class="flex justify-between border-b-4 py-4">
-      <div class="text-2xl font-bold">
-        <h1>Room: {data.roomName}</h1>
-        <h1>Plant: {data.plantName}</h1>
-      </div>
+<section class="mt-12">
+  {#if isMobile}
+    <h1 class="flex justify-center text-3xl font-bold">Scan QR-Code</h1>
+    {#if !scanning}
       <button
-        in:slide={{ duration: 400, axis: "x" }}
-        on:click={() => fileinput.click()}
-        class="btn btn-primary mt-3 hover:dark:fill-black hover:fill-white"
+        class="btn btn-primary flex justify-center mx-auto"
+        on:click={() => start()}>Start</button
       >
-        <Camera class="w-8 dark:fill-white" />
-        <!-- NOTE: it might make sence to change accept if there are restrictions from the backend-->
-        <input
-          class="hidden"
-          type="file"
-          accept="image/*"
-          capture="environment"
-          on:change={(e) => onFileSelected(e)}
-          bind:this={fileinput}
-        />
-      </button>
+    {/if}
+    <div class={scanning ? "block" : "hidden"}>
+      <div class="p-4 bg-base-100 rounded-2xl shadow-2xl">
+        <reader class="flex items-center justify-center" id="reader" />
+      </div>
     </div>
-
-    <div>
-      {#if test}
-        <img src={test} alt="plant" />
-      {/if}
+  {/if}
+  {#if !scanning}
+    <div class="w-fit flex justify-center mx-auto">
+      <form>
+        <h1 class="flex justify-center text-2xl">Type in Plant Code</h1>
+        <Input name="plantId" type="text" placeholder="123456789" />
+        <div class="flex justify-center mt-4">
+          <button class="btn btn-primary">Find</button>
+        </div>
+      </form>
     </div>
-
-    <div class="mt-6">
-      <ImagesGrid pictures={data.pictures} />
-    </div>
-  </section>
-{/if}
+  {/if}
+</section>

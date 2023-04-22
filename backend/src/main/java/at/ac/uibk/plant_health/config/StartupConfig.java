@@ -9,8 +9,8 @@ import org.springframework.context.event.EventListener;
 
 import java.util.UUID;
 
-import at.ac.uibk.plant_health.models.Permission;
-import at.ac.uibk.plant_health.models.Person;
+import at.ac.uibk.plant_health.models.user.Permission;
+import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.service.PersonService;
 import lombok.extern.slf4j.Slf4j;
 

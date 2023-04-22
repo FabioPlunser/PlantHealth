@@ -6,6 +6,7 @@
   import Plant from "$assets/icons/potted-plant.svg?component";
   import Gardener from "$assets/icons/gardening-shears.svg?component";
   import User from "$assets/icons/user.svg?component";
+  // import Graph from "$components/graph/Graph.svelte";
 
   let rendered = false;
   onMount(() => {

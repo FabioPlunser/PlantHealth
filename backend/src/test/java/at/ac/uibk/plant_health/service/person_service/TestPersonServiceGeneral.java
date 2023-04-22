@@ -9,8 +9,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.*;
 
-import at.ac.uibk.plant_health.models.Permission;
-import at.ac.uibk.plant_health.models.Person;
+import at.ac.uibk.plant_health.models.user.Permission;
+import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.service.PersonService;
 import at.ac.uibk.plant_health.util.StringGenerator;
 

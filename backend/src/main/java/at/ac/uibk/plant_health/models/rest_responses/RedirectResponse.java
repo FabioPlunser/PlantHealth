@@ -1,7 +1,6 @@
 package at.ac.uibk.plant_health.models.rest_responses;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,23 +16,17 @@ public class RedirectResponse extends RestResponse {
 	@Builder.Default
 	private HttpStatusCode statusCode = HttpStatusCode.valueOf(HttpStatus.FOUND.value());
 
-	@Override
-	@JsonInclude
-	public String getType() {
-		return "Redirect";
-	}
-
 	@NonNull
 	@JsonIgnore
 	private String redirectLocation;
 
 	private RedirectResponse() {
-		super(true, HttpStatus.FOUND);
+		super(HttpStatus.FOUND);
 		this.redirectLocation = "/";
 	}
 
 	public RedirectResponse(String redirectLocation) {
-		super(true, HttpStatus.FOUND);
+		super(HttpStatus.FOUND);
 		this.redirectLocation = redirectLocation;
 	}
 
