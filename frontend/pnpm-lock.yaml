@@ -1,5 +1,10 @@
 lockfileVersion: "6.0"
 
+dependencies:
+  html5-qrcode:
+    specifier: ^2.3.8
+    version: 2.3.8
+
 devDependencies:
   "@poppanator/sveltekit-svg":
     specifier: ^3.0.0
@@ -1653,6 +1658,13 @@ packages:
       }
     engines: { node: ">=8" }
     dev: true
+
+  /html5-qrcode@2.3.8:
+    resolution:
+      {
+        integrity: sha512-jsr4vafJhwoLVEDW3n1KvPnCCXWaQfRng0/EEYk1vNcQGcG/htAdhJX0be8YyqMoSz7+hZvOZSTAepsabiuhiQ==,
+      }
+    dev: false
 
   /import-fresh@3.3.0:
     resolution:
