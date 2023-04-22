@@ -2,7 +2,7 @@
   import { page } from "$app/stores";
   import { fly } from "svelte/transition";
 
-  import PageTransition from "$components/PageTransition.svelte";
+  import PageTransition from "$components/pageTransition.svelte";
   import Mobile from "$helper/Mobile.svelte";
   import Query from "$helper/Query.svelte";
   import toast, { Toaster } from "$components/toast";
