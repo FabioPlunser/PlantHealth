@@ -4,10 +4,12 @@ import { fail, redirect, error } from "@sveltejs/kit";
 import { z } from "zod";
 
 export const load = (async ({ fetch }) => {
-  let res = await fetch(`http://${BACKEND_URL}/api/get-all-users`);
+  let res = await fetch(`http://${BACKEND_URL}/get-all-users`);
   res = await res.json();
+  // TODO: figure out what happened to res.success :laugh:
+  console.log(res);
   if (res.success) {
-    return { users: res.users };
+    return { users: res.items };
   } else if (!res.success) {
     return { success: false, message: res.message };
   }

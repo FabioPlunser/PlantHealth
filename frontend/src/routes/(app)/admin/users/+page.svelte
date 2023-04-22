@@ -100,6 +100,7 @@
   class="btn btn-primary flex justify-center w-fit mx-auto m-4"
   on:click={() => (addUserModal = true)}>Add User</btn
 >
+{data.success}
 <!-- TODO: Add filtering to every column add option to show/hide columns as needed -->
 {#if data?.success}
   <div class=" flex justify-center">
