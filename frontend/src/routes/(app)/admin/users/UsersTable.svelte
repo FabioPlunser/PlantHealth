@@ -93,23 +93,24 @@
                 selectedUser = row.original;
                 showEditModal = true;
               }}
-              class="hidden"
-            />
-            <!-- TODO figure out how to change color on hover seems like hover:dark:fill-gray-500 does not work...-->
-            <Edit class="w-8 hover:dark:fill-gray-500 dark:fill-white " />
+              class="dark:fill-white hover:fill-gray-500"
+              ><Edit class="w-8 " /></button
+            >
+            <!-- TODO figure out how to change color on hover seems like hover:fill-gray-500 does not work-->
           </label>
         </td>
         <td class="table-cell">
           <div>
             <label class="button">
+              <!-- TODO make delete user action with verification Modal-->
               <button
                 on:click={() => {
                   selectedUser = row.original;
-                  showEditModal = true;
                 }}
-                class="hidden"
-              />
-              <i class="bi bi-trash text-3xl hover:text-red-500 shadow-2xl" />
+                class=""
+              >
+                <i class="bi bi-trash text-3xl hover:text-red-500 shadow-2xl" />
+              </button>
             </label>
           </div>
         </td>
