@@ -22,6 +22,10 @@ class Database:
     """
     Handler class for the actual data storage.
     """
+
+    # Number of failed connection attempts until a connection is flagged as lost
+    MAX_FAILED_CONNECTION_ATTEMPTS = 3
+
     def __init__(self, db_filename: str) -> None:
         """
         Initializes the local SQLite database handler.
@@ -67,11 +71,11 @@ class Database:
         :raises DatabaseError: If the sensor station could not be added
         """
         query = """
-            INSERT INTO sensor_station(address, timestamp_added, connection_alive)
-            VALUES (?,?,?)
+            INSERT INTO sensor_station(address, timestamp_added)
+            VALUES (?,?)
         """
         cursor = self._conn.cursor()
-        cursor.execute(query, (address, datetime.now(), False))
+        cursor.execute(query, (address, datetime.now()))
 
     @_with_connection
     def disable_sensor_station(self, address: str) -> None:
@@ -160,7 +164,9 @@ class Database:
         # set connection to sensor station to alive
         query = """
             UPDATE sensor_station
-            SET connection_alive = 1
+            SET
+                failed_connection_attempts = 0,
+                connection_alive = 1
             WHERE address = ?
         """
         cursor.execute(query, (sensor_station_address,))
@@ -177,6 +183,7 @@ class Database:
             UPDATE sensor_station
             SET
                 dip_id = ?,
+                failed_connection_attempts = 0,
                 connection_alive = 1
             WHERE address = ?
         """
@@ -184,19 +191,27 @@ class Database:
         cursor.execute(query, (dip_id, sensor_station_address))
 
     @_with_connection
-    def set_connection_lost(self, sensor_station_address: str) -> None:
+    def add_failed_connection_attempt(self, sensor_station_address: str) -> None:
         """
-        Flags the connection to a sensor station as lost.
+        Adds info that there was a failed connection attempt to a sensor station.
+        After MAX_FAILED_CONNECTION_ATTEMPTS (default = 3) failed attempts the connection to the
+        sensor station is flagged as lost.
         :param sensor_station_address: Address of the sensor station
-        :raises DatabaseError: if the connection could not be flagged as lost
+        .raises DatabaseError: If the failed connection attempt could not be added or the 
+            connection could not be flagged as lost
         """
         query = """
             UPDATE sensor_station
-            SET connection_alive = 0
-            WHERE address = ?
+            SET
+                failed_connection_attempts = failed_connection_attempts + 1,
+                connection_alive = IIF(failed_connection_attempts + 1 >= ?, 0, 1)
+            WHERE
+                address = ? AND
+                connection_alive = 1 AND
+                failed_connection_attempts < ?
         """
         cursor = self._conn.cursor()
-        cursor.execute(query, (sensor_station_address,))
+        cursor.execute(query, (self.MAX_FAILED_CONNECTION_ATTEMPTS, sensor_station_address, self.MAX_FAILED_CONNECTION_ATTEMPTS))
     
     @_with_connection
     def update_limits(self,
@@ -252,6 +267,9 @@ class Database:
         query = """
             SELECT address
             FROM sensor_station
+            ORDER BY
+                failed_connection_attempts ASC,
+                timestamp_added DESC
         """
         cursor = self._conn.cursor()
         cursor.execute(query)

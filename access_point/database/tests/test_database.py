@@ -136,7 +136,8 @@ def test_connection_state_after_adding_measurement():
 
 def test_set_connection_state_lost():
     """
-    It is possible to set the connection to a sensor station as lost
+    The connection state to a sensor station is set to lost after the set amount
+    of failed attempts
     """
     database = Database(tempfile.NamedTemporaryFile().name)
     database.setup()
@@ -144,7 +145,11 @@ def test_set_connection_state_lost():
     database.set_dip_id(DUMMY_ADR, 0)
     state = database.get_all_states()[DUMMY_ADR]
     assert state['connection_alive'] == True
-    database.set_connection_lost(DUMMY_ADR)
+    for i in range(database.MAX_FAILED_CONNECTION_ATTEMPTS - 1):
+        database.add_failed_connection_attempt(DUMMY_ADR)
+        state = database.get_all_states()[DUMMY_ADR]
+        assert state['connection_alive'] == True
+    database.add_failed_connection_attempt(DUMMY_ADR)
     state = database.get_all_states()[DUMMY_ADR]
     assert state['connection_alive'] == False
 

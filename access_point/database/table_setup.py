@@ -2,11 +2,12 @@
 # for a whole sensor station
 CREATE_SENSOR_STATION_TABLE_QUERY = """
     CREATE TABLE IF NOT EXISTS sensor_station (
-        id                  integer PRIMARY KEY,
-        address             text    UNIQUE,
-        dip_id              integer,
-        timestamp_added     text    NOT NULL,
-        connection_alive    integer NOT NULL
+        id                          integer PRIMARY KEY,
+        address                     text    UNIQUE,
+        dip_id                      integer,
+        timestamp_added             text    NOT NULL,
+        failed_connection_attempts  integer DEFAULT 0 NOT NULL,
+        connection_alive            integer DEFAULT false NOT NULL
     );
 """
 

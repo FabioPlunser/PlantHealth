@@ -131,7 +131,7 @@ async def single_connection(address: str):
             await sensor_station.set_alarms(alarms)
     except BLEConnectionError as e:
         log.error(f'Unable to connect to sensor station {address}: {e}')
-        database.set_connection_lost(address)
+        database.add_failed_connection_attempt(address)
     except ReadError as e:
         log.error(f'Unable to read value from sensor station {address}: {e}')
     except WriteError as e:
