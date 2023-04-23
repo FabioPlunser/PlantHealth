@@ -1,15 +1,23 @@
 <script lang="ts">
   import type { PageData, ActionData } from "./$types";
   import toast from "$components/toast";
-  import Trash from "$assets/icons/trash.svg?component";
-  import Edit from "$assets/icons/settingVert.svg?component";
-  import Modal from "$components/ui/Modal.svelte";
-  import Input from "$lib/components/ui/Input.svelte";
-  import FormError from "$lib/helper/formError.svelte";
   import AddUserModal from "./AddUserModal.svelte";
-
-  import { enhance } from "$app/forms";
   import EditUserModal from "./EditUserModal.svelte";
+  import type { ColumnDef, TableOptions } from "@tanstack/svelte-table";
+  import {
+    createSvelteTable,
+    flexRender,
+    getCoreRowModel,
+  } from "@tanstack/svelte-table";
+  import { writable } from "svelte/store";
+
+  type User = {
+    username: string;
+    token: string;
+    permissions: string[];
+    email: string;
+    personId: string;
+  };
 
   export let data: PageData;
 
@@ -18,6 +26,37 @@
       toast.error(data.message);
     }
   }
+
+  const defaultColumns: ColumnDef<User>[] = [
+    {
+      accessorKey: "personId",
+      header: "ID",
+      cell: (info) => info.getValue(),
+    },
+    {
+      accessorKey: "username",
+      header: "Username",
+      cell: (info) => info.getValue(),
+    },
+    {
+      accessorKey: "email",
+      header: "Email",
+      cell: (info) => info.getValue(),
+    },
+    {
+      accessorKey: "permissions",
+      header: "Permissions",
+      cell: (info) => info.getValue(),
+    },
+  ];
+
+  const options = writable<TableOptions<User>>({
+    data: data.users,
+    columns: defaultColumns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  const table = createSvelteTable(options);
 
   export let form: ActionData;
 
@@ -38,59 +77,31 @@
   class="btn btn-primary flex justify-center w-fit mx-auto m-4"
   on:click={() => (addUserModal = true)}>Add User</btn
 >
-<!-- TODO: Add filtering to every column add option to show/hide columns as needed -->
-<!--
-{#if data?.success}
-  <div class=" flex justify-center">
-    <table class="table table-compact table-zebra 2-xl">
-      <thead class="">
+<div class="flex justify-center">
+  <table class="table">
+    <thead>
+      {#each $table.getHeaderGroups() as headerGroup}
         <tr>
-          <th>ID</th>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Delete</th>
-          <th>Edit</th>
+          {#each headerGroup.headers as header}
+            <th colspan={header.colSpan}>
+              {#if !header.isPlaceholder}
+                {header}
+              {/if}
+            </th>
+          {/each}
         </tr>
-        <!-- <tr>
-        <th></th>
-        <th><input class="input bg-gray-800 max-w-xs"/></th>
-        <th><input class="input bg-gray-800 max-w-xs"/></th>
-        <th><input class="input bg-gray-800 max-w-xs"/></th>
-        <th><input class="input bg-gray-800 max-w-xs"/></th>
-      </tr> 
-      </thead>
-      <tbody>
-        {#each data.items as row, i}
-          <tr>
+      {/each}
+    </thead>
+    <tbody>
+      {#each $table.getRowModel().rows as row}
+        <tr>
+          {#each row.getVisibleCells() as cell}
             <td>
-              <span>{i + 1}</span>
+              {cell.getValue()}
             </td>
-            <td>
-              {row.username}
-            </td>
-            <td>
-              {row.email}
-            </td>
-            <td>
-              <!-- // TODO: should be a form action 
-              <button class="" on:click={() => (editModal = true)}
-                ><Trash class="hover:fill-primary dark:fill-white" /></button
-              >
-            </td>
-            <td>
-              <button
-                class=""
-                on:click={() => {
-                  (editModal = true), (selectedUser = row);
-                }}
-                ><Edit
-                  class="hover:stroke-primary dark:stroke-white stroke-black stroke-4"
-                /></button
-              >
-            </td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
-  </div>
-{/if} -->
+          {/each}
+        </tr>
+      {/each}
+    </tbody>
+  </table>
+</div>
