@@ -62,7 +62,7 @@ public class AccessPoint extends Device {
 		this.scanActive = scanActive;
 	}
 
-	public boolean isScanActive() {
+	public boolean getScanActive() {
 		return this.scanActive;
 	}
 

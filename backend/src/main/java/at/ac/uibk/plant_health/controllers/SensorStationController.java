@@ -25,7 +25,7 @@ public class SensorStationController {
 
 	@AnyPermission(Permission.ADMIN)
 	@RequestMapping(
-			value = "/set-lock-sensor-station", method = {RequestMethod.POST, RequestMethod.PUT}
+			value = "/set-unlock-sensor-station", method = {RequestMethod.POST, RequestMethod.PUT}
 	)
 	public RestResponseEntity
 	setLockSensorStation(

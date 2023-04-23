@@ -29,6 +29,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.device.AccessPoint;
+import at.ac.uibk.plant_health.models.device.Device;
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.plant.Sensor;
 import at.ac.uibk.plant_health.models.user.Permission;
@@ -83,19 +84,20 @@ public class TestAccessPointController {
 
 	@Test
 	void accessPointRegister() throws Exception {
-		UUID accessPointId = UUID.randomUUID();
+		UUID selfAssignedId = UUID.randomUUID();
 		// register access point expect accessPoint is locked
 		mockMvc.perform(MockMvcRequestBuilders.post("/register-access-point")
-								.param("accessPointId", String.valueOf(accessPointId))
+								.param("selfAssignedId", String.valueOf(selfAssignedId))
 								.param("roomName", "Office1")
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().is(401));
 
+		AccessPoint accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
 		// unlock access point and try again
-		accessPointService.setUnlocked(true, accessPointId);
+		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/register-access-point")
-								.param("accessPointId", String.valueOf(accessPointId))
+								.param("selfAssignedId", String.valueOf(selfAssignedId))
 								.param("roomName", "Office1")
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk(), jsonPath("$.token").exists());
@@ -118,59 +120,64 @@ public class TestAccessPointController {
 										AuthGenerator.generateToken(person))
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(
-						status().isOk(), jsonPath("$.access-points").isArray(),
-						jsonPath("$.access-points").value(Matchers.hasSize(accessPointList.size())),
-						jsonPath("$.access-points[*].id")
+						status().isOk(), jsonPath("$.accessPoints").isArray(),
+						jsonPath("$.accessPoints").value(Matchers.hasSize(accessPointList.size())),
+						jsonPath("$.accessPoints[*].accessPointId")
 								.value(Matchers.containsInAnyOrder(
 										accessPointList.stream()
 												.map(d -> d.getDeviceId().toString())
 												.toArray(String[] ::new)
 								)),
-						jsonPath("$.access-points[*].locked")
+						jsonPath("$.accessPoints[*].unlocked")
+								.value(Matchers.containsInAnyOrder(accessPointList.stream()
+																		   .map(Device::isUnlocked)
+																		   .toArray(Boolean[] ::new)
+								)),
+						jsonPath("$.accessPoints[*].roomName")
 								.value(Matchers.containsInAnyOrder(
 										accessPointList.stream()
-												.map(d -> !d.isUnlocked())
+												.map(AccessPoint::getRoomName)
+												.toArray(String[] ::new)
+								)),
+						jsonPath("$.accessPoints[*].scanActive")
+								.value(Matchers.containsInAnyOrder(
+										accessPointList.stream()
+												.map(AccessPoint::getScanActive)
 												.toArray(Boolean[] ::new)
 								)),
-						jsonPath("$.access-points[*].room-name")
-								.value(Matchers.containsInAnyOrder(accessPointList.stream()
-																		   .map(d -> d.getRoomName()
-																		   )
-																		   .toArray(String[] ::new))
-								)
+						jsonPath("$.accessPoints[*].transferInterval")
+								.value(Matchers.containsInAnyOrder(
+										accessPointList.stream()
+												.map(AccessPoint::getTransferInterval)
+												.toArray(Integer[] ::new)
+								))
 				);
 	}
 
 	@Test
 	void setUnlockAccessPoint() throws Exception {
 		Person person = createUserAndLogin(true);
-		UUID accessPointId = UUID.randomUUID();
-		accessPointService.register(accessPointId, "Office1");
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
 
-		// testing
-		// unlock access point
+		AccessPoint accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
+
 		mockMvc.perform(MockMvcRequestBuilders.post("/set-unlocked-access-point")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(person))
-								.param("accessPointId", String.valueOf(accessPointId))
+								.param("accessPointId", String.valueOf(accessPoint.getDeviceId()))
 								.param("unlocked", "true")
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
-		// get accessPointToken once accessPoint is unlocked
-		Optional<AccessPoint> maybeAccessPoint =
-				accessPointRepository.findBySelfAssignedId(accessPointId);
-		AccessPoint accessPoint = null;
-		if (maybeAccessPoint.isPresent()) {
-			accessPoint = maybeAccessPoint.get();
-		}
-		System.out.println(accessPoint.getAccessToken());
+		accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
+		//
 		mockMvc.perform(MockMvcRequestBuilders.post("/register-access-point")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(person))
-								.param("accessPointId", String.valueOf(accessPointId))
+								.param("selfAssignedId", String.valueOf(selfAssignedId))
 								.param("roomName", "Office1")
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(
@@ -181,11 +188,12 @@ public class TestAccessPointController {
 
 	@Test
 	void getAccessPointConfig() throws Exception {
-		UUID accessPointId = UUID.randomUUID();
-		accessPointService.register(accessPointId, "Office1");
-		accessPointService.setUnlocked(true, accessPointId);
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+		AccessPoint accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
+		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
 
-		AccessPoint accessPoint = accessPointRepository.findBySelfAssignedId(accessPointId).get();
+		accessPoint = accessPointRepository.findByDeviceId(accessPoint.getDeviceId()).get();
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/get-access-point-config")
 								.header(HttpHeaders.USER_AGENT, "AccessPoint")
@@ -200,11 +208,12 @@ public class TestAccessPointController {
 
 	@Test
 	void foundSensorStations() throws Exception {
-		UUID accessPointId = UUID.randomUUID();
-		accessPointService.register(accessPointId, "Office1");
-		accessPointService.setUnlocked(true, accessPointId);
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+		AccessPoint accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
+		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
 
-		AccessPoint accessPoint = accessPointRepository.findBySelfAssignedId(accessPointId).get();
+		accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
 
 		ArrayNode sensorStations = mapper.createArrayNode();
 
@@ -227,12 +236,13 @@ public class TestAccessPointController {
 
 	@Test
 	void transferData() throws Exception {
-		UUID accessPointId = UUID.randomUUID();
-		accessPointService.register(accessPointId, "Office1");
-		accessPointService.setUnlocked(true, accessPointId);
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+		AccessPoint accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
+		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
 
 		int sensorStationsCount = 2;
-		AccessPoint accessPoint = accessPointRepository.findBySelfAssignedId(accessPointId).get();
+		accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
 
 		ArrayNode sensorStations = mapper.createArrayNode();
 
@@ -273,9 +283,6 @@ public class TestAccessPointController {
 			sensorStations.add(sensorStation);
 		}
 
-		System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(sensorStations
-		));
-
 		mockMvc.perform(MockMvcRequestBuilders.post("/transfer-data")
 								.header(HttpHeaders.USER_AGENT, "AccessPoint")
 								.header(HttpHeaders.AUTHORIZATION,
@@ -288,4 +295,7 @@ public class TestAccessPointController {
 		assertEquals(sensorMap.size() * sensorStationsCount, sensorDataRepository.findAll().size());
 		assertEquals(sensorMap.size(), sensorRepository.findAll().size());
 	}
+
+	@Test
+	void scanForSensorStations() {}
 }
