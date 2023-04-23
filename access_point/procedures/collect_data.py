@@ -29,7 +29,10 @@ def collect_data(config: Config):
         return
 
     for address in addresses:
-        asyncio.run(single_connection(address))
+        # check if sensor station is still enabled (or it has been disabled in the meantime)
+        # (establishing connections to sensor stations takes time - this is not unprobable)
+        if address in database.get_all_known_sensor_station_addresses():
+            asyncio.run(single_connection(address))
 
     if len(addresses) == 0:
         log.info('Did not find any assigned sensor stations')

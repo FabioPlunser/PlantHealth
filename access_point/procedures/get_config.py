@@ -83,12 +83,12 @@ def get_config(config: Config) -> None:
                 continue
         if sensor_stations_to_disable: log.info(f'Disabling sensor stations: {sensor_stations_to_disable}')
         for adr in sensor_stations_to_disable:
-            asyncio.run(lock_sensor_station(adr))
             try:
                 database.disable_sensor_station(adr)
             except DatabaseError as e:
                 log.error(f'Unable to disable sensor station {adr} in database: {e}')
                 continue
+            asyncio.run(lock_sensor_station(adr))
 
         # update limits for sensors if applicable
         for sensor_station in sensor_stations:
@@ -116,4 +116,4 @@ async def lock_sensor_station(address: str) -> None:
             await sensor_station.set_unlocked(False)
             log.info(f'Locked sensor station {address}')
     except BLEConnectionError + (WriteError,):
-        log.warning(f'Unable to set sensor station {address} to locked (deleting from assigned sensor stations anyway)')
+        log.warning(f'Unable to set sensor station {address} to locked (deleted from database anyway)')
