@@ -22,7 +22,7 @@
           <div class="card bg-base-100 shadow-xl w-fit p-5">
             <div>
               <h1 class="flex justify-center text-2xl font-bold">
-                AccessPoint: {accessPoint?.selfAssignedId.slice(0, 5)}
+                AccessPoint: {accessPoint?.id.slice(0, 5)}
               </h1>
 
               {#each Object.entries(accessPoint) as [key, value]}
@@ -43,7 +43,7 @@
               <input
                 type="hidden"
                 name="accessPointId"
-                value={accessPoint?.selfAssignedId}
+                value={accessPoint?.id}
               />
               <button class="btn btn-primary" formaction="?/search"
                 >Search Stations</button
