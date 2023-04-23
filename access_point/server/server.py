@@ -167,49 +167,35 @@ class Server:
         # get content
         content =  response.json()
 
-        # construct and validate config
+        # construct and validate access point configuration
         config = {}
-        if isinstance(content.get('roomName'), str):
-            config['room_name'] = str(content.pop('roomName'))
-        if isinstance(content.get('pairingMode'), bool):
-            config['scan_active'] = bool(content.pop('pairingMode'))
-        if isinstance(content.get('transferInterval'), int):
-            config['transfer_data_interval'] = int(content.pop('transferInterval'))
+        try:
+            config['room_name'] = str(content['roomName'])
+            config['scan_active'] = bool(content['pairingMode'])
+            config['transfer_data_interval'] = int(content['transferInterval'])
+        except (ValueError, KeyError):
+            raise ConnectionError('Received malformed access point configuration')
 
         # construct and validate sensor station data
-        raw_sensor_stations = content.get('sensorStations')
-        if raw_sensor_stations is None: raw_sensor_stations = []
+        raw_sensor_stations = content['sensorStations'] if 'sensorStations' in content else []
         if not isinstance(raw_sensor_stations, list): raise ConnectionError('Did not receive a valid sensor station list')
         sensor_stations = []
         for raw_sensor_station in raw_sensor_stations:
             sensor_station = {}
-            if not isinstance(raw_sensor_station, dict): raise ConnectionError('Sensor stations not described as expected')
-            if not isinstance(raw_sensor_station.get('bdAddress'), str):
-                raise ConnectionError('Sensor stations not described as expected')
-            else:
-                sensor_station['address'] = raw_sensor_station.get('bdAddress')
-            if not isinstance(raw_sensor_station.get('sensors'), list):
-                if raw_sensor_station.get('sensors'):
-                    raw_sensor_station.pop('sensors')
-            else:
+            try:
+                sensor_station['address'] = raw_sensor_station['bdAddress']
                 sensor_station['sensors'] = []
-                for raw_sensor in raw_sensor_station.get('sensors'):
+                raw_sensors = raw_sensor_station['sensors'] if 'sensors' in raw_sensor_station else []
+                for raw_sensor in raw_sensors:
                     sensor = {}
-                    if not isinstance(raw_sensor, dict): continue
-                    if not isinstance(raw_sensor.get('sensorName'), str):
-                        continue
-                    else:
-                        sensor['sensor_name'] = str(raw_sensor.get('sensorName'))
-                    if isinstance(raw_sensor.get('limits'), dict):        
-                        if isinstance(raw_sensor['limits'].get('lowerLimit'), float):
-                            sensor['lower_limit'] = float(raw_sensor['limits'].get('lowerLimit'))
-                        if isinstance(raw_sensor['limits'].get('upperLimit'), float):
-                            sensor['upper_limit'] = float(raw_sensor['limits'].get('upperLimit'))
-                    if isinstance(raw_sensor.get('thresholdTime'), int):
-                        sensor['alarm_tripping_time'] = int(raw_sensor.get('thresholdTime'))
+                    sensor['sensor_name'] = raw_sensor['sensorName']
+                    sensor['lower_limit'] = raw_sensor['limits']['lowerLimit']
+                    sensor['upper_limit'] = raw_sensor['limits']['upperLimit']
+                    sensor['alarm_tripping_time'] = raw_sensor['thresholdTime']
                     sensor_station['sensors'].append(sensor)
-            sensor_stations.append(sensor_station)
-
+                sensor_stations.append(sensor_station)
+            except (ValueError, KeyError, TypeError):
+                raise ConnectionError('Received malformed sensor station configuration')
         return config, sensor_stations
     
     def transfer_data(self,
