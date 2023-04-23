@@ -1,7 +1,0 @@
-{
-	"devDependencies": {
-		"@poppanator/sveltekit-svg": "^3.0.0",
-		"html5-qrcode": "^2.3.8",
-		"zod": "^3.21.4"
-	}
-}
