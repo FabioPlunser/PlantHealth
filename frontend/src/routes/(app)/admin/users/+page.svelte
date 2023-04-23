@@ -30,22 +30,22 @@
   const defaultColumns: ColumnDef<User>[] = [
     {
       accessorKey: "personId",
-      header: "ID",
+      header: () => "ID",
       cell: (info) => info.getValue(),
     },
     {
       accessorKey: "username",
-      header: "Username",
+      header: () => "Username",
       cell: (info) => info.getValue(),
     },
     {
       accessorKey: "email",
-      header: "Email",
+      header: () => "Email",
       cell: (info) => info.getValue(),
     },
     {
       accessorKey: "permissions",
-      header: "Permissions",
+      header: () => "Permissions",
       cell: (info) => info.getValue(),
     },
   ];
@@ -85,7 +85,12 @@
           {#each headerGroup.headers as header}
             <th colspan={header.colSpan}>
               {#if !header.isPlaceholder}
-                {header}
+                <svelte:component
+                  this={flexRender(
+                    header.column.columnDef.header,
+                    header.getContext()
+                  )}
+                />
               {/if}
             </th>
           {/each}
@@ -97,7 +102,9 @@
         <tr>
           {#each row.getVisibleCells() as cell}
             <td>
-              {cell.getValue()}
+              <svelte:component
+                this={flexRender(cell.column.columnDef.cell, cell.getContext())}
+              />
             </td>
           {/each}
         </tr>
