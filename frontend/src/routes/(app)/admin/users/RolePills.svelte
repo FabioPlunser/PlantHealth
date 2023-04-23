@@ -1,28 +1,30 @@
 <script lang="ts">
   export let roles: string[];
-  let rolesToLower = roles.map((role) => role.toLowerCase());
+  let rolesToLower = roles.map((role) => role.toUpperCase());
 
   const getColorClass = (role: string) => {
-    if (role === "admin") {
+    if (role === "ADMIN") {
       return "bg-orange-500";
-    } else if (role === "gardener") {
+    } else if (role === "GARDENER") {
       return "bg-green-500";
-    } else if (role === "user") {
-      return "bg-blue-500";
+    } else if (role === "USER") {
+      return "bg-cyan-500";
     } else {
       return "bg-gray-500";
     }
   };
 </script>
 
-{#each rolesToLower as role}
-  <span
-    class={`
-    inline-flex items-center px-2 py-1 rounded-full 
-    text-white text-sm
-    ${getColorClass(role)}
-  `}
-  >
-    {role}
-  </span>
-{/each}
+<div class="flex gap-2">
+  {#each rolesToLower as role}
+    <span
+      class={`
+      flex items-center px-2 rounded-full 
+      text-white text-sm
+      ${getColorClass(role)}
+    `}
+    >
+      {role}
+    </span>
+  {/each}
+</div>

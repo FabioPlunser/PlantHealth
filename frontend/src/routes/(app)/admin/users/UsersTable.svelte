@@ -7,6 +7,7 @@
   } from "@tanstack/svelte-table";
   import { writable } from "svelte/store";
   import RolePills from "./RolePills.svelte";
+  import Edit from "$lib/assets/icons/edit.svg?component";
 
   type User = {
     username: string;
@@ -68,6 +69,8 @@
             {/if}
           </th>
         {/each}
+        <th>EDIT</th>
+        <th>DELETE</th>
       </tr>
     {/each}
   </thead>
@@ -84,15 +87,31 @@
           </td>
         {/each}
         <td class="table-cell">
-          <button
-            on:click={() => {
-              selectedUser = row.original;
-              showEditModal = true;
-            }}
-            class="btn btn-primary"
-          >
-            Edit
-          </button>
+          <label class="button ">
+            <button
+              on:click={() => {
+                selectedUser = row.original;
+                showEditModal = true;
+              }}
+              class="hidden"
+            />
+            <!-- TODO figure out how to change color on hover seems like hover:dark:fill-gray-500 does not work...-->
+            <Edit class="w-8 hover:dark:fill-gray-500 dark:fill-white " />
+          </label>
+        </td>
+        <td class="table-cell">
+          <div>
+            <label class="button">
+              <button
+                on:click={() => {
+                  selectedUser = row.original;
+                  showEditModal = true;
+                }}
+                class="hidden"
+              />
+              <i class="bi bi-trash text-3xl hover:text-red-500 shadow-2xl" />
+            </label>
+          </div>
         </td>
       </tr>
     {/each}
