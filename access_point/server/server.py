@@ -87,7 +87,7 @@ class Server:
         :param endpoint: The endpoint for which the full URL is wanted
         :return: Full URL of the endpoint
         """
-        return urljoin(self.address, f'{endpoint}')
+        return "/".join([self.address, f'{endpoint}'])
 
     def register(self, id: str, room_name: str) -> str:
         """
