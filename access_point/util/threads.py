@@ -32,8 +32,8 @@ class ThreadScheduler:
         self.interval = interval
         self.kwargs = kwargs
 
-        # set timestamp so that thread is immediately started when calling run()
-        self.start_timestamp = datetime.now() - (self.interval if start_immediately else timedelta(0))
+        self.start_timestamp = None
+        self.start_immediately = start_immediately
         self.thread = None
         self.interval_warning_logged = False
         self.suppress_interval_warning = suppress_interval_warning or interval == timedelta(0)
@@ -43,6 +43,11 @@ class ThreadScheduler:
         Try to start the thread. If the thread is already running, do nothing.
         If the interval has not passed yet, do nothing.
         """
+        # set initial start timestamp on first call of the run method - ensures that the timer only starts running,
+        # once the thread has been started initially
+        if self.start_timestamp is None:
+            self.start_timestamp = datetime.now() - (self.interval if self.start_immediately else timedelta(0))
+        # check if thread shall be started
         if (datetime.now() - self.start_timestamp) >= self.interval:
             if self.thread is None or not self.thread.is_alive():
                 self.thread = threading.Thread(target=self.target, name=self.name, kwargs=self.kwargs, daemon=True)
