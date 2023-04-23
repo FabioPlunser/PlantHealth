@@ -5,13 +5,17 @@
   import type { ActionData } from "./$types";
   import { enhance } from "$app/forms";
 
+  type User = {
+    username: string;
+    token: string;
+    permissions: string[];
+    email: string;
+    personId: string;
+  };
+
   export let showModal: boolean;
   export let form: ActionData;
-  export let selectedUser: {
-    username: string;
-    email: string;
-    password: string;
-  };
+  export let selectedUser: User;
 </script>
 
 <Modal
