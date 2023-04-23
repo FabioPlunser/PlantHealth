@@ -1,7 +1,7 @@
 import logging
 import asyncio
 
-from bleak import BleakClient, exc
+from bleak import BleakClient
 
 from server import Server, TokenDeclinedError
 from database import Database, DatabaseError, DB_FILENAME

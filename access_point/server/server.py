@@ -4,7 +4,6 @@ import functools
 
 from typing import Union, Optional
 from datetime import datetime
-from requests.compat import urljoin
 from requests.adapters import HTTPAdapter, Retry
 
 
@@ -107,6 +106,8 @@ class Server:
             )
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
             raise ConnectionError(f'Request timed out: {e}')
+        except OSError as e:
+            raise ConnectionError(f'Unable to reach endpoint: {e}]')
 
         # check status code
         if response.status_code in self._LOCKED_STATUS_CODES:
@@ -154,6 +155,8 @@ class Server:
             response = self._client.get(self._get_endpoint_url('get-access-point-config'))
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
             raise ConnectionError(f'Request timed out: {e}')
+        except OSError as e:
+            raise ConnectionError(f'Unable to reach endpoint: {e}]')
         
         # check status code
         if response.status_code in self._LOCKED_STATUS_CODES:
@@ -262,6 +265,8 @@ class Server:
             )
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
             raise ConnectionError(f'Request timed out: {e}')
+        except OSError as e:
+            raise ConnectionError(f'Unable to reach endpoint: {e}]')
         
         if response.status_code in self._LOCKED_STATUS_CODES:
             self.token = None
@@ -289,6 +294,8 @@ class Server:
             )
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
             raise ConnectionError(f'Request timed out: {e}')
+        except OSError as e:
+            raise ConnectionError(f'Unable to reach endpoint: {e}]')
         
         # check status code
         if response.status_code in self._LOCKED_STATUS_CODES:
