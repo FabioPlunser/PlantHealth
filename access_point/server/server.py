@@ -103,7 +103,7 @@ class Server:
             response = self._client.post(
                 self._get_endpoint_url('register-access-point'),
                 params={'accessPointId': id,
-                      'roomName': room_name}
+                        'roomName': room_name}
             )
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
             raise ConnectionError(f'Request timed out: {e}')
