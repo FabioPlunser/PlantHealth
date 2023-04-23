@@ -2,7 +2,7 @@
   import { page } from "$app/stores";
   import { fly } from "svelte/transition";
 
-  import PageTransition from "$components/PageTransition.svelte";
+  import PageTransition from "$components/pageTransition.svelte";
   import Mobile from "$helper/Mobile.svelte";
   import Query from "$helper/Query.svelte";
   import toast, { Toaster } from "$components/toast";
@@ -46,5 +46,5 @@
 
 <br class="mt-24" />
 <div class="fixed bottom-0 mb-4 z-50 w-full">
-  <!-- <AdminNav /> -->
+  <AdminNav />
 </div>

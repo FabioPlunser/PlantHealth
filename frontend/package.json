@@ -32,7 +32,12 @@
     "typescript": "^5.0.4",
     "vite": "^4.2.1",
     "vite-svg-loader": "^4.0.0",
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "html5-qrcode": "^2.3.8",
+    "@tanstack/svelte-table": "^8.8.6"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+   
+  }
 }
