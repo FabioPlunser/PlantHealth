@@ -6,6 +6,7 @@
     getCoreRowModel,
   } from "@tanstack/svelte-table";
   import { writable } from "svelte/store";
+  import RolePills from "./RolePills.svelte";
 
   type User = {
     username: string;
@@ -38,7 +39,7 @@
     {
       accessorKey: "permissions",
       header: () => "Permissions",
-      cell: (info) => info.getValue(),
+      cell: (info) => flexRender(RolePills, { roles: info.getValue() }),
     },
   ];
 
@@ -52,7 +53,7 @@
 </script>
 
 <table class="table">
-  <thead>
+  <thead class="">
     {#each $table.getHeaderGroups() as headerGroup}
       <tr>
         {#each headerGroup.headers as header}
@@ -72,20 +73,23 @@
   </thead>
   <tbody>
     {#each $table.getRowModel().rows as row}
-      <tr>
+      <tr class="table-row">
         {#each row.getVisibleCells() as cell}
-          <td>
-            <svelte:component
-              this={flexRender(cell.column.columnDef.cell, cell.getContext())}
-            />
+          <td class="table-cell">
+            <div class="flex justify-center">
+              <svelte:component
+                this={flexRender(cell.column.columnDef.cell, cell.getContext())}
+              />
+            </div>
           </td>
         {/each}
-        <td>
+        <td class="table-cell">
           <button
             on:click={() => {
               selectedUser = row.original;
               showEditModal = true;
             }}
+            class="btn btn-primary"
           >
             Edit
           </button>
