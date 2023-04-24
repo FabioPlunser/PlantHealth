@@ -23,7 +23,6 @@ sonarqube-check-job:
   stage: sonarqube-check
   image:
     name: sonarsource/sonar-scanner-cli:latest
-    entrypoint: [""]
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR/code/.sonar}"
     GIT_DEPTH: "0"
