@@ -6,7 +6,7 @@ import sys
 
 from logging.handlers import RotatingFileHandler
 
-from util import *
+from util import Config, ThreadScheduler, StreamToLogger, CONFIG_FILENAME
 from database import Database, DatabaseError, DB_FILENAME
 
 
