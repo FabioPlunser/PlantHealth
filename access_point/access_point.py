@@ -45,8 +45,7 @@ def main():
                                                    config=config)
             collect_data_thread = ThreadScheduler(target=procedures.collect_data,
                                                   name='CollectData',
-                                                  interval=config.collect_data_interval,
-                                                  config=config)
+                                                  interval=config.collect_data_interval)
             transfer_data_thread = ThreadScheduler(target=procedures.transfer_data,
                                                    name='TransferData',
                                                    interval=config.transfer_data_interval,

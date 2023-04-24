@@ -118,7 +118,8 @@ class Config(object):
         Validates before updating.
         :raises ValueError: If some given values do not pass the validation
         """
-        log.debug(f'Received {len(kwargs)} unknown parameters')
+        if kwargs:
+            log.debug(f'Received {len(kwargs)} unknown parameters')
 
         data = {k: v for k, v in locals().items() if k != 'self'}
         self._validate(**data)
@@ -195,7 +196,8 @@ class Config(object):
             **kwargs
         ):
         """Validates the given values against set constraints."""
-        log.debug(f'Unknown parameters: {kwargs}')
+        if kwargs:
+            log.debug(f'Unknown parameters: {kwargs}')
 
         def describe_wrong_type(name, type):
             return f'Expected value of type {type.__name__} for {name}'
