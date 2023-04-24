@@ -1,0 +1,18 @@
+stages:          # List of stages for jobs, and their order of execution
+  - setup
+  - test
+
+setup-job:       # This job creates a python venv for further testing
+  stage: setup
+  script:
+    - cd access_point
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - pip install -r requirements.txt
+
+unit-test-job:   # This jobs runs runs the unit tests and measures coverage
+  stage: test    
+  script:
+    - coverage run
+    - coverage html
+    - coverage json -q -o /dev/stdout | jq .totals.percent_covered
