@@ -1,10 +1,16 @@
 import requests
 import json
 import functools
+import logging
 
 from typing import Union, Optional
 from datetime import datetime
 from requests.adapters import HTTPAdapter, Retry
+
+
+# suppress log output from requests and urllib3 library
+logging.getLogger('requests').setLevel(logging.CRITICAL)
+logging.getLogger('urllib3').setLevel(logging.CRITICAL)
 
 
 def describe_not_ok_response(r: requests.Response) -> str:
@@ -107,7 +113,7 @@ class Server:
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
             raise ConnectionError(f'Request timed out: {e}')
         except OSError as e:
-            raise ConnectionError(f'Unable to reach endpoint: {e}]')
+            raise ConnectionError(f'Unable to reach endpoint at given address: {self.address}')
 
         # check status code
         if response.status_code in self._LOCKED_STATUS_CODES:
@@ -156,7 +162,7 @@ class Server:
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
             raise ConnectionError(f'Request timed out: {e}')
         except OSError as e:
-            raise ConnectionError(f'Unable to reach endpoint: {e}]')
+            raise ConnectionError(f'Unable to reach endpoint at given address: {self.address}')
         
         # check status code
         if response.status_code in self._LOCKED_STATUS_CODES:
@@ -252,7 +258,7 @@ class Server:
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
             raise ConnectionError(f'Request timed out: {e}')
         except OSError as e:
-            raise ConnectionError(f'Unable to reach endpoint: {e}]')
+            raise ConnectionError(f'Unable to reach endpoint at given address: {self.address}')
         
         if response.status_code in self._LOCKED_STATUS_CODES:
             self.token = None
@@ -281,7 +287,7 @@ class Server:
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
             raise ConnectionError(f'Request timed out: {e}')
         except OSError as e:
-            raise ConnectionError(f'Unable to reach endpoint: {e}]')
+            raise ConnectionError(f'Unable to reach endpoint at given address: {self.address}')
         
         # check status code
         if response.status_code in self._LOCKED_STATUS_CODES:
