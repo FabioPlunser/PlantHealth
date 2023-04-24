@@ -22,7 +22,7 @@ unit-test-job:   # This jobs runs the unit tests and measures coverage
 sonarqube-check-job:
   stage: sonarqube-check
   image:
-    name: sonarsource/sonar-scanner-cli:latest
+    name: sonarsource/sonar-scanner-cli:4.7
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR/code/.sonar}"
     GIT_DEPTH: "0"
