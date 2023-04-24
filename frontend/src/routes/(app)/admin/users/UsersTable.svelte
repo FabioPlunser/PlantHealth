@@ -86,7 +86,7 @@
   <div>
     <input
       type="search"
-      class="input border-2 w-full mb-3"
+      class="input dark:input-bordered w-full dark:bg-gray-800 bg-gray-200 text-white mb-3"
       on:keyup={handleSearch}
       on:search={handleSearch}
       placeholder="Search..."
