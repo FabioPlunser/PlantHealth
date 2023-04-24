@@ -56,13 +56,35 @@ public class SensorStationService {
 		}
 	}
 
+	public boolean sensorStationExists(UUID sensorStationId) {
+		try {
+			Optional<SensorStation> maybeSensorStation = findById(sensorStationId);
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+	/**
+	 * Set unlock status of sensor station.
+	 * @param unlocked
+	 * @param sensorStationId
+	 * @return
+	 */
+	public boolean setUnlocked(boolean unlocked, UUID sensorStationId) {
+		Optional<SensorStation> maybeSensorStation = findById(sensorStationId);
+		if (maybeSensorStation.isEmpty()) return false;
+
+		SensorStation sensorStation = maybeSensorStation.get();
+		sensorStation.setUnlocked(unlocked);
+		return save(sensorStation) != null;
+	}
+
 	public List<String> getPlantPictures(SensorStation plant) {
 		// TODO
 		return List.of();
 	}
 
 	public boolean uploadPlantPicture(UUID plantId, String picture) {
-		// TODO
 		return false;
 	}
 
@@ -81,11 +103,6 @@ public class SensorStationService {
 	}
 
 	public boolean deletePicture(PlantPicture plantPicture) {
-		// TODO
-		return false;
-	}
-
-	public boolean createQrCode(UUID qrCodeId) {
 		// TODO
 		return false;
 	}
