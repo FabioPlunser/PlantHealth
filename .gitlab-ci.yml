@@ -18,7 +18,6 @@ unit-test-job:   # This jobs runs the unit tests and measures coverage
     - echo "Running unit tests"
     - coverage run
     - coverage xml
-  allow_failure: true
 
 sonarqube-check-job:
   stage: sonarqube-check
@@ -34,6 +33,5 @@ sonarqube-check-job:
     paths:
       - .sonar/cache
   script:
-    - echo "Running SonarQube scan"
     - sonar-scanner -Dsonar.python.coverage.reportPaths=access_point/coverage.xml
   allow_failure: true
