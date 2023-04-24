@@ -33,6 +33,6 @@ sonarqube-check-job:
       - .sonar/cache
   script:
     - sonar-scanner
-      -Dsonar.projectKey="${CI_PROJECT_NAMESPACE}-${CI_PROJECT_NAME}"
+      -Dsonar.projectKey=${CI_PROJECT_NAMESPACE}-${CI_PROJECT_NAME}
       -Dsonar.projectName="${CI_PROJECT_NAME} ${GITLAB_USER_NAME}"
       -Dsonar.python.coverage.reportPaths=access_point/coverage.xml
