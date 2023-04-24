@@ -119,7 +119,7 @@ class Config(object):
         :raises ValueError: If some given values do not pass the validation
         """
         if kwargs:
-            log.debug(f'Received {len(kwargs)} unknown parameters')
+            log.debug(f'Received {len(kwargs)} unknown parameters: {kwargs}')
 
         data = {k: v for k, v in locals().items() if k != 'self'}
         self._validate(**data)
@@ -192,12 +192,9 @@ class Config(object):
             transfer_data_interval:int=None,
             scan_active:bool=None,
             scan_duration:int=None,
-            debug:bool=None,
-            **kwargs
+            debug:bool=None
         ):
         """Validates the given values against set constraints."""
-        if kwargs:
-            log.debug(f'Unknown parameters: {kwargs}')
 
         def describe_wrong_type(name, type):
             return f'Expected value of type {type.__name__} for {name}'
