@@ -4,14 +4,13 @@ import asyncio
 from datetime import datetime
 from bleak import BleakClient
 
-from util import Config
 from sensors import SensorStation, BLEConnectionError, ReadError, WriteError
 from database import Database, DatabaseError, DB_FILENAME
 
 log = logging.getLogger()
 
 
-def collect_data(config: Config):
+def collect_data():
     """
     Polls all enabled sensor stations and collects sensor data.
     The 'unlocked' flag on each sensor station is set in any case.
@@ -62,7 +61,7 @@ async def single_connection(address: str):
                 return
             
             # read sensor data if new available
-            if not await sensor_station.sensor_data_read:        
+            if not await sensor_station.sensor_data_read:
                 sensor_values = await sensor_station.sensor_data
                 log.info(f'Got data for {len(sensor_values)} sensors from sensor station {address}')
                 # get all sensor data
