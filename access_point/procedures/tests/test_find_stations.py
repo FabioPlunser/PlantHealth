@@ -1,5 +1,3 @@
-from tempfile import NamedTemporaryFile
-
 from procedures import find_stations
 from database import Database
 from server import Server, TokenDeclinedError
