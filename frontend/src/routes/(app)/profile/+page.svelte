@@ -53,6 +53,8 @@
         <FormError field="email" {form} />
         <PasswordInput field="password" value={data.userPassword} />
 
+        <!-- TODO implement propper user logic in profile (can not see password) add password confirm-->
+
         <FormError field="password" {form} />
         <div class="mt-6">
           <ul class="grid w-full gap-6 md:grid-rows-3">

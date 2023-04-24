@@ -74,10 +74,6 @@ export const actions = {
     res = await res.json();
   },
 
-  updateUser: async ({ fetch, event }) => {
-    const formData = new FormData();
-  },
-
   deleteUser: async ({ fetch, event }) => {
     const formData = new FormData();
     formData.append("id", event.query.get("id"));
@@ -86,7 +82,6 @@ export const actions = {
       method: "POST",
       body: formData,
     };
-
     let res = await fetch(`http://${BACKEND_URL}/delete-user`, requestOptions);
 
     res = await res.json();

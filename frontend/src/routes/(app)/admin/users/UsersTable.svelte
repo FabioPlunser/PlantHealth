@@ -24,7 +24,6 @@
 
   export let users: User[];
   export let selectedUser: User;
-  export let showEditModal: boolean;
 
   const defaultColumns: ColumnDef<User>[] = [
     {
@@ -145,17 +144,9 @@
               </td>
             {/each}
             <td class="table-cell">
-              <label class="button">
-                <button
-                  on:click={() => {
-                    selectedUser = row.original;
-                    showEditModal = true;
-                  }}
-                  class="dark:fill-white hover:fill-gray-500"
-                  ><Edit class="w-8 " /></button
-                >
-                <!-- TODO figure out how to change color on hover seems like hover:fill-gray-500 does not work-->
-              </label>
+              <a href={`/profile?personid=${row.original.personId}`}>
+                <Edit class="w-8 " />
+              </a>
             </td>
             <td class="table-cell">
               <div>

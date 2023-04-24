@@ -43,7 +43,7 @@ export const actions = {
 } satisfies Actions;
 
 export async function load({ params, url }) {
-  let userId = url.searchParams.get("userId");
+  let personId = url.searchParams.get("personId");
 
   // TODO: fetch proper backend endpoint
   let username: string = "Sakura";

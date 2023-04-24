@@ -15,14 +15,9 @@
 
   export let form: ActionData;
 
-  let showEditModal = false;
   let addUserModal = false;
   let selectedUser: any = null;
 </script>
-
-{#if showEditModal}
-  <EditUserModal bind:showModal={showEditModal} {form} {selectedUser} />
-{/if}
 
 {#if addUserModal}
   <AddUserModal bind:showModal={addUserModal} {form} />
@@ -33,5 +28,5 @@
   on:click={() => (addUserModal = true)}>Add User</btn
 >
 <div class="flex justify-center">
-  <UsersTable bind:users={data.users} bind:showEditModal bind:selectedUser />
+  <UsersTable bind:users={data.users} bind:selectedUser />
 </div>
