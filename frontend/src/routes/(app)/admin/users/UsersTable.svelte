@@ -1,21 +1,18 @@
 <script lang="ts">
-  import type {
-    ColumnDef,
-    TableOptions,
-    SortDirection,
-  } from "@tanstack/svelte-table";
+  import type { ColumnDef, TableOptions } from "@tanstack/svelte-table";
   import {
     createSvelteTable,
     flexRender,
     getCoreRowModel,
     getSortedRowModel,
+    getFilteredRowModel,
   } from "@tanstack/svelte-table";
   import { writable } from "svelte/store";
   import RolePills from "./RolePills.svelte";
   import Edit from "$lib/assets/icons/edit.svg?component";
-  import SortUp from "$lib/assets/icons/sortUp.svg?component";
-  import SortDown from "$lib/assets/icons/sortDown.svg?component";
   import TextCell from "./TextCell.svelte";
+  import SortSymbol from "./SortSymbol.svelte";
+  import type { NodeJS } from "node:types";
 
   type User = {
     username: string;
@@ -29,113 +26,157 @@
   export let selectedUser: User;
   export let showEditModal: boolean;
 
-  function getSortSymbol(isSorted: boolean | SortDirection) {
-    return isSorted ? (isSorted === "asc" ? "up" : "down") : "";
-  }
-
   const defaultColumns: ColumnDef<User>[] = [
     {
       accessorKey: "username",
-      header: () => "Username",
+      header: () => flexRender(TextCell, { text: "Username" }),
       cell: (info) => flexRender(TextCell, { text: info.getValue() }),
     },
     {
       accessorKey: "email",
-      header: () => "Email",
+      header: () => flexRender(TextCell, { text: "Email" }),
       cell: (info) => flexRender(TextCell, { text: info.getValue() }),
     },
     {
       accessorKey: "permissions",
-      header: () => "Permissions",
+      header: () => flexRender(TextCell, { text: "Permissions" }),
       cell: (info) => flexRender(RolePills, { roles: info.getValue() }),
     },
   ];
+
+  let globalFilter = "";
 
   const options = writable<TableOptions<User>>({
     data: users,
     columns: defaultColumns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      globalFilter,
+    },
   });
 
+  function setGlobalFilter(filter: string) {
+    globalFilter = filter;
+    options.update((old) => {
+      return {
+        ...old,
+        state: {
+          ...old.state,
+          globalFilter: filter,
+        },
+      };
+    });
+  }
+
   const table = createSvelteTable(options);
+
+  let timer: NodeJS.Timeout;
+  function handleSearch(e: Event) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const target = e.target as HTMLInputElement;
+      setGlobalFilter(target.value);
+    }, 200);
+  }
+  const noTypeCheck = (x: any) => x;
 </script>
 
-<table class="table">
-  <thead class="">
-    {#each $table.getHeaderGroups() as headerGroup}
-      <tr>
-        {#each headerGroup.headers as header}
-          <th colspan={header.colSpan}>
-            {#if !header.isPlaceholder}
-              <div
-                class:cursor-pointer={header.column.getCanSort()}
-                class:select-none={header.column.getCanSort()}
-                on:click={header.column.getToggleSortingHandler()}
-                on:keyup={header.column.getToggleSortingHandler()}
-              >
-                <svelte:component
-                  this={flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
-                />
-                {getSortSymbol(header.column.getIsSorted())}
-              </div>
-              <!--
+<div>
+  <div class="w-full mb-3">
+    <input
+      type="search"
+      class="input"
+      on:keyup={handleSearch}
+      on:search={handleSearch}
+      placeholder="Search..."
+      {...noTypeCheck(null)}
+    />
+  </div>
+  <div>
+    <table class="table">
+      <thead class="">
+        {#each $table.getHeaderGroups() as headerGroup}
+          <tr>
+            {#each headerGroup.headers as header}
+              <th colspan={header.colSpan}>
+                {#if !header.isPlaceholder}
+                  <div
+                    class:cursor-pointer={header.column.getCanSort()}
+                    class:select-none={header.column.getCanSort()}
+                    on:click={header.column.getToggleSortingHandler()}
+                    on:keyup={header.column.getToggleSortingHandler()}
+                  >
+                    <svelte:component
+                      this={flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                    />
+                    <SortSymbol isSorted={header.column.getIsSorted()} />
+                  </div>
+                  <!--
                   <SortDown class="dark:fill-white fill-black"/>
                 -->
-            {/if}
-          </th>
+                {/if}
+              </th>
+            {/each}
+            <th>EDIT</th>
+            <th>DELETE</th>
+          </tr>
         {/each}
-        <th>EDIT</th>
-        <th>DELETE</th>
-      </tr>
-    {/each}
-  </thead>
-  <tbody>
-    {#each $table.getRowModel().rows as row}
-      <tr class="table-row">
-        {#each row.getVisibleCells() as cell}
-          <td class="table-cell">
-            <div class="flex justify-center">
-              <!--
+      </thead>
+      <tbody>
+        {#each $table.getRowModel().rows as row}
+          <tr class="table-row">
+            {#each row.getVisibleCells() as cell}
+              <td class="table-cell">
+                <div class="flex justify-center">
+                  <!--
               -->
-              <svelte:component
-                this={flexRender(cell.column.columnDef.cell, cell.getContext())}
-              />
-            </div>
-          </td>
+                  <svelte:component
+                    this={flexRender(
+                      cell.column.columnDef.cell,
+                      cell.getContext()
+                    )}
+                  />
+                </div>
+              </td>
+            {/each}
+            <td class="table-cell">
+              <label class="button">
+                <button
+                  on:click={() => {
+                    selectedUser = row.original;
+                    showEditModal = true;
+                  }}
+                  class="dark:fill-white hover:fill-gray-500"
+                  ><Edit class="w-8 " /></button
+                >
+                <!-- TODO figure out how to change color on hover seems like hover:fill-gray-500 does not work-->
+              </label>
+            </td>
+            <td class="table-cell">
+              <div>
+                <label class="button">
+                  <!-- TODO make delete user action with verification Modal-->
+                  <button
+                    on:click={() => {
+                      selectedUser = row.original;
+                    }}
+                    class=""
+                  >
+                    <i
+                      class="bi bi-trash text-3xl hover:text-red-500 shadow-2xl"
+                    />
+                  </button>
+                </label>
+              </div>
+            </td>
+          </tr>
         {/each}
-        <td class="table-cell">
-          <label class="button">
-            <button
-              on:click={() => {
-                selectedUser = row.original;
-                showEditModal = true;
-              }}
-              class="dark:fill-white hover:fill-gray-500"
-              ><Edit class="w-8 " /></button
-            >
-            <!-- TODO figure out how to change color on hover seems like hover:fill-gray-500 does not work-->
-          </label>
-        </td>
-        <td class="table-cell">
-          <div>
-            <label class="button">
-              <!-- TODO make delete user action with verification Modal-->
-              <button
-                on:click={() => {
-                  selectedUser = row.original;
-                }}
-                class=""
-              >
-                <i class="bi bi-trash text-3xl hover:text-red-500 shadow-2xl" />
-              </button>
-            </label>
-          </div>
-        </td>
-      </tr>
-    {/each}
-  </tbody>
-</table>
+      </tbody>
+    </table>
+  </div>
+</div>
