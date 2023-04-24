@@ -22,7 +22,7 @@ class ErrorQueue {
 			return errorQueue;
 		}
 
-	private:
+	public:
 		/**
 		 * @return: The error with top priority after adding the error.
 		 */
