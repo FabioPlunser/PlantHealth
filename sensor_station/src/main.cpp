@@ -53,9 +53,9 @@ void setup() {
 	initialize_communication();
 	// enable_pairing_mode();
 
-	while (!Serial) {
-		delay(50);
-	}
+	// while (!Serial) {
+	// 	delay(50);
+	// }
 
 	delay(1000);
 }
@@ -64,11 +64,17 @@ void setup() {
 
 void loop() {
 	static arduino::String pairedDevice;
-	static bool inPairingMode = false;
+	static bool inPairingMode		 = false;
+	static unsigned long pairingTime = 0;
+	// Activate pairing mode if button is pressed.
 	if (analogRead(PIN_BUTTON_1) == PinStatus::HIGH) {
 		enable_pairing_mode();
 		inPairingMode = true;
+		pairingTime	  = millis();
+	} else if (millis() - pairingTime > DURATION_IN_PAIRING_MODE_MS) {
+		inPairingMode = false;
 	}
+	// If button is not pressed for 10
 	BLEDevice central = BLE.central();
 	if (central) {
 		if (inPairingMode) {

@@ -37,6 +37,7 @@
 // Definition of boundary values
 #define ANALOG_READ_MAX_VALUE		  1023
 #define UPDATE_INTERVAL_BME680_MS_MAX 1000
+#define DURATION_IN_PAIRING_MODE_MS	  60'000
 
 // Mapping of the arduino pin connections
 #define PIN_PHOTOTRANSISTOR			  A0
