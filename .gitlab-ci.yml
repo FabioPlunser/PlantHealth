@@ -1,0 +1,16 @@
+image: alpine:3.17
+
+stages:          # List of stages for jobs, and their order of execution
+  - test
+
+unit-test-job:   # This jobs runs runs the unit tests and measures coverage
+  stage: test    
+  script:
+    - apk add --no-cache python3 py3-pip
+    - cd access_point
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - pip install -r requirements.txt
+    - coverage run
+    - coverage html
+    - coverage json -q -o /dev/stdout | jq .totals.percent_covered
