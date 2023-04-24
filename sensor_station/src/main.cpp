@@ -71,10 +71,11 @@ void loop() {
 		enable_pairing_mode();
 		inPairingMode = true;
 		pairingTime	  = millis();
+		// If button is not pressed for "DURATION_IN_PAIRING_MODE_MS" time it
+		// will got back to normal mode
 	} else if (millis() - pairingTime > DURATION_IN_PAIRING_MODE_MS) {
 		inPairingMode = false;
 	}
-	// If button is not pressed for 10
 	BLEDevice central = BLE.central();
 	if (central) {
 		if (inPairingMode) {
@@ -85,16 +86,16 @@ void loop() {
 		// Serial.print("* Device MAC address: ");
 		// Serial.println(central.address());
 		// Serial.println(" ");
-		if (pairedDevice.compareTo(central.address()) == 0) {
-			if (central.connected()) {
-				setSensorValuesInBLE();
-				while (central.connected()) {
-					;
-				}
-			} else {
-				central.disconnect();
+		// if (pairedDevice.compareTo(central.address()) == 0) {
+		if (central.connected()) {
+			setSensorValuesInBLE();
+			while (central.connected()) {
+				;
 			}
+		} else {
+			central.disconnect();
 		}
+		// }
 		Serial.println("* Disconnected from central device!");
 		if (get_sensor_data_read_flag() == true) {
 			clear_sensor_data_read_flag();
