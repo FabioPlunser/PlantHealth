@@ -2,17 +2,22 @@ package at.ac.uibk.plant_health.controllers;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+import javax.mail.Message;
 
 import at.ac.uibk.plant_health.models.annotations.AnyPermission;
+import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
 import at.ac.uibk.plant_health.models.rest_responses.LockedSensorStationResponse;
+import at.ac.uibk.plant_health.models.rest_responses.MessageResponse;
 import at.ac.uibk.plant_health.models.rest_responses.RestResponseEntity;
 import at.ac.uibk.plant_health.models.user.Permission;
+import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.service.SensorStationService;
 
+@RestController
 public class SensorStationController {
 	@Autowired
 	private SensorStationService sensorStationService;
@@ -29,9 +34,22 @@ public class SensorStationController {
 	)
 	public RestResponseEntity
 	setLockSensorStation(
-			//            @RequestBody final UUID sensorStationId
-			@RequestBody final boolean locked
+			@RequestParam("sensorStationId") final UUID sensorStationId,
+			@RequestParam("unlocked") final boolean unlocked
 	) {
-		throw new NotImplementedException();
+		if (!sensorStationService.sensorStationExists(sensorStationId)) {
+			return MessageResponse.builder()
+					.statusCode(404)
+					.message("Could not find sensorStation")
+					.toEntity();
+		}
+		if (!sensorStationService.setUnlocked(unlocked, sensorStationId)) {
+			return MessageResponse.builder()
+					.statusCode(500)
+					.message("Couldn't set unlock state of SensorStation")
+					.toEntity();
+		}
+
+		return MessageResponse.builder().statusCode(200).toEntity();
 	}
 }
