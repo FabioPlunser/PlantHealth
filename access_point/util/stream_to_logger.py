@@ -16,4 +16,5 @@ class StreamToLogger(object):
             self.logger.log(self.level, line.rstrip())
 
    def flush(self):
+      """System requires flush() method - no functional use"""
       pass
