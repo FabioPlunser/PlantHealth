@@ -11,7 +11,7 @@ Functions:
 from .collect_data_f import collect_data
 from .find_stations_f import find_stations
 from .get_config_f import get_config
-from .transfer_data import transfer_data
+from .transfer_data_f import transfer_data
 
 __all__ = [
     'collect_data',
