@@ -84,10 +84,10 @@
 </script>
 
 <div>
-  <div class="w-full mb-3">
+  <div>
     <input
       type="search"
-      class="input"
+      class="input border-2 w-full mb-3"
       on:keyup={handleSearch}
       on:search={handleSearch}
       placeholder="Search..."
@@ -95,7 +95,7 @@
     />
   </div>
   <div>
-    <table class="table">
+    <table class="table border-white">
       <thead class="">
         {#each $table.getHeaderGroups() as headerGroup}
           <tr>

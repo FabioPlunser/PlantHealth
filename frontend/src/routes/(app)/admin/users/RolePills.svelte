@@ -19,7 +19,7 @@
   {#each rolesToLower as role}
     <span
       class={`
-      flex items-center px-2 rounded-full 
+      badge badge-lg border-none
       text-white text-sm
       ${getColorClass(role)}
     `}
