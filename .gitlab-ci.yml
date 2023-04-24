@@ -34,6 +34,7 @@ sonarqube-check-job:
   script:
     - sonar-scanner
       -Dsonar.sources=access_point
+      -Dsonar.exclusions=**/test-*.py
       -Dsonar.projectKey=${SONAR_PROJECT_KEY}
-      -Dsonar.projectName="${CI_PROJECT_NAME} ${GITLAB_USER_NAME}"
+      -Dsonar.projectName="${CI_PROJECT_NAME} ${CI_COMMIT_BRANCH}"
       -Dsonar.python.coverage.reportPaths=access_point/coverage.xml
