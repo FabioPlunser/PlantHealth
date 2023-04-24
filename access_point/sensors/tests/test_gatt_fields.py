@@ -1,11 +1,19 @@
 import pytest
 import random
 
-from ..gatt_fields import BooleanArrayField, ScalarField
+from ..gatt_fields import BooleanField, BooleanArrayField, IndexField, ScalarField
 
-def test_boolean_field_basic_decoding():
-    """Basic boolean fields are correctly decoded"""
-    original_value = 0x03.to_bytes(1,'big')
+def test_boolean_field_encoding_and_decoding():
+    """Boolean fields are correctly encoded and decoded"""
+    for original_value in [False, True]:
+        field = BooleanField()
+        encoded = field.get_raw_value(original_value)
+        decoded = field.get_represented_value(encoded)
+        assert decoded == original_value
+
+def test_boolean_array_field_basic_decoding():
+    """Basic boolean array fields are correctly decoded"""
+    original_value = 0x03.to_bytes(1,'little')
     field = BooleanArrayField(1)
     decoded = field.get_represented_value(original_value)
     assert decoded[0] == True
@@ -13,14 +21,25 @@ def test_boolean_field_basic_decoding():
     for i in range(2,8):
         assert decoded[i] == False
 
-def test_boolean_field_encoding_and_decoding():
-    """Boolean fields are correctly encoded and decoded"""
+def test_boolean_array_field_encoding_and_decoding():
+    """Boolean array fields are correctly encoded and decoded"""
     original_list = [bool(i % 3) for i in range(16)]
     original_list = [(i < 2) for i in range(16)]
     field = BooleanArrayField(2)
     encoded = field.get_raw_value(original_list)
     decoded = field.get_represented_value(encoded)
     assert decoded == original_list
+
+def test_index_field_encoding_and_decoding():
+    """Index fields are correctly encoded and decoded"""
+    random.seed(42)
+    for i in range(50):
+        for num_bytes in range(1, 5):
+            original_value = random.randint(0, 256**num_bytes - 1)
+            field = IndexField(num_bytes)
+            encoded = field.get_raw_value(original_value)
+            decoded = field.get_represented_value(encoded)
+            assert decoded == original_value
 
 def test_scalar_field_encoding_and_decoding():
     """Scalar fields are correctly encoded and decoded"""
