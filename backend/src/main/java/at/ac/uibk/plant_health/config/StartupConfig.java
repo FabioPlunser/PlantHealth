@@ -1,5 +1,7 @@
 package at.ac.uibk.plant_health.config;
 
+import at.ac.uibk.plant_health.models.device.AccessPoint;
+import at.ac.uibk.plant_health.service.AccessPointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -19,6 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 public class StartupConfig {
 	@Autowired
 	private PersonService personService;
+
+	@Autowired
+	private AccessPointService accessPointService;
 
 	/**
 	 * Injected Name of the Active Profile specified in the Application
@@ -50,6 +55,11 @@ public class StartupConfig {
 	@EventListener(ApplicationReadyEvent.class)
 	public void createBaseAdminUser() {
 		Profile activeProfile = getActiveProfile();
+
+		AccessPoint ac = new AccessPoint(UUID.randomUUID(), "Test", 10, false);
+		ac.setConnected(true);
+		accessPointService.save(ac);
+
 		switch (activeProfile) {
 						case DEBUG -> {
                 String unhashedPassword = "password";

@@ -3,6 +3,10 @@ swa:
     expiration-duration: 1d
   api:
     base: /
+  scheduling:
+    rate:
+      in:
+        seconds: 15
 
 server:
   port: 8080
