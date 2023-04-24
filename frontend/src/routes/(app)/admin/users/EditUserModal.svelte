@@ -23,24 +23,35 @@
   on:close={() => (showModal = false)}
   closeOnBodyClick={false}
 >
-  <Input
-    value={selectedUser.username}
-    field="username"
-    type="text"
-    label="Username"
-  />
-  <FormError field="username" {form} />
+  <form method="POST" action="?/updateUser" use:enhance>
+    <Input
+      value={selectedUser.username}
+      field="username"
+      type="text"
+      label="Username"
+    />
+    <FormError field="username" {form} />
 
-  <Input value={selectedUser.email} field="email" type="email" label="Email" />
-  <FormError field="email" {form} />
+    <Input
+      value={selectedUser.email}
+      field="email"
+      type="email"
+      label="Email"
+    />
+    <FormError field="email" {form} />
 
-  <Input field="password" type="text" label="Password" />
-  <FormError field="password" {form} />
+    <Input field="password" type="text" label="Password" />
+    <FormError field="password" {form} />
 
-  <div class="flex justify-between mt-4">
-    <button class="btn btn-primary">Update</button>
-    <button class="btn btn-info" on:click={() => (showModal = false)}
-      >Close</button
-    >
-  </div>
+    <div class="flex justify-between mt-4">
+      <button
+        type="submit"
+        class="btn btn-primary"
+        on:click={() => (showModal = false)}>Update</button
+      >
+      <button class="btn btn-info" on:click={() => (showModal = false)}
+        >Close</button
+      >
+    </div>
+  </form>
 </Modal>

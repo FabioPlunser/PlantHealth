@@ -1,13 +1,21 @@
 <script lang="ts">
-  import type { ColumnDef, TableOptions } from "@tanstack/svelte-table";
+  import type {
+    ColumnDef,
+    TableOptions,
+    SortDirection,
+  } from "@tanstack/svelte-table";
   import {
     createSvelteTable,
     flexRender,
     getCoreRowModel,
+    getSortedRowModel,
   } from "@tanstack/svelte-table";
   import { writable } from "svelte/store";
   import RolePills from "./RolePills.svelte";
   import Edit from "$lib/assets/icons/edit.svg?component";
+  import SortUp from "$lib/assets/icons/sortUp.svg?component";
+  import SortDown from "$lib/assets/icons/sortDown.svg?component";
+  import TextCell from "./TextCell.svelte";
 
   type User = {
     username: string;
@@ -21,21 +29,20 @@
   export let selectedUser: User;
   export let showEditModal: boolean;
 
+  function getSortSymbol(isSorted: boolean | SortDirection) {
+    return isSorted ? (isSorted === "asc" ? "up" : "down") : "";
+  }
+
   const defaultColumns: ColumnDef<User>[] = [
-    {
-      accessorKey: "personId",
-      header: () => "ID",
-      cell: (info) => info.getValue(),
-    },
     {
       accessorKey: "username",
       header: () => "Username",
-      cell: (info) => info.getValue(),
+      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
     },
     {
       accessorKey: "email",
       header: () => "Email",
-      cell: (info) => info.getValue(),
+      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
     },
     {
       accessorKey: "permissions",
@@ -48,6 +55,7 @@
     data: users,
     columns: defaultColumns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
 
   const table = createSvelteTable(options);
@@ -60,12 +68,23 @@
         {#each headerGroup.headers as header}
           <th colspan={header.colSpan}>
             {#if !header.isPlaceholder}
-              <svelte:component
-                this={flexRender(
-                  header.column.columnDef.header,
-                  header.getContext()
-                )}
-              />
+              <div
+                class:cursor-pointer={header.column.getCanSort()}
+                class:select-none={header.column.getCanSort()}
+                on:click={header.column.getToggleSortingHandler()}
+                on:keyup={header.column.getToggleSortingHandler()}
+              >
+                <svelte:component
+                  this={flexRender(
+                    header.column.columnDef.header,
+                    header.getContext()
+                  )}
+                />
+                {getSortSymbol(header.column.getIsSorted())}
+              </div>
+              <!--
+                  <SortDown class="dark:fill-white fill-black"/>
+                -->
             {/if}
           </th>
         {/each}
@@ -80,6 +99,8 @@
         {#each row.getVisibleCells() as cell}
           <td class="table-cell">
             <div class="flex justify-center">
+              <!--
+              -->
               <svelte:component
                 this={flexRender(cell.column.columnDef.cell, cell.getContext())}
               />
@@ -87,7 +108,7 @@
           </td>
         {/each}
         <td class="table-cell">
-          <label class="button ">
+          <label class="button">
             <button
               on:click={() => {
                 selectedUser = row.original;

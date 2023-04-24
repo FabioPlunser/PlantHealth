@@ -37,7 +37,11 @@
     </select>
 
     <div class="flex justify-between mt-4">
-      <button type="submit" class="btn btn-primary">Add User</button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        on:click={() => (showModal = false)}>Add User</button
+      >
       <button class="btn btn-info" on:click={() => (showModal = false)}
         >Close</button
       >
