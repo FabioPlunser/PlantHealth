@@ -295,7 +295,7 @@ class SensorStation:
         }
 
         if flags['BatteryLevelPresent']:
-            offset = 1 * flags['AdditionalStatusPresent']
+            offset = 2 * flags['IdentifierPresent']
             field = ScalarField(1,0,0,1, min=0.0, max=100.0)
             return field.get_represented_value(battery_level_state_raw[3+offset:3+offset+1])
         else:
