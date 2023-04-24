@@ -1,11 +1,15 @@
 import bleak
 import asyncio
+import logging
 
 from bleak import BleakClient, exc
 from typing import Optional, Literal, Callable
 
 from .gatt_fields import BooleanField, BooleanArrayField, IndexField, ScalarField
 from .util import get_short_uuid
+
+
+log = logging.getLogger()
 
 # Fixing wrong definition of 'Battery Level Status' characteristic UUID
 bleak.uuids.uuid16_dict[0x2BED] = 'Battery Level State'
@@ -267,11 +271,15 @@ class SensorStation:
         :raises NoConnectionError: If the BleakClient was not properly initialized
         """
         values = {}
+        log.debug('Reading sensor values')
         for sensor in self.sensors:
             try:
-                values[sensor.name] = await sensor.get_value()
-            except ReadError:
+                value = await sensor.get_value()
+                log.debug(f'Received value {value} for sensor {sensor.name} on sensor station {self.address}')
+                values[sensor.name] = value
+            except ReadError as e:
                 # ignore read errors on sensor data -> skip over currently unreadable sensor values
+                log.debug(f'Unable to read value of sensor {sensor.name} on sensor station {self.address}: {e}')
                 pass
         return values
     
@@ -297,8 +305,11 @@ class SensorStation:
         if flags['BatteryLevelPresent']:
             offset = 2 * flags['IdentifierPresent']
             field = ScalarField(1,0,0,1, min=0.0, max=100.0)
-            return field.get_represented_value(battery_level_state_raw[3+offset:3+offset+1])
+            battery_level = field.get_represented_value(battery_level_state_raw[3+offset:3+offset+1])
+            log.debug(f'Received a battery level of {battery_level} for sensor station {self.address}')
+            return battery_level
         else:
+            log.debug(f'Received battery level status {[int(byte) for byte in battery_level_state_raw]}')
             return None
 
     async def set_alarms(self, alarms: dict[str, Literal['n', 'l', 'h']]) -> None:
