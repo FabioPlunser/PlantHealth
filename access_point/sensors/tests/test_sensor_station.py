@@ -1,38 +1,43 @@
 import pytest
 import asyncio
 
+from uuid import uuid4
+
 from .mock_ble import MockBleakClient, MockGATTService, MockGATTCharacteristic
 from sensors import SensorStation
 from ..sensor_station import get_short_uuid
 
 
 ADR = 'adr'
+BYTEORDER = 'little'
 
 SERVICES =[MockGATTService('dea07cc4-d084-11ed-a760-325096b39f47',  # sensor station info service
-                           [MockGATTCharacteristic('2bed', 0x0200002a),
-                            MockGATTCharacteristic('2a9a', 101),
-                            MockGATTCharacteristic('2ae2', True),
-                            MockGATTCharacteristic('2abf', 1234567890)]),
+                           [MockGATTCharacteristic('2bed', int(0b00000010).to_bytes(1, BYTEORDER) +
+                                                           int(0x0000).to_bytes(2, BYTEORDER) +
+                                                           int(70).to_bytes(1, BYTEORDER)),
+                            MockGATTCharacteristic('2a9a', int(101).to_bytes(1, BYTEORDER)),
+                            MockGATTCharacteristic('2ae2', True.to_bytes(1, BYTEORDER)),
+                            MockGATTCharacteristic('2abf', int(uuid4()).to_bytes(16, BYTEORDER))]),
            MockGATTService('dea07cc4-d084-11ed-a760-325096b39f48',  # sensor data read
-                           [MockGATTCharacteristic('2ae2', False)]),
+                           [MockGATTCharacteristic('2ae2', False.to_bytes(1, BYTEORDER))]),
            MockGATTService('dea07cc4-d084-11ed-a760-325096b39f49',  # earth humidity
-                           [MockGATTCharacteristic('2a6f', 100),
-                            MockGATTCharacteristic('2a9a', 1)]),
+                           [MockGATTCharacteristic('2a6f', int(100).to_bytes(2, BYTEORDER)),
+                            MockGATTCharacteristic('2a9a', int(1).to_bytes(1, BYTEORDER))]),
            MockGATTService('dea07cc4-d084-11ed-a760-325096b39f4a',  # air humidity
-                           [MockGATTCharacteristic('2a6f', 200),
-                            MockGATTCharacteristic('2a9a', 1)]),
+                           [MockGATTCharacteristic('2a6f', int(200).to_bytes(2, BYTEORDER)),
+                            MockGATTCharacteristic('2a9a', int(1).to_bytes(1, BYTEORDER))]),
            MockGATTService('dea07cc4-d084-11ed-a760-325096b39f4b',  # air pressure
-                           [MockGATTCharacteristic('2a6d', 30),
-                            MockGATTCharacteristic('2a9a', 1)]),
+                           [MockGATTCharacteristic('2a6d', int(30).to_bytes(4, BYTEORDER)),
+                            MockGATTCharacteristic('2a9a', int(1).to_bytes(1, BYTEORDER))]),
            MockGATTService('dea07cc4-d084-11ed-a760-325096b39f4c',  # temperature
-                           [MockGATTCharacteristic('2b0d', 8),
-                            MockGATTCharacteristic('2a9a', 1)]),
+                           [MockGATTCharacteristic('2b0d', int(8).to_bytes(1, BYTEORDER, signed=True)),
+                            MockGATTCharacteristic('2a9a', int(1).to_bytes(1, BYTEORDER))]),
            MockGATTService('dea07cc4-d084-11ed-a760-325096b39f4d',  # air quality
-                           [MockGATTCharacteristic('2b04', 10),
-                            MockGATTCharacteristic('2a9a', 1)]),
+                           [MockGATTCharacteristic('2b04', int(10).to_bytes(1, BYTEORDER)),
+                            MockGATTCharacteristic('2a9a', int(1).to_bytes(1, BYTEORDER))]),
            MockGATTService('dea07cc4-d084-11ed-a760-325096b39f4e',  # light intensity
-                           [MockGATTCharacteristic('2aff', 6),
-                            MockGATTCharacteristic('2a9a', 1)])]
+                           [MockGATTCharacteristic('2aff', int(6).to_bytes(2, BYTEORDER)),
+                            MockGATTCharacteristic('2a9a', int(1).to_bytes(1, BYTEORDER))])]
 
 def test_get_short_uuid():
     """A long uuid is correctly shortened"""
@@ -106,7 +111,7 @@ async def test_read_battery_level():
     async with MockBleakClient(ADR, SERVICES) as client:
         sensor_station = SensorStation(ADR, client)
         battery_level = await sensor_station.battery_level
-    assert battery_level == 42
+    assert battery_level == 70
 
 @pytest.mark.asyncio
 async def test_set_alarm():

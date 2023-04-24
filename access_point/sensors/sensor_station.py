@@ -4,6 +4,9 @@ import asyncio
 from bleak import BleakClient, exc
 from typing import Optional, Literal, Callable
 
+from .gatt_fields import BooleanField, BooleanArrayField, IndexField, ScalarField
+from .util import get_short_uuid
+
 # Fixing wrong definition of 'Battery Level Status' characteristic UUID
 bleak.uuids.uuid16_dict[0x2BED] = 'Battery Level State'
 
@@ -36,15 +39,6 @@ class WriteError(Exception):
     """
     pass
 
-def get_short_uuid(uuid: str) -> str:
-    """
-    Extracts the relevant 4 half-bytes from the 32 digit UUID to identify a characteristic type.
-    """
-    if len(uuid.replace('-','')) == 32:
-        return uuid[4:8]
-    else:
-        return uuid
-
 class Sensor:
     """
     Handler class for a single sensor of a sensor station.
@@ -57,13 +51,12 @@ class Sensor:
     }
 
     # determined by GATT characteristic UUID
-    UNITS = {
-        '2a6f': (0.01, '%'),
-        '2a6d': (0.1, 'Pa'),
-        '2b0d': (0.5, '°C'),
-        '2b04': (0.5, '%'),
-        '2aff': (1, 'lm'),
-        '2bed': (1, '%')
+    VALUE_FIELD_SPECIFICATIONS : dict[str, tuple[ScalarField, str]]= {
+        '2a6f': (ScalarField(1, -2, 0, 2, min=0.0, max=100.0), '%'),
+        '2a6d': (ScalarField(1, -1, 0, 4), 'Pa'),
+        '2b0d': (ScalarField(1, 0, -1, 1, min=-64.0, max=63.0), '°C'),
+        '2b04': (ScalarField(1, 0, -1, 1, min=0.0, max=100.0), '%'),
+        '2aff': (ScalarField(1, 0, 0, 2, min=0.0, max=65534.0), 'lm')
     }
 
     def __init__(self, name: str, service_uuid: str, client: BleakClient, transform: Callable = lambda x: x ) -> None:
@@ -107,11 +100,8 @@ class Sensor:
                     if get_short_uuid(characteristic.uuid) != self.ALARM_CHARACTERISTIC_UUID:
                         try:
                             self.characteristic_uuid = characteristic.uuid
-                            if get_short_uuid(characteristic.uuid) in self.UNITS.keys():
-                                resolution = self.UNITS[get_short_uuid(characteristic.uuid)][0]
-                            else:
-                                resolution = 1
-                            return int.from_bytes(await self.client.read_gatt_char(characteristic), byteorder='big') * resolution
+                            field , _ = self.VALUE_FIELD_SPECIFICATIONS.get(get_short_uuid(characteristic.uuid))
+                            return field.get_represented_value(await self.client.read_gatt_char(characteristic))
                         except Exception as e:
                             raise ReadError(f'Unable to read value of sensor {self.name}: {e}')        
                 raise ReadError(f'Unable to find characteristic for value of sensor {self.name} on service {self.service_uuid}')
@@ -131,7 +121,8 @@ class Sensor:
                     # ignore everything but alarm characteristic
                     if get_short_uuid(characteristic.uuid) == self.ALARM_CHARACTERISTIC_UUID:
                         try:
-                            return await self.client.write_gatt_char(characteristic, data=self.ALARM_CODES[alarm].to_bytes(byteorder='big', length=1))
+                            field = IndexField(1)
+                            return await self.client.write_gatt_char(characteristic, data=field.get_raw_value(self.ALARM_CODES[alarm]))
                         except Exception as e:
                             raise WriteError(f'Unable to set/reset alarm for sensor {self.name} on station {self.client.address}: {e}')        
                 raise WriteError(f'Unable to find characteristic for alarm of sensor {self.name} on station {self.client.address}')
@@ -144,8 +135,8 @@ class Sensor:
         Defaults to None if unit is unknown.
         :raises ReadError: If the sensor data has not been read yet.
         """
-        if self.characteristic_uuid and get_short_uuid(self.characteristic_uuid) in self.UNITS:
-            return self.UNITS[get_short_uuid(self.characteristic_uuid)][1]
+        if self.characteristic_uuid and get_short_uuid(self.characteristic_uuid) in self.VALUE_FIELD_SPECIFICATIONS:
+            return self.VALUE_FIELD_SPECIFICATIONS[get_short_uuid(self.characteristic_uuid)][1]
         else:
             raise ReadError(f'Unable to determine unit of sensor {self.name} on station {self.client.address} - read sensor data first')
 
@@ -230,8 +221,8 @@ class SensorStation:
         :raises ReadError: If it was not possible to read the flag
         :raises NoConnectionError: If the BleakClient was not properly initialized 
         """
-        return bool.from_bytes(await self._read_characteristic(service_uuid=self.INFO_SERVICE_UUID,
-                                                               characteristic_uuid='2ae2'), byteorder='big')
+        return bool(BooleanField().get_represented_value(await self._read_characteristic(service_uuid=self.INFO_SERVICE_UUID,
+                                                                                         characteristic_uuid='2ae2')))
     
     async def set_unlocked(self, value: bool) -> None:
         """
@@ -242,20 +233,20 @@ class SensorStation:
         """
         await self._write_characteristic(service_uuid=self.INFO_SERVICE_UUID,
                                          characteristic_uuid='2ae2',
-                                         data=value.to_bytes(byteorder='big', length=1))
+                                         data=BooleanField().get_raw_value(value))
     
     @property
-    async def sensor_data_read(self):
+    async def sensor_data_read(self) -> bool:
         """
         Flag that indicates if new sensor value is available on the sensor station
         :return: 'True' if data has already been read and no new data is available | 'False' otherwise
         :raises ReadError: If it was not possible to read the flag
         :raises NoConnectionError: If the BleakClient was not properly initialized
         """
-        return bool.from_bytes(await self._read_characteristic(service_uuid=self.SENSOR_DATA_READ_SERVICE_UUID,
-                                                               characteristic_uuid='2ae2'), byteorder='big')
+        return bool(BooleanField().get_represented_value(await self._read_characteristic(service_uuid=self.SENSOR_DATA_READ_SERVICE_UUID,
+                                                                                         characteristic_uuid='2ae2')))
     
-    async def set_sensor_data_read(self, value: bool):
+    async def set_sensor_data_read(self, value: bool) -> None:
         """
         Sets/resets the flag that indicates if sensor data has been read from the station.
         :param value: 'True' to indicate that the sensor values have been read | 'False' otherwise
@@ -264,7 +255,7 @@ class SensorStation:
         """
         await self._write_characteristic(service_uuid=self.SENSOR_DATA_READ_SERVICE_UUID,
                                          characteristic_uuid='2ae2',
-                                         data=value.to_bytes(byteorder='big', length=1))
+                                         data=BooleanField().get_raw_value(value))
 
     @property
     async def sensor_data(self) -> dict[str, float]:
@@ -292,16 +283,21 @@ class SensorStation:
         :raises ReadError: If it was not possible to read the battery level
         :raises NoConnectionError: If the BleakClient was not properly initialized
         """
-        battery_level_state = await self._read_characteristic(service_uuid=self.INFO_SERVICE_UUID,
-                                                              characteristic_uuid='2bed')
+        battery_level_state_raw = await self._read_characteristic(service_uuid=self.INFO_SERVICE_UUID,
+                                                                  characteristic_uuid='2bed')
+
+        flags_raw = BooleanArrayField(1).get_represented_value(battery_level_state_raw[0:1])
+
         flags = {
-            'IdentifierPresent':        bool((battery_level_state[0] >> 0) & 1),
-            'BatteryLevelPresent':      bool((battery_level_state[0] >> 1) & 1),
-            'AdditionalStatusPresent':  bool((battery_level_state[0] >> 2) & 1)
+            'IdentifierPresent':        flags_raw[0],
+            'BatteryLevelPresent':      flags_raw[1],
+            'AdditionalStatusPresent':  flags_raw[2]
         }
+
         if flags['BatteryLevelPresent']:
-            pos = 2 + 2 * flags['IdentifierPresent']
-            return int.from_bytes(battery_level_state[pos:pos+2], byteorder='big')
+            offset = 1 * flags['AdditionalStatusPresent']
+            field = ScalarField(1,0,0,1, min=0.0, max=100.0)
+            return field.get_represented_value(battery_level_state_raw[3+offset:3+offset+1])
         else:
             return None
 

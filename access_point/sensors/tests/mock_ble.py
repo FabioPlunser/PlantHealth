@@ -10,13 +10,13 @@ class MockBLEDevice:
 
 class MockGATTDescriptor:
     """Mocks a GATT descriptor"""
-    def __init__(self, uuid : str, value : str):
+    def __init__(self, uuid : str, value : bytearray):
         self.uuid = uuid
         self._value = value
 
 class MockGATTCharacteristic:
     """Mocks a GATT characteristic"""
-    def __init__(self, uuid : str, value : int, descriptors : list[MockGATTDescriptor] = []):
+    def __init__(self, uuid : str, value : bytearray, descriptors : list[MockGATTDescriptor] = []):
         self.uuid = uuid
         self._value = value
         self.descriptors = descriptors
@@ -53,13 +53,13 @@ class MockBleakClient(object):
         
     async def read_gatt_char(self, characteristic : MockGATTCharacteristic):
         if self._is_in_characteristics(characteristic):
-            return characteristic._value.to_bytes(byteorder='big', length = 4)
+            return characteristic._value
         else:
             raise exc.BleakError
         
     async def write_gatt_char(self, characteristic : MockGATTCharacteristic, data : bytearray):
         if self._is_in_characteristics(characteristic):
-            characteristic._value = int.from_bytes(data)
+            characteristic._value = int.from_bytes(data, 'little')
         else:
             raise exc.BleakError      
         
