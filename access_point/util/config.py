@@ -197,7 +197,7 @@ class Config(object):
         ):
         """Validates the given values against set constraints."""
         if kwargs:
-            print(f'Unknown parameters: {kwargs.get("kwargs")}')
+            log.debug(f'Unknown parameters: {kwargs.get("kwargs")}')
 
         def describe_wrong_type(name, type):
             return f'Expected value of type {type.__name__} for {name}'
