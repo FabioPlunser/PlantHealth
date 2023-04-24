@@ -101,7 +101,7 @@ class Server:
         try:
             response = self._client.post(
                 self._get_endpoint_url('register-access-point'),
-                params={'accessPointId': id,
+                params={'selfAssignedId': id,
                         'roomName': room_name}
             )
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:

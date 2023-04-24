@@ -25,7 +25,7 @@ def test_register(requests_mock: Mocker):
     assert backend.token == token
     assert returned_token == token
     sent_params = requests_mock.last_request.qs
-    assert sent_params['accesspointid'] == ['id']
+    assert sent_params['selfassignedid'] == ['id']
     assert sent_params['roomname'] == ['room']
 
 def test_register_declined(requests_mock: Mocker):
