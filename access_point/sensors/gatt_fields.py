@@ -122,7 +122,7 @@ class ScalarField(Field):
         :raises ValueError: If the calculated represented value is outside the allowed range
         """
         represented_value = int.from_bytes(raw_value, BYTEORDER, signed=self.signed) * self.multiplier * 10**self.decimal_exponent * 2**self.binary_exponent
-        if (self.min and not self.min <= represented_value) or (self.max and not represented_value <= self.max):
+        if (self.min and self.min > represented_value) or (self.max and represented_value > self.max):
             raise ValueError(f'Calculated value (={represented_value}) is outside allowed range [{self.min}, {self.max}]')
         return represented_value
 
@@ -132,7 +132,7 @@ class ScalarField(Field):
         :param represented_value: Represented value as float
         :raises ValueError: If the given represented value is outside the allowed range
         """
-        if (self.min and not self.min <= represented_value) or (self.max and not represented_value <= self.max):
+        if (self.min and self.min > represented_value) or (self.max and represented_value > self.max):
             raise ValueError(f'Given value (={represented_value}) is outside allowed range [{self.min}, {self.max}]')
         raw_int_value = int(represented_value / (self.multiplier * 10**self.decimal_exponent * 2**self.binary_exponent))
         return raw_int_value.to_bytes(self.num_bytes, BYTEORDER, signed=self.signed) 

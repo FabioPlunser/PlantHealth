@@ -270,7 +270,7 @@ class SensorStation:
         for sensor in self.sensors:
             try:
                 values[sensor.name] = await sensor.get_value()
-            except ReadError as e:
+            except ReadError:
                 # ignore read errors on sensor data -> skip over currently unreadable sensor values
                 pass
         return values
