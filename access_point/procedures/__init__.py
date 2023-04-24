@@ -8,7 +8,7 @@ Functions:
     - transfer_data
 """
 
-from .collect_data import collect_data
+from .collect_data_f import collect_data
 from .find_stations import find_stations
 from .get_config import get_config
 from .transfer_data import transfer_data
