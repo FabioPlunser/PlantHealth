@@ -321,7 +321,7 @@ class SensorStation:
                 except KeyError:
                     raise ValueError(f'Alarm flags must be "n", "l" or "h"')
             
-    def get_sensor_unit(self, sensor_name: str) -> str:
+    def get_sensor_unit(self, sensor_name: str) -> Optional[str]:
         """
         Returns the unit for a specific sensor.
         :param sensor_name: The name of the sensor

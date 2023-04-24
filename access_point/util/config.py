@@ -1,8 +1,11 @@
 import validators
 import yaml
+import logging
 
 from uuid import UUID, uuid4
 from datetime import timedelta
+
+log = logging.getLogger()
 
 
 # File in which the configuration is stored
@@ -115,6 +118,8 @@ class Config(object):
         Validates before updating.
         :raises ValueError: If some given values do not pass the validation
         """
+        log.debug(f'Received unspecified parameters: {kwargs}')
+
         data = {k: v for k, v in locals().items() if k != 'self'}
         self._validate(**data)
 

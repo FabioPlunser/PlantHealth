@@ -68,7 +68,7 @@ class BooleanArrayField(Field):
                 represented_value.append(bool((byte >> i) & 1))
         return represented_value
 
-    def get_raw_value(self, represented_value: list[bool]) -> bytearray:
+    def get_raw_value(self, represented_value: list[bool]) -> bytes:
         """
         Calculates the raw value (as bytearray) from the given represented value.
         :param represented_value: Represented value as list of booleans
@@ -126,7 +126,7 @@ class ScalarField(Field):
             raise ValueError(f'Calculated value (={represented_value}) is outside allowed range [{self.min}, {self.max}]')
         return represented_value
 
-    def get_raw_value(self, represented_value: float) -> bytearray:
+    def get_raw_value(self, represented_value: float) -> bytes:
         """
         Calculates the raw value (as bytearray) from the given represented value.
         :param represented_value: Represented value as float
@@ -135,7 +135,7 @@ class ScalarField(Field):
         if (self.min and self.min > represented_value) or (self.max and represented_value > self.max):
             raise ValueError(f'Given value (={represented_value}) is outside allowed range [{self.min}, {self.max}]')
         raw_int_value = int(represented_value / (self.multiplier * 10**self.decimal_exponent * 2**self.binary_exponent))
-        return raw_int_value.to_bytes(self.num_bytes, BYTEORDER, signed=self.signed) 
+        return raw_int_value.to_bytes(self.num_bytes, BYTEORDER, signed=self.signed)
 
 class IndexField(Field):
     """Represents a field within a GATT characteristic representing an index"""
@@ -158,7 +158,7 @@ class IndexField(Field):
             raise ValueError(f'Calculated value (={represented_value}) is outside allowed range [0, {2**(8 * self.num_bytes)}]')
         return represented_value
     
-    def get_raw_value(self, represented_value: int) -> bytearray:
+    def get_raw_value(self, represented_value: int) -> bytes:
         """
         Calculates the raw value from the given represented value.
         :param represented_value: Represented value
