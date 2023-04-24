@@ -10,6 +10,7 @@ unit-test-job:   # This jobs runs runs the unit tests and measures coverage
     - cd access_point
     - python3 -m venv venv
     - source venv/bin/activate
+    - pip install wheel
     - pip install -r requirements.txt
     - coverage run
     - coverage html
