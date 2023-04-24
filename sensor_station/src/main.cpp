@@ -51,7 +51,7 @@ void setup() {
 	dipSwitch				= new DipSwitchClass(pinConnection, 8);
 
 	initialize_communication();
-	enable_pairing_mode();
+	// enable_pairing_mode();
 
 	while (!Serial) {
 		delay(50);
@@ -63,16 +63,30 @@ void setup() {
 // ----- Loop ----- //
 
 void loop() {
+	static arduino::String pairedDevice;
+	static bool inPairingMode = false;
+	if (analogRead(PIN_BUTTON_1) == PinStatus::HIGH) {
+		enable_pairing_mode();
+		inPairingMode = true;
+	}
 	BLEDevice central = BLE.central();
 	if (central) {
-		Serial.println("* Connected to central device!");
-		Serial.print("* Device MAC address: ");
-		Serial.println(central.address());
-		Serial.println(" ");
-		if (central.connected()) {
-			setSensorValuesInBLE();
-			while (central.connected()) {
-				;
+		if (inPairingMode) {
+			pairedDevice  = central.address();
+			inPairingMode = false;
+		}
+		// Serial.println("* Connected to central device!");
+		// Serial.print("* Device MAC address: ");
+		// Serial.println(central.address());
+		// Serial.println(" ");
+		if (pairedDevice.compareTo(central.address()) == 0) {
+			if (central.connected()) {
+				setSensorValuesInBLE();
+				while (central.connected()) {
+					;
+				}
+			} else {
+				central.disconnect();
 			}
 		}
 		Serial.println("* Disconnected from central device!");
