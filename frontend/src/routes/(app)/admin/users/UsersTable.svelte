@@ -13,6 +13,7 @@
   import TextCell from "./TextCell.svelte";
   import SortSymbol from "./SortSymbol.svelte";
   import type { NodeJS } from "node:types";
+  import Input from "$lib/components/ui/Input.svelte";
 
   type User = {
     username: string;
@@ -83,10 +84,9 @@
 </script>
 
 <div>
-  <div>
-    <input
+  <div class="mb-3">
+    <Input
       type="search"
-      class="input dark:input-bordered w-full dark:bg-gray-800 bg-gray-200 text-white mb-3"
       on:keyup={handleSearch}
       on:search={handleSearch}
       placeholder="Search..."
