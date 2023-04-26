@@ -1,11 +1,7 @@
 import logging
-import asyncio
-
-from bleak import BleakClient
 
 from server import Server, TokenDeclinedError
 from database import Database, DatabaseError, DB_FILENAME
-from sensors import SensorStation, BLEConnectionError, WriteError
 from util import Config
 
 log = logging.getLogger()

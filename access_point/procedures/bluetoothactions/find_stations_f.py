@@ -8,7 +8,7 @@ from typing import Union
 from util import Config
 from server import Server, TokenDeclinedError
 from database import Database, DB_FILENAME, DatabaseError
-from sensors import SensorStation, scan_for_new_stations, BLEConnectionError,ReadError
+from sensors import SensorStation, scan_for_new_stations, BLEConnectionErrorSlow, BLEConnectionErrorFast, ReadError
 
 
 log = logging.getLogger()
@@ -76,8 +76,8 @@ def get_data_from_new_stations(addresses: list[str]) -> list[dict[str, Union[str
                     'dip-switch': dip_id
                 })
                 break
-            except BLEConnectionError + (ReadError,) as e:
-                log.warning(f'Unable to read DIP id from sensor station {address}: {e} {type(e).__name__}')
+            except BLEConnectionErrorSlow + (ReadError,) as e:
+                log.warning(f'Unable to read DIP id from sensor station {address}: {e}')
     return report_data
 
 def clean_data(report_data: list[dict[str, Union[str, int]]]):
@@ -124,6 +124,12 @@ async def get_dip_id(address: str) -> int:
     :raises BLEConnectionError: If the connection to the device fails
     :raises ReadError: If the DIP switch position could not be read
     """
-    async with BleakClient(address) as client:
-        sensor_station = SensorStation(address, client)
-        return await sensor_station.dip_id
+    connection_attempts = 3
+    for i in range(connection_attempts):
+        try:
+            async with BleakClient(address) as client:
+                sensor_station = SensorStation(address, client)
+                return await sensor_station.dip_id
+        except BLEConnectionErrorFast as e:
+            if i >= connection_attempts - 1:
+                raise TimeoutError(e)

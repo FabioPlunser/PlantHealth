@@ -1,7 +1,5 @@
 import logging
 
-from datetime import datetime
-
 from util import Config
 from server import Server, TokenDeclinedError
 from database import Database, DatabaseError, DB_FILENAME

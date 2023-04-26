@@ -5,7 +5,7 @@ from bleak import BleakClient
 from datetime import datetime
 
 from database import Database, DB_FILENAME, DatabaseError
-from sensors import SensorStation, BLEConnectionError, WriteError, ReadError
+from sensors import SensorStation, BLEConnectionErrorSlow, BLEConnectionErrorFast, WriteError, ReadError
 
 log = logging.getLogger()
 
@@ -31,32 +31,38 @@ async def collect_data_from_single_station(address: str):
     """
     Handles the connection and actions for a single sensor station.
     """
+    connection_attempts = 3
     database = Database(DB_FILENAME)
     log.info(f'Connecting to sensor station {address}')
     try:
-        async with BleakClient(address) as client:
-            log.info(f'Established connection to sensor station {address}')
-            sensor_station = SensorStation(address, client)
-            # set sensor station to unlocked
-            await sensor_station.set_unlocked(True)
-            # get DIP id (defined by DIP switches)
+        for i in range(connection_attempts):
             try:
-                database.set_dip_id(sensor_station_address=address,
-                                    dip_id=await sensor_station.dip_id)
-            except DatabaseError as e:
-                log.error(f'Unable to update dip id for sensor station {address} in database: {e}')
-                return
-            # get battery level
-            await get_battery_level(sensor_station)
-            # read sensor data if new available
-            if not await sensor_station.sensor_data_read:
-                await read_sensor_data(sensor_station)
-                # set data read flag on station
-                await sensor_station.set_sensor_data_read(True)
-            else:
-                log.info(f'No new sensor data available on sensor station {address}')
-    except BLEConnectionError as e:
-        log.error(f'Unable to connect to sensor station {address}: {e} {type(e).__name__}')
+                async with BleakClient(address) as client:
+                    log.info(f'Established connection to sensor station {address}')
+                    sensor_station = SensorStation(address, client)
+                    # set sensor station to unlocked
+                    await sensor_station.set_unlocked(True)
+                    # get DIP id (defined by DIP switches)
+                    try:
+                        database.set_dip_id(sensor_station_address=address,
+                                            dip_id=await sensor_station.dip_id)
+                    except DatabaseError as e:
+                        log.error(f'Unable to update dip id for sensor station {address} in database: {e}')
+                        return
+                    # get battery level
+                    await get_battery_level(sensor_station)
+                    # read sensor data if new available
+                    if not await sensor_station.sensor_data_read:
+                        await read_sensor_data(sensor_station)
+                        # set data read flag on station
+                        await sensor_station.set_sensor_data_read(True)
+                    else:
+                        log.info(f'No new sensor data available on sensor station {address}')
+            except BLEConnectionErrorFast as e:
+                if i >= connection_attempts - 1:
+                    raise ConnectionError(e)
+    except BLEConnectionErrorSlow + (ConnectionError,) as e:
+        log.error(f'Unable to connect to sensor station {address}: {e}')
         database.add_failed_connection_attempt(address)
     except ReadError as e:
         log.error(f'Unable to read value from sensor station {address}: {e}')

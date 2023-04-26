@@ -15,13 +15,15 @@ log = logging.getLogger()
 bleak.uuids.uuid16_dict[0x2BED] = 'Battery Level State'
 
 # Summarization of all exceptions that indicate a failed connection
-BLEConnectionError = (exc.BleakDeviceNotFoundError,
-                      exc.BleakDBusError,
-                      exc.BleakError,
-                      asyncio.TimeoutError,
-                      OSError,
-                      AttributeError,
-                      RuntimeError)
+BLEConnectionErrorSlow = (exc.BleakDeviceNotFoundError,
+                          exc.BleakDBusError,
+                          exc.BleakError,
+                          asyncio.TimeoutError,
+                          OSError,
+                          AttributeError,
+                          RuntimeError)
+BLEConnectionErrorFast = (exc.BleakDBusError,)
+RETRIES_ON_FAST_ERROR = 3
 
 class NoConnectionError(Exception):
     """
@@ -83,7 +85,7 @@ class Sensor:
         """
         async def decorated(self, *args, **kwargs):
             if self.client and self.client.is_connected:
-                return await f(self, *args, **kwargs)
+                return await f(self, *args, **kwargs)                
             else:
                 raise NoConnectionError
         return decorated
@@ -102,12 +104,16 @@ class Sensor:
                 for characteristic in service.characteristics:
                     # ignore alarm characteristic
                     if get_short_uuid(characteristic.uuid) != self.ALARM_CHARACTERISTIC_UUID:
-                        try:
-                            self.characteristic_uuid = characteristic.uuid
-                            field , _ = self.VALUE_FIELD_SPECIFICATIONS.get(get_short_uuid(characteristic.uuid))
-                            return field.get_represented_value(await self.client.read_gatt_char(characteristic))
-                        except Exception as e:
-                            raise ReadError(f'{e}')        
+                        for i in range(RETRIES_ON_FAST_ERROR):
+                            try:
+                                self.characteristic_uuid = characteristic.uuid
+                                field , _ = self.VALUE_FIELD_SPECIFICATIONS.get(get_short_uuid(characteristic.uuid))
+                                return field.get_represented_value(await self.client.read_gatt_char(characteristic))
+                            except BLEConnectionErrorFast as e:
+                                if i >= RETRIES_ON_FAST_ERROR - 1:
+                                    raise ReadError(f'{e}')
+                            except BLEConnectionErrorSlow as e:
+                                raise ReadError(f'{e}')
                 raise ReadError(f'Did not find characteristic for value of sensor on service {self.service_uuid}')
         raise ReadError(f'Did not find service {self.service_uuid} for sensor')
     
@@ -124,11 +130,15 @@ class Sensor:
                 for characteristic in service.characteristics:
                     # ignore everything but alarm characteristic
                     if get_short_uuid(characteristic.uuid) == self.ALARM_CHARACTERISTIC_UUID:
-                        try:
-                            field = IndexField(1)
-                            return await self.client.write_gatt_char(characteristic, data=field.get_raw_value(self.ALARM_CODES[alarm]))
-                        except Exception as e:
-                            raise WriteError(f'{e}')        
+                        for i in range(RETRIES_ON_FAST_ERROR):
+                            try:
+                                field = IndexField(1)
+                                return await self.client.write_gatt_char(characteristic, data=field.get_raw_value(self.ALARM_CODES[alarm]))
+                            except BLEConnectionErrorFast as e:
+                                if i >= RETRIES_ON_FAST_ERROR - 1:
+                                    raise WriteError(f'{e}')
+                            except BLEConnectionErrorSlow as e:
+                                raise WriteError(f'{e}')
                 raise WriteError(f'Did not find characteristic for alarm of sensor')
         raise WriteError(f'Did not find service {self.service_uuid} for sensor')
 
@@ -188,10 +198,14 @@ class SensorStation:
             if service.uuid == service_uuid:
                 for characteristic in service.characteristics:
                     if get_short_uuid(characteristic.uuid) == characteristic_uuid:
-                        try:
-                            return await self.client.read_gatt_char(characteristic)       
-                        except Exception as e:
-                            raise ReadError(f'Unable to read characteristic {characteristic_uuid} from service {service_uuid} on station {self.address}: {e}')
+                        for i in range(RETRIES_ON_FAST_ERROR):
+                            try:
+                                return await self.client.read_gatt_char(characteristic)       
+                            except BLEConnectionErrorFast as e:
+                                if i >= RETRIES_ON_FAST_ERROR - 1:
+                                    raise ReadError(f'{e}')
+                            except BLEConnectionErrorSlow as e:
+                                raise ReadError(f'Unable to read characteristic {characteristic_uuid} from service {service_uuid} on station {self.address}: {e}')
                 raise ReadError(f'Characteristic {characteristic_uuid} not found on service {service_uuid} on station {self.address}')
         raise ReadError(f'Service {service_uuid} not found on statin {self.address}')
     
@@ -201,10 +215,14 @@ class SensorStation:
             if service.uuid == service_uuid:
                 for characteristic in service.characteristics:
                     if get_short_uuid(characteristic.uuid) == characteristic_uuid:
-                        try:
-                            return await self.client.write_gatt_char(characteristic, data)
-                        except Exception as e:
-                            raise WriteError(f'Unable to write characteristic {characteristic_uuid} from service {service_uuid} on station {self.address}: {e}')
+                        for i in range(RETRIES_ON_FAST_ERROR):
+                            try:
+                                return await self.client.write_gatt_char(characteristic, data)
+                            except BLEConnectionErrorFast as e:
+                                if i >= RETRIES_ON_FAST_ERROR - 1:
+                                    raise ReadError(f'{e}')
+                            except BLEConnectionErrorSlow as e:
+                                raise WriteError(f'Unable to write characteristic {characteristic_uuid} from service {service_uuid} on station {self.address}: {e}')
                 raise WriteError(f'Characteristic {characteristic_uuid} not found on service {service_uuid} on station {self.address}')
         raise WriteError(f'Service {service_uuid} not found on statin {self.address}')
     
@@ -302,8 +320,6 @@ class SensorStation:
             'BatteryLevelPresent':          flags_field_raw[1],
             'ExternalPowerSourcePresent':   power_state_field_raw[1]
         }
-
-        log.info(f'Received battery level status {[int(byte) for byte in battery_level_state_raw]}')
 
         if flags['BatteryLevelPresent']:
             offset = 2 * flags['IdentifierPresent']
