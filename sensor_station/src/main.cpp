@@ -1,8 +1,9 @@
 
-#include "Defines.h"
+#include <Defines.h>
 
 #ifdef DO_MAIN
 
+// #include "../lib/ErrorHandler/SensorErrors.h"
 #include "SensorClasses/AirSensor.cpp"
 #include "SensorClasses/DipSwitch.cpp"
 #include "SensorClasses/Hydrometer.cpp"
@@ -30,6 +31,7 @@ int8_t convertToGATT_airTemperature_notKnown();
 uint16_t convertToGATT_lightIntensity(uint16_t lightIntensity);
 uint16_t convertToGATT_lightIntensity_notKnown();
 uint16_t luminosityFromVoltage(uint16_t measured);
+void setArduinoPowerStatus();
 
 // ----- Global Variables ----- //
 
@@ -142,10 +144,15 @@ bool setSensorValuesInBLE() {
 	clearAllFlags();
 
 	set_sensorstation_locked_status(false);
-	battery_level_status_t batteryStatus = {0};
-	set_battery_level_status(batteryStatus);
+	setArduinoPowerStatus();
 	set_sensorstation_id(0);
 	return true;
+}
+
+void setArduinoPowerStatus() {
+	set_battery_level_status(
+		BATTERY_LEVEL_FLAGS_FIELD, BATTERY_POWER_STATE_FLAGS, 100
+	);
 }
 
 AirSensorClass::UPDATE_ERROR setSensorValuesFromSensors(sensor_data_t * str) {
