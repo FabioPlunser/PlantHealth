@@ -27,7 +27,7 @@ class HydrometerClass {
 			tryUpdateValues();
 		}
 
-		uint16_t getHumidity_10bit() {
+		uint16_t getHumidity_16bit() {
 			tryUpdateValues();
 			return this->humidity;
 		}

@@ -17,7 +17,7 @@
 
 bool setSensorValuesInBLE();
 AirSensorClass::UPDATE_ERROR setSensorValuesFromSensors(sensor_data_t * str);
-uint16_t convertToGATT_soilHumidity(float humidity);
+uint16_t convertToGATT_soilHumidity(uint16_t humidity);
 uint16_t convertToGATT_soilHumidity_notKnown();
 uint16_t convertToGATT_airHumidity(float humidity);
 uint16_t convertToGATT_airHumidity_notKnown();
@@ -51,7 +51,7 @@ void setup() {
 	dipSwitch				= new DipSwitchClass(pinConnection, 8);
 
 	initialize_communication();
-	// enable_pairing_mode();
+	enable_pairing_mode();
 
 	// while (!Serial) {
 	// 	delay(50);
@@ -63,38 +63,40 @@ void setup() {
 // ----- Loop ----- //
 
 void loop() {
-	static arduino::String pairedDevice;
-	static bool inPairingMode		 = false;
-	static unsigned long pairingTime = 0;
+	// static arduino::String pairedDevice;
+	// static bool inPairingMode		 = false;
+	// static unsigned long pairingTime = 0;
 	// Activate pairing mode if button is pressed.
-	if (analogRead(PIN_BUTTON_1) == PinStatus::HIGH) {
-		enable_pairing_mode();
-		inPairingMode = true;
-		pairingTime	  = millis();
-		// If button is not pressed for "DURATION_IN_PAIRING_MODE_MS" time it
-		// will got back to normal mode
-	} else if (millis() - pairingTime > DURATION_IN_PAIRING_MODE_MS) {
-		inPairingMode = false;
-	}
+	// if (analogRead(PIN_BUTTON_1) == PinStatus::HIGH) {
+	// 	Serial.print("Pairing Button is pressed\n");
+	// 	inPairingMode = true;
+	// 	pairingTime	  = millis();
+	// 	// If button is not pressed for "DURATION_IN_PAIRING_MODE_MS" time it
+	// 	// will got back to normal mode
+	// } else if (millis() - pairingTime > DURATION_IN_PAIRING_MODE_MS) {
+	// 	inPairingMode = false;
+	// }
+	// enable_pairing_mode();
 	BLEDevice central = BLE.central();
 	if (central) {
-		if (inPairingMode) {
-			pairedDevice  = central.address();
-			inPairingMode = false;
-		}
-		// Serial.println("* Connected to central device!");
-		// Serial.print("* Device MAC address: ");
-		// Serial.println(central.address());
-		// Serial.println(" ");
+		// if (inPairingMode) {
+		// 	pairedDevice  = central.address();
+		// 	inPairingMode = false;
+		// }
+		Serial.println("* Connected to central device!");
+		Serial.print("* Device MAC address: ");
+		Serial.println(central.address());
+		Serial.println(" ");
 		// if (pairedDevice.compareTo(central.address()) == 0) {
-		if (central.connected()) {
-			setSensorValuesInBLE();
-			while (central.connected()) {
-				;
-			}
-		} else {
-			central.disconnect();
+		// if (central.connected()) {
+		setSensorValuesInBLE();
+		while (central.connected()) {
+			; // TODO: Timeout required
 		}
+		// } else {
+		// 	central.disconnect();
+		// }
+		enable_pairing_mode();
 		// }
 		Serial.println("* Disconnected from central device!");
 		if (get_sensor_data_read_flag() == true) {
@@ -106,8 +108,12 @@ void loop() {
 			);
 		}
 	}
-	Serial.println("Searching for central device!");
-	delay(500);
+	static int i = 0;
+	if (i++ == 100) {
+		Serial.println("Searching for central device!");
+		i = 0;
+	}
+	delay(50);
 }
 
 // ----- Functions ----- //
@@ -145,7 +151,7 @@ bool setSensorValuesInBLE() {
 AirSensorClass::UPDATE_ERROR setSensorValuesFromSensors(sensor_data_t * str) {
 	float pressure = 0, temperature = 0, humidity = 0;
 	uint32_t gas_resistance	 = 0;
-	uint16_t earth_humidity	 = hydrometer->getHumidity_10bit();
+	uint16_t earth_humidity	 = hydrometer->getHumidity_16bit();
 	uint16_t light_intensity = phototransistor->getLighting_10bit();
 
 	AirSensorClass::UPDATE_ERROR updateError = airSensor->getMeasuredValues(
@@ -167,11 +173,21 @@ AirSensorClass::UPDATE_ERROR setSensorValuesFromSensors(sensor_data_t * str) {
 	return updateError;
 };
 
-uint16_t convertToGATT_soilHumidity(float humidity) {
-	if (humidity < 0 || humidity > 100) {
+uint16_t convertToGATT_soilHumidity(uint16_t humidity) {
+	Serial.print("Soil humidity = ");
+	Serial.println(humidity);
+
+	static uint16_t valueHigh = 480;
+	static uint16_t valueLow  = 850;
+	float calculation =
+		100 - ((humidity - valueHigh) / (float) (valueLow - valueHigh) * 100);
+
+	Serial.print("Calculated = ");
+	Serial.println(calculation);
+	if (calculation < 0 || calculation > 100) {
 		return convertToGATT_soilHumidity_notKnown();
 	}
-	return uint16_t(humidity * 100);
+	return uint16_t(calculation * 100);
 }
 uint16_t convertToGATT_soilHumidity_notKnown() { return (uint16_t) 0xFFFF; }
 
@@ -186,7 +202,7 @@ uint16_t convertToGATT_airHumidity_notKnown() { return (uint16_t) 0xFFFF; }
 uint32_t convertToGATT_airPressure(float pressure) {
 	return uint32_t(pressure * 10);
 }
-uint32_t convertToGATT_airPressure_notKnown() { return (uint8_t) 0xFFFFFFFF; }
+uint32_t convertToGATT_airPressure_notKnown() { return (uint8_t) 0xFFFF'FFFF; }
 
 uint8_t convertToGATT_airQuality(float gas_resistance) {
 	const float calibrationValue = 146000;

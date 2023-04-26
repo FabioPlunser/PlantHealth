@@ -479,7 +479,7 @@ void set_sensor_data(sensor_data_t sensor_data) {
 }
 
 void set_battery_level_status(battery_level_status_t battery_level_status) {
-	uint8_t value = 0;
+	uint8_t value = 55;
 	battery_level_status_characteristic.writeValue(value);
 }
 
