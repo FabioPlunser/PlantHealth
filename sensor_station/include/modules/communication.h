@@ -3,7 +3,6 @@
 #define COMMUNICATION_H
 
 #include <models/sensor_data.h>
-#include <models/sensor_station_info.h>
 #include <models/sensor_types.h>
 #include <stdbool.h>
 #include <uuid.h>
@@ -30,7 +29,9 @@ void clear_sensor_data_read_flag();
 
 // Setters for the Characteristics
 void set_sensor_data(sensor_data_t);
-void set_battery_level_status(battery_level_status_t);
+void set_battery_level_status(
+	uint8_t flags, uint16_t power_state, uint8_t battery_level
+);
 void set_dip_switch_id(uint8_t);
 
 string get_address();
@@ -39,8 +40,6 @@ void clearAllFlags();
 void set_sensorstation_locked_status(bool locked);
 void set_dip_switch_id(uint8_t id);
 void set_sensorstation_id(uint8_t id);
-void set_battery_level_status(battery_level_status_t battery_level_status);
 uint8_t get_sensor_data_read_flag();
-
 
 #endif
