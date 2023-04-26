@@ -114,7 +114,7 @@ async def set_alarms(sensor_station: SensorStation, values: dict[str, float]) ->
         log.error(f'Unable to get limits for sensor station {sensor_station.address} from database: {e}')
         return
     # update alarm flags
-    alarms = {}
+    alarms = {sensor_name: 'n' for sensor_name in values.keys()}
     for sensor, sensor_limits in limits.items():
         # no value for this sensor received
         if sensor not in values:
