@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.SensorStationPersonReference;
+import at.ac.uibk.plant_health.models.plant.PlantPicture;
 import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import jakarta.persistence.*;
@@ -32,10 +33,6 @@ public class SensorStation extends Device implements Serializable {
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
 	private String name = null;
 
-	@Column(name = "qr_code_id", unique = true)
-	@JdbcTypeCode(SqlTypes.UUID)
-	private UUID qrCodeId = null;
-
 	@JdbcTypeCode(SqlTypes.INTEGER)
 	@Column(name = "dip_switch_id", nullable = false)
 	private int dipSwitchId;
@@ -54,6 +51,12 @@ public class SensorStation extends Device implements Serializable {
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "sensorStation", orphanRemoval = true)
 	private List<SensorStationPersonReference> sensorStationPersonReferences = new ArrayList<>();
 
+	@OneToMany(
+			fetch = FetchType.EAGER, mappedBy = "sensorStation", orphanRemoval = true,
+			cascade = CascadeType.ALL
+	)
+	private List<PlantPicture> plantPictures = new ArrayList<>();
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return Set.of(DeviceType.SENSOR_STATION);
@@ -71,7 +74,7 @@ public class SensorStation extends Device implements Serializable {
 
 	@Override
 	public String toString() {
-		return "SensorStation [bdAddress=" + bdAddress + ", name=" + name + ", qrCodeId=" + qrCodeId
+		return "SensorStation [bdAddress=" + bdAddress + ", name=" + name
 				+ ", dipSwitchId=" + dipSwitchId + ", accessPoint=" + accessPoint
 				+ ", sensorStationPersonReferences=" + sensorStationPersonReferences
 				+ ", sensorData=" + sensorData + ", sensorLimits=" + sensorLimits + "]";

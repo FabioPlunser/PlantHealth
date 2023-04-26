@@ -17,7 +17,5 @@ public interface SensorStationRepository extends CrudRepository<SensorStation, U
 
 	List<SensorStation> findByIsUnlockedAndIsDeleted(boolean isUnlocked, boolean isDeleted);
 
-	Optional<SensorStation> findByQrCodeId(UUID qrCodeId);
-
 	Optional<SensorStation> findByBdAddress(String bdAddress);
 }
