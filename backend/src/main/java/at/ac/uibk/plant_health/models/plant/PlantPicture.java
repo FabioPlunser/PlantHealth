@@ -27,10 +27,10 @@ public class PlantPicture {
 	@Column(name = "picture_id", nullable = false)
 	private UUID pictureId;
 
+	@JsonIgnore
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "sensor_station_id", nullable = false, unique = true)
-	@JsonIgnore
 	private SensorStation sensorStation;
 
 	@JdbcTypeCode(SqlTypes.NVARCHAR)

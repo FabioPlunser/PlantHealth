@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.mail.imap.DefaultFolder;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -85,7 +89,8 @@ public class TestSensorStationController {
 			SensorStation sensorStation = new SensorStation(bdAddress, 255 - i);
 			sensorStationService.save(sensorStation);
 		}
-		List<SensorStation> sensorStations = sensorStationService.findAll();
+		List<SensorStation> sensorStations =
+				sensorStationService.findAll().stream().filter(s -> !s.isDeleted()).toList();
 		mockMvc.perform(MockMvcRequestBuilders.get("/get-sensor-stations")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
@@ -138,6 +143,16 @@ public class TestSensorStationController {
 
 		sensorStation = sensorStationService.findByBdAddress(bdAddress).get();
 		assertEquals(1, sensorStation.getPlantPictures().size());
+
+		List<PlantPicture> pictures = sensorStation.getPlantPictures();
+		try {
+			for (PlantPicture picture1 : pictures) {
+				Path path = Paths.get(picture1.getPicturePath());
+				Files.delete(path);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test

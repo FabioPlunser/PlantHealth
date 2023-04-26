@@ -51,6 +51,7 @@ public class SensorData implements Serializable {
 	@JoinColumn(name = "sensor_id", nullable = false)
 	private Sensor sensor;
 
+	@JsonIgnore
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "sensor_station_id", nullable = false)
 	private SensorStation sensorStation;
