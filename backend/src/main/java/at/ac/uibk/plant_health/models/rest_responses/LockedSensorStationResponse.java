@@ -15,24 +15,22 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 public class LockedSensorStationResponse extends RestResponse implements Serializable {
-	@JsonProperty("sensor-stations")
-	private final List<InnerSensorStation> sensorStations;
+	private final List<SensorStation> sensorStations;
 
 	public LockedSensorStationResponse(List<SensorStation> sensorStations) {
-		this.sensorStations = sensorStations.stream().map(InnerSensorStation::new).toList();
+		this.sensorStations = sensorStations;
 	}
 
-	@Getter
-	private class InnerSensorStation implements Serializable {
-		private final UUID id;
-		@JsonProperty("dip-switch")
-		private final int dipSwitchId;
-		private final boolean locked;
-
-		public InnerSensorStation(SensorStation sensorStation) {
-			this.id = sensorStation.getDeviceId();
-			this.dipSwitchId = sensorStation.getDipSwitchId();
-			this.locked = sensorStation.isUnlocked();
-		}
-	}
+	//	@Getter
+	//	private class InnerSensorStation implements Serializable {
+	//		private final UUID id;
+	//		private final int dipSwitchId;
+	//		private final boolean locked;
+	//
+	//		public InnerSensorStation(SensorStation sensorStation) {
+	//			this.id = sensorStation.getDeviceId();
+	//			this.dipSwitchId = sensorStation.getDipSwitchId();
+	//			this.locked = sensorStation.isUnlocked();
+	//		}
+	//	}
 }

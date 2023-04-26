@@ -1,5 +1,6 @@
 package at.ac.uibk.plant_health.models.plant;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -22,6 +23,7 @@ public class SensorLimits implements Serializable {
 	@Id
 	@Column(name = "time_stamp", nullable = false)
 	@JdbcTypeCode(SqlTypes.TIMESTAMP)
+	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	private LocalDateTime timeStamp;
 
 	@JdbcTypeCode(SqlTypes.FLOAT)
