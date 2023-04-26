@@ -294,13 +294,16 @@ class SensorStation:
         battery_level_state_raw = await self._read_characteristic(service_uuid=self.INFO_SERVICE_UUID,
                                                                   characteristic_uuid='2bed')
 
-        flags_raw = BooleanArrayField(1).get_represented_value(battery_level_state_raw[0:1])
+        flags_field_raw = BooleanArrayField(1).get_represented_value(battery_level_state_raw[0:1])
+        power_state_field_raw = BooleanArrayField(2).get_represented_value(battery_level_state_raw[1:3])
 
         flags = {
-            'IdentifierPresent':        flags_raw[0],
-            'BatteryLevelPresent':      flags_raw[1],
-            'AdditionalStatusPresent':  flags_raw[2]
+            'IdentifierPresent':            flags_field_raw[0],
+            'BatteryLevelPresent':          flags_field_raw[1],
+            'ExternalPowerSourcePresent':   power_state_field_raw[1]
         }
+
+        log.info(f'Received battery level status {[int(byte) for byte in battery_level_state_raw]}')
 
         if flags['BatteryLevelPresent']:
             offset = 2 * flags['IdentifierPresent']
@@ -308,8 +311,10 @@ class SensorStation:
             battery_level = field.get_represented_value(battery_level_state_raw[3+offset:3+offset+1])
             log.info(f'Received a battery level of {battery_level} for sensor station {self.address}')
             return battery_level
+        elif flags['ExternalPowerSourcePresent']:
+            log.info(f'Sensor station {self.address} is connected to external power source')
+            return 100
         else:
-            log.info(f'Received battery level status {[int(byte) for byte in battery_level_state_raw]}')
             return None
 
     async def set_alarms(self, alarms: dict[str, Literal['n', 'l', 'h']]) -> None:
