@@ -66,12 +66,12 @@ class Database:
     @_with_connection
     def enable_sensor_station(self, address: str) -> None:
         """
-        Adds a sensor station to the database.
+        Adds a sensor station to the database (or re-enables it, if it already exists).
         :param address: Address of the sensor station to add
         :raises DatabaseError: If the sensor station could not be added
         """
         query = """
-            INSERT INTO sensor_station(address, timestamp_added)
+            INSERT OR REPLACE INTO sensor_station(address, timestamp_added)
             VALUES (?,?)
         """
         cursor = self._conn.cursor()
@@ -80,10 +80,25 @@ class Database:
     @_with_connection
     def disable_sensor_station(self, address: str) -> None:
         """
-        Removes a sensor station from the database.
-        Will also remove all associated sensors and measured values.
-        :param address: Address of the sensor station to remove
-        :raises DatabaseError: If the sensor station could not be removed
+        Disables a sensor station in the database.
+        :param address: Address of the sensor station to disable
+        :raises DatabaseError: If the sensor station could not be disabled
+        """
+        query = """
+            UPDATE sensor_station
+            SET disabled = 1
+            WHERE address = ?
+        """
+        cursor = self._conn.cursor()
+        cursor.execute(query, (address,))
+
+    @_with_connection
+    def delete_sensor_station(self, address: str) -> None:
+        """
+        Deletes a sensor station from the database.
+        Also deletes all associated sensor and measurements.
+        :param address: Address of the sensor station to disable
+        :raises DatabaseError: If the sensor station could not be deleted
         """
         query = """
             DELETE FROM sensor_station
@@ -91,6 +106,7 @@ class Database:
         """
         cursor = self._conn.cursor()
         cursor.execute(query, (address,))
+        
     
     @_with_connection
     def add_measurement(self,
@@ -260,16 +276,37 @@ class Database:
     @_with_connection
     def get_all_known_sensor_station_addresses(self) -> list[str]:
         """
-        Gets all sensor stations that are stored in the database / enabled.
+        Gets all sensor stations that are stored in the database and enabled.
         :return: List with the addresses of all enabled sensor stations
         :raises DatabaseError: If the sensor station addresses could not be retrieved
         """
         query = """
             SELECT address
             FROM sensor_station
+            WHERE disabled = 0
             ORDER BY
                 failed_connection_attempts ASC,
                 timestamp_added DESC
+        """
+        cursor = self._conn.cursor()
+        cursor.execute(query)
+
+        rows = cursor.fetchall()
+        addresses = [adr for (adr,) in rows]
+
+        return addresses
+    
+    @_with_connection
+    def get_all_disabled_sensor_station_addresses(self) -> list[str]:
+        """
+        Gets all sensor staitons that are stored in the database but disabled (marked for locking)
+        :return: List with addresses of all disabled sensor stations
+        :raises DatabaseError: If the sensor station addresses could not be retrieved
+        """
+        query = """
+            SELECT address
+            FROM sensor_station
+            WHERE disabled = 1
         """
         cursor = self._conn.cursor()
         cursor.execute(query)

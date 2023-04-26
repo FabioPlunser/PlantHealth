@@ -7,7 +7,8 @@ CREATE_SENSOR_STATION_TABLE_QUERY = """
         dip_id                      integer,
         timestamp_added             text    NOT NULL,
         failed_connection_attempts  integer DEFAULT 0 NOT NULL,
-        connection_alive            integer DEFAULT false NOT NULL
+        connection_alive            integer DEFAULT false NOT NULL,
+        disabled                    integer DEFAULT false NOT NULL
     );
 """
 

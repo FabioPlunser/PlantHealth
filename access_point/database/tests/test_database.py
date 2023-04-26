@@ -39,14 +39,12 @@ def test_enable_new_sensor_station():
 
 def test_enable_new_sensor_station_twice():
     """
-    Adding a sensor station to the database twice raises a DatabaseError
+    Adding a sensor station to the database twice does not raise any error
     and no duplicates are created
     """
     database = Database(tempfile.NamedTemporaryFile().name)
     database.setup()
     database.enable_sensor_station(DUMMY_ADR)
-    with pytest.raises(DatabaseError):
-        database.enable_sensor_station(DUMMY_ADR)
     known_addresses = database.get_all_known_sensor_station_addresses()
     assert DUMMY_ADR in known_addresses
     assert len(known_addresses) == 1
@@ -244,7 +242,36 @@ def test_delete_no_measurements():
 
 def test_disable_sensor_station():
     """
-    It is possible to disable a sensor station and all associated measurements
+    It is possible to disable a sensor station in the database
+    """
+    database = Database(tempfile.NamedTemporaryFile().name)
+    database.setup()
+    database.enable_sensor_station(DUMMY_ADR)
+    assert len(database.get_all_known_sensor_station_addresses()) == 1
+    database.disable_sensor_station(DUMMY_ADR)
+    assert len(database.get_all_known_sensor_station_addresses()) == 0
+    assert len(database.get_all_disabled_sensor_station_addresses()) == 1
+
+def test_reenable_sensor_station():
+    """
+    It is possible to re-enable a disabled sensor station and
+    all previous measurements are deleted
+    """
+    database = Database(tempfile.NamedTemporaryFile().name)
+    database.setup()
+    database.enable_sensor_station(DUMMY_ADR)
+    database.enable_sensor_station('other')
+    database.add_measurement(DUMMY_ADR, **DUMMY_MEASUREMENT)
+    database.update_limits(DUMMY_ADR, DUMMY_MEASUREMENT['sensor_name'], **DUMMY_SETTINGS)
+    database.disable_sensor_station(DUMMY_ADR)
+    database.enable_sensor_station(DUMMY_ADR)
+    assert len(database.get_all_known_sensor_station_addresses()) == 2
+    assert len(database.get_all_measurements()) == 0
+
+
+def test_delete_sensor_station():
+    """
+    It is possible to delete a sensor station from the database and all associated measurements
     are deleted from the database
     """
     database = Database(tempfile.NamedTemporaryFile().name)
@@ -253,7 +280,7 @@ def test_disable_sensor_station():
     database.add_measurement(DUMMY_ADR, **DUMMY_MEASUREMENT)
     assert len(database.get_all_known_sensor_station_addresses()) == 1
     assert len(database.get_all_measurements()) == 1
-    database.disable_sensor_station(DUMMY_ADR)
+    database.delete_sensor_station(DUMMY_ADR)
     assert len(database.get_all_known_sensor_station_addresses()) == 0
     assert len(database.get_all_measurements()) == 0
 

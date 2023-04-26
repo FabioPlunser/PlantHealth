@@ -1,25 +1,100 @@
 import logging
 import asyncio
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from bleak import BleakClient
 
-from sensors import SensorStation, BLEConnectionError, ReadError, WriteError
+from util import Config
+from sensors import SensorStation, BLEConnectionError, ReadError, WriteError, scan_for_new_stations
 from database import Database, DatabaseError, DB_FILENAME
+from server import Server, TokenDeclinedError
 
 log = logging.getLogger()
 
 
+def run_bluetooth_actions(config: Config):
+    """
+    Scans for new stations if desired
+    Collects data from known stations
+    Disabled (locks) stations if desired
+    """
+    # scan for new stations
+    if config.scan_active:
+        find_stations(config)
+
+    # collect data from assigned stations
+    collect_data()
+
+    # set disabled stations to locked
+    disable_stations()
+
+    
+def find_stations(config: Config):
+    """
+    Scans for advertising BLEDevices and and filters out potential sensor_stations.
+    Sensor stations are identified by their name, set via the constant SENSOR_STATION_NAME.
+    Potential sensor stations are the polled and their DIP switch position is requested.
+    All sensor stations for which that succeeds are then reported to the backend.
+    """
+    # If a found BLEDevice has this name, it is treated as a potential new sensor station
+    SENSOR_STATION_NAME = 'SensorStation'
+
+    backend = Server(config.backend_address, config.token)
+    database = Database(DB_FILENAME)
+
+    # start scan, ignore known stations
+    log.info('Starting to scan for sensor stations')
+    try:
+        known_addresses = database.get_all_known_sensor_station_addresses()
+    except DatabaseError as e:
+        log.error(f'Unable to load addresses of known sensor stations from database: {e}')
+        return
+    try:
+        new_station_addresses = scan_for_new_stations(known_addresses, SENSOR_STATION_NAME, timedelta(seconds=10))
+    except ConnectionError as e:
+        log.error(f'Unable to scan for sensor stations: {e}')
+        return
+    log.info(f'Found {len(new_station_addresses)} potential new sensor stations')
+
+    # get required data
+    report_data = []
+    for address in new_station_addresses:
+        try:
+            dip_id = asyncio.run(get_dip_id(address))
+            report_data.append({
+                'address': address,
+                'dip-switch': dip_id
+            })
+        except BLEConnectionError + (ReadError,) as e:
+            log.warning(f'Unable to read DIP id from sensor station {address}: {e}')
+
+    # remove stations that have been enabled while scanning
+    try:
+        known_addresses = database.get_all_known_sensor_station_addresses()
+    except DatabaseError as e:
+        log.error(f'Unable to load addresses of known sensor stations from database: {e}')
+        return   
+    report_data = [entry for entry in report_data if entry.get('address') not in known_addresses]
+
+    # send data to backend
+    if report_data:
+        try:
+            backend.report_found_sensor_station(report_data)
+            log.info(f'Reported {len(report_data)} found sensor stations to backend')
+        except TokenDeclinedError:
+            log.warning('The sensor station has been locked by backend')
+            config.reset_token()
+            return
+        except ConnectionError as e:
+            log.error(e)
+            return
+    else:
+        log.info('Did not find any new sensor stations to report to backend')
+
+    config.update(scan_active=False)
+    log.info(f'Disabled scanning mode')
+
 def collect_data():
-    """
-    Polls all enabled sensor stations and collects sensor data.
-    The 'unlocked' flag on each sensor station is set in any case.
-    Sensor data is stored in the local database.
-    Updates miscellaneous data like connection state, DIP switch
-    position, etc.
-    Sets alarms on the sensor stations if the defined limits are
-    exceeded.
-    """
     database = Database(DB_FILENAME)
     try:
         addresses = database.get_all_known_sensor_station_addresses()
@@ -31,12 +106,19 @@ def collect_data():
         # check if sensor station is still enabled (or it has been disabled in the meantime)
         # (establishing connections to sensor stations takes time - this is not unprobable)
         if address in database.get_all_known_sensor_station_addresses():
-            asyncio.run(single_connection(address))
+            asyncio.run(collect_data_from_single_station(address))
 
     if len(addresses) == 0:
         log.info('Did not find any assigned sensor stations')
 
-async def single_connection(address: str):
+def disable_stations():
+    database = Database(DB_FILENAME)
+    addresses = database.get_all_disabled_sensor_station_addresses()
+    for address in addresses:
+        database.delete_sensor_station(address)
+        asyncio.run(lock_sensor_station(address))
+
+async def collect_data_from_single_station(address: str):
     """
     Handles the connection and actions for a single sensor station.
     """
@@ -136,3 +218,28 @@ async def single_connection(address: str):
     except WriteError as e:
         log.error(f'Unable to write value to sensor station {address}: {e}')
 
+async def get_dip_id(address: str) -> int:
+    """
+    Handles a single connection to a BLE device for reading the
+    DIP switch position.
+    :param address: The address of the sensor station
+    :return: The integer encoded DIP switch position
+    :raises BLEConnectionError: If the connection to the device fails
+    :raises ReadError: If the DIP switch position could not be read
+    """
+    async with BleakClient(address) as client:
+        sensor_station = SensorStation(address, client)
+        return await sensor_station.dip_id
+    
+async def lock_sensor_station(address: str) -> None:
+    """
+    Handles a single connection to a sensor station to reset the 'unlocked' flag.
+    """
+    try:
+        log.info(f'Attempting to lock sensor station {address}')
+        async with BleakClient(address) as client:
+            sensor_station = SensorStation(address, client)
+            await sensor_station.set_unlocked(False)
+            log.info(f'Locked sensor station {address}')
+    except BLEConnectionError + (WriteError,):
+        log.warning(f'Unable to set sensor station {address} to locked (deleted from database anyway)')

@@ -88,7 +88,6 @@ def get_config(config: Config) -> None:
             except DatabaseError as e:
                 log.error(f'Unable to disable sensor station {adr} in database: {e}')
                 continue
-            asyncio.run(lock_sensor_station(adr))
 
         # update limits for sensors if applicable
         for sensor_station in sensor_stations:
@@ -103,17 +102,4 @@ def get_config(config: Config) -> None:
                         database.update_limits(sensor_station_address=address,
                                                        **sensor)
                     except DatabaseError as e:
-                        log.error(f'Unable to update setting for sensor {sensor} on sensor station {adr} in database: {e}')    
-
-async def lock_sensor_station(address: str) -> None:
-    """
-    Handles a single connection to a sensor station to reset the 'unlocked' flag.
-    """
-    try:
-        log.info(f'Attempting to lock sensor station {address}')
-        async with BleakClient(address) as client:
-            sensor_station = SensorStation(address, client)
-            await sensor_station.set_unlocked(False)
-            log.info(f'Locked sensor station {address}')
-    except BLEConnectionError + (WriteError,):
-        log.warning(f'Unable to set sensor station {address} to locked (deleted from database anyway)')
+                        log.error(f'Unable to update setting for sensor {sensor} on sensor station {adr} in database: {e}')   

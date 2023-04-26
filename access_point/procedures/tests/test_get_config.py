@@ -50,7 +50,6 @@ def test_updates_config_and_sensor_stations(mocker):
     def mock_disable_sensor_station(self, address: str):
         disabled_stations.append(address)
     mocker.patch.object(Database, 'disable_sensor_station', mock_disable_sensor_station)
-    mocker.patch('procedures.get_config_f.lock_sensor_station', return_value=True)
     get_config(MockConfig())
     assert len(updated_fields) == 2
     assert 'arg1' in updated_fields

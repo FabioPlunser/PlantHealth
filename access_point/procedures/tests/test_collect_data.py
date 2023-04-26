@@ -1,20 +1,20 @@
 import pytest
 import asyncio
 
-from procedures import collect_data
+from ..run_bluetooth_actions_f import collect_data
 from database import Database, DB_FILENAME
 from sensors import SensorStation
-from ..collect_data_f import single_connection
+from ..run_bluetooth_actions_f import collect_data_from_single_station
 from sensors.tests.mock_ble import MockBleakClient
 
 
 def test_iterates_through_all_sensor_stations(mocker):
     """The collect_data() procedure iterates through all sensor stations"""
     stations_checked = {'adr1': False, 'adr2': False}
-    async def mock_single_connection(address: str):
+    async def mock_collect_data_from_single_station(address: str):
         stations_checked[address] = True
-    mocker.patch('procedures.collect_data_f.single_connection',
-                 new=mock_single_connection)
+    mocker.patch('procedures.run_bluetooth_actions_f.collect_data_from_single_station',
+                 new=mock_collect_data_from_single_station)
     mocker.patch('database.Database.get_all_known_sensor_station_addresses',
                  return_value=stations_checked.keys())
     collect_data()
@@ -28,11 +28,11 @@ def test_does_not_connect_to_recently_disabled_sensor_station(mocker):
     """
     stations_checked = {'adr1': False, 'adr2': False}
     sensor_station_addresses = list(stations_checked.keys())
-    async def mock_single_connection(address: str):
+    async def mock_collect_data_from_single_station(address: str):
         stations_checked[address] = True
         sensor_station_addresses.pop(1)
-    mocker.patch('procedures.collect_data_f.single_connection',
-                 new=mock_single_connection)
+    mocker.patch('procedures.run_bluetooth_actions_f.collect_data_from_single_station',
+                 new=mock_collect_data_from_single_station)
     mocker.patch('database.Database.get_all_known_sensor_station_addresses',
                  return_value=sensor_station_addresses)
     collect_data()
@@ -40,22 +40,22 @@ def test_does_not_connect_to_recently_disabled_sensor_station(mocker):
     assert stations_checked['adr2'] == False
 
 def test_sets_unlocked(mocker):
-    """The single_connection() procedure sets the sensor station to unlocked"""
+    """The collect_data_from_single_station() procedure sets the sensor station to unlocked"""
     unlocked = [False]
-    mocker.patch('procedures.collect_data_f.BleakClient', MockBleakClient)
-    mocker.patch('procedures.collect_data_f.DB_FILENAME', ':memory:')
+    mocker.patch('procedures.run_bluetooth_actions_f.BleakClient', MockBleakClient)
+    mocker.patch('procedures.run_bluetooth_actions_f.DB_FILENAME', ':memory:')
     def mock_set_unlocked(self, value: bool):
         unlocked[0] = value
     mocker.patch.object(SensorStation, 'set_unlocked', mock_set_unlocked)
-    asyncio.run(single_connection('adr'))
+    asyncio.run(collect_data_from_single_station('adr'))
     assert unlocked[0] == True
 
 
 def test_reads_sensor_data_if_available(mocker):
-    """The single_connection() procedure reads sensor data if available"""
+    """The collect_data_from_single_station() procedure reads sensor data if available"""
     sensor_data_read = [False]
-    mocker.patch('procedures.collect_data_f.BleakClient', MockBleakClient)
-    mocker.patch('procedures.collect_data_f.DB_FILENAME', ':memory:')
+    mocker.patch('procedures.run_bluetooth_actions_f.BleakClient', MockBleakClient)
+    mocker.patch('procedures.run_bluetooth_actions_f.DB_FILENAME', ':memory:')
     async def mock_set_unlocked(*args, **kwargs):
         await asyncio.sleep(0)
     mocker.patch.object(SensorStation, 'set_unlocked', mock_set_unlocked)
@@ -75,5 +75,5 @@ def test_reads_sensor_data_if_available(mocker):
     async def mock_battery_level(*args, **kwargs):
         return 0
     mocker.patch.object(SensorStation, 'battery_level', new_callable=mock_battery_level)
-    asyncio.run(single_connection('adr'))
+    asyncio.run(collect_data_from_single_station('adr'))
     assert sensor_data_read[0] == True

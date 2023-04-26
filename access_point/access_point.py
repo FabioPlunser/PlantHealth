@@ -40,12 +40,10 @@ def main():
                                                 interval=config.get_config_interval,
                                                 start_immediately=True,
                                                 config=config)
-            find_stations_thread = ThreadScheduler(target=procedures.find_stations,
-                                                   name='FindStations',
-                                                   config=config)
-            collect_data_thread = ThreadScheduler(target=procedures.collect_data,
-                                                  name='CollectData',
-                                                  interval=config.collect_data_interval)
+            collect_data_thread = ThreadScheduler(target=procedures.run_bluetooth_actions,
+                                                  name='BluetoothActions',
+                                                  interval=config.collect_data_interval,
+                                                  config=config)
             transfer_data_thread = ThreadScheduler(target=procedures.transfer_data,
                                                    name='TransferData',
                                                    interval=config.transfer_data_interval,
@@ -56,8 +54,6 @@ def main():
                 get_config_thread.run()
                 # only run other threads if access point is unlocked
                 if config.token:
-                    if config.scan_active:
-                        find_stations_thread.run()
                     collect_data_thread.run()
                     transfer_data_thread.run()
 
@@ -78,7 +74,7 @@ def main():
 
 if __name__ == '__main__':
     # set up logging to file
-    log_formatter = logging.Formatter('%(asctime)s | %(threadName)-12s | %(levelname)-8s |> %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    log_formatter = logging.Formatter('%(asctime)s | %(threadName)-16s | %(levelname)-8s |> %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
     log_file = 'main.log'
     handler = RotatingFileHandler(log_file, mode='a', maxBytes=10*1024*1024, backupCount=2)
     handler.setFormatter(log_formatter)
