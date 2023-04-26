@@ -58,6 +58,7 @@ async def collect_data_from_single_station(address: str):
                         await sensor_station.set_sensor_data_read(True)
                     else:
                         log.info(f'No new sensor data available on sensor station {address}')
+                    break
             except BLEConnectionErrorFast as e:
                 if i >= connection_attempts - 1:
                     raise ConnectionError(e)
