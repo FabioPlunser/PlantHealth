@@ -13,7 +13,7 @@ def test_iterates_through_all_sensor_stations(mocker):
     stations_checked = {'adr1': False, 'adr2': False}
     async def mock_collect_data_from_single_station(address: str):
         stations_checked[address] = True
-    mocker.patch('procedures.run_bluetooth_actions_f.collect_data_from_single_station',
+    mocker.patch('procedures.bluetoothactions.collect_data.collect_data_from_single_station',
                  new=mock_collect_data_from_single_station)
     mocker.patch('database.Database.get_all_known_sensor_station_addresses',
                  return_value=stations_checked.keys())
@@ -31,7 +31,7 @@ def test_does_not_connect_to_recently_disabled_sensor_station(mocker):
     async def mock_collect_data_from_single_station(address: str):
         stations_checked[address] = True
         sensor_station_addresses.pop(1)
-    mocker.patch('procedures.run_bluetooth_actions_f.collect_data_from_single_station',
+    mocker.patch('procedures.bluetoothactions.collect_data.collect_data_from_single_station',
                  new=mock_collect_data_from_single_station)
     mocker.patch('database.Database.get_all_known_sensor_station_addresses',
                  return_value=sensor_station_addresses)
@@ -42,8 +42,8 @@ def test_does_not_connect_to_recently_disabled_sensor_station(mocker):
 def test_sets_unlocked(mocker):
     """The collect_data_from_single_station() procedure sets the sensor station to unlocked"""
     unlocked = [False]
-    mocker.patch('procedures.run_bluetooth_actions_f.BleakClient', MockBleakClient)
-    mocker.patch('procedures.run_bluetooth_actions_f.DB_FILENAME', ':memory:')
+    mocker.patch('procedures.bluetoothactions.collect_data.BleakClient', MockBleakClient)
+    mocker.patch('procedures.bluetoothactions.collect_data.DB_FILENAME', ':memory:')
     def mock_set_unlocked(self, value: bool):
         unlocked[0] = value
     mocker.patch.object(SensorStation, 'set_unlocked', mock_set_unlocked)
@@ -54,8 +54,8 @@ def test_sets_unlocked(mocker):
 def test_reads_sensor_data_if_available(mocker):
     """The collect_data_from_single_station() procedure reads sensor data if available"""
     sensor_data_read = [False]
-    mocker.patch('procedures.run_bluetooth_actions_f.BleakClient', MockBleakClient)
-    mocker.patch('procedures.run_bluetooth_actions_f.DB_FILENAME', ':memory:')
+    mocker.patch('procedures.bluetoothactions.collect_data.BleakClient', MockBleakClient)
+    mocker.patch('procedures.bluetoothactions.collect_data.DB_FILENAME', ':memory:')
     async def mock_set_unlocked(*args, **kwargs):
         await asyncio.sleep(0)
     mocker.patch.object(SensorStation, 'set_unlocked', mock_set_unlocked)
