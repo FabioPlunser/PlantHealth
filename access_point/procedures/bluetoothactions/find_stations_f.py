@@ -67,17 +67,15 @@ def get_data_from_new_stations(addresses: list[str]) -> list[dict[str, Union[str
     :return: A list of dictionaries with addresses and dip-switch ids
     """
     report_data = []
-    for i in range(3):
-        for address in addresses:
-            try:
-                dip_id = asyncio.run(get_dip_id(address))
-                report_data.append({
-                    'address': address,
-                    'dip-switch': dip_id
-                })
-                break
-            except BLEConnectionErrorSlow + (ReadError,) as e:
-                log.warning(f'Unable to read DIP id from sensor station {address}: {e}')
+    for address in addresses:
+        try:
+            dip_id = asyncio.run(get_dip_id(address))
+            report_data.append({
+                'address': address,
+                'dip-switch': dip_id
+            })
+        except BLEConnectionErrorSlow + (ReadError,) as e:
+            log.warning(f'Unable to read DIP id from sensor station {address}: {e}')
     return report_data
 
 def clean_data(report_data: list[dict[str, Union[str, int]]]):
