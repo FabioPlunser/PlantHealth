@@ -107,9 +107,9 @@ class Sensor:
                             field , _ = self.VALUE_FIELD_SPECIFICATIONS.get(get_short_uuid(characteristic.uuid))
                             return field.get_represented_value(await self.client.read_gatt_char(characteristic))
                         except Exception as e:
-                            raise ReadError(f'Unable to read value of sensor {self.name}: {e}')        
-                raise ReadError(f'Unable to find characteristic for value of sensor {self.name} on service {self.service_uuid}')
-        raise ReadError(f'Unable to find service {self.service_uuid} for sensor {self.name}')
+                            raise ReadError(f'{e}')        
+                raise ReadError(f'Did not find characteristic for value of sensor on service {self.service_uuid}')
+        raise ReadError(f'Did not find service {self.service_uuid} for sensor')
     
     @_with_connection
     async def set_alarm(self, alarm: Literal['n', 'l', 'h']) -> None:
@@ -128,9 +128,9 @@ class Sensor:
                             field = IndexField(1)
                             return await self.client.write_gatt_char(characteristic, data=field.get_raw_value(self.ALARM_CODES[alarm]))
                         except Exception as e:
-                            raise WriteError(f'Unable to set/reset alarm for sensor {self.name} on station {self.client.address}: {e}')        
-                raise WriteError(f'Unable to find characteristic for alarm of sensor {self.name} on station {self.client.address}')
-        raise WriteError(f'Unable to find service {self.service_uuid} for sensor {self.name} on station {self.client.address}')
+                            raise WriteError(f'{e}')        
+                raise WriteError(f'Did not find characteristic for alarm of sensor')
+        raise WriteError(f'Did not find service {self.service_uuid} for sensor')
 
     @property
     def unit(self) -> str:
