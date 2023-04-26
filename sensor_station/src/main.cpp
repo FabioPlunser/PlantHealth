@@ -18,7 +18,7 @@
 
 bool setSensorValuesInBLE();
 AirSensorClass::UPDATE_ERROR setSensorValuesFromSensors(sensor_data_t * str);
-uint16_t convertToGATT_soilHumidity(float humidity);
+uint16_t convertToGATT_soilHumidity(uint16_t humidity);
 uint16_t convertToGATT_soilHumidity_notKnown();
 uint16_t convertToGATT_airHumidity(float humidity);
 uint16_t convertToGATT_airHumidity_notKnown();
@@ -53,7 +53,6 @@ void setup() {
 	dipSwitch				= new DipSwitchClass(pinConnection, 8);
 
 	initialize_communication();
-	enable_pairing_mode();
 
 	// while (!Serial) {
 	// 	delay(50);
@@ -65,17 +64,55 @@ void setup() {
 // ----- Loop ----- //
 
 void loop() {
+	static arduino::String pairedDevice;
+	static bool inPairingMode = false;
+// Activate pairing mode if button is pressed pressed.
+#if PAIRING_BUTTON_REQUIRED
+	static unsigned long pairingTime = 0;
+	if (digitalRead(PIN_BUTTON_1) == PinStatus::HIGH) {
+		Serial.print("Pairing Button is pressed\n");
+		enable_pairing_mode();
+		inPairingMode = true;
+		pairingTime	  = millis();
+		// If button is not pressed for "DURATION_IN_PAIRING_MODE_MS" time it
+		// will got back to normal mode
+	} else if (millis() - pairingTime > DURATION_IN_PAIRING_MODE_MS && inPairingMode) {
+		Serial.print("Pairing mode ended\n");
+		inPairingMode = false;
+	}
+#else
+	inPairingMode = true;
+	enable_pairing_mode();
+#endif
+	// enable_pairing_mode();
 	BLEDevice central = BLE.central();
 	if (central) {
+		uint8_t dipSwitchId = dipSwitch->getdipSwitchValue();
+		set_dip_switch_id(dipSwitchId);
+		if (inPairingMode) {
+			Serial.print("In pairing mode\n");
+			Serial.print("New device is: ");
+			pairedDevice = central.address();
+			Serial.println(pairedDevice);
+			inPairingMode = false;
+		}
 		Serial.println("* Connected to central device!");
 		Serial.print("* Device MAC address: ");
 		Serial.println(central.address());
 		Serial.println(" ");
-		if (central.connected()) {
-			setSensorValuesInBLE();
-			while (central.connected()) {
-				;
+		if (pairedDevice.compareTo(central.address()) == 0) {
+			Serial.print("Central device is remembered device.\n");
+			if (central.connected()) {
+				Serial.print("Connected\n");
+				setSensorValuesInBLE();
+				while (central.connected()) {
+					; // TODO: Timeout required
+				}
 			}
+		} else {
+			Serial.print("Declined connection to ");
+			Serial.println(central.address());
+			central.disconnect();
 		}
 		Serial.println("* Disconnected from central device!");
 		if (get_sensor_data_read_flag() == true) {
@@ -86,9 +123,16 @@ void loop() {
 				get_sensor_data_read_flag()
 			);
 		}
+
+		Serial.print("Station is unlocked: ");
+		Serial.println(get_sensor_station_locked_status());
 	}
-	Serial.println("Searching for central device!");
-	delay(500);
+	static int i = 0;
+	if (inPairingMode && i++ > 3) {
+		Serial.println("Searching for central device!");
+		i = 0;
+	}
+	delay(1000);
 }
 
 // ----- Functions ----- //
@@ -98,7 +142,6 @@ bool setSensorValuesInBLE() {
 	sensor_data_t sensorData;
 	AirSensorClass::UPDATE_ERROR updateError =
 		setSensorValuesFromSensors(&sensorData);
-	uint8_t dipSwitchId = dipSwitch->getdipSwitchValue();
 
 #if PRINT_TIME_READ_SENSOR
 	char buffer[16];
@@ -113,7 +156,6 @@ bool setSensorValuesInBLE() {
 		ERROR_PRINT("Got update Error ", updateError);
 		return false;
 	}
-	set_dip_switch_id(dipSwitchId);
 	clearAllFlags();
 
 	set_sensorstation_locked_status(false);
@@ -124,14 +166,14 @@ bool setSensorValuesInBLE() {
 
 void setArduinoPowerStatus() {
 	set_battery_level_status(
-		BATTERY_LEVEL_FLAGS_FIELD, BATTERY_POWER_STATE_FLAGS, 100
+		BATTERY_LEVEL_FLAGS_FIELD, BATTERY_POWER_STATE_FIELD, 100
 	);
 }
 
 AirSensorClass::UPDATE_ERROR setSensorValuesFromSensors(sensor_data_t * str) {
 	float pressure = 0, temperature = 0, humidity = 0;
 	uint32_t gas_resistance	 = 0;
-	uint16_t earth_humidity	 = hydrometer->getHumidity_10bit();
+	uint16_t earth_humidity	 = hydrometer->getHumidity_16bit();
 	uint16_t light_intensity = phototransistor->getLighting_10bit();
 
 	AirSensorClass::UPDATE_ERROR updateError = airSensor->getMeasuredValues(
@@ -153,11 +195,21 @@ AirSensorClass::UPDATE_ERROR setSensorValuesFromSensors(sensor_data_t * str) {
 	return updateError;
 };
 
-uint16_t convertToGATT_soilHumidity(float humidity) {
-	if (humidity < 0 || humidity > 100) {
+uint16_t convertToGATT_soilHumidity(uint16_t humidity) {
+	Serial.print("Soil humidity = ");
+	Serial.println(humidity);
+
+	static uint16_t valueHigh = 300;
+	static uint16_t valueLow  = 950;
+	float calculation =
+		100 - ((humidity - valueHigh) / (float) (valueLow - valueHigh) * 100);
+
+	Serial.print("Calculated = ");
+	Serial.println(calculation);
+	if (calculation < 0 || calculation > 100) {
 		return convertToGATT_soilHumidity_notKnown();
 	}
-	return uint16_t(humidity * 100);
+	return uint16_t(calculation * 100);
 }
 uint16_t convertToGATT_soilHumidity_notKnown() { return (uint16_t) 0xFFFF; }
 
@@ -172,7 +224,7 @@ uint16_t convertToGATT_airHumidity_notKnown() { return (uint16_t) 0xFFFF; }
 uint32_t convertToGATT_airPressure(float pressure) {
 	return uint32_t(pressure * 10);
 }
-uint32_t convertToGATT_airPressure_notKnown() { return (uint8_t) 0xFFFFFFFF; }
+uint32_t convertToGATT_airPressure_notKnown() { return (uint8_t) 0xFFFF'FFFF; }
 
 uint8_t convertToGATT_airQuality(float gas_resistance) {
 	const float calibrationValue = 146000;

@@ -480,7 +480,7 @@ void set_sensor_data(sensor_data_t sensor_data) {
 void set_battery_level_status(
 	uint8_t flags, uint16_t power_state, uint8_t battery_level
 ) {
-	uint32_t batteyStatus = battery_level << 24 + power_state << 8 + flags;
+	uint32_t batteyStatus = (battery_level << 24) + (power_state << 8) + flags;
 	battery_level_status_characteristic.writeValue(batteyStatus);
 }
 
@@ -499,6 +499,12 @@ void set_dip_switch_id(uint8_t id) {
 string get_address() { return BLE.address().c_str(); }
 
 uint8_t get_sensor_data_read_flag() {
+	uint8_t value;
+	sensor_values_read_characteristic.readValue(value);
+	return value;
+}
+
+uint8_t get_sensor_station_locked_status(){
 	uint8_t value;
 	sensor_station_unlocked_characteristic.readValue(value);
 	return value;
