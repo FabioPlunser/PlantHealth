@@ -56,7 +56,7 @@ async def collect_data_from_single_station(address: str):
             else:
                 log.info(f'No new sensor data available on sensor station {address}')
     except BLEConnectionError as e:
-        log.error(f'Unable to connect to sensor station {address}: {e}')
+        log.error(f'Unable to connect to sensor station {address}: {e} {type(e).__name__}')
         database.add_failed_connection_attempt(address)
     except ReadError as e:
         log.error(f'Unable to read value from sensor station {address}: {e}')
