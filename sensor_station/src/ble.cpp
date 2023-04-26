@@ -280,7 +280,7 @@ using namespace std;
 BLEService arduino_info_service("dea07cc4-d084-11ed-a760-325096b39f47");
 
 BLECharacteristic
-	battery_level_status_characteristic("2BED", BLERead | BLEIndicate, 1);
+	battery_level_status_characteristic("2BED", BLERead | BLEIndicate, 4);
 BLECharacteristic dip_switch_id_characteristic("2A9A", BLERead | BLENotify, 1);
 BLECharacteristic
 	sensor_station_unlocked_characteristic("2AE2", BLERead | BLEWrite, 1);
