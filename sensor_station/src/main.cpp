@@ -65,7 +65,7 @@ void setup() {
 
 void loop() {
 	static arduino::String pairedDevice;
-	static bool inPairingMode		 = false;
+	static bool inPairingMode = false;
 // Activate pairing mode if button is pressed pressed.
 #if PAIRING_BUTTON_REQUIRED
 	static unsigned long pairingTime = 0;
@@ -82,6 +82,7 @@ void loop() {
 	}
 #else
 	inPairingMode = true;
+	enable_pairing_mode();
 #endif
 	// enable_pairing_mode();
 	BLEDevice central = BLE.central();
