@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.*;
@@ -15,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -37,10 +37,12 @@ import at.ac.uibk.plant_health.service.SensorStationService;
 import at.ac.uibk.plant_health.util.AuthGenerator;
 import at.ac.uibk.plant_health.util.MockAuthContext;
 import at.ac.uibk.plant_health.util.StringGenerator;
+import jakarta.transaction.Transactional;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class TestSensorStationController {
 	@Autowired
 	private SensorStationService sensorStationService;
@@ -83,7 +85,7 @@ public class TestSensorStationController {
 			SensorStation sensorStation = new SensorStation(bdAddress, 255 - i);
 			sensorStationService.save(sensorStation);
 		}
-
+		List<SensorStation> sensorStations = sensorStationService.findAll();
 		mockMvc.perform(MockMvcRequestBuilders.get("/get-sensor-stations")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
@@ -91,14 +93,8 @@ public class TestSensorStationController {
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(
 						status().isOk(), jsonPath("$.sensorStations").exists(),
-						jsonPath("$.sensorStations.length()").value(sensorStationCount)
+						jsonPath("$.sensorStations.length()").value(sensorStations.size())
 				);
-
-		List<SensorStation> sensorStations = sensorStationService.findAll();
-		for (SensorStation sensorStation : sensorStations) {
-			System.out.println(sensorStation);
-			System.out.println();
-		}
 	}
 
 	@Test
@@ -125,8 +121,6 @@ public class TestSensorStationController {
 
 	@Test
 	void uploadPicture() throws Exception {
-		Person person = createUserAndLogin(false);
-
 		// precondition accessPoint exists
 		String picture =
 				"iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAIAAADTED8xAAADMElEQVR4nOzVwQnAIBQFQYXff81RUkQCOyDj1YOPnbXWPmeTRef+/3O/OyBjzh3CD95BfqICMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMO0TAAD//2Anhf4QtqobAAAAAElFTkSuQmCC";
@@ -141,6 +135,9 @@ public class TestSensorStationController {
 								.content(picture)
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
+
+		sensorStation = sensorStationService.findByBdAddress(bdAddress).get();
+		assertEquals(1, sensorStation.getPlantPictures().size());
 	}
 
 	@Test
@@ -169,21 +166,21 @@ public class TestSensorStationController {
 				);
 	}
 
-	@Test
-	void setSensorLimits() throws Exception {
-		Person person = createUserAndLogin(true);
-		// precondition accessPoint has found and reported at least one sensor station
-		String bdAddress = StringGenerator.macAddress();
-		SensorStation sensorStation = new SensorStation(bdAddress, 4);
-		sensorStationService.save(sensorStation);
-
-		// precondition sensorStation has at least one sensor
-		Map<String, String> sensorMap = new HashMap<>();
-		sensorMap.put("TEMPERATURE", "°C");
-		sensorMap.put("HUMIDITY", "%");
-		sensorMap.put("PRESSURE", "hPa");
-		sensorMap.put("SOILHUMIDITY", "%");
-		sensorMap.put("LIGHTINTENSITY", "lux");
-		sensorMap.put("GASPRESSURE", "ppm");
-	}
+	//	@Test
+	//	void setSensorLimits() throws Exception {
+	//		Person person = createUserAndLogin(true);
+	//		// precondition accessPoint has found and reported at least one sensor station
+	//		String bdAddress = StringGenerator.macAddress();
+	//		SensorStation sensorStation = new SensorStation(bdAddress, 4);
+	//		sensorStationService.save(sensorStation);
+	//
+	//		// precondition sensorStation has at least one sensor
+	//		Map<String, String> sensorMap = new HashMap<>();
+	//		sensorMap.put("TEMPERATURE", "°C");
+	//		sensorMap.put("HUMIDITY", "%");
+	//		sensorMap.put("PRESSURE", "hPa");
+	//		sensorMap.put("SOILHUMIDITY", "%");
+	//		sensorMap.put("LIGHTINTENSITY", "lux");
+	//		sensorMap.put("GASPRESSURE", "ppm");
+	//	}
 }

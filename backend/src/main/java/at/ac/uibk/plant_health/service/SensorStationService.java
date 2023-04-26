@@ -45,15 +45,10 @@ public class SensorStationService {
 		return sensorStationRepository.findByIsUnlockedAndIsDeleted(false, false);
 	}
 
-	public Optional<SensorStation> findByQrCode(UUID qrCode) {
-		return sensorStationRepository.findByQrCodeId(qrCode);
-	}
-
 	public Optional<SensorStation> findByBdAddress(String bdAddress) {
 		return sensorStationRepository.findByBdAddress(bdAddress);
 	}
 
-	@Transactional
 	public SensorStation save(SensorStation sensorStation) {
 		try {
 			return sensorStationRepository.save(sensorStation);
@@ -62,7 +57,6 @@ public class SensorStationService {
 		}
 	}
 
-	@Transactional
 	public boolean sensorStationExists(UUID sensorStationId) {
 		try {
 			Optional<SensorStation> maybeSensorStation = findById(sensorStationId);
@@ -142,7 +136,9 @@ public class SensorStationService {
 			return false;
 		}
 		plantPictureRepository.save(plantPicture);
-		sensorStation.getPlantPictures().add(plantPicture);
+		List<PlantPicture> sensorStationPictures = sensorStation.getPlantPictures();
+		sensorStationPictures.add(plantPicture);
+		sensorStation.setPlantPictures(sensorStationPictures);
 		return save(sensorStation) != null;
 	}
 

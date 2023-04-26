@@ -1,24 +1,19 @@
 package at.ac.uibk.plant_health.models.rest_responses;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.io.Serializable;
 import java.util.List;
-import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class LockedSensorStationResponse extends RestResponse implements Serializable {
+public class SensorStationResponse extends RestResponse implements Serializable {
 	private final List<SensorStation> sensorStations;
 
-	public LockedSensorStationResponse(List<SensorStation> sensorStations) {
-		this.sensorStations = sensorStations;
+	public SensorStationResponse(List<SensorStation> sensorStations) {
+		this.sensorStations = sensorStations.stream().filter(s -> !s.isDeleted()).toList();
 	}
 
 	//	@Getter

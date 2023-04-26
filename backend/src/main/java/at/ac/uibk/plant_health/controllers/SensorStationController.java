@@ -8,22 +8,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-import javax.mail.Message;
-
-import at.ac.uibk.plant_health.models.annotations.AllPermission;
 import at.ac.uibk.plant_health.models.annotations.AnyPermission;
-import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
 import at.ac.uibk.plant_health.models.annotations.PublicEndpoint;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
-import at.ac.uibk.plant_health.models.rest_responses.ListResponse;
-import at.ac.uibk.plant_health.models.rest_responses.LockedSensorStationResponse;
 import at.ac.uibk.plant_health.models.rest_responses.MessageResponse;
 import at.ac.uibk.plant_health.models.rest_responses.PlantPictureResponse;
 import at.ac.uibk.plant_health.models.rest_responses.RestResponseEntity;
+import at.ac.uibk.plant_health.models.rest_responses.SensorStationResponse;
 import at.ac.uibk.plant_health.models.user.Permission;
-import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.service.SensorStationService;
-import lombok.With;
 
 @RestController
 public class SensorStationController {
@@ -33,7 +26,7 @@ public class SensorStationController {
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
 	@GetMapping("/get-sensor-stations")
 	public RestResponseEntity getSensorStations() {
-		return new LockedSensorStationResponse(sensorStationService.findLocked()).toEntity();
+		return new SensorStationResponse(sensorStationService.findAll()).toEntity();
 	}
 
 	@AnyPermission(Permission.ADMIN)
