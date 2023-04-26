@@ -63,17 +63,17 @@ def test_reads_sensor_data_if_available(mocker):
         return 0
     mocker.patch.object(SensorStation, 'dip_id', new_callable=mock_dip_id)
     mocker.patch.object(Database, 'set_dip_id', return_value=True)
-    async def mock_sensor_data_read(*args, **kwargs):
-        return False
-    mocker.patch.object(SensorStation, 'sensor_data_read', new_callable=mock_sensor_data_read)
-    async def mock_sensor_data(*args, **kwargs):
-        return {'sensor': 0}
-    mocker.patch.object(SensorStation, 'sensor_data', new_callable=mock_sensor_data)
-    def mock_set_sensor_data_read(self, value, **kwargs):
-        sensor_data_read[0] = value
-    mocker.patch.object(SensorStation, 'set_sensor_data_read', mock_set_sensor_data_read)
     async def mock_battery_level(*args, **kwargs):
         return 0
     mocker.patch.object(SensorStation, 'battery_level', new_callable=mock_battery_level)
+    async def mock_sensor_data_read(*args, **kwargs):
+        return False
+    mocker.patch.object(SensorStation, 'sensor_data_read', new_callable=mock_sensor_data_read)
+    async def mock_read_sensor_data(self, *args, **kwargs):
+        return
+    mocker.patch('procedures.bluetoothactions.collect_data.read_sensor_data', mock_read_sensor_data)
+    def mock_set_sensor_data_read(self, value, **kwargs):
+        sensor_data_read[0] = value
+    mocker.patch.object(SensorStation, 'set_sensor_data_read', mock_set_sensor_data_read)
     asyncio.run(collect_data_from_single_station('adr'))
     assert sensor_data_read[0] == True

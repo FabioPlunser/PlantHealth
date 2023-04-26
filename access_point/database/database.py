@@ -365,41 +365,39 @@ class Database:
 
     @_with_connection
     def get_limits(self,
-                   sensor_station_address: str,
-                   sensor_name: str) -> tuple[Optional[float], Optional[float], Optional[timedelta], datetime]:
+                   sensor_station_address: str) -> dict[str, dict[str, Union[Optional[float], Optional[float], Optional[timedelta], Optional[datetime]]]]:
         """
-        Gets the currently set limits and timing information on limits.
+        Gets the currently set limits and timing information on limits for all sensors of a sensor stations.
         :param sensor_station_address: Address of the sensor station
-        :param sensor_name: Name of the sensor
-        :return: A tuple with three values
+        :return: A dictionary with the sensor names as keys and subordinated dictionaries like:
             lower_limit: The currently set lower limit -> float
             upper_limit: The currently set upper limit -> float
             alarm_tripping_time: The currently set time until tripping an alarm -> timedelta
             last_inside_limits: The time at which the value has been inside limits at last
-                (or the time at which the sensor station has been enabled) -> datetime
+                (or the time at which the first measurement for the sensor has been added) -> datetime
         :raises DatabaseError: If the limits could not be retrieved from the database
         """
         query = """
             SELECT
+                s.name,
                 s.lower_limit,
                 s.upper_limit,
                 s.alarm_tripping_time,
                 s.last_inside_limits
             FROM sensor_station st
-                LEFT OUTER JOIN (
-                    SELECT *
-                    FROM sensor
-                    WHERE name = ?
-                ) s ON st.id = s.sensor_station_id
+                JOIN sensor s ON st.id = s.sensor_station_id
             WHERE
                 st.address = ?
         """
         cursor = self._conn.cursor()
-        cursor.execute(query, (sensor_name, sensor_station_address))
-        (lower_limit, upper_limit, alarm_tripping_time, last_inside_limits) = cursor.fetchone()
-        alarm_tripping_time = timedelta(seconds=alarm_tripping_time) if alarm_tripping_time else None
-        last_inside_limits = datetime.fromisoformat(last_inside_limits) if last_inside_limits else None
-        return lower_limit, upper_limit, alarm_tripping_time, last_inside_limits
+        cursor.execute(query, (sensor_station_address, ))
+        rows = cursor.fetchall()
+        limits = {sensor_name: {'lower_limit': lower_limit,
+                                'upper_limit': upper_limit,
+                                'alarm_tripping_time': timedelta(seconds=alarm_tripping_time) if alarm_tripping_time else None,
+                                'last_inside_limits': datetime.fromisoformat(last_inside_limits) if last_inside_limits else None}
+                  for (sensor_name, lower_limit, upper_limit, alarm_tripping_time, last_inside_limits) in rows}
+        return limits
     
     @_with_connection
     def get_all_states(self) -> dict[str, dict[str, Union[bool, Optional[int]]]]:

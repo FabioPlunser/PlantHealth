@@ -160,11 +160,13 @@ def test_set_and_remove_limits():
     database.enable_sensor_station(DUMMY_ADR)
     database.add_measurement(DUMMY_ADR, **DUMMY_MEASUREMENT)
     database.update_limits(DUMMY_ADR, DUMMY_MEASUREMENT['sensor_name'], **DUMMY_SETTINGS)
-    (lower_limit, upper_limit, alarm_tripping_time, last_inside_limits) = database.get_limits(DUMMY_ADR, DUMMY_MEASUREMENT['sensor_name'])
-    assert lower_limit == DUMMY_SETTINGS['lower_limit']
-    assert upper_limit == DUMMY_SETTINGS['upper_limit']
-    assert alarm_tripping_time.total_seconds() == DUMMY_SETTINGS['alarm_tripping_time']
-    assert last_inside_limits == DUMMY_MEASUREMENT['timestamp']
+    limits = database.get_limits(DUMMY_ADR)
+    assert DUMMY_MEASUREMENT['sensor_name'] in limits
+    sensor_limits = limits[DUMMY_MEASUREMENT['sensor_name']]
+    assert sensor_limits['lower_limit'] == DUMMY_SETTINGS['lower_limit']
+    assert sensor_limits['upper_limit'] == DUMMY_SETTINGS['upper_limit']
+    assert sensor_limits['alarm_tripping_time'].total_seconds() == DUMMY_SETTINGS['alarm_tripping_time']
+    assert sensor_limits['last_inside_limits'] == DUMMY_MEASUREMENT['timestamp']
     database.update_limits(DUMMY_ADR, DUMMY_MEASUREMENT['sensor_name'])
 
 def test_set_limits_unknown_sensor():
@@ -176,11 +178,8 @@ def test_set_limits_unknown_sensor():
     database.setup()
     database.enable_sensor_station(DUMMY_ADR)
     database.update_limits(DUMMY_ADR, DUMMY_MEASUREMENT['sensor_name'], **DUMMY_SETTINGS)
-    (lower_limit, upper_limit, alarm_tripping_time, last_inside_limits) = database.get_limits(DUMMY_ADR, DUMMY_MEASUREMENT['sensor_name'])
-    assert lower_limit is None
-    assert upper_limit is None
-    assert alarm_tripping_time is None
-    assert last_inside_limits is None
+    limits = database.get_limits(DUMMY_ADR)
+    assert len(limits) == 0
 
 def test_initial_limits():
     """
@@ -190,11 +189,13 @@ def test_initial_limits():
     database.setup()
     database.enable_sensor_station(DUMMY_ADR)
     database.add_measurement(DUMMY_ADR, **DUMMY_MEASUREMENT)
-    (lower_limit, upper_limit, alarm_tripping_time, last_inside_limits) = database.get_limits(DUMMY_ADR, DUMMY_MEASUREMENT['sensor_name'])
-    assert lower_limit is None
-    assert upper_limit is None
-    assert alarm_tripping_time is None
-    assert last_inside_limits == DUMMY_MEASUREMENT['timestamp']
+    limits = database.get_limits(DUMMY_ADR)
+    assert DUMMY_MEASUREMENT['sensor_name'] in limits
+    sensor_limits = limits[DUMMY_MEASUREMENT['sensor_name']]
+    assert sensor_limits['lower_limit'] == None
+    assert sensor_limits['upper_limit'] == None
+    assert sensor_limits['alarm_tripping_time'] == None
+    assert sensor_limits['last_inside_limits'] == DUMMY_MEASUREMENT['timestamp']
 
 def test_delete_single_measurements():
     """
