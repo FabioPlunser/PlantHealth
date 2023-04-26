@@ -1,7 +1,7 @@
 from procedures import get_config
 from server import Server
 from database import Database
-from .mock_config import MockConfig
+from procedures.tests.mock_config import MockConfig
 
 def test_tries_to_register(mocker):
     """

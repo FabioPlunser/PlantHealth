@@ -1,10 +1,10 @@
 import pytest
 import asyncio
 
-from ..run_bluetooth_actions_f import collect_data
+from procedures.bluetoothactions import collect_data
 from database import Database, DB_FILENAME
 from sensors import SensorStation
-from ..run_bluetooth_actions_f import collect_data_from_single_station
+from procedures.bluetoothactions.collect_data import collect_data_from_single_station
 from sensors.tests.mock_ble import MockBleakClient
 
 

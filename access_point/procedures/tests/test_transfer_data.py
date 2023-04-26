@@ -1,7 +1,7 @@
 from procedures import transfer_data
 from database import Database
 from server import Server
-from .mock_config import MockConfig
+from procedures.tests.mock_config import MockConfig
 
 def test_transfers_data_to_backend_and_deletes_measurements(mocker):
     """
