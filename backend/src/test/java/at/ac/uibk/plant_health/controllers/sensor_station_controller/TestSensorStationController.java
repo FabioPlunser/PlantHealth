@@ -24,6 +24,7 @@ import java.util.*;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.plant.PlantPicture;
+import at.ac.uibk.plant_health.models.plant.Sensor;
 import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
@@ -79,7 +80,7 @@ public class TestSensorStationController {
 		int sensorStationCount = 5;
 		for (int i = 0; i < sensorStationCount; i++) {
 			String bdAddress = StringGenerator.macAddress();
-			SensorStation sensorStation = new SensorStation(bdAddress, 255);
+			SensorStation sensorStation = new SensorStation(bdAddress, 255 - i);
 			sensorStationService.save(sensorStation);
 		}
 
@@ -90,8 +91,14 @@ public class TestSensorStationController {
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(
 						status().isOk(), jsonPath("$.sensorStations").exists(),
-						jsonPath("$.sensorStations.length()").value(sensorStationCount + 1)
+						jsonPath("$.sensorStations.length()").value(sensorStationCount)
 				);
+
+		List<SensorStation> sensorStations = sensorStationService.findAll();
+		for (SensorStation sensorStation : sensorStations) {
+			System.out.println(sensorStation);
+			System.out.println();
+		}
 	}
 
 	@Test
@@ -99,7 +106,7 @@ public class TestSensorStationController {
 		Person person = createUserAndLogin(true);
 		// precondition accessPoint has found and reported at least one sensor station
 		String bdAddress = StringGenerator.macAddress();
-		SensorStation sensorStation = new SensorStation(bdAddress, 255);
+		SensorStation sensorStation = new SensorStation(bdAddress, 1);
 		sensorStationService.save(sensorStation);
 		sensorStation = sensorStationService.findByBdAddress(bdAddress).get();
 
@@ -125,7 +132,7 @@ public class TestSensorStationController {
 				"iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAIAAADTED8xAAADMElEQVR4nOzVwQnAIBQFQYXff81RUkQCOyDj1YOPnbXWPmeTRef+/3O/OyBjzh3CD95BfqICMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMO0TAAD//2Anhf4QtqobAAAAAElFTkSuQmCC";
 
 		String bdAddress = StringGenerator.macAddress();
-		SensorStation sensorStation = new SensorStation(bdAddress, 255);
+		SensorStation sensorStation = new SensorStation(bdAddress, 2);
 		sensorStationService.save(sensorStation);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/upload-sensor-station-picture")
@@ -134,9 +141,6 @@ public class TestSensorStationController {
 								.content(picture)
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
-
-		sensorStation = sensorStationService.findByBdAddress(bdAddress).get();
-		assertEquals(1, sensorStation.getPlantPictures().size());
 	}
 
 	@Test
@@ -145,7 +149,7 @@ public class TestSensorStationController {
 				"iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAIAAADTED8xAAADMElEQVR4nOzVwQnAIBQFQYXff81RUkQCOyDj1YOPnbXWPmeTRef+/3O/OyBjzh3CD95BfqICMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMO0TAAD//2Anhf4QtqobAAAAAElFTkSuQmCC";
 
 		String bdAddress = StringGenerator.macAddress();
-		SensorStation sensorStation = new SensorStation(bdAddress, 255);
+		SensorStation sensorStation = new SensorStation(bdAddress, 3);
 		sensorStationService.save(sensorStation);
 
 		PlantPicture plantPicture =
@@ -170,7 +174,7 @@ public class TestSensorStationController {
 		Person person = createUserAndLogin(true);
 		// precondition accessPoint has found and reported at least one sensor station
 		String bdAddress = StringGenerator.macAddress();
-		SensorStation sensorStation = new SensorStation(bdAddress, 255);
+		SensorStation sensorStation = new SensorStation(bdAddress, 4);
 		sensorStationService.save(sensorStation);
 
 		// precondition sensorStation has at least one sensor

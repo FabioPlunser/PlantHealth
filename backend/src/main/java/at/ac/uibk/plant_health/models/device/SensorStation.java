@@ -55,6 +55,7 @@ public class SensorStation extends Device implements Serializable {
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "sensorStation", orphanRemoval = true)
 	private List<SensorStationPersonReference> sensorStationPersonReferences = new ArrayList<>();
 
+	@JsonIgnore
 	@OneToMany(
 			fetch = FetchType.EAGER, mappedBy = "sensorStation", orphanRemoval = true,
 			cascade = CascadeType.ALL

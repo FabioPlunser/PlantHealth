@@ -53,6 +53,7 @@ public class SensorStationService {
 		return sensorStationRepository.findByBdAddress(bdAddress);
 	}
 
+	@Transactional
 	public SensorStation save(SensorStation sensorStation) {
 		try {
 			return sensorStationRepository.save(sensorStation);
@@ -61,6 +62,7 @@ public class SensorStationService {
 		}
 	}
 
+	@Transactional
 	public boolean sensorStationExists(UUID sensorStationId) {
 		try {
 			Optional<SensorStation> maybeSensorStation = findById(sensorStationId);
@@ -76,6 +78,7 @@ public class SensorStationService {
 	 * @param sensorStationId
 	 * @return
 	 */
+	@Transactional
 	public boolean setUnlocked(boolean unlocked, UUID sensorStationId) {
 		Optional<SensorStation> maybeSensorStation = findById(sensorStationId);
 		if (maybeSensorStation.isEmpty()) return false;
@@ -90,6 +93,7 @@ public class SensorStationService {
 	 * @param sensorStationId
 	 * @return list of base64 encoded pictures
 	 */
+	@Transactional
 	public List<String> getPictures(UUID sensorStationId) {
 		Optional<SensorStation> maybeSensorStation = findById(sensorStationId);
 		if (maybeSensorStation.isEmpty())
@@ -119,30 +123,27 @@ public class SensorStationService {
 	 * @param picture base64 encoded picture
 	 * @return true if upload was successful
 	 */
+	@Transactional
 	public boolean uploadPicture(String picture, UUID sensorStationId) {
 		Optional<SensorStation> maybeSensorStation = findById(sensorStationId);
 		if (maybeSensorStation.isEmpty())
 			throw new IllegalArgumentException("SensorStation could not be found");
+		SensorStation sensorStation = maybeSensorStation.get();
 		PlantPicture plantPicture = null;
 		try {
 			byte[] imageByte = Base64.decodeBase64(picture);
 
 			Path path = Paths.get("static/images/" + UUID.randomUUID().toString() + ".jpg");
-			plantPicture = new PlantPicture(
-					maybeSensorStation.get(), path.toString(), LocalDateTime.now()
-			);
+			plantPicture = new PlantPicture(sensorStation, path.toString(), LocalDateTime.now());
 			Files.createDirectories(path.getParent());
 			Files.write(path, imageByte);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
-
-		return plantPictureRepository.save(plantPicture) != null;
-	}
-
-	public boolean uploadPlantPicture(UUID plantId, String picture) {
-		return false;
+		plantPictureRepository.save(plantPicture);
+		sensorStation.getPlantPictures().add(plantPicture);
+		return save(sensorStation) != null;
 	}
 
 	public boolean setSensorLimits(List<SensorLimits> sensorLimits, UUID sensorStationId) {
