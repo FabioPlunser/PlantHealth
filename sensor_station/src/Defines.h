@@ -38,6 +38,10 @@
 #define ANALOG_READ_MAX_VALUE		  1023
 #define UPDATE_INTERVAL_BME680_MS_MAX 1000
 
+// This line defines according to GATT what info fileds will be sent over BLE
+#define BATTERY_LEVEL_FLAGS_FIELD	  0b0'1'0
+#define BATTERY_POWER_STATE_FLAGS	  0b000'000'00'00'00'01'0
+
 // Mapping of the arduino pin connections
 #define PIN_PHOTOTRANSISTOR			  A0
 #define PIN_HYDROMETER				  A1
