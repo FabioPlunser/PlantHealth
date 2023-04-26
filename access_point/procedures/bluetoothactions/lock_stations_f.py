@@ -30,5 +30,5 @@ async def lock_sensor_station(address: str) -> None:
             sensor_station = SensorStation(address, client)
             await sensor_station.set_unlocked(False)
             log.info(f'Locked sensor station {address}')
-    except BLEConnectionError + (WriteError,):
-        log.warning(f'Unable to set sensor station {address} to locked')
+    except BLEConnectionError + (WriteError,) as e:
+        log.warning(f'Unable to set sensor station {address} to locked: {e}')
