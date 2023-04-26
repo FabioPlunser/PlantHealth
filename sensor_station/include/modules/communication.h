@@ -41,5 +41,6 @@ void set_sensorstation_locked_status(bool locked);
 void set_dip_switch_id(uint8_t id);
 void set_sensorstation_id(uint8_t id);
 uint8_t get_sensor_data_read_flag();
+uint8_t get_sensor_station_locked_status();
 
 #endif
