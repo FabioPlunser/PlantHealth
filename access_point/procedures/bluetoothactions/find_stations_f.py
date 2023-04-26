@@ -77,7 +77,7 @@ def get_data_from_new_stations(addresses: list[str]) -> list[dict[str, Union[str
                 })
                 break
             except BLEConnectionError + (ReadError,) as e:
-                log.warning(f'Unable to read DIP id from sensor station {address}: {e}')
+                log.warning(f'Unable to read DIP id from sensor station {address}: {e} {type(e).__name__}')
     return report_data
 
 def clean_data(report_data: list[dict[str, Union[str, int]]]):
