@@ -54,7 +54,7 @@ export async function load({ params, url }) {
     gardener: true,
     admin: false,
   };
-  let CanActiveUserChangeRoles: boolean = false;
+  let canActiveUserChangeRoles: boolean = false;
 
   return {
     username,
