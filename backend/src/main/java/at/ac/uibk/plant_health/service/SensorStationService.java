@@ -2,22 +2,23 @@ package at.ac.uibk.plant_health.service;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
+import at.ac.uibk.plant_health.models.exceptions.ServiceException;
 import at.ac.uibk.plant_health.models.plant.PlantPicture;
 import at.ac.uibk.plant_health.models.plant.Sensor;
 import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
+import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.repositories.*;
 
 @Service
@@ -32,6 +33,8 @@ public class SensorStationService {
 	private PlantPictureRepository plantPictureRepository;
 	@Autowired
 	private SensorStationPersonReferenceRepository sensorStationPersonReferenceRepository;
+	@Autowired
+	private SensorLimitsRepository sensorLimitsRepository;
 
 	public Optional<SensorStation> findById(UUID id) {
 		return this.sensorStationRepository.findById(id);
@@ -49,11 +52,14 @@ public class SensorStationService {
 		return sensorStationRepository.findByBdAddress(bdAddress);
 	}
 
+	@Value("${swa.pictures.path}")
+	private String picturesPath;
+
 	public SensorStation save(SensorStation sensorStation) {
 		try {
 			return sensorStationRepository.save(sensorStation);
 		} catch (Exception e) {
-			return null;
+			throw new ServiceException("Could not save SensorStation", 500);
 		}
 	}
 
@@ -99,7 +105,7 @@ public class SensorStationService {
 
 		try {
 			for (PlantPicture picture : pictures) {
-				Path path = Paths.get("static/images/" + picture.getPicturePath());
+				Path path = Paths.get(picturesPath + picture.getPictureName());
 				byte[] pictureBytes = Files.readAllBytes(path);
 				String base64 = Base64.encodeBase64String(pictureBytes);
 				picturesBase64.add(base64);
@@ -126,9 +132,9 @@ public class SensorStationService {
 		PlantPicture plantPicture = null;
 		try {
 			byte[] imageByte = Base64.decodeBase64(picture);
-
-			Path path = Paths.get("static/images/" + UUID.randomUUID().toString() + ".jpg");
-			plantPicture = new PlantPicture(sensorStation, path.toString(), LocalDateTime.now());
+			String pictureName = UUID.randomUUID() + ".png";
+			Path path = Paths.get(picturesPath + pictureName);
+			plantPicture = new PlantPicture(sensorStation, pictureName, LocalDateTime.now());
 			Files.createDirectories(path.getParent());
 			Files.write(path, imageByte);
 		} catch (Exception e) {
@@ -142,9 +148,31 @@ public class SensorStationService {
 		return save(sensorStation) != null;
 	}
 
-	public boolean setSensorLimits(List<SensorLimits> sensorLimits, UUID sensorStationId) {
-		// TODO
-		return false;
+	/**
+	 * Set sensor limits of sensor station.
+	 * @param sensorLimits
+	 * @param sensorStationId
+	 * @return
+	 */
+	public void setSensorLimits(
+			List<SensorLimits> sensorLimits, UUID sensorStationId, Person person
+	) throws ServiceException {
+		Optional<SensorStation> maybeSensorStation = findById(sensorStationId);
+		if (maybeSensorStation.isEmpty())
+			throw new ServiceException("SensorStation not found", 500);
+		SensorStation sensorStation = maybeSensorStation.get();
+		List<Sensor> possibleSensors = sensorRepository.findAll();
+		for (SensorLimits limits : sensorLimits) {
+			System.out.println(limits.getSensor());
+			if (!possibleSensors.contains(limits.getSensor()))
+				throw new ServiceException("Sensor not found", 500);
+			limits.setGardener(person);
+			limits.setSensorStation(sensorStation);
+			limits.setTimeStamp(LocalDateTime.now());
+		}
+		sensorLimitsRepository.saveAll(sensorLimits);
+		sensorStation.setSensorLimits(sensorLimits);
+		save(sensorStation);
 	}
 
 	public boolean setTransferInterval(int transferInterval) {

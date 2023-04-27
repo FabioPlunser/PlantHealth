@@ -35,7 +35,7 @@ public class PlantPicture {
 
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
 	@Column(name = "picture_path", nullable = false)
-	private String picturePath;
+	private String pictureName;
 
 	@JdbcTypeCode(SqlTypes.BOOLEAN)
 	@Column(name = "is_deleted", nullable = false)
@@ -46,9 +46,9 @@ public class PlantPicture {
 	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	private LocalDateTime timeStamp;
 
-	public PlantPicture(SensorStation sensorStation, String picturePath, LocalDateTime timeStamp) {
+	public PlantPicture(SensorStation sensorStation, String pictureName, LocalDateTime timeStamp) {
 		this.sensorStation = sensorStation;
-		this.picturePath = picturePath;
+		this.pictureName = pictureName;
 		this.timeStamp = timeStamp;
 	}
 

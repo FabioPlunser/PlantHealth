@@ -6,10 +6,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.mail.imap.DefaultFolder;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
@@ -29,7 +32,6 @@ import java.util.*;
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.plant.PlantPicture;
 import at.ac.uibk.plant_health.models.plant.Sensor;
-import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.repositories.PlantPictureRepository;
@@ -41,7 +43,6 @@ import at.ac.uibk.plant_health.service.SensorStationService;
 import at.ac.uibk.plant_health.util.AuthGenerator;
 import at.ac.uibk.plant_health.util.MockAuthContext;
 import at.ac.uibk.plant_health.util.StringGenerator;
-import jakarta.transaction.Transactional;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -65,6 +66,8 @@ public class TestSensorStationController {
 	private PlantPictureRepository plantPictureRepository;
 	@Autowired
 	private SensorStationRepository sensorStationRepository;
+
+	PlantPicture plantPicture;
 
 	private Person createUserAndLogin(boolean alsoAdmin) {
 		String username = StringGenerator.username();
@@ -124,12 +127,50 @@ public class TestSensorStationController {
 		assertTrue(sensorStation.isUnlocked());
 	}
 
+	private final String picture =
+			"iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAIAAADTED8xAAADMElEQVR4nOzVwQnAIBQFQYXff81RUkQCOyDj1YOPnbXWPmeTRef+/3O/OyBjzh3CD95BfqICMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMO0TAAD//2Anhf4QtqobAAAAAElFTkSuQmCC";
+
+	@Value("${swa.pictures.path}")
+	private String picturesPath;
+
+	private void createPicture(SensorStation sensorStation) {
+		List<PlantPicture> plantPictures = new ArrayList<>();
+		System.out.println(picturesPath);
+		try {
+			byte[] imageByte = Base64.decodeBase64(picture);
+			String pictureName = UUID.randomUUID() + ".png";
+			Path path = Paths.get(picturesPath + pictureName);
+			plantPicture = new PlantPicture(sensorStation, pictureName, LocalDateTime.now());
+			plantPictureRepository.save(plantPicture);
+			Files.createDirectories(path.getParent());
+			Files.write(path, imageByte);
+			plantPictures.add(plantPicture);
+			sensorStation.setPlantPictures(plantPictures);
+			sensorStationService.save(sensorStation);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void deleteAllPictures(SensorStation sensorStation) throws Exception {
+		List<PlantPicture> pictures = sensorStation.getPlantPictures();
+		try {
+			for (PlantPicture picture1 : pictures) {
+				Path path = Paths.get(picturesPath + picture1.getPictureName());
+				System.out.println(path);
+				Files.delete(path);
+			}
+			sensorStation.setPlantPictures(new ArrayList<>());
+			sensorStationService.save(sensorStation);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Test
 	void uploadPicture() throws Exception {
 		// precondition accessPoint exists
-		String picture =
-				"iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAIAAADTED8xAAADMElEQVR4nOzVwQnAIBQFQYXff81RUkQCOyDj1YOPnbXWPmeTRef+/3O/OyBjzh3CD95BfqICMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMO0TAAD//2Anhf4QtqobAAAAAElFTkSuQmCC";
-
 		String bdAddress = StringGenerator.macAddress();
 		SensorStation sensorStation = new SensorStation(bdAddress, 2);
 		sensorStationService.save(sensorStation);
@@ -144,32 +185,17 @@ public class TestSensorStationController {
 		sensorStation = sensorStationService.findByBdAddress(bdAddress).get();
 		assertEquals(1, sensorStation.getPlantPictures().size());
 
-		List<PlantPicture> pictures = sensorStation.getPlantPictures();
-		try {
-			for (PlantPicture picture1 : pictures) {
-				Path path = Paths.get(picture1.getPicturePath());
-				Files.delete(path);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		deleteAllPictures(sensorStation);
+		assertEquals(0, sensorStation.getPlantPictures().size());
 	}
 
 	@Test
 	void getPictures() throws Exception {
-		String picture =
-				"iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAIAAADTED8xAAADMElEQVR4nOzVwQnAIBQFQYXff81RUkQCOyDj1YOPnbXWPmeTRef+/3O/OyBjzh3CD95BfqICMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMO0TAAD//2Anhf4QtqobAAAAAElFTkSuQmCC";
-
 		String bdAddress = StringGenerator.macAddress();
 		SensorStation sensorStation = new SensorStation(bdAddress, 3);
 		sensorStationService.save(sensorStation);
 
-		PlantPicture plantPicture =
-				new PlantPicture(sensorStation, "Test.jpg", LocalDateTime.now());
-		plantPictureRepository.save(plantPicture);
-
-		sensorStation.setPlantPictures(Collections.singletonList(plantPicture));
-		sensorStationService.save(sensorStation);
+		createPicture(sensorStation);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/get-sensor-station-pictures")
 								.param("sensorStationId",
@@ -179,23 +205,62 @@ public class TestSensorStationController {
 						status().isOk(), jsonPath("$.pictures").exists(),
 						jsonPath("$.pictures[0]").exists(), jsonPath("$.pictures[0]").value(picture)
 				);
+
+		sensorStation = sensorStationService.findByBdAddress(bdAddress).get();
+		assertEquals(1, sensorStation.getPlantPictures().size());
+
+		sensorStation.getPlantPictures().forEach(p -> System.out.println(p.getPictureName()));
+
+		deleteAllPictures(sensorStation);
+		assertEquals(0, sensorStation.getPlantPictures().size());
 	}
 
-	//	@Test
-	//	void setSensorLimits() throws Exception {
-	//		Person person = createUserAndLogin(true);
-	//		// precondition accessPoint has found and reported at least one sensor station
-	//		String bdAddress = StringGenerator.macAddress();
-	//		SensorStation sensorStation = new SensorStation(bdAddress, 4);
-	//		sensorStationService.save(sensorStation);
-	//
-	//		// precondition sensorStation has at least one sensor
-	//		Map<String, String> sensorMap = new HashMap<>();
-	//		sensorMap.put("TEMPERATURE", "°C");
-	//		sensorMap.put("HUMIDITY", "%");
-	//		sensorMap.put("PRESSURE", "hPa");
-	//		sensorMap.put("SOILHUMIDITY", "%");
-	//		sensorMap.put("LIGHTINTENSITY", "lux");
-	//		sensorMap.put("GASPRESSURE", "ppm");
-	//	}
+	@Disabled
+	@Test
+	void setSensorLimits() throws Exception {
+		Person person = createUserAndLogin(true);
+		// precondition accessPoint has found and reported at least one sensor station
+		String bdAddress = StringGenerator.macAddress();
+		SensorStation sensorStation = new SensorStation(bdAddress, 4);
+		sensorStationService.save(sensorStation);
+
+		// precondition sensorStation has at least one sensor
+		Map<String, String> sensorMap = new HashMap<>();
+		sensorMap.put("TEMPERATURE", "°C");
+		sensorMap.put("HUMIDITY", "%");
+		sensorMap.put("PRESSURE", "hPa");
+		sensorMap.put("SOILHUMIDITY", "%");
+		sensorMap.put("LIGHTINTENSITY", "lux");
+		sensorMap.put("GASPRESSURE", "ppm");
+
+		ArrayNode limits = mapper.createArrayNode();
+
+		for (int i = 0; i < sensorMap.size(); i++) {
+			Sensor sensor = new Sensor(
+					sensorMap.keySet().toArray()[i].toString(),
+					sensorMap.values().toArray()[i].toString()
+			);
+			sensorRepository.save(sensor);
+			ObjectNode sensorJson = mapper.createObjectNode();
+			sensorJson.put("type", sensorMap.keySet().toArray()[i].toString());
+			sensorJson.put("unit", sensorMap.values().toArray()[i].toString());
+
+			ObjectNode limit = mapper.createObjectNode();
+			limit.putPOJO("sensor", sensorJson);
+			limit.put("upperLimit", rand.nextFloat());
+			limit.put("lowerLimit", rand.nextFloat());
+			limit.put("thresholdDuration", rand.nextFloat());
+			limits.add(limit);
+		}
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/set-sensor-limits")
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(person))
+								.param("sensorStationId",
+									   String.valueOf(sensorStation.getDeviceId()))
+								.content(limits.toString())
+								.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
+	}
 }

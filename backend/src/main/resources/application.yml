@@ -7,6 +7,8 @@ swa:
     rate:
       in:
         seconds: 15
+  pictures:
+    path: static/images/
 
 server:
   port: 8080
