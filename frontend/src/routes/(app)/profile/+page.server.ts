@@ -1,5 +1,6 @@
 import type { Actions } from "./$types";
 import { fail } from "@sveltejs/kit";
+import { BACKEND_URL } from "$env/static/private";
 import { z } from "zod";
 
 const schema = z.object({
@@ -42,10 +43,11 @@ export const actions = {
   },
 } satisfies Actions;
 
-export async function load({ params, url }) {
+export async function load({ url, fetch }) {
   let personId = url.searchParams.get("personId");
 
   // TODO: fetch proper backend endpoint
+  let res = await fetch(`http://${BACKEND_URL}/get-user-info`);
   let username: string = "Sakura";
   let userEmail: string = "sakura.tree@mail.com";
   let userPassword: string = "1stPasswdOfSakura";
