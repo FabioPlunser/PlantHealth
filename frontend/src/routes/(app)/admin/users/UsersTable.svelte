@@ -145,7 +145,10 @@
             {/each}
             <td class="table-cell">
               <a href={`/profile?personid=${row.original.personId}`}>
-                <Edit class="w-8 " />
+                <!--
+                  <Edit class="w-8 " />
+                -->
+                <i class="bi bi-pencil-square text-3xl hover:text-gray-500" />
               </a>
             </td>
             <td class="table-cell">
@@ -158,9 +161,7 @@
                     }}
                     class=""
                   >
-                    <i
-                      class="bi bi-trash text-3xl hover:text-red-500 shadow-2xl"
-                    />
+                    <i class="bi bi-trash text-3xl hover:text-red-500" />
                   </button>
                 </label>
               </div>
