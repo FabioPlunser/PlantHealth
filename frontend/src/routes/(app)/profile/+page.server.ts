@@ -54,13 +54,13 @@ export async function load({ params, url }) {
     gardener: true,
     admin: false,
   };
-  let isActiveUserAdmin: boolean = false;
+  let canActiveUserChangeRoles: boolean = false;
 
   return {
     username,
     userEmail,
     userPassword,
     userPermissions,
-    isActiveUserAdmin,
+    canActiveUserChangeRoles,
   };
 }

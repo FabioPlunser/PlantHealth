@@ -17,7 +17,7 @@
     isRendered = true;
   });
 
-  const isDisabled: boolean = !data.isActiveUserAdmin;
+  const isDisabled: boolean = !data.canActiveUserChangeRoles;
 
   export let form;
 
