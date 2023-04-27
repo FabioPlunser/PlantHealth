@@ -70,6 +70,7 @@
           </ul>
         </div>
         <div class="flex justify-center mt-6">
+          <!-- TODO if admin came from admin/users redirect back to it-->
           <button
             type="submit"
             class="btn btn-primary"

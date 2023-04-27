@@ -37,6 +37,7 @@
     </select>
 
     <div class="flex justify-between mt-4">
+      <!-- TODO: modal should not close if input validation failed-->
       <button
         type="submit"
         class="btn btn-primary"

@@ -85,6 +85,7 @@
 
 <div>
   <div class="mb-3">
+    <!-- TODO: fix input component to support on:search on:keyup-->
     <Input
       type="search"
       on:keyup={handleSearch}
