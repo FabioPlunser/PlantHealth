@@ -30,16 +30,12 @@ public class PlantPicture {
 	@JsonIgnore
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "sensor_station_id", nullable = false, unique = true)
+	@JoinColumn(name = "sensor_station_id", nullable = false)
 	private SensorStation sensorStation;
 
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
 	@Column(name = "picture_path", nullable = false)
 	private String pictureName;
-
-	@JdbcTypeCode(SqlTypes.BOOLEAN)
-	@Column(name = "is_deleted", nullable = false)
-	private boolean isDeleted = false;
 
 	@JdbcTypeCode(SqlTypes.TIMESTAMP)
 	@Column(name = "time_stamp", nullable = false)
@@ -57,12 +53,11 @@ public class PlantPicture {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		PlantPicture that = (PlantPicture) o;
-		return Objects.equals(pictureId, that.pictureId)
-				&& Objects.equals(sensorStation, that.sensorStation);
+		return Objects.equals(pictureId, that.pictureId);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(pictureId, sensorStation);
+		return Objects.hash(pictureId);
 	}
 }
