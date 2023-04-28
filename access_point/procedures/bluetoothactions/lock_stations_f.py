@@ -4,7 +4,11 @@ import asyncio
 from bleak import BleakClient
 
 from database import Database, DB_FILENAME, DatabaseError
-from sensors import SensorStation, BLEConnectionErrorFast, BLEConnectionErrorSlow, WriteError
+from sensors import (SensorStation,
+                     BLE_CONNECTION_ATTEMPTS,
+                     BLEConnectionErrorFast,
+                     BLEConnectionErrorSlow,
+                     WriteError)
 
 log = logging.getLogger()
 
@@ -24,8 +28,7 @@ async def lock_sensor_station(address: str) -> None:
     """
     Handles a single connection to a sensor station to reset the 'unlocked' flag.
     """
-    connection_attempts = 3
-    for i in range(connection_attempts):
+    for i in range(BLE_CONNECTION_ATTEMPTS):
         try:
             log.info(f'Attempting to lock sensor station {address}')
             async with BleakClient(address) as client:
@@ -34,7 +37,7 @@ async def lock_sensor_station(address: str) -> None:
                 log.info(f'Locked sensor station {address}')
                 break
         except BLEConnectionErrorFast as e:
-            if i >= connection_attempts - 1:
+            if i >= BLE_CONNECTION_ATTEMPTS - 1:
                 log.warning(f'Unable to set sensor station {address} to locked: {e}')
         except BLEConnectionErrorSlow + (WriteError,) as e:
             log.warning(f'Unable to set sensor station {address} to locked: {e}')

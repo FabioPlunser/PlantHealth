@@ -7,6 +7,9 @@ Classes:
 Functions:
     - scan_for_new_stations
 
+Miscellaneous variables:
+    - BLE_CONNECTION_ATTEMPTS
+
 Exceptions:
     - BLEConnectionErrorSlow
     - BLEConnectionErrorFast
@@ -15,5 +18,11 @@ Exceptions:
     - NoConnectionError
 """
 
-from .sensor_station import SensorStation, BLEConnectionErrorSlow, BLEConnectionErrorFast, ReadError, WriteError, NoConnectionError
+from .sensor_station import (SensorStation,
+                             BLE_CONNECTION_ATTEMPTS,
+                             BLEConnectionErrorSlow,
+                             BLEConnectionErrorFast,
+                             ReadError,
+                             WriteError,
+                             NoConnectionError)
 from .scanner import scan_for_new_stations

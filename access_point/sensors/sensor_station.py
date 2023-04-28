@@ -23,7 +23,12 @@ BLEConnectionErrorSlow = (exc.BleakDeviceNotFoundError,
                           AttributeError,
                           RuntimeError)
 BLEConnectionErrorFast = (exc.BleakDBusError,)
+
+# Number of retry attempts in case usually fast error occurs
 RETRIES_ON_FAST_ERROR = 3
+
+# Number of retry attempts in case of failed connections - used outside this module
+BLE_CONNECTION_ATTEMPTS = 3
 
 class NoConnectionError(Exception):
     """

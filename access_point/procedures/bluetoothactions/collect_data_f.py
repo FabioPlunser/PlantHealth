@@ -5,7 +5,12 @@ from bleak import BleakClient
 from datetime import datetime
 
 from database import Database, DB_FILENAME, DatabaseError
-from sensors import SensorStation, BLEConnectionErrorSlow, BLEConnectionErrorFast, WriteError, ReadError
+from sensors import (SensorStation,
+                     BLE_CONNECTION_ATTEMPTS,
+                     BLEConnectionErrorSlow,
+                     BLEConnectionErrorFast,
+                     WriteError,
+                     ReadError)
 
 log = logging.getLogger()
 

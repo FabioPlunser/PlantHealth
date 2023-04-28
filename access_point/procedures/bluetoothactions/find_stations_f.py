@@ -8,7 +8,12 @@ from typing import Union
 from util import Config
 from server import Server, TokenDeclinedError
 from database import Database, DB_FILENAME, DatabaseError
-from sensors import SensorStation, scan_for_new_stations, BLEConnectionErrorSlow, BLEConnectionErrorFast, ReadError
+from sensors import (SensorStation,
+                     scan_for_new_stations,
+                     BLE_CONNECTION_ATTEMPTS,
+                     BLEConnectionErrorSlow,
+                     BLEConnectionErrorFast,
+                     ReadError)
 
 
 log = logging.getLogger()
@@ -122,12 +127,11 @@ async def get_dip_id(address: str) -> int:
     :raises BLEConnectionError: If the connection to the device fails
     :raises ReadError: If the DIP switch position could not be read
     """
-    connection_attempts = 3
-    for i in range(connection_attempts):
+    for i in range(BLE_CONNECTION_ATTEMPTS):
         try:
             async with BleakClient(address) as client:
                 sensor_station = SensorStation(address, client)
                 return await sensor_station.dip_id
         except BLEConnectionErrorFast as e:
-            if i >= connection_attempts - 1:
+            if i >= BLE_CONNECTION_ATTEMPTS - 1:
                 raise TimeoutError(e)
