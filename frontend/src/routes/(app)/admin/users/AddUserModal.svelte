@@ -30,7 +30,10 @@
     <label class="label">
       <span class="label-text font-bold">Permission</span>
     </label>
-    <select name="permissions" class="select w-full text-white bg-gray-800">
+    <select
+      name="permissions"
+      class="select w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
+    >
       <option selected>USER</option>
       <option>GARDENER</option>
       <option>ADMIN</option>
@@ -38,11 +41,7 @@
 
     <div class="flex justify-between mt-4">
       <!-- TODO: modal should not close if input validation failed-->
-      <button
-        type="submit"
-        class="btn btn-primary"
-        on:click={() => (showModal = false)}>Add User</button
-      >
+      <button type="submit" class="btn btn-primary">Add User</button>
       <button class="btn btn-info" on:click={() => (showModal = false)}
         >Close</button
       >
