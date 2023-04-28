@@ -72,6 +72,10 @@
 #define PRIORITY_ERRORS					 0
 #define PRIORITY_NOTIFICATIONS			 1
 
+// Definition of values to send over BLE
+#define SENSOR_STATION_LOCKED_VALUE		 0
+#define SENSOR_STATION_UNLOCKED_VALUE	 1
+
 // Mapping of the arduino pin connections
 #define PIN_PHOTOTRANSISTOR				 A0
 #define PIN_HYDROMETER					 A1
