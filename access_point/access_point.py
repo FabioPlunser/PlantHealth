@@ -42,7 +42,7 @@ def main():
                                                 config=config)
             collect_data_thread = ThreadScheduler(target=procedures.run_bluetooth_actions,
                                                   name='BluetoothActions',
-                                                  interval=config.collect_data_interval,
+                                                  start_immediately=True,
                                                   config=config)
             transfer_data_thread = ThreadScheduler(target=procedures.transfer_data,
                                                    name='TransferData',

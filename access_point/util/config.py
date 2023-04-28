@@ -2,8 +2,8 @@ import validators
 import yaml
 import logging
 
-from uuid import UUID, uuid4
-from datetime import timedelta
+from uuid import uuid4
+from datetime import timedelta, datetime
 
 log = logging.getLogger()
 
@@ -26,7 +26,8 @@ class Config(object):
     # Attributes of the configuration that are not stored within the config file
     ATTRIBUTES_NO_FILESAVE = [
                     'filename',
-                    'scan_active'
+                    'scan_active',
+                    'last_collect_data'
                 ]
 
     def __init__(self, filename: str) -> None:
@@ -51,7 +52,8 @@ class Config(object):
         self._collect_data_interval = timedelta(seconds=10)
         self._transfer_data_interval = timedelta(seconds=30)
         
-        self._scan_active = False    # not stored in config file
+        self._scan_active = False                   # not stored in config file
+        self._last_data_collect = datetime.now()    # not stored in config file
 
         self._debug = False
 
@@ -94,6 +96,15 @@ class Config(object):
     def scan_active(self):
         """Flag to indicate the access point shall scan for new sensor stations."""
         return self._scan_active
+    
+    @property
+    def last_data_collect(self):
+        """Timestamp of when the last time data has been collected from sensor stations"""
+        return self._last_data_collect
+    
+    def data_collected(self):
+        """Indicates that data has been collected from sensor station and updates the timestamp 'last_data_collect'"""
+        self._last_data_collect = datetime.now()
     
     @property
     def debug(self):

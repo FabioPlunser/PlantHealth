@@ -337,6 +337,7 @@ class Database:
             FROM sensor_station st
                 JOIN sensor s on st.id = s.sensor_station_id
                 JOIN sensor_value v on s.id = v.sensor_id
+            WHERE st.disabled = 0
         """
         cursor = self._conn.cursor()
         cursor.execute(query)
