@@ -1,6 +1,5 @@
 package at.ac.uibk.plant_health.controllers;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
@@ -9,13 +8,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.annotations.AnyPermission;
+import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
 import at.ac.uibk.plant_health.models.annotations.PublicEndpoint;
+import at.ac.uibk.plant_health.models.exceptions.ServiceException;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import at.ac.uibk.plant_health.models.rest_responses.MessageResponse;
 import at.ac.uibk.plant_health.models.rest_responses.PlantPictureResponse;
 import at.ac.uibk.plant_health.models.rest_responses.RestResponseEntity;
 import at.ac.uibk.plant_health.models.rest_responses.SensorStationResponse;
 import at.ac.uibk.plant_health.models.user.Permission;
+import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.service.SensorStationService;
 
 @RestController
@@ -54,10 +56,11 @@ public class SensorStationController {
 		return MessageResponse.builder().statusCode(200).toEntity();
 	}
 
-	@AnyPermission(Permission.GARDENER)
+	@AnyPermission({Permission.GARDENER, Permission.ADMIN})
+	@PrincipalRequired(Person.class)
 	@RequestMapping(value = "/set-sensor-limits", method = {RequestMethod.POST, RequestMethod.PUT})
 	public RestResponseEntity setSensorLimits(
-			@RequestParam("sensorStationId") final UUID sensorStationId,
+			Person person, @RequestParam("sensorStationId") final UUID sensorStationId,
 			@RequestBody final List<SensorLimits> sensorLimits
 	) {
 		if (!sensorStationService.sensorStationExists(sensorStationId)) {
@@ -66,7 +69,9 @@ public class SensorStationController {
 					.message("Could not find sensorStation")
 					.toEntity();
 		}
-		throw new NotImplementedException("Not implemented yet");
+		sensorStationService.setSensorLimits(sensorLimits, sensorStationId, person);
+
+		return MessageResponse.builder().statusCode(200).toEntity();
 	}
 
 	@PublicEndpoint

@@ -45,7 +45,7 @@ public class SensorStation extends Device implements Serializable {
 	@OneToMany(mappedBy = "sensorStation", fetch = FetchType.EAGER)
 	private List<SensorData> sensorData = new ArrayList<>();
 
-	@OneToMany(mappedBy = "sensorStation", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "sensorStation", fetch = FetchType.EAGER, orphanRemoval = true)
 	private List<SensorLimits> sensorLimits = new ArrayList<>();
 
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "sensorStation", orphanRemoval = true)
@@ -74,10 +74,9 @@ public class SensorStation extends Device implements Serializable {
 
 	@Override
 	public String toString() {
-		return "SensorStation [bdAddress=" + bdAddress + ", name=" + name
-				+ ", dipSwitchId=" + dipSwitchId + ", accessPoint=" + accessPoint
-				+ ", sensorStationPersonReferences=" + sensorStationPersonReferences
-				+ ", sensorData=" + sensorData + ", sensorLimits=" + sensorLimits + "]";
+		return "SensorStation [bdAddress=" + bdAddress + ", name=" + name + ", dipSwitchId="
+				+ dipSwitchId + ", accessPoint=" + accessPoint + ", sensorStationPersonReferences="
+				+ sensorStationPersonReferences + ", sensorData=" + sensorData + "]";
 	}
 
 	@Override

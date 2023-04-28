@@ -22,6 +22,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,12 +33,10 @@ import java.util.*;
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.plant.PlantPicture;
 import at.ac.uibk.plant_health.models.plant.Sensor;
+import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
-import at.ac.uibk.plant_health.repositories.PlantPictureRepository;
-import at.ac.uibk.plant_health.repositories.SensorDataRepository;
-import at.ac.uibk.plant_health.repositories.SensorRepository;
-import at.ac.uibk.plant_health.repositories.SensorStationRepository;
+import at.ac.uibk.plant_health.repositories.*;
 import at.ac.uibk.plant_health.service.PersonService;
 import at.ac.uibk.plant_health.service.SensorStationService;
 import at.ac.uibk.plant_health.util.AuthGenerator;
@@ -132,10 +131,11 @@ public class TestSensorStationController {
 
 	@Value("${swa.pictures.path}")
 	private String picturesPath;
+	@Autowired
+	private SensorLimitsRepository sensorLimitsRepository;
 
 	private void createPicture(SensorStation sensorStation) {
 		List<PlantPicture> plantPictures = new ArrayList<>();
-		System.out.println(picturesPath);
 		try {
 			byte[] imageByte = Base64.decodeBase64(picture);
 			String pictureName = UUID.randomUUID() + ".png";
@@ -158,7 +158,6 @@ public class TestSensorStationController {
 		try {
 			for (PlantPicture picture1 : pictures) {
 				Path path = Paths.get(picturesPath + picture1.getPictureName());
-				System.out.println(path);
 				Files.delete(path);
 			}
 			sensorStation.setPlantPictures(new ArrayList<>());
@@ -215,7 +214,6 @@ public class TestSensorStationController {
 		assertEquals(0, sensorStation.getPlantPictures().size());
 	}
 
-	@Disabled
 	@Test
 	void setSensorLimits() throws Exception {
 		Person person = createUserAndLogin(true);
@@ -227,11 +225,11 @@ public class TestSensorStationController {
 		// precondition sensorStation has at least one sensor
 		Map<String, String> sensorMap = new HashMap<>();
 		sensorMap.put("TEMPERATURE", "°C");
-		sensorMap.put("HUMIDITY", "%");
-		sensorMap.put("PRESSURE", "hPa");
-		sensorMap.put("SOILHUMIDITY", "%");
-		sensorMap.put("LIGHTINTENSITY", "lux");
-		sensorMap.put("GASPRESSURE", "ppm");
+		//		sensorMap.put("HUMIDITY", "%");
+		//		sensorMap.put("PRESSURE", "hPa");
+		//		sensorMap.put("SOILHUMIDITY", "%");
+		//		sensorMap.put("LIGHTINTENSITY", "lux");
+		//		sensorMap.put("GASPRESSURE", "ppm");
 
 		ArrayNode limits = mapper.createArrayNode();
 
@@ -249,7 +247,7 @@ public class TestSensorStationController {
 			limit.putPOJO("sensor", sensorJson);
 			limit.put("upperLimit", rand.nextFloat());
 			limit.put("lowerLimit", rand.nextFloat());
-			limit.put("thresholdDuration", rand.nextFloat());
+			limit.put("thresholdDuration", rand.nextInt(1000));
 			limits.add(limit);
 		}
 
@@ -262,5 +260,16 @@ public class TestSensorStationController {
 								.content(limits.toString())
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
+
+		Optional<SensorStation> maybeSensorStation =
+				sensorStationRepository.findById(sensorStation.getDeviceId());
+		if (maybeSensorStation.isEmpty()) {
+			fail("SensorStation not found");
+		}
+		sensorStation = maybeSensorStation.get();
+		System.out.println("\u001B[31m" + sensorStation.getSensorLimits() + "\u001B[0m");
+		List<SensorLimits> sensorLimits = sensorLimitsRepository.findAll();
+		assertEquals(sensorMap.size(), sensorLimits.size());
+		assertEquals(sensorLimits.size(), sensorStation.getSensorLimits().size());
 	}
 }
