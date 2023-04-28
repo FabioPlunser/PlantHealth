@@ -11,6 +11,13 @@ log = logging.getLogger()
 # File in which the configuration is stored
 CONFIG_FILENAME = 'conf.yaml'
 
+# helper methods
+def describe_wrong_type(name, type):
+    return f'Expected value of type {type.__name__} for {name}'
+
+def describe_limits(name, lower, upper, unit=''):
+    return f'Expected value of {name} between {lower}{unit} and {upper}{unit}'
+
 class Config(object):
     """
     Handler class for the global configuration.
@@ -45,7 +52,6 @@ class Config(object):
         self._transfer_data_interval = timedelta(seconds=30)
         
         self._scan_active = False    # not stored in config file
-        self._scan_duration = timedelta(seconds=30)
 
         self._debug = False
 
@@ -90,11 +96,6 @@ class Config(object):
         return self._scan_active
     
     @property
-    def scan_duration(self):
-        """Time for which a scan for new sensor stations lasts."""
-        return self._scan_duration
-    
-    @property
     def debug(self):
         """Flag to indicate if debugging output shall be included in the logfiles."""
         return self._debug
@@ -109,7 +110,6 @@ class Config(object):
             collect_data_interval:int=None,
             transfer_data_interval:int=None,
             scan_active:bool=None,
-            scan_duration:int=None,
             debug:bool=None,
             **kwargs
         ) -> None:
@@ -128,18 +128,15 @@ class Config(object):
         change_found = len([v for k, v in locals().items() if k in current_state and v is not None and v != current_state[k]]) > 0
 
         if change_found:
-            self._set_new_values(
-                uuid,
-                room_name,
-                backend_address,
-                token,
-                get_config_interval,
-                collect_data_interval,
-                transfer_data_interval,
-                scan_active,
-                scan_duration,
-                debug)
-
+            self._set_new_values(uuid,
+                                 room_name,
+                                 backend_address,
+                                 token,
+                                 get_config_interval,
+                                 collect_data_interval,
+                                 transfer_data_interval,
+                                 scan_active,
+                                 debug)
             self._save()
 
     def _set_new_values(self,
@@ -151,7 +148,6 @@ class Config(object):
                         collect_data_interval:int,
                         transfer_data_interval:int,
                         scan_active:bool,
-                        scan_duration:int,
                         debug:bool) -> None:
         """Sets new values."""
         self._uuid = uuid if uuid else self._uuid
@@ -164,7 +160,6 @@ class Config(object):
         self._transfer_data_interval = timedelta(seconds=transfer_data_interval) if transfer_data_interval else self._transfer_data_interval
 
         self._scan_active = scan_active if scan_active else self._scan_active
-        self._scan_duration = timedelta(seconds=scan_duration) if scan_duration else self._scan_duration
 
         self._debug = debug if debug else self._debug
 
@@ -215,41 +210,46 @@ class Config(object):
             collect_data_interval:int=None,
             transfer_data_interval:int=None,
             scan_active:bool=None,
-            scan_duration:int=None,
             debug:bool=None,
             **kwargs
         ):
-        """Validates the given values against set constraints."""
+        """
+        Validates the given values against set constraints.
+        :raises ValueError: If validation fails
+        """
         if kwargs:
             log.debug(f'Unknown parameters: {kwargs.get("kwargs")}')
 
-        def describe_wrong_type(name, type):
-            return f'Expected value of type {type.__name__} for {name}'
+        self._validate_backend_info(backend_address,
+                                    token)
         
-        def describe_limits(name, lower, upper, unit=''):
-            return f'Expected value of {name} between {lower}{unit} and {upper}{unit}'
+        self._validation_access_point_info(uuid,
+                                           room_name,
+                                           scan_active,
+                                           debug)
 
-        if uuid and not isinstance(uuid, str):
-            raise ValueError(describe_wrong_type('uuid', str))
-        if room_name and not isinstance(room_name, str):
-            raise ValueError(describe_wrong_type('room_name', str))
-        if backend_address and not isinstance(backend_address, str):
-            raise ValueError(describe_wrong_type('backend_address', str))
-        if token and not isinstance(token, str):
-            raise ValueError(describe_wrong_type('token', str))
+        self._validate_intervals(get_config_interval,
+                                 collect_data_interval,
+                                 transfer_data_interval)
+
+        
+    def _validate_intervals(self,
+                            get_config_interval:int=None,
+                            collect_data_interval:int=None,
+                            transfer_data_interval:int=None):
+        """
+        Sub-method for _validate()
+        :raises ValueError: If validation fails
+        """
+        # datatypes
         if get_config_interval and not isinstance(get_config_interval, int):
             raise ValueError(describe_wrong_type('get_config_interval', int))
         if collect_data_interval and not isinstance(collect_data_interval, int):
             raise ValueError(describe_wrong_type('collect_data_interval', int))
         if transfer_data_interval and not isinstance(transfer_data_interval, int):
             raise ValueError(describe_wrong_type('transfer_data_interval', int))
-        if scan_active is not None and not isinstance(scan_active, bool):
-            raise ValueError(describe_wrong_type('scan_active', bool))
-        if scan_duration and not isinstance(scan_duration, int):
-            raise ValueError(describe_wrong_type('scan_duration', int))
-        if debug and not isinstance(debug, bool):
-            raise ValueError(describe_wrong_type('debug', bool))
-
+        
+        # min and max values
         if get_config_interval and not 1 <= get_config_interval <= 10:
             raise ValueError(describe_limits('get_config_interval', 1, 10, 'sec'))
         if collect_data_interval and not 1 <= collect_data_interval <= 3600:
@@ -261,16 +261,47 @@ class Config(object):
                 transfer_data_interval_lower_limit = self._collect_data_interval.total_seconds()
             if not transfer_data_interval_lower_limit <= transfer_data_interval <= 3600:
                 raise ValueError(describe_limits('transfer_data_interval', transfer_data_interval_lower_limit, 3600, 'sec'))
-        if scan_duration and not 10 <= scan_duration <= 120:
-            raise ValueError(describe_limits('scan_duration', 10, 120, 'sec'))
+            
+    def _validate_backend_info(self,
+                               backend_address:str=None,
+                               token:str=None):
+        """
+        Sub-method for _validate()
+        :raises ValueError: If validation fails
+        """
+        # data types
+        if backend_address and not isinstance(backend_address, str):
+            raise ValueError(describe_wrong_type('backend_address', str))
+        if token and not isinstance(token, str):
+            raise ValueError(describe_wrong_type('token', str))
         
-        if uuid and not validators.uuid(uuid):
-            raise ValueError('Expected a valid UUID for uuid')
+        # general
         if not backend_address and not self._backend_address:
             raise ValueError('Expected a value for backend_address')
         if backend_address and not validators.url(backend_address):
             raise ValueError('Expected valid URL for backend_address')
         
+    def _validation_access_point_info(self,
+                                      uuid:str=None,
+                                      room_name:str=None,
+                                      scan_active:bool=None,
+                                      debug:bool=None,):
+        """
+        Sub-method for _validate()
+        :raises ValueError: If validation fails
+        """
+        if uuid and not isinstance(uuid, str):
+            raise ValueError(describe_wrong_type('uuid', str))
+        if room_name and not isinstance(room_name, str):
+            raise ValueError(describe_wrong_type('room_name', str))
+        if scan_active is not None and not isinstance(scan_active, bool):
+            raise ValueError(describe_wrong_type('scan_active', bool))
+        if debug and not isinstance(debug, bool):
+            raise ValueError(describe_wrong_type('debug', bool))
+        
+        if uuid and not validators.uuid(uuid):
+            raise ValueError('Expected a valid UUID for uuid')
+
     def _get_cleaned_vars(self):
         """
         Like vars(self) but with a modified output.

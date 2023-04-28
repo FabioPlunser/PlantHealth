@@ -3,7 +3,6 @@ collect_data_interval: 30
 debug: false
 get_config_interval: 5
 room_name: room
-scan_duration: 30
 token: 8aa7ac45-a152-4f96-a721-282611c4ae76
 transfer_data_interval: 60
 uuid: efd12e47-3680-47f2-9aee-3bc37f040bbe
