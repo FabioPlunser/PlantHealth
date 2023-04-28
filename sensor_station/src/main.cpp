@@ -64,16 +64,45 @@ void setup() {
 // ----- Loop ----- //
 
 void loop() {
+	static arduino::String pairedDevice;
+	static bool inPairingMode = false;
+// Activate pairing mode if button is pressed pressed.
+#if PAIRING_BUTTON_REQUIRED
+	static unsigned long pairingTime = 0;
+	if (digitalRead(PIN_BUTTON_1) == PinStatus::HIGH) {
+		Serial.print("Pairing Button is pressed\n");
+		enable_pairing_mode();
+		set_sensorstation_locked_status(SENSOR_STATION_LOCKED_VALUE);
+		inPairingMode = true;
+		pairingTime	  = millis();
+		// If button is not pressed for "DURATION_IN_PAIRING_MODE_MS" time it
+		// will got back to normal mode
+	} else if (millis() - pairingTime > DURATION_IN_PAIRING_MODE_MS && inPairingMode) {
+		Serial.print("Pairing mode ended\n");
+		inPairingMode = false;
+	}
+#else
+	inPairingMode = true;
+	enable_pairing_mode();
+#endif
+	// enable_pairing_mode();
 	BLEDevice central = BLE.central();
 	if (central) {
 		Serial.println("* Connected to central device!");
 		Serial.print("* Device MAC address: ");
 		Serial.println(central.address());
 		Serial.println(" ");
-		if (central.connected()) {
-			setSensorValuesInBLE();
-			while (central.connected()) {
-				;
+		if (pairedDevice.compareTo(central.address()) == 0) {
+			Serial.print("Central device is remembered device.\n");
+			if (central.connected()) {
+				Serial.print("Connected\n");
+				if (get_sensorstation_locked_status() ==
+					SENSOR_STATION_UNLOCKED_VALUE) {
+					setSensorValuesInBLE();
+				}
+				while (central.connected()) {
+					; // TODO: Timeout required
+				}
 			}
 		}
 		Serial.println("* Disconnected from central device!");
@@ -153,6 +182,7 @@ uint16_t convertToGATT_soilHumidity(float humidity) {
 	}
 	return uint16_t(humidity * 100);
 }
+
 uint16_t convertToGATT_soilHumidity_notKnown() { return (uint16_t) 0xFFFF; }
 
 uint16_t convertToGATT_airHumidity(float humidity) {

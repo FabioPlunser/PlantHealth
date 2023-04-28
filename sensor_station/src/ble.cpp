@@ -281,7 +281,7 @@ BLEService arduino_info_service("dea07cc4-d084-11ed-a760-325096b39f47");
 
 BLECharacteristic
 	battery_level_status_characteristic("2BED", BLERead | BLEIndicate, 1);
-BLECharacteristic dip_switch_id_characteristic("2A9A",BLERead | BLENotify, 1);
+BLECharacteristic dip_switch_id_characteristic("2A9A", BLERead | BLENotify, 1);
 BLECharacteristic
 	sensor_station_unlocked_characteristic("2AE2", BLERead | BLEWrite, 1);
 BLECharacteristic sensor_station_id_characteristic("2ABF", BLERead, 16);
@@ -294,34 +294,33 @@ BLECharacteristic
 
 // ----- Soil Humidity Sensor Service ----- //
 
-BLEService soil_humidity_sensor_service("dea07cc4-d084-11ed-a760-325096b39f49"
-);
+BLEService soil_humidity_sensor_service("dea07cc4-d084-11ed-a760-325096b39f49");
 BLECharacteristic soil_humidity_characteristic("2A6F", BLERead | BLENotify, 2);
 BLECharacteristic
-	soil_humidity_valid_characteristic("2A9A",BLEWrite | BLERead, 1);
+	soil_humidity_valid_characteristic("2A9A", BLEWrite | BLERead, 1);
 
 // ----- Air Quality Sensor Service ----- //
 
 BLEService air_humidity_sensor_service("dea07cc4-d084-11ed-a760-325096b39f4a");
 BLECharacteristic air_humidity_characteristic("2A6F", BLERead | BLENotify, 2);
 BLECharacteristic
-	air_humidity_valid_characteristic("2A9A",BLEWrite | BLERead, 1);
+	air_humidity_valid_characteristic("2A9A", BLEWrite | BLERead, 1);
 
 BLEService air_pressure_sensor_service("dea07cc4-d084-11ed-a760-325096b39f4b");
 BLECharacteristic air_pressure_characteristic("2A6D", BLERead | BLENotify, 4);
 BLECharacteristic
-	air_pressure_valid_characteristic("2A9A",BLEWrite | BLERead, 1);
+	air_pressure_valid_characteristic("2A9A", BLEWrite | BLERead, 1);
 
 BLEService air_temperature_sensor_service("dea07cc4-d084-11ed-a760-325096b39f4c"
 );
 BLECharacteristic temperature_characteristic("2B0D", BLERead | BLENotify, 2);
 BLECharacteristic
-	temperature_valid_characteristic("2A9A",BLEWrite | BLERead, 1);
+	temperature_valid_characteristic("2A9A", BLEWrite | BLERead, 1);
 
 BLEService air_quality_sensor_service("dea07cc4-d084-11ed-a760-325096b39f4d");
 BLECharacteristic air_quality_characteristic("2B04", BLERead | BLENotify, 2);
 BLECharacteristic
-	air_quality_valid_characteristic("2A9A",BLEWrite | BLERead, 1);
+	air_quality_valid_characteristic("2A9A", BLEWrite | BLERead, 1);
 
 // ----- Light Sensor Service ----- //
 
@@ -329,7 +328,7 @@ BLEService light_sensor_service("dea07cc4-d084-11ed-a760-325096b39f4e");
 BLECharacteristic
 	light_intensity_characteristic("2AFF", BLERead | BLENotify, 2);
 BLECharacteristic
-	light_intensity_valid_characteristic("2A9A",BLEWrite | BLERead, 1);
+	light_intensity_valid_characteristic("2A9A", BLEWrite | BLERead, 1);
 
 // ----- Function Implementations -----
 
@@ -487,17 +486,23 @@ void set_sensorstation_id(uint8_t id) {
 	sensor_station_id_characteristic.writeValue(id);
 }
 
-void set_sensorstation_locked_status(bool locked) {
-	sensor_station_unlocked_characteristic.writeValue((uint8_t) locked);
-}
-
 void set_dip_switch_id(uint8_t id) {
 	dip_switch_id_characteristic.writeValue(id);
 }
 
 string get_address() { return BLE.address().c_str(); }
 
-uint8_t get_sensor_data_read_flag(){
+uint8_t get_sensor_data_read_flag() {
+	uint8_t value;
+	sensor_values_read_characteristic.readValue(value);
+	return value;
+}
+
+void set_sensorstation_locked_status(bool locked) {
+	sensor_station_unlocked_characteristic.writeValue((uint8_t) locked);
+}
+
+uint8_t get_sensorstation_locked_status() {
 	uint8_t value;
 	sensor_station_unlocked_characteristic.readValue(value);
 	return value;

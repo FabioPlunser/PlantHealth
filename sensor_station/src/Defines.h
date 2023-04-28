@@ -38,6 +38,10 @@
 #define ANALOG_READ_MAX_VALUE		  1023
 #define UPDATE_INTERVAL_BME680_MS_MAX 1000
 
+// Values that will be sent over BLE
+#define SENSOR_STATION_LOCKED_VALUE	  0
+#define SENSOR_STATION_UNLOCKED_VALUE 1
+
 // Mapping of the arduino pin connections
 #define PIN_PHOTOTRANSISTOR			  A0
 #define PIN_HYDROMETER				  A1
