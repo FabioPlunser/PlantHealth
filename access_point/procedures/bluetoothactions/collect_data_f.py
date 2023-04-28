@@ -36,11 +36,10 @@ async def collect_data_from_single_station(address: str):
     """
     Handles the connection and actions for a single sensor station.
     """
-    connection_attempts = 3
     database = Database(DB_FILENAME)
     log.info(f'Connecting to sensor station {address}')
     try:
-        for i in range(connection_attempts):
+        for i in range(BLE_CONNECTION_ATTEMPTS):
             try:
                 async with BleakClient(address) as client:
                     log.info(f'Established connection to sensor station {address}')
@@ -65,7 +64,7 @@ async def collect_data_from_single_station(address: str):
                         log.info(f'No new sensor data available on sensor station {address}')
                     break
             except BLEConnectionErrorFast as e:
-                if i >= connection_attempts - 1:
+                if i >= BLE_CONNECTION_ATTEMPTS - 1:
                     raise ConnectionError(e)
     except BLEConnectionErrorSlow + (ConnectionError,) as e:
         log.error(f'Unable to connect to sensor station {address}: {e}')
