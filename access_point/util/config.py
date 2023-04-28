@@ -170,9 +170,9 @@ class Config(object):
         self._collect_data_interval = timedelta(seconds=collect_data_interval) if collect_data_interval else self._collect_data_interval
         self._transfer_data_interval = timedelta(seconds=transfer_data_interval) if transfer_data_interval else self._transfer_data_interval
 
-        self._scan_active = scan_active if scan_active else self._scan_active
+        self._scan_active = scan_active if scan_active is not None else self._scan_active
 
-        self._debug = debug if debug else self._debug
+        self._debug = debug if debug is not None else self._debug
 
     def reset_token(self):
         """Resets the token."""
