@@ -4,6 +4,7 @@
   export let text: string;
   export let bool: boolean;
   export let disabled: boolean;
+  export let field: string;
 </script>
 
 <input
@@ -11,6 +12,7 @@
   id={text}
   bind:checked={bool}
   {disabled}
+  name={field}
   class=" hidden peer"
 />
 <label
