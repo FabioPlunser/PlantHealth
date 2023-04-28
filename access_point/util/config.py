@@ -254,13 +254,9 @@ class Config(object):
             raise ValueError(describe_limits('get_config_interval', 1, 10, 'sec'))
         if collect_data_interval and not 1 <= collect_data_interval <= 3600:
             raise ValueError(describe_limits('collect_data_interval', 1, 3600, 'sec'))
-        if transfer_data_interval:
-            if collect_data_interval:
-                transfer_data_interval_lower_limit = collect_data_interval
-            else:
-                transfer_data_interval_lower_limit = self._collect_data_interval.total_seconds()
-            if not transfer_data_interval_lower_limit <= transfer_data_interval <= 3600:
-                raise ValueError(describe_limits('transfer_data_interval', transfer_data_interval_lower_limit, 3600, 'sec'))
+        transfer_data_interval_lower_limit = collect_data_interval if collect_data_interval else self._collect_data_interval.total_seconds()
+        if transfer_data_interval and not transfer_data_interval_lower_limit <= transfer_data_interval <= 3600:
+            raise ValueError(describe_limits('transfer_data_interval', transfer_data_interval_lower_limit, 3600, 'sec'))
             
     def _validate_backend_info(self,
                                backend_address:str=None,
