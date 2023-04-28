@@ -3,8 +3,15 @@
   import toast from "$components/toast";
   import AddUserModal from "./AddUserModal.svelte";
   import UsersTable from "./UsersTable.svelte";
-
+  import { onMount } from "svelte";
+  import { slide } from "svelte/transition";
   export let data: PageData;
+
+  let isRendered = false;
+
+  onMount(() => {
+    isRendered = true;
+  });
 
   $: {
     if (data?.message) {
@@ -21,11 +28,13 @@
 {#if addUserModal}
   <AddUserModal bind:showModal={addUserModal} {form} />
 {/if}
-
-<btn
-  class="btn btn-primary flex justify-center w-fit mx-auto m-4"
-  on:click={() => (addUserModal = true)}>Add User</btn
->
-<div class="flex justify-center">
-  <UsersTable bind:users={data.users} />
-</div>
+{#if isRendered}
+  <btn
+    class="btn btn-primary flex justify-center w-fit mx-auto m-4"
+    on:click={() => (addUserModal = true)}
+    in:slide={{ duration: 400, axis: "y" }}>Add User</btn
+  >
+  <div class="flex justify-center">
+    <UsersTable bind:users={data.users} />
+  </div>
+{/if}

@@ -7,6 +7,7 @@ export const load = (async ({ fetch }) => {
   let res = await fetch(`http://${BACKEND_URL}/get-all-users`);
   let res_json = await res.json();
   if (res?.ok) {
+    console.log();
     return { success: true, users: res_json.items };
   } else if (!res.ok) {
     return { success: false, message: res_json.message };
