@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.device.AccessPoint;
 import at.ac.uibk.plant_health.models.device.SensorStation;
+import at.ac.uibk.plant_health.models.exceptions.ServiceException;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import at.ac.uibk.plant_health.repositories.AccessPointRepository;
 import jakarta.persistence.Access;
@@ -117,7 +118,7 @@ public class AccessPointService {
 		return maybeAccessPoint.isPresent();
 	}
 
-	public boolean isAccessPointRegisteredByDeviceId(UUID deviceId) {
+	public boolean isAccessPointRegisteredByDeviceId(UUID deviceId) throws ServiceException {
 		Optional<AccessPoint> maybeAccessPoint = accessPointRepository.findById(deviceId);
 		return maybeAccessPoint.isPresent();
 	}
@@ -199,6 +200,17 @@ public class AccessPointService {
 		return save(accessPoint) != null;
 	}
 
+	/**
+	 * Set the transfer interval of the AccessPoint with the given ID.
+	 * @param accessPointId
+	 * @param interval
+	 * @throws ServiceException
+	 */
+	public void setTransferInterval(UUID accessPointId, int interval) throws ServiceException {
+		AccessPoint accessPoint = getAccessPointByDeviceId(accessPointId);
+		accessPoint.setTransferInterval(interval);
+		save(accessPoint);
+	}
 	public boolean reconnectedToSensorStation(
 			AccessPoint accessPoint, SensorStation sensorStation
 	) {
@@ -243,8 +255,8 @@ public class AccessPointService {
 		Optional<AccessPoint> maybeAccessPoint =
 				accessPointRepository.findBySelfAssignedId(selfAssignedId);
 		if (maybeAccessPoint.isEmpty())
-			throw new IllegalArgumentException(
-					"AccessPoint with ID " + selfAssignedId + " does not exist."
+			throw new ServiceException(
+					"AccessPoint with ID " + selfAssignedId + " does not exist.", 404
 			);
 		return maybeAccessPoint.get();
 	}
@@ -257,9 +269,7 @@ public class AccessPointService {
 	public AccessPoint getAccessPointByDeviceId(UUID deviceId) {
 		Optional<AccessPoint> maybeAccessPoint = accessPointRepository.findById(deviceId);
 		if (maybeAccessPoint.isEmpty())
-			throw new IllegalArgumentException(
-					"AccessPoint with ID " + deviceId + " does not exist."
-			);
+			throw new ServiceException("AccessPoint with ID " + deviceId + "does not exist", 404);
 		return maybeAccessPoint.get();
 	}
 }

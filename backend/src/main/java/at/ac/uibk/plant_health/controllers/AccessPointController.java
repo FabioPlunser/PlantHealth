@@ -15,6 +15,7 @@ import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
 import at.ac.uibk.plant_health.models.annotations.PublicEndpoint;
 import at.ac.uibk.plant_health.models.device.AccessPoint;
 import at.ac.uibk.plant_health.models.device.SensorStation;
+import at.ac.uibk.plant_health.models.exceptions.ServiceException;
 import at.ac.uibk.plant_health.models.rest_responses.*;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.service.AccessPointService;
@@ -142,6 +143,28 @@ public class AccessPointController {
 		return MessageResponse.builder()
 				.statusCode(200)
 				.message("Successfully started scan")
+				.toEntity();
+	}
+
+	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
+	@PostMapping("/set-access-point-transfer-interval")
+	public RestResponseEntity setAPTransferInterval(
+			@RequestParam("accessPointId") final UUID accessPointId,
+			@RequestParam("transferInterval") final int transferInterval
+	) {
+		try {
+			accessPointService.isAccessPointRegisteredByDeviceId(accessPointId);
+			accessPointService.setTransferInterval(accessPointId, transferInterval);
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
+
+		return MessageResponse.builder()
+				.statusCode(200)
+				.message("Successfully set transfer interval")
 				.toEntity();
 	}
 
