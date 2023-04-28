@@ -17,10 +17,10 @@
   </label>
   <!-- it seems like the focus properties of input input-bordered do not translate to a div... therefore I had to imitate the behaviour-->
   <div
-    class="flex input input-bordered w-full bg-gray-800 text-white
+    class="flex input dark:input-bordered w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black
     focus-within:ring-2 focus-within:ring-offset-2 first-line:focus-within:ring-opacity-50
     focus-within:ring-gray-300 dark:focus-within:ring-gray-700
-    focus-within:ring-offset-theme-offset-color dark:focus-within:ring-offset-gray-900 "
+    focus-within:ring-offset-theme-offset-color dark:focus-within:ring-offset-gray-900"
   >
     <div class="flex-grow flex">
       <input
