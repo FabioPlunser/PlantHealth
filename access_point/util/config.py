@@ -128,19 +128,19 @@ class Config(object):
         change_found = len([v for k, v in locals().items() if k in current_state and v is not None and v != current_state[k]]) > 0
 
         if change_found:
-            if uuid:            self._uuid = uuid
-            if room_name:       self._room_name = room_name
-            if backend_address: self._backend_address = backend_address
-            if token:           self._token = token
+            self._uuid = uuid if uuid else self._uuid
+            self._room_name = room_name if room_name else self._room_name
+            self._backend_address = backend_address if backend_address else self._backend_address
+            self._token = token if token else self._token
 
-            if get_config_interval:     self._get_config_interval = timedelta(seconds=get_config_interval)
-            if collect_data_interval:   self._collect_data_interval = timedelta(seconds=collect_data_interval)
-            if transfer_data_interval:  self._transfer_data_interval = timedelta(seconds=transfer_data_interval)
+            self._get_config_interval = timedelta(seconds=get_config_interval) if get_config_interval else self._get_config_interval
+            self._collect_data_interval = timedelta(seconds=collect_data_interval) if collect_data_interval else self._collect_data_interval
+            self._transfer_data_interval = timedelta(seconds=transfer_data_interval) if transfer_data_interval else self._transfer_data_interval
 
-            if scan_active is not None: self._scan_active = scan_active
-            if scan_duration:           self._scan_duration = timedelta(seconds=scan_duration)
+            self._scan_active = scan_active if scan_active else self._scan_active
+            self._scan_duration = timedelta(seconds=scan_duration) if scan_duration else self._scan_duration
 
-            if debug is not None:       self._debug = debug
+            self._debug = debug if debug else self._debug
 
             self._save()
 
