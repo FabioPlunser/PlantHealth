@@ -34,9 +34,25 @@
  */
 #define PRINT_TIME_READ_SENSOR			 TRUE
 
+/**
+ * If this constant is set to true the sensor station will only connect to the
+ * device that was connected previously. If false no button press is required to
+ * pair it and it will always send data to a device that connects.
+ */
+#define PAIRING_BUTTON_REQUIRED			 FALSE
+
 // Definition of boundary values
 #define ANALOG_READ_MAX_VALUE			 1023
 #define UPDATE_INTERVAL_BME680_MS_MAX	 1000
+#define DURATION_IN_PAIRING_MODE_MS		 (5 * 60'000)
+
+// This line defines according to GATT what info fields will be sent over BLE
+#define BATTERY_LEVEL_FLAGS_FIELD		 0b0'1'0
+#define BATTERY_POWER_STATE_FIELD		 0b000'000'00'00'00'01'0
+
+// Values that will be sent over BLE
+#define SENSOR_STATION_LOCKED_VALUE		 0
+#define SENSOR_STATION_UNLOCKED_VALUE	 1
 
 /*
 	This section will be used to define what values that the sensor station gets
@@ -71,10 +87,6 @@
 */
 #define PRIORITY_ERRORS					 0
 #define PRIORITY_NOTIFICATIONS			 1
-
-// Definition of values to send over BLE
-#define SENSOR_STATION_LOCKED_VALUE		 0
-#define SENSOR_STATION_UNLOCKED_VALUE	 1
 
 // Mapping of the arduino pin connections
 #define PIN_PHOTOTRANSISTOR				 A0

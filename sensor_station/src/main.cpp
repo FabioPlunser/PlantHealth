@@ -133,7 +133,7 @@ void loop() {
 		}
 
 		Serial.print("Station is unlocked: ");
-		Serial.println(get_sensor_station_locked_status());
+		Serial.println(get_sensorstation_locked_status());
 	}
 	static int i = 0;
 	if (inPairingMode && i++ > 3) {
