@@ -106,7 +106,7 @@ async def read_sensor_data(sensor_station: SensorStation) -> None:
                                      unit=unit,
                                      timestamp=datetime.now(),
                                      value=value,
-                                     alarm=alarms[sensor_name])
+                                     alarm=alarms.get(sensor_name))
         except DatabaseError as e:
             log.error(f'Unable to add measurement for sensor {sensor_name} on sensor station {sensor_station.address} to database: {e}')
             continue
@@ -114,14 +114,14 @@ async def read_sensor_data(sensor_station: SensorStation) -> None:
 
 async def set_alarms(sensor_station: SensorStation, values: dict[str, float]) -> dict[str, str]:
     database = Database(DB_FILENAME)
+    alarms = {sensor_name: 'n' for sensor_name in values.keys()}
     # get current alarm settings
     try:
         limits = database.get_limits(sensor_station_address=sensor_station.address)
     except DatabaseError as e:
         log.error(f'Unable to get limits for sensor station {sensor_station.address} from database: {e}')
-        return
+        return alarms
     # update alarm flags
-    alarms = {sensor_name: 'n' for sensor_name in values.keys()}
     for sensor, sensor_limits in limits.items():
         # no value for this sensor received
         if sensor not in values:
