@@ -2,6 +2,7 @@ import type { Actions, PageServerLoad } from "./$types";
 import { fail, redirect } from "@sveltejs/kit";
 import { BACKEND_URL } from "$env/static/private";
 import { z } from "zod";
+import { applyAction } from "$app/forms";
 
 let personId: string;
 let source: string | null;
@@ -25,12 +26,23 @@ export const load = (async ({ url, fetch, locals }) => {
   };
 
   if (canActiveUserChangeRoles) {
-    // TODO: fetch admin get-all-permissions
-    let allPermissions = ["USER", "GARDENER", "ADMIN"];
-    allPermissions.forEach((permission) => {
-      userPermissions[permission.toLowerCase()] =
-        user.permissions.includes(permission);
-    });
+    fetch(`http://${BACKEND_URL}/get-all-permissions`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        data.items.forEach((permission: string) => {
+          userPermissions[permission.toLowerCase()] =
+            user.permissions.includes(permission);
+        });
+        console.log(userPermissions);
+      })
+      .catch((error) => {
+        console.error("Error fetching /get-all-permissions", error);
+      });
   } else {
     user.permissions.forEach((permission) => {
       userPermissions[permission.toLowerCase()] = true;
