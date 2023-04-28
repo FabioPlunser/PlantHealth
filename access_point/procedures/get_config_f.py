@@ -37,8 +37,6 @@ def update_limits(sensor_station_info: list[dict]) -> None:
         if sensors:
             log.info(f'Updating limits for sensor station {address}')
         for sensor in sensors:
-            # update limits for each sensor
-            log.info(f'Adjusting limits for sensor {sensor.get("sensor_name")}')
             try:
                 database.update_limits(sensor_station_address=address, **sensor)
             except DatabaseError as e:

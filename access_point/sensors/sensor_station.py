@@ -312,15 +312,15 @@ class SensorStation:
         :raises NoConnectionError: If the BleakClient was not properly initialized
         """
         values = {}
-        log.info('Reading sensor values')
+        log.debug('Reading sensor values')
         for sensor in self.sensors:
             try:
                 value = await sensor.get_value()
-                log.info(f'Received value {value} for sensor {sensor.name} on sensor station {self.address}')
+                log.debug(f'Received value {value} for sensor {sensor.name} on sensor station {self.address}')
                 values[sensor.name] = value
             except ReadError as e:
                 # ignore read errors on sensor data -> skip over currently unreadable sensor values
-                log.info(f'Unable to read value of sensor {sensor.name} on sensor station {self.address}: {e}')
+                log.debug(f'Unable to read value of sensor {sensor.name} on sensor station {self.address}: {e}')
         return values
     
     @property
@@ -347,10 +347,10 @@ class SensorStation:
             offset = 2 * flags['IdentifierPresent']
             field = ScalarField(1,0,0,1, min=0.0, max=100.0)
             battery_level = field.get_represented_value(battery_level_state_raw[3+offset:3+offset+1])
-            log.info(f'Received a battery level of {battery_level} for sensor station {self.address}')
+            log.debug(f'Received a battery level of {battery_level} for sensor station {self.address}')
             return battery_level
         elif flags['ExternalPowerSourcePresent']:
-            log.info(f'Sensor station {self.address} is connected to external power source')
+            log.debug(f'Sensor station {self.address} is connected to external power source')
             return 100
         else:
             return None
