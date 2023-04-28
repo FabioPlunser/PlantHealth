@@ -128,21 +128,45 @@ class Config(object):
         change_found = len([v for k, v in locals().items() if k in current_state and v is not None and v != current_state[k]]) > 0
 
         if change_found:
-            self._uuid = uuid if uuid else self._uuid
-            self._room_name = room_name if room_name else self._room_name
-            self._backend_address = backend_address if backend_address else self._backend_address
-            self._token = token if token else self._token
-
-            self._get_config_interval = timedelta(seconds=get_config_interval) if get_config_interval else self._get_config_interval
-            self._collect_data_interval = timedelta(seconds=collect_data_interval) if collect_data_interval else self._collect_data_interval
-            self._transfer_data_interval = timedelta(seconds=transfer_data_interval) if transfer_data_interval else self._transfer_data_interval
-
-            self._scan_active = scan_active if scan_active else self._scan_active
-            self._scan_duration = timedelta(seconds=scan_duration) if scan_duration else self._scan_duration
-
-            self._debug = debug if debug else self._debug
+            self._set_new_values(
+                uuid,
+                room_name,
+                backend_address,
+                token,
+                get_config_interval,
+                collect_data_interval,
+                transfer_data_interval,
+                scan_active,
+                scan_duration,
+                debug)
 
             self._save()
+
+    def _set_new_values(self,
+                        uuid: str,
+                        room_name:str,
+                        backend_address:str,
+                        token:str,
+                        get_config_interval:int,
+                        collect_data_interval:int,
+                        transfer_data_interval:int,
+                        scan_active:bool,
+                        scan_duration:int,
+                        debug:bool) -> None:
+        """Sets new values."""
+        self._uuid = uuid if uuid else self._uuid
+        self._room_name = room_name if room_name else self._room_name
+        self._backend_address = backend_address if backend_address else self._backend_address
+        self._token = token if token else self._token
+
+        self._get_config_interval = timedelta(seconds=get_config_interval) if get_config_interval else self._get_config_interval
+        self._collect_data_interval = timedelta(seconds=collect_data_interval) if collect_data_interval else self._collect_data_interval
+        self._transfer_data_interval = timedelta(seconds=transfer_data_interval) if transfer_data_interval else self._transfer_data_interval
+
+        self._scan_active = scan_active if scan_active else self._scan_active
+        self._scan_duration = timedelta(seconds=scan_duration) if scan_duration else self._scan_duration
+
+        self._debug = debug if debug else self._debug
 
     def reset_token(self):
         """Resets the token."""
