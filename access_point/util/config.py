@@ -217,7 +217,7 @@ class Config(object):
         Validates the given values against set constraints.
         :raises ValueError: If validation fails
         """
-        if kwargs:
+        if kwargs and kwargs.get('kwargs'):
             log.debug(f'Unknown parameters: {kwargs.get("kwargs")}')
 
         self._validate_backend_info(backend_address,

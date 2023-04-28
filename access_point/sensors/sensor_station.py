@@ -8,8 +8,11 @@ from typing import Optional, Literal, Callable
 from .gatt_fields import BooleanField, BooleanArrayField, IndexField, ScalarField
 from .util import get_short_uuid
 
-
 log = logging.getLogger()
+
+# suppress log output from bleak and asyncio library
+logging.getLogger('bleak').setLevel(logging.WARNING)
+logging.getLogger('asyncio').setLevel(logging.WARNING)
 
 # Fixing wrong definition of 'Battery Level Status' characteristic UUID
 bleak.uuids.uuid16_dict[0x2BED] = 'Battery Level State'

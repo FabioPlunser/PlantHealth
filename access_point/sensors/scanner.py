@@ -2,10 +2,14 @@ import asyncio
 import logging
 
 from datetime import timedelta
-from bleak import BleakScanner, exc
-from .sensor_station import BLEConnectionErrorSlow, BLEConnectionErrorFast
+from bleak import BleakScanner
+from .sensor_station import BLEConnectionErrorSlow
 
 log = logging.getLogger()
+
+# suppress log output from bleak and asyncio library
+logging.getLogger('bleak').setLevel(logging.WARNING)
+logging.getLogger('asyncio').setLevel(logging.WARNING)
 
 
 def scan_for_new_stations(known_station_addresses: list[str], identifier: str, duration: timedelta) -> list[str]:
