@@ -4,11 +4,11 @@ import { BACKEND_URL } from "$env/static/private";
 import { z } from "zod";
 
 let personId: string;
-let source: string;
+let source: string | null;
 
 export const load = (async ({ url, fetch, locals }) => {
   personId = url.searchParams.get("personId") ?? locals.user.personId;
-  source = url.searchParams.get("source") ?? "";
+  source = url.searchParams.get("source");
 
   let canActiveUserChangeRoles: boolean =
     locals.user.permissions.includes("ADMIN") &&
@@ -125,7 +125,7 @@ export const actions = {
 
     let res = await fetch(`http://${BACKEND_URL}/update-user`, requestOptions);
     res = await res.json();
-    if (source) {
+    if (res.ok && source !== null) {
       throw redirect(307, source);
     }
   },
