@@ -2,6 +2,51 @@ import type { Actions } from "./$types";
 import { fail } from "@sveltejs/kit";
 import { BACKEND_URL } from "$env/static/private";
 import { z } from "zod";
+import { noop } from "svelte/internal";
+export async function load({ url, fetch, locals }) {
+  personId = url.searchParams.get("personId") ?? locals.user.personId;
+
+  let canActiveUserChangeRoles: boolean =
+    locals.user.permissions.includes("ADMIN") &&
+    personId !== locals.user.personId;
+
+  let userPermissions: { [role: string]: boolean } = {};
+  // TODO: fetch proper backend endpoint
+  //let user = await fetch(`http://${BACKEND_URL}/get-user-info`);
+  let user = {
+    personId: "1123iefefsa",
+    username: "Sakura",
+    email: "sakura@mail.com",
+    permissions: ["USER"],
+  };
+
+  if (canActiveUserChangeRoles) {
+    // TODO: fetch admin get-all-permissions
+    let allPermissions = ["USER", "GARDENER", "ADMIN"];
+    allPermissions.forEach((permission) => {
+      userPermissions[permission] = user.permissions.includes(permission);
+    });
+  } else {
+    user.permissions.forEach((permission) => {
+      userPermissions[permission.toLowerCase()] = true;
+    });
+  }
+  return {
+    username: user.username,
+    email: user.email,
+    permissions: userPermissions,
+    canActiveUserChangeRoles,
+  };
+}
+
+/*
+ * In FormData the permissions will have the following shape if selected in the form:
+ * { name: 'permission[PERMISSION]', value: 'on' }
+ * in order to access this permission and add it to the permissions array we use this regex.
+ */
+const permissionRegex = /\[(.*?)\]/;
+
+let personId: string;
 
 const schema = z.object({
   username: z
@@ -26,9 +71,14 @@ const schema = z.object({
 });
 
 export const actions = {
-  profile: async ({ request, locals }) => {
+  updateUser: async ({ request, fetch }) => {
     const formData = await request.formData();
     const zodData = schema.safeParse(Object.fromEntries(formData));
+
+    if (formData.get("password") !== formData.get("passwordConfirm")) {
+      return fail(400, { error: true, errors: "Passwords do not match" });
+    }
+
     if (!zodData.success) {
       // Loop through the errors array and create a custom errors array
       const errors = zodData.error.errors.map((error) => {
@@ -40,29 +90,37 @@ export const actions = {
 
       return fail(400, { error: true, errors });
     }
+
+    let permissions: string[] = [];
+    /* For every permission BooleanButton parse the name to find which Permission it represents
+     * and add it to the permissions array
+     */
+    formData.forEach((value, key) => {
+      if (key.includes("permission[")) {
+        let match = key.match(permissionRegex);
+        if (match) {
+          permissions.push(match[1].toUpperCase());
+        }
+      }
+    });
+
+    var requestOptions = {
+      method: "POST",
+      body: JSON.stringify({
+        personId,
+        username: formData.get("username"),
+        email: formData.get("email"),
+        password: formData.get("password"),
+        permissions,
+      }),
+    };
+    console.log(requestOptions);
+
+    let res = await fetch(`http://${BACKEND_URL}/update-user`, requestOptions);
+    res = await res.json();
+
+    if (res.success) {
+      // throw redirect(302, "/");
+    }
   },
 } satisfies Actions;
-
-export async function load({ url, fetch }) {
-  let personId = url.searchParams.get("personId");
-
-  // TODO: fetch proper backend endpoint
-  let res = await fetch(`http://${BACKEND_URL}/get-user-info`);
-  let username: string = "Sakura";
-  let userEmail: string = "sakura.tree@mail.com";
-  let userPassword: string = "1stPasswdOfSakura";
-  let userPermissions: { [role: string]: boolean } = {
-    user: true,
-    gardener: true,
-    admin: false,
-  };
-  let canActiveUserChangeRoles: boolean = false;
-
-  return {
-    username,
-    userEmail,
-    userPassword,
-    userPermissions,
-    canActiveUserChangeRoles,
-  };
-}

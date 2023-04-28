@@ -21,16 +21,17 @@
 
   export let form;
 
-  let roles: string[] = Array.from(Object.keys(data.userPermissions));
-</script>
+  let password: string;
+  let passwordConfirm: string;
 
-<h1>Profile</h1>
+  let roles: string[] = Array.from(Object.keys(data.permissions));
+</script>
 
 {#if isRendered}
   <section class="w-full">
     <form
       method="POST"
-      action="?/profile"
+      action="?/updateUser"
       class="flex justify-center"
       use:enhance
     >
@@ -48,21 +49,35 @@
           field="email"
           label="Email"
           placeholder="example.mail@planthealth.com"
-          value={data.userEmail}
+          value={data.email}
         />
         <FormError field="email" {form} />
-        <PasswordInput field="password" value={data.userPassword} />
+        <PasswordInput
+          field="password"
+          label="Password"
+          placeholder="Password"
+          value={password}
+        />
 
         <!-- TODO implement propper user logic in profile (can not see password) add password confirm-->
 
         <FormError field="password" {form} />
+
+        <PasswordInput
+          field="passwordConfirm"
+          label="Confirm Password"
+          placeholder="Confirm Password"
+          value={passwordConfirm}
+        />
+        <FormError field="passwordConfirm" {form} />
         <div class="mt-6">
           <ul class="grid w-full gap-6 md:grid-rows-3">
             {#each roles as role}
               <li class="" in:slide={{ duration: 400, axis: "x" }}>
                 <BooleanButton
+                  field={`permission[${role}]`}
                   text={role}
-                  bind:bool={data.userPermissions[role]}
+                  bind:bool={data.permissions[role]}
                   disabled={isDisabled}
                 />
               </li>
