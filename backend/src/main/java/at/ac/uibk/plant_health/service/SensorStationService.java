@@ -185,9 +185,53 @@ public class SensorStationService {
 		);
 	}
 
-	public boolean deletePicture(PlantPicture plantPicture) {
-		// TODO
-		return false;
+	/**
+	 * Delete specific picture of sensor station
+	 * @param pictureId
+	 * @return
+	 * @throws ServiceException
+	 */
+	public void deletePicture(UUID pictureId) throws ServiceException {
+		Optional<PlantPicture> maybePicture = plantPictureRepository.findById(pictureId);
+		if (maybePicture.isEmpty()) throw new ServiceException("Picture does not exist", 404);
+		PlantPicture picture = maybePicture.get();
+
+		SensorStation sensorStation = picture.getSensorStation();
+		try {
+			Path path = Paths.get(picturesPath + picture.getPictureName());
+			Files.delete(path);
+			plantPictureRepository.delete(picture);
+			sensorStation.getPlantPictures().remove(picture);
+			save(sensorStation);
+		} catch (Exception e) {
+			throw new ServiceException("Failed to delete pictue of the server", 500);
+		}
+	}
+
+	/**
+	 * Delete all pictures of a sensor station
+	 * @param sensorStationId
+	 * @throws ServiceException
+	 */
+	public void deleteAllPictures(UUID sensorStationId) throws ServiceException {
+		Optional<SensorStation> maybeSensorStation = findById(sensorStationId);
+		if (maybeSensorStation.isEmpty())
+			throw new ServiceException("Couldn't find sensor station", 404);
+
+		SensorStation sensorStation = maybeSensorStation.get();
+		List<PlantPicture> pictures = new ArrayList<>(sensorStation.getPlantPictures());
+		try {
+			for (PlantPicture picture : pictures) {
+				Path path = Paths.get(picturesPath + picture.getPictureName());
+				Files.delete(path);
+				plantPictureRepository.delete(picture);
+				sensorStation.getPlantPictures().remove(picture);
+			}
+			save(sensorStation);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new ServiceException("Failed to delete pictue of the server", 500);
+		}
 	}
 
 	@Transactional

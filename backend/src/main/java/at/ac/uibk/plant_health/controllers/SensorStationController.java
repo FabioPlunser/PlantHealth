@@ -1,11 +1,15 @@
 package at.ac.uibk.plant_health.controllers;
 
+import org.apache.commons.lang3.NotImplementedException;
+import org.hibernate.annotations.Any;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+
+import javax.mail.Message;
 
 import at.ac.uibk.plant_health.models.annotations.AnyPermission;
 import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
@@ -119,5 +123,46 @@ public class SensorStationController {
 					.toEntity();
 		}
 		return new PlantPictureResponse(pictures).toEntity();
+	}
+
+	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
+	@WriteOperation
+	@PostMapping("/delete-sensor-station-picture")
+	public RestResponseEntity deleteSensorStationPicture(@RequestParam("pictureId"
+	) final UUID pictureId) {
+		try {
+			sensorStationService.deletePicture(pictureId);
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
+
+		return MessageResponse.builder()
+				.statusCode(200)
+				.message("Delete all pictures " + pictureId)
+				.toEntity();
+	}
+
+	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
+	@WriteOperation
+	@PostMapping("/delete-all-sensor-station-pictures")
+	public RestResponseEntity deleteAllSensorStationPictures(@RequestParam("sensorStationId"
+	) final UUID sensorStationId) {
+		try {
+			sensorStationService.sensorStationExists(sensorStationId);
+			sensorStationService.deleteAllPictures(sensorStationId);
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
+
+		return MessageResponse.builder()
+				.statusCode(200)
+				.message("Delete all pictures of SensorStation " + sensorStationId)
+				.toEntity();
 	}
 }

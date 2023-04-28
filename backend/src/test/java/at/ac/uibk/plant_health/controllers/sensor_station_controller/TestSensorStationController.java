@@ -149,7 +149,7 @@ public class TestSensorStationController {
 			sensorStationService.save(sensorStation);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new RuntimeException("Error");
 		}
 	}
 
@@ -215,7 +215,7 @@ public class TestSensorStationController {
 	}
 
 	@Test
-	void setSensorLimits() throws Exception {
+	void setSensorLimitsAdmin() throws Exception {
 		Person person = createUserAndLogin(true);
 		// precondition accessPoint has found and reported at least one sensor station
 		String bdAddress = StringGenerator.macAddress();
@@ -267,10 +267,91 @@ public class TestSensorStationController {
 			fail("SensorStation not found");
 		}
 		sensorStation = maybeSensorStation.get();
-		System.out.println("\u001B[31m" + sensorStation.getSensorLimits() + "\u001B[0m");
 		List<SensorLimits> sensorLimits = sensorLimitsRepository.findAll();
 		assertEquals(sensorMap.size(), sensorLimits.size());
 		assertEquals(sensorLimits.size(), sensorStation.getSensorLimits().size());
 		assertEquals(sensorLimits, sensorStation.getSensorLimits());
+	}
+
+	@Test
+	void deletePictureAdmin() throws Exception {
+		Person person = createUserAndLogin(true);
+		// precondition accessPoint has found and reported at least one sensor station
+		String bdAddress = StringGenerator.macAddress();
+		SensorStation sensorStation = new SensorStation(bdAddress, 4);
+		sensorStationService.save(sensorStation);
+
+		createPicture(sensorStation);
+
+		List<PlantPicture> pictures = plantPictureRepository.findAll();
+		PlantPicture picture1 = pictures.get(0);
+
+		assertEquals(pictures.size(), sensorStation.getPlantPictures().size());
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/delete-sensor-station-picture")
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(person))
+								.param("pictureId", String.valueOf(picture1.getPictureId()))
+								.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
+
+		Optional<SensorStation> maybeSensorStation =
+				sensorStationRepository.findById(sensorStation.getDeviceId());
+		if (maybeSensorStation.isEmpty()) {
+			fail("SensorStation not found");
+		}
+		sensorStation = maybeSensorStation.get();
+		assertEquals(0, sensorStation.getPlantPictures().size());
+	}
+
+	@Test
+	void deleteAllPicturesAdmin() throws Exception {
+		Person person = createUserAndLogin(true);
+		// precondition accessPoint has found and reported at least one sensor station
+		String bdAddress = StringGenerator.macAddress();
+		SensorStation sensorStation = new SensorStation(bdAddress, 4);
+		sensorStationService.save(sensorStation);
+
+		int pictureCount = 10;
+
+		List<PlantPicture> plantPictures = new ArrayList<>();
+		for (int i = 0; i < pictureCount; i++) {
+			try {
+				byte[] imageByte = Base64.decodeBase64(picture);
+				String pictureName = UUID.randomUUID() + ".png";
+				Path path = Paths.get(picturesPath + pictureName);
+				plantPicture = new PlantPicture(sensorStation, pictureName, LocalDateTime.now());
+				plantPictureRepository.save(plantPicture);
+				Files.createDirectories(path.getParent());
+				Files.write(path, imageByte);
+				plantPictures.add(plantPicture);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		sensorStation.setPlantPictures(plantPictures);
+		sensorStationService.save(sensorStation);
+
+		List<PlantPicture> pictures = plantPictureRepository.findAll();
+		assertEquals(pictures.size(), sensorStation.getPlantPictures().size());
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/delete-all-sensor-station-pictures")
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(person))
+								.param("sensorStationId",
+									   String.valueOf(sensorStation.getDeviceId()))
+								.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
+
+		Optional<SensorStation> maybeSensorStation =
+				sensorStationRepository.findById(sensorStation.getDeviceId());
+		if (maybeSensorStation.isEmpty()) {
+			fail("SensorStation not found");
+		}
+		sensorStation = maybeSensorStation.get();
+		assertEquals(0, sensorStation.getPlantPictures().size());
 	}
 }
