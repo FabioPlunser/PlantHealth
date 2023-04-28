@@ -145,7 +145,7 @@
               </td>
             {/each}
             <td class="table-cell">
-              <a href={`/profile?personid=${row.original.personId}`}>
+              <a href={`/profile?personId=${row.original.personId}`}>
                 <!--
                   <Edit class="w-8 " />
                 -->
