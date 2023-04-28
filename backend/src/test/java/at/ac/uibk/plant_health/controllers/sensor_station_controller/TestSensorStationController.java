@@ -225,11 +225,11 @@ public class TestSensorStationController {
 		// precondition sensorStation has at least one sensor
 		Map<String, String> sensorMap = new HashMap<>();
 		sensorMap.put("TEMPERATURE", "°C");
-		//		sensorMap.put("HUMIDITY", "%");
-		//		sensorMap.put("PRESSURE", "hPa");
-		//		sensorMap.put("SOILHUMIDITY", "%");
-		//		sensorMap.put("LIGHTINTENSITY", "lux");
-		//		sensorMap.put("GASPRESSURE", "ppm");
+		sensorMap.put("HUMIDITY", "%");
+		sensorMap.put("PRESSURE", "hPa");
+		sensorMap.put("SOILHUMIDITY", "%");
+		sensorMap.put("LIGHTINTENSITY", "lux");
+		sensorMap.put("GASPRESSURE", "ppm");
 
 		ArrayNode limits = mapper.createArrayNode();
 
@@ -271,5 +271,6 @@ public class TestSensorStationController {
 		List<SensorLimits> sensorLimits = sensorLimitsRepository.findAll();
 		assertEquals(sensorMap.size(), sensorLimits.size());
 		assertEquals(sensorLimits.size(), sensorStation.getSensorLimits().size());
+		assertEquals(sensorLimits, sensorStation.getSensorLimits());
 	}
 }

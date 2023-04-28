@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -58,6 +60,7 @@ public class SensorLimits implements Serializable {
 	private Sensor sensor;
 
 	@JsonIgnore
+	@Fetch(FetchMode.SELECT)
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "gardener_id", nullable = false)
 	private Person gardener;

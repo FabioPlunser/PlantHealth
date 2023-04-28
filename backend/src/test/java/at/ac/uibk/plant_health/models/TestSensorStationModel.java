@@ -2,6 +2,8 @@ package at.ac.uibk.plant_health.models;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.mysql.cj.x.protobuf.MysqlxDatatypes;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -73,8 +75,8 @@ public class TestSensorStationModel {
 		sensorMap.put("GASPRESSURE", "ppm");
 
 		Person person = createUserAndLogin(true);
-
-		SensorStation sensorStation = new SensorStation("48-42", 255);
+		String bdAddress = StringGenerator.macAddress();
+		SensorStation sensorStation = new SensorStation(bdAddress, 255);
 		sensorStationRepository.save(sensorStation);
 
 		for (int i = 0; i < sensorMap.size(); i++) {
@@ -82,7 +84,7 @@ public class TestSensorStationModel {
 					sensorMap.keySet().toArray()[i].toString(),
 					sensorMap.values().toArray()[i].toString()
 			);
-			sensorRepository.save(sensor);
+			if (!sensorRepository.findAll().contains(sensor)) sensorRepository.save(sensor);
 		}
 
 		List<SensorLimits> sensorLimitsList = new ArrayList<>();
@@ -109,7 +111,6 @@ public class TestSensorStationModel {
 		assertEquals(
 				sensorStation, sensorStationRepository.findById(sensorStation.getDeviceId()).get()
 		);
-		System.out.println(sensorStation.getSensorLimits());
 		assertEquals(sensorMap.size(), sensorStation.getSensorLimits().size());
 	}
 }
