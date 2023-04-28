@@ -55,6 +55,13 @@ class Notification {
 			}
 			return *this;
 		}
+
+		struct NotificationLessComparator {
+				bool
+				operator()(const Notification * fst, const Notification * snd) {
+					return *fst < *snd;
+				}
+		};
 };
 
 #endif

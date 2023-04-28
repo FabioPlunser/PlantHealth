@@ -10,7 +10,10 @@
 
 class NotificationQueue {
 	private:
-		std::priority_queue<Notification *> queue;
+		std::priority_queue<
+			const Notification *, std::vector<const Notification *>,
+			Notification::NotificationLessComparator>
+			queue;
 		NotificationQueue() {}
 
 	public:
@@ -33,8 +36,7 @@ class NotificationQueue {
 					queueElement = new SensorError(
 						*static_cast<SensorError *>(&notification)
 					);
-					// TODO: Check if this does not result in an error on
-					// casting to be absolutely shure.
+					// TODO: Test if all the values get sett accordingly.
 					break;
 
 				default:
@@ -45,12 +47,12 @@ class NotificationQueue {
 			return *queue.top();
 		}
 
-		const Notification & getPrioritisedHighestPriorityNotification() const {
+		const Notification & getPrioritisedNotification() const {
 			return *queue.top();
 		}
 
-		const Notification removePrioritisedHighestPriorityNotification() {
-			Notification * notificationToDelete = queue.top();
+		const Notification removePrioritisedNotification() {
+			const Notification * notificationToDelete = queue.top();
 			queue.pop();
 			Notification notificationToReturn = *notificationToDelete;
 			delete (notificationToDelete);
@@ -59,7 +61,7 @@ class NotificationQueue {
 
 		void clearAllErrors() {
 			while (!queue.empty()) {
-				removePrioritisedHighestPriorityNotification();
+				removePrioritisedNotification();
 			}
 		}
 
@@ -72,7 +74,7 @@ class NotificationQueue {
 		 */
 		uint8_t deleteErrorFromQueue(Notification & toDelete) {
 			// List to store the values we don't wand to delete.
-			std::list<Notification *> list;
+			std::list<const Notification *> list;
 			uint8_t numDeleted = 0;
 			bool belowPriority = false;
 			/*
@@ -83,7 +85,7 @@ class NotificationQueue {
 			a lower priotiry as the error to delete we know we have deleted
 			all errors of this type.
 			*/
-			while (!belowPriority && queue.size() > 0) {
+			while (!belowPriority && !queue.empty()) {
 				const Notification * topError = queue.top();
 				if (topError->getNotificationType() !=
 					toDelete.getNotificationType()) {
@@ -94,8 +96,9 @@ class NotificationQueue {
 					bool isEqual = false;
 					switch (topError->getNotificationType()) {
 						case Notification::NotificationType::ERROR:
-							isEqual = *static_cast<SensorError *>(topError) ==
-									  *static_cast<SensorError *>(&toDelete);
+							isEqual =
+								*static_cast<const SensorError *>(topError) ==
+								*static_cast<const SensorError *>(&toDelete);
 							break;
 
 						default:
@@ -126,16 +129,17 @@ class NotificationQueue {
 		 */
 		uint8_t deleteErrorFromQueue(SensorErrors::Type errorType) {
 			// List to store the values we don't wand to delete.
-			std::priority_queue<Notification> newQueue;
+			decltype(queue) newQueue;
 			uint8_t numDeleted = 0;
-			while (queue.size() > 0) {
-				const Notification & topNotification = queue.top();
-				if (topNotification.getNotificationType() ==
+			while (!queue.empty()) {
+				const Notification * topNotification = queue.top();
+				if (topNotification->getNotificationType() ==
 					Notification::ERROR) {
 					const SensorError * topError =
-						static_cast<const SensorError *>(&topNotification);
+						static_cast<const SensorError *>(topNotification);
 					if (topError->getErrorType() == errorType) {
 						numDeleted++;
+						delete (topError);
 					} else {
 						newQueue.push(topNotification);
 					}
