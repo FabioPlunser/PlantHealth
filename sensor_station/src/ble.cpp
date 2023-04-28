@@ -280,7 +280,7 @@ using namespace std;
 BLEService arduino_info_service("dea07cc4-d084-11ed-a760-325096b39f47");
 
 BLECharacteristic
-	battery_level_status_characteristic("2BED", BLERead | BLEIndicate, 1);
+	battery_level_status_characteristic("2BED", BLERead | BLEIndicate, 4);
 BLECharacteristic dip_switch_id_characteristic("2A9A", BLERead | BLENotify, 1);
 BLECharacteristic
 	sensor_station_unlocked_characteristic("2AE2", BLERead | BLEWrite, 1);
@@ -477,9 +477,11 @@ void set_sensor_data(sensor_data_t sensor_data) {
 	clear_sensor_data_read_flag();
 }
 
-void set_battery_level_status(battery_level_status_t battery_level_status) {
-	uint8_t value = 0;
-	battery_level_status_characteristic.writeValue(value);
+void set_battery_level_status(
+	uint8_t flags, uint16_t power_state, uint8_t battery_level
+) {
+	uint32_t batteyStatus = (battery_level << 24) + (power_state << 8) + flags;
+	battery_level_status_characteristic.writeValue(batteyStatus);
 }
 
 void set_sensorstation_id(uint8_t id) {
