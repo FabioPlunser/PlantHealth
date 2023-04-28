@@ -1,25 +1,24 @@
 #ifndef ERROR_HANDLER_CLASS
 #define ERROR_HANDLER_CLASS
 
-#include "ErrorLedHandler.cpp"
-#include "ErrorQueue.cpp"
+#include "../../include/Defines.h"
+#include "LedController.cpp"
+#include "NotificationQueue.cpp"
 #include "SensorError.cpp"
 #include "SensorErrors.h"
 
-#include <Defines.h>
-
-class ErrorHandler {
+class NotificationHandler {
 	private:
-		ErrorQueue * errorQueue;
-		ErrorLedHandler * ledHandler;
+		NotificationQueue * notificationQueue;
+		LedHandler * ledHandler;
 
-		ErrorHandler(
+		NotificationHandler(
 			uint8_t ledPinRed, uint8_t ledPinGreen, uint8_t ledPinBlue
 		) {
-			errorQueue = &ErrorQueue::getErrorQueue();
-			ledHandler = &ErrorLedHandler::getErrorLedHandler(
-				ledPinRed, ledPinGreen, ledPinBlue
-			);
+			notificationQueue = &NotificationQueue::getNotificationQueue();
+			ledHandler		  = &LedHandler::getErrorLedHandler(
+				   ledPinRed, ledPinGreen, ledPinBlue
+			   );
 		}
 
 		struct LedErrorParameter {
@@ -32,15 +31,16 @@ class ErrorHandler {
 		} ledErrorParam = {0};
 
 	public:
-		static ErrorHandler & getErrorHandler(
+		static NotificationHandler & getErrorHandler(
 			uint8_t ledPinRed, uint8_t ledPinGreen, uint8_t ledPinBlue
 		) {
-			static ErrorHandler errorHandler(
+			static NotificationHandler errorHandler(
 				ledPinRed, ledPinGreen, ledPinBlue
 			);
 			return errorHandler;
 		}
 
+	public:
 		void addErrorCode(
 			SensorErrors::Type errorType, SensorErrors::Status errorStatus
 		) {
@@ -80,7 +80,7 @@ class ErrorHandler {
 					break;
 			}
 			SensorError error(errorType, errorStatus, priority);
-			errorQueue->addError(error);
+			notificationQueue->addError(error);
 		}
 };
 

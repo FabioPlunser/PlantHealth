@@ -2,6 +2,7 @@
 #define PIEZO_BUZZER_TEST_CLASS
 
 #include <Arduino.h>
+#include <Defines.h>
 
 class PiezoBuzzerTest {
 	private:

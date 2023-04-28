@@ -6,7 +6,7 @@
 #include <queue>
 #include <stdlib.h>
 
-class ErrorLedHandler {
+class LedHandler {
 	private:
 		uint8_t pinRed;
 		uint8_t pinGreen;
@@ -26,7 +26,7 @@ class ErrorLedHandler {
 		bool isOn					 = false;
 		bool isFinished				 = true;
 
-		ErrorLedHandler(uint8_t pinRed, uint8_t pinGreen, uint8_t pinBlue) {
+		LedHandler(uint8_t pinRed, uint8_t pinGreen, uint8_t pinBlue) {
 			this->pinRed   = pinRed;
 			this->pinGreen = pinGreen;
 			this->pinBlue  = pinBlue;
@@ -37,14 +37,14 @@ class ErrorLedHandler {
 		}
 
 	public:
-		ErrorLedHandler & operator=(ErrorLedHandler &) = delete;
-		ErrorLedHandler(ErrorLedHandler &)			   = delete;
+		LedHandler & operator=(LedHandler &) = delete;
+		LedHandler(LedHandler &)			 = delete;
 
-		static ErrorLedHandler & getErrorLedHandler(
+		static LedHandler & getErrorLedHandler(
 
 			uint8_t pinRed, uint8_t pinGreen, uint8_t pinBlue
 		) {
-			static ErrorLedHandler errorClass(pinRed, pinGreen, pinBlue);
+			static LedHandler errorClass(pinRed, pinGreen, pinBlue);
 			return errorClass;
 		}
 

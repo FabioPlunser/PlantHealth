@@ -1,6 +1,5 @@
-#include "../Defines.h"
-
 #include <Arduino.h>
+#include <Defines.h>
 
 class PhototransistorClass {
 	private:

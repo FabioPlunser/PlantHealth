@@ -1,10 +1,9 @@
 #ifndef AIR_SENSOR_TEST_CLASS
 #define AIR_SENSOR_TEST_CLASS
 
-#include "../Defines.h"
-
 #include <Adafruit_BME680.h>
 #include <Arduino.h>
+#include <Defines.h>
 
 #define SET_IF_NOT_NULL(x, y) \
 	if (x != NULL) {          \

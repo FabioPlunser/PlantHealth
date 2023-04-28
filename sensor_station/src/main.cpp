@@ -1,9 +1,9 @@
 
-#include "Defines.h"
+#include <Defines.h>
 
 #ifdef DO_MAIN
 
-#include "../lib/ErrorHandler/SensorErrors.h"
+#include "../lib/NotificationHandler/SensorErrors.h"
 #include "SensorClasses/AirSensor.cpp"
 #include "SensorClasses/DipSwitch.cpp"
 #include "SensorClasses/Hydrometer.cpp"
@@ -54,9 +54,9 @@ void setup() {
 	initialize_communication();
 	enable_pairing_mode();
 
-	while (!Serial) {
-		delay(50);
-	}
+	// while (!Serial) {
+	// 	delay(50);
+	// }
 
 	delay(1000);
 }

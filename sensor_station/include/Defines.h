@@ -51,18 +51,26 @@
 	If 2 errors have the same priority only one will be displayed. Which one it
    is is undefined. Highest number means highest priority.
 */
-#define AIR_HUMIDITY_TO_HIGH_PRIORITY	 0
-#define AIR_HUMIDITY_TO_LOW_PRIORITY	 0
-#define AIR_TEMPERATURE_TO_HIGH_PRIORITY 0
-#define AIR_TEMPERATURE_TO_LOW_PRIORITY	 0
-#define AIR_PRESSURE_TO_HIGH_PRIORITY	 0
-#define AIR_PRESSURE_TO_LOW_PRIORITY	 0
-#define AIR_QUALITY_TO_HIGH_PRIORITY	 0
-#define AIR_QUALITY_TO_LOW_PRIORITY		 0
-#define SOIL_HUMIDITY_TO_HIGH_PRIORITY	 0
-#define SOIL_HUMIDITY_TO_LOW_PRIORITY	 0
-#define LUMINOSITY_TO_HIGH_PRIORITY		 0
-#define LUMINOSITY_TO_LOW_PRIORITY		 0
+#define AIR_QUALITY_TO_HIGH_PRIORITY	 6'1
+#define AIR_QUALITY_TO_LOW_PRIORITY		 6'0
+#define SOIL_HUMIDITY_TO_HIGH_PRIORITY	 5'1
+#define SOIL_HUMIDITY_TO_LOW_PRIORITY	 5'0
+#define AIR_TEMPERATURE_TO_HIGH_PRIORITY 4'1
+#define AIR_TEMPERATURE_TO_LOW_PRIORITY	 4'0
+#define LUMINOSITY_TO_HIGH_PRIORITY		 3'1
+#define LUMINOSITY_TO_LOW_PRIORITY		 3'0
+#define AIR_HUMIDITY_TO_HIGH_PRIORITY	 2'1
+#define AIR_HUMIDITY_TO_LOW_PRIORITY	 2'0
+#define AIR_PRESSURE_TO_HIGH_PRIORITY	 1'1
+#define AIR_PRESSURE_TO_LOW_PRIORITY	 1'0
+
+/*
+	This section of priorities will bind stronger than the Sensor errors.
+	If PIORITY_ERRORS is lower than PRIORITY_NOTIFICATIONS then the notification
+   will allways be displayed first.
+*/
+#define PRIORITY_ERRORS					 0
+#define PRIORITY_NOTIFICATIONS			 1
 
 // Mapping of the arduino pin connections
 #define PIN_PHOTOTRANSISTOR				 A0

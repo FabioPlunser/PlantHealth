@@ -1,9 +1,8 @@
 #ifndef HYDROMETER_TEST_CLASS
 #define HYDROMETER_TEST_CLASS
 
-#include "../Defines.h"
-
 #include <Arduino.h>
+#include <Defines.h>
 
 class HydrometerTest {
 	private:

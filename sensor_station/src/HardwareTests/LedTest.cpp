@@ -2,6 +2,7 @@
 #define LED_TEST_CLASS
 
 #include <Arduino.h>
+#include <Defines.h>
 #include <math.h>
 
 class LedTest {

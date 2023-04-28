@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Defines.h>
 
 class DipSwitchClass {
 	private:
