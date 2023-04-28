@@ -2,7 +2,6 @@
   import type { PageData, ActionData } from "./$types";
   import toast from "$components/toast";
   import AddUserModal from "./AddUserModal.svelte";
-  import EditUserModal from "./EditUserModal.svelte";
   import UsersTable from "./UsersTable.svelte";
 
   export let data: PageData;
@@ -28,5 +27,5 @@
   on:click={() => (addUserModal = true)}>Add User</btn
 >
 <div class="flex justify-center">
-  <UsersTable bind:users={data.users} bind:selectedUser />
+  <UsersTable bind:users={data.users} />
 </div>

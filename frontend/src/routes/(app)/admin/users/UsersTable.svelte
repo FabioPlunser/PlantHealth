@@ -24,7 +24,6 @@
   };
 
   export let users: User[];
-  export let selectedUser: User;
 
   const defaultColumns: ColumnDef<User>[] = [
     {
@@ -156,12 +155,8 @@
               <div>
                 <label class="button">
                   <!-- TODO make delete user action with verification Modal-->
-                  <button
-                    on:click={() => {
-                      selectedUser = row.original;
-                    }}
-                    class=""
-                  >
+                  <!--on click should call deleteUser action and pass personId somehow -->
+                  <button on:click={() => {}} class="">
                     <i class="bi bi-trash text-3xl hover:text-red-500" />
                   </button>
                 </label>

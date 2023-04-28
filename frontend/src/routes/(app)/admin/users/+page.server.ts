@@ -3,7 +3,7 @@ import { BACKEND_URL } from "$env/static/private";
 import { fail, redirect, error } from "@sveltejs/kit";
 import { z } from "zod";
 
-export const load = (async ({ fetch }) => {
+(async ({ fetch }) => {
   let res = await fetch(`http://${BACKEND_URL}/get-all-users`);
   let res_json = await res.json();
   if (res?.ok) {
@@ -71,6 +71,10 @@ export const actions = {
 
     let res = await fetch(`http://${BACKEND_URL}/create-user`, requestOptions);
     res = await res.json();
+
+    if (res.success) {
+      // throw redirect(302, "/");
+    }
   },
 
   deleteUser: async ({ fetch, event }) => {
