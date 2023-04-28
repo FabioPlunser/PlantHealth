@@ -14,6 +14,7 @@
   import SortSymbol from "./SortSymbol.svelte";
   import type { NodeJS } from "node:types";
   import Input from "$lib/components/ui/Input.svelte";
+  import { page } from "$app/stores";
 
   type User = {
     username: string;
@@ -144,10 +145,9 @@
               </td>
             {/each}
             <td class="table-cell">
-              <a href={`/profile?personId=${row.original.personId}`}>
-                <!--
-                  <Edit class="w-8 " />
-                -->
+              <a
+                href={`/profile?personId=${row.original.personId}&source=${$page.url}`}
+              >
                 <i class="bi bi-pencil-square text-3xl hover:text-gray-500" />
               </a>
             </td>
@@ -155,7 +155,7 @@
               <div>
                 <label class="button">
                   <!-- TODO make delete user action with verification Modal-->
-                  <!--on click should call deleteUser action and pass personId somehow -->
+                  <!--on click should call deleteUser action and pass Id-->
                   <button on:click={() => {}} class="">
                     <i class="bi bi-trash text-3xl hover:text-red-500" />
                   </button>

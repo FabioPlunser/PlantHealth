@@ -2,7 +2,6 @@
   import { enhance } from "$app/forms";
   import FormError from "$helper/formError.svelte";
   import Input from "$components/ui/Input.svelte";
-  import CheckRing from "$lib/assets/icons/checkRing.svg?component";
   import BooleanButton from "$lib/components/ui/BooleanButton.svelte";
   import toast from "$components/toast";
   import PasswordInput from "$lib/components/ui/PasswordInput.svelte";
@@ -59,8 +58,6 @@
           value={password}
         />
 
-        <!-- TODO implement propper user logic in profile (can not see password) add password confirm-->
-
         <FormError field="password" {form} />
 
         <PasswordInput
@@ -89,8 +86,10 @@
           <button
             type="submit"
             class="btn btn-primary"
-            in:slide={{ duration: 400, axis: "x" }}>submit</button
+            in:slide={{ duration: 400, axis: "x" }}
           >
+            submit
+          </button>
         </div>
       </div>
     </form>

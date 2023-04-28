@@ -1,10 +1,14 @@
-import type { Actions } from "./$types";
-import { fail } from "@sveltejs/kit";
+import type { Actions, PageServerLoad } from "./$types";
+import { fail, redirect } from "@sveltejs/kit";
 import { BACKEND_URL } from "$env/static/private";
 import { z } from "zod";
-import { noop } from "svelte/internal";
-export async function load({ url, fetch, locals }) {
+
+let personId: string;
+let source: string;
+
+export const load = (async ({ url, fetch, locals }) => {
   personId = url.searchParams.get("personId") ?? locals.user.personId;
+  source = url.searchParams.get("source") ?? "";
 
   let canActiveUserChangeRoles: boolean =
     locals.user.permissions.includes("ADMIN") &&
@@ -24,7 +28,8 @@ export async function load({ url, fetch, locals }) {
     // TODO: fetch admin get-all-permissions
     let allPermissions = ["USER", "GARDENER", "ADMIN"];
     allPermissions.forEach((permission) => {
-      userPermissions[permission] = user.permissions.includes(permission);
+      userPermissions[permission.toLowerCase()] =
+        user.permissions.includes(permission);
     });
   } else {
     user.permissions.forEach((permission) => {
@@ -36,17 +41,9 @@ export async function load({ url, fetch, locals }) {
     email: user.email,
     permissions: userPermissions,
     canActiveUserChangeRoles,
+    source,
   };
-}
-
-/*
- * In FormData the permissions will have the following shape if selected in the form:
- * { name: 'permission[PERMISSION]', value: 'on' }
- * in order to access this permission and add it to the permissions array we use this regex.
- */
-const permissionRegex = /\[(.*?)\]/;
-
-let personId: string;
+}) satisfies PageServerLoad;
 
 const schema = z.object({
   username: z
@@ -70,6 +67,13 @@ const schema = z.object({
     .trim(),
 });
 
+/*
+ * In FormData the permissions will have the following shape if selected in the form:
+ * { name: 'permission[PERMISSION]', value: 'on' }
+ * in order to access this PERMISSION and add it to the permissions array this regex is used.
+ */
+const permissionRegex = /\[(.*?)\]/;
+
 export const actions = {
   updateUser: async ({ request, fetch }) => {
     const formData = await request.formData();
@@ -92,7 +96,9 @@ export const actions = {
     }
 
     let permissions: string[] = [];
-    /* For every permission BooleanButton parse the name to find which Permission it represents
+
+    /*
+     * For every permission BooleanButton in the form, parse the name to find which Permission it represents
      * and add it to the permissions array
      */
     formData.forEach((value, key) => {
@@ -114,13 +120,13 @@ export const actions = {
         permissions,
       }),
     };
+
     console.log(requestOptions);
 
     let res = await fetch(`http://${BACKEND_URL}/update-user`, requestOptions);
     res = await res.json();
-
-    if (res.success) {
-      // throw redirect(302, "/");
+    if (source) {
+      throw redirect(307, source);
     }
   },
 } satisfies Actions;
