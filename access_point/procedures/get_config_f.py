@@ -34,7 +34,8 @@ def update_limits(sensor_station_info: list[dict]) -> None:
     for st in sensor_station_info:
         address = st.get('address')
         sensors = st.get('sensors', [])
-        log.info(f'Updating limits for sensor station {address}')
+        if sensors:
+            log.info(f'Updating limits for sensor station {address}')
         for sensor in sensors:
             # update limits for each sensor
             log.info(f'Adjusting limits for sensor {sensor.get("sensor_name")}')
