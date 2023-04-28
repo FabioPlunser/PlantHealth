@@ -298,7 +298,6 @@ class SensorStation:
             except ReadError as e:
                 # ignore read errors on sensor data -> skip over currently unreadable sensor values
                 log.info(f'Unable to read value of sensor {sensor.name} on sensor station {self.address}: {e}')
-                pass
         return values
     
     @property
