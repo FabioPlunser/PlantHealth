@@ -40,7 +40,7 @@ public class Sensor implements Serializable {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Sensor sensor = (Sensor) o;
-		return Objects.equals(sensorId, sensor.sensorId) && Objects.equals(type, sensor.type);
+		return Objects.equals(type, sensor.type);
 	}
 
 	@Override

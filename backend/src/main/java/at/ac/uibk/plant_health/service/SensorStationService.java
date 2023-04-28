@@ -111,7 +111,6 @@ public class SensorStationService {
 				picturesBase64.add(base64);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			return null;
 		}
 
@@ -138,7 +137,6 @@ public class SensorStationService {
 			Files.createDirectories(path.getParent());
 			Files.write(path, imageByte);
 		} catch (Exception e) {
-			e.printStackTrace();
 			return false;
 		}
 		plantPictureRepository.save(plantPicture);
@@ -154,6 +152,7 @@ public class SensorStationService {
 	 * @param sensorStationId
 	 * @return
 	 */
+	// @Transactional
 	public void setSensorLimits(
 			List<SensorLimits> sensorLimits, UUID sensorStationId, Person person
 	) throws ServiceException {
@@ -161,23 +160,29 @@ public class SensorStationService {
 		if (maybeSensorStation.isEmpty())
 			throw new ServiceException("SensorStation not found", 500);
 		SensorStation sensorStation = maybeSensorStation.get();
-		List<Sensor> possibleSensors = sensorRepository.findAll();
-		for (SensorLimits limits : sensorLimits) {
-			System.out.println(limits.getSensor());
-			if (!possibleSensors.contains(limits.getSensor()))
-				throw new ServiceException("Sensor not found", 500);
-			limits.setGardener(person);
-			limits.setSensorStation(sensorStation);
-			limits.setTimeStamp(LocalDateTime.now());
+		for (SensorLimits limit : sensorLimits) {
+			Optional<Sensor> sensor = sensorRepository.findByType(limit.getSensor().getType());
+			if (sensor.isEmpty())
+				throw new ServiceException(
+						"Sensor " + limit.getSensor().getType() + " not found", 500
+				);
+			limit.setSensor(sensor.get());
+			limit.setGardener(person);
+			limit.setSensorStation(sensorStation);
+			limit.setTimeStamp(LocalDateTime.now());
+			sensorLimitsRepository.save(limit);
+			//			sensorStation.addSensorLimit(limit);
+			//			save(sensorStation);
 		}
-		sensorLimitsRepository.saveAll(sensorLimits);
-		sensorStation.setSensorLimits(sensorLimits);
-		save(sensorStation);
-	}
 
-	public boolean setTransferInterval(int transferInterval) {
-		// TODO
-		return false;
+		Optional<SensorStation> maybeSensorStation2 = findById(sensorStationId);
+		if (maybeSensorStation2.isEmpty())
+			throw new ServiceException("SensorStation not found", 500);
+		SensorStation sensorStation2 = maybeSensorStation2.get();
+		System.out.println(
+				"\u001B[33m"
+				+ "SensorLimitService" + sensorStation.getSensorLimits() + "\u001B[0m"
+		);
 	}
 
 	public boolean deletePicture(PlantPicture plantPicture) {
