@@ -1,7 +1,7 @@
 <script lang="ts">
   export let field: string = "";
-  export let label: string = "Password";
-  export let placeholder: string = "Password";
+  export let label: string = "";
+  export let placeholder: string = "";
   export let value: string = "";
 
   let ispasswordHidden: boolean = true;
@@ -12,7 +12,7 @@
 </script>
 
 <div>
-  <label for="password" class="label">
+  <label class="label">
     <span class="label-text font-bold">{label}</span>
   </label>
   <!-- it seems like the focus properties of input input-bordered do not translate to a div... therefore I had to imitate the behaviour-->
@@ -24,7 +24,6 @@
   >
     <div class="flex-grow flex">
       <input
-        id="password"
         {value}
         name={field}
         type={inputType}
@@ -35,11 +34,11 @@
     <div class="flex-shrink">
       <input
         type="checkbox"
-        id="eye"
+        id={label}
         bind:checked={ispasswordHidden}
         class="hidden"
       />
-      <label for="eye" class="label text-gray-400 hover:underline">
+      <label for={label} class="label text-gray-400 hover:underline">
         {#if ispasswordHidden}
           show
         {:else}
