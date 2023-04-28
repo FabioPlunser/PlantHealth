@@ -2,14 +2,11 @@ import type { Actions, PageServerLoad } from "./$types";
 import { fail, redirect } from "@sveltejs/kit";
 import { BACKEND_URL } from "$env/static/private";
 import { z } from "zod";
-import { applyAction } from "$app/forms";
 
 let personId: string;
-let source: string | null;
 
 export const load = (async ({ url, fetch, locals }) => {
   personId = url.searchParams.get("personId") ?? locals.user.personId;
-  source = url.searchParams.get("source");
 
   let canActiveUserChangeRoles: boolean =
     locals.user.permissions.includes("ADMIN") &&
@@ -26,7 +23,7 @@ export const load = (async ({ url, fetch, locals }) => {
   };
 
   if (canActiveUserChangeRoles) {
-    fetch(`http://${BACKEND_URL}/get-all-permissions`)
+    await fetch(`http://${BACKEND_URL}/get-all-permissions`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(response.statusText);
@@ -38,7 +35,6 @@ export const load = (async ({ url, fetch, locals }) => {
           userPermissions[permission.toLowerCase()] =
             user.permissions.includes(permission);
         });
-        console.log(userPermissions);
       })
       .catch((error) => {
         console.error("Error fetching /get-all-permissions", error);
@@ -48,12 +44,12 @@ export const load = (async ({ url, fetch, locals }) => {
       userPermissions[permission.toLowerCase()] = true;
     });
   }
+
   return {
     username: user.username,
     email: user.email,
     permissions: userPermissions,
     canActiveUserChangeRoles,
-    source,
   };
 }) satisfies PageServerLoad;
 
@@ -87,7 +83,7 @@ const schema = z.object({
 const permissionRegex = /\[(.*?)\]/;
 
 export const actions = {
-  updateUser: async ({ request, fetch }) => {
+  updateUser: async ({ url, request, fetch }) => {
     const formData = await request.formData();
     const zodData = schema.safeParse(Object.fromEntries(formData));
 
@@ -107,12 +103,11 @@ export const actions = {
       return fail(400, { error: true, errors });
     }
 
-    let permissions: string[] = [];
-
     /*
      * For every permission BooleanButton in the form, parse the name to find which Permission it represents
      * and add it to the permissions array
      */
+    let permissions: string[] = [];
     formData.forEach((value, key) => {
       if (key.includes("permission[")) {
         let match = key.match(permissionRegex);
@@ -133,12 +128,21 @@ export const actions = {
       }),
     };
 
-    console.log(requestOptions);
-
-    let res = await fetch(`http://${BACKEND_URL}/update-user`, requestOptions);
-    res = await res.json();
-    if (res.ok && source !== null) {
-      throw redirect(307, source);
-    }
+    await fetch(`http://${BACKEND_URL}/update-user`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        let source = url.searchParams.get("personId");
+        if (source !== null) {
+          throw redirect(307, source);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching /get-all-permissions", error);
+      });
   },
 } satisfies Actions;
