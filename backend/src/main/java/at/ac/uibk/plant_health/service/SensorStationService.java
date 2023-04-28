@@ -111,7 +111,6 @@ public class SensorStationService {
 				picturesBase64.add(base64);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			return null;
 		}
 
@@ -138,7 +137,6 @@ public class SensorStationService {
 			Files.createDirectories(path.getParent());
 			Files.write(path, imageByte);
 		} catch (Exception e) {
-			e.printStackTrace();
 			return false;
 		}
 		plantPictureRepository.save(plantPicture);
