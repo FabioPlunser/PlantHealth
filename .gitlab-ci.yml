@@ -2,7 +2,7 @@ stages:          # List of stages for jobs, and their order of execution
   - test
   - sonarqube-check
 
-unit-test-job:   # This jobs runs the unit tests and measures coverage
+unit-test-job:   # This job runs the unit tests and measures coverage
   stage: test    
   image:
     name: alpine:3.17
@@ -19,7 +19,7 @@ unit-test-job:   # This jobs runs the unit tests and measures coverage
     - coverage run
     - coverage xml
 
-sonarqube-check-job:
+sonarqube-check-job:  # This job triggers the sonar check
   stage: sonarqube-check
   image:
     name: sonarsource/sonar-scanner-cli:4.7
