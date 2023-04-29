@@ -15,7 +15,7 @@ class NotificationHandler {
 		NotificationHandler(
 			uint8_t ledPinRed, uint8_t ledPinGreen, uint8_t ledPinBlue
 		) {
-			notificationQueue = &NotificationQueue::getNotificationQueue();
+			notificationQueue = NotificationQueue::getNotificationQueue();
 			ledHandler		  = &LedHandler::getErrorLedHandler(
 				   ledPinRed, ledPinGreen, ledPinBlue
 			   );

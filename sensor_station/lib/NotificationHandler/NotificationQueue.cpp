@@ -20,9 +20,9 @@ class NotificationQueue {
 		NotificationQueue & operator=(NotificationQueue &) = delete;
 		NotificationQueue(NotificationQueue &)			   = delete;
 
-		static NotificationQueue & getNotificationQueue() {
+		static NotificationQueue * getNotificationQueue() {
 			static NotificationQueue notificationQueue;
-			return notificationQueue;
+			return &notificationQueue;
 		}
 
 	public:
@@ -47,23 +47,24 @@ class NotificationQueue {
 			return *queue.top();
 		}
 
-		const Notification & getPrioritisedNotification() const {
-			return *queue.top();
+		const Notification * getPrioritisedNotification() const {
+			return queue.top();
 		}
 
-		const Notification removePrioritisedNotification() {
+		void deletePrioritisedNotification() {
 			const Notification * notificationToDelete = queue.top();
 			queue.pop();
-			Notification notificationToReturn = *notificationToDelete;
 			delete (notificationToDelete);
-			return notificationToReturn;
+			return;
 		}
 
 		void clearAllErrors() {
 			while (!queue.empty()) {
-				removePrioritisedNotification();
+				deletePrioritisedNotification();
 			}
 		}
+
+		uint8_t getSize() { return queue.size(); }
 
 		/**
 		 * Deletes all errors that are the same as toDelete in the error queue
@@ -143,7 +144,6 @@ class NotificationQueue {
 					} else {
 						newQueue.push(topNotification);
 					}
-
 				} else {
 					newQueue.push(topNotification);
 				}

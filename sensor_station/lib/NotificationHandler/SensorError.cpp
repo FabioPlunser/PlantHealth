@@ -23,6 +23,7 @@ class SensorError : public Notification {
 		}
 
 		SensorErrors::Type getErrorType() const { return this->type; }
+		SensorErrors::Status getErrorStatus() const { return this->status; }
 
 		bool operator==(const SensorError & other) const {
 			return Notification::operator==(other) &&
