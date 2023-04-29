@@ -25,6 +25,7 @@ class LedHandler {
 		unsigned long prevChangeTime = 0;
 		bool isOn					 = false;
 		bool isFinished				 = true;
+		bool isEnabled				 = true;
 
 		LedHandler(uint8_t pinRed, uint8_t pinGreen, uint8_t pinBlue) {
 			this->pinRed   = pinRed;
@@ -40,12 +41,10 @@ class LedHandler {
 		LedHandler & operator=(LedHandler &) = delete;
 		LedHandler(LedHandler &)			 = delete;
 
-		static LedHandler & getErrorLedHandler(
-
-			uint8_t pinRed, uint8_t pinGreen, uint8_t pinBlue
-		) {
-			static LedHandler errorClass(pinRed, pinGreen, pinBlue);
-			return errorClass;
+		static LedHandler *
+		getLedHandler(uint8_t pinRed, uint8_t pinGreen, uint8_t pinBlue) {
+			static LedHandler ledHandler(pinRed, pinGreen, pinBlue);
+			return &ledHandler;
 		}
 
 	private:
@@ -69,6 +68,13 @@ class LedHandler {
 		void toggleLEDStatus() { setLEDStatus(!this->isOn); }
 
 	public:
+		void enable() { this->isEnabled = true; }
+
+		void diable() {
+			this->isEnabled = false;
+			setLEDStatus(false);
+		}
+
 		void setErrorProperties(
 			uint8_t valueRed, uint8_t valueGreen, uint8_t valueBlue,
 			uint16_t * durationOn, uint16_t * durationOff, uint8_t durationSize,
@@ -99,7 +105,7 @@ class LedHandler {
 		}
 
 		uint16_t updateLEDStatus() {
-			if (isFinished) {
+			if (isFinished || !isEnabled) {
 				return 0;
 			}
 			uint16_t remainingTime = getMsTillNext();

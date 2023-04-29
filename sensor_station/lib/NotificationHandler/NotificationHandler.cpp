@@ -7,18 +7,24 @@
 #include "SensorError.cpp"
 #include "SensorErrors.h"
 
+#define CAST_NOTIFICATION_TO_SENSOR_ERROR(notification, varName) \
+	assert(                                                      \
+		notification->getNotificationType() ==                   \
+		Notification::NotificationType::ERROR                    \
+	);                                                           \
+	varName = static_cast<const SensorError *>(notification);
+
 class NotificationHandler {
 	private:
 		NotificationQueue * notificationQueue;
-		LedHandler * ledHandler;
+		LedHandler * ledConstroller;
 
 		NotificationHandler(
 			uint8_t ledPinRed, uint8_t ledPinGreen, uint8_t ledPinBlue
 		) {
 			notificationQueue = NotificationQueue::getNotificationQueue();
-			ledHandler		  = &LedHandler::getErrorLedHandler(
-				   ledPinRed, ledPinGreen, ledPinBlue
-			   );
+			ledConstroller =
+				LedHandler::getLedHandler(ledPinRed, ledPinGreen, ledPinBlue);
 		}
 
 		struct LedErrorParameter {
@@ -28,6 +34,7 @@ class NotificationHandler {
 				uint8_t rgbColorRed;
 				uint8_t rgbColorGreen;
 				uint8_t rgbColorBlue;
+				bool loopError;
 		} ledErrorParam = {0};
 
 	public:
@@ -44,7 +51,7 @@ class NotificationHandler {
 		void addErrorCode(
 			SensorErrors::Type errorType, SensorErrors::Status errorStatus
 		) {
-			int priority = -1;
+			int priority = 0;
 			switch (errorType) {
 				case SensorErrors::Type::AirHumidityError:
 					priority = errorStatus == SensorErrors::Status::High
