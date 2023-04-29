@@ -85,7 +85,7 @@
 	If PIORITY_ERRORS is lower than PRIORITY_NOTIFICATIONS then the notification
    will allways be displayed first.
 */
-#define PRIORITY_ERRORS					 0
+#define PRIORITY_SENSOR_ERRORS			 0
 #define PRIORITY_NOTIFICATIONS			 1
 
 // Mapping of the arduino pin connections

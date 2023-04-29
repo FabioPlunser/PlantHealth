@@ -34,7 +34,7 @@
 #define CAST_NOTIFICATION_TO_SENSOR_ERROR(notification, varName) \
 	assert(                                                      \
 		notification->getNotificationType() ==                   \
-		Notification::NotificationType::ERROR                    \
+		Notification::NotificationType::SENSOR_ERROR             \
 	);                                                           \
 	varName = static_cast<const SensorError *>(notification);
 

@@ -7,11 +7,12 @@
 #include "SensorError.cpp"
 #include "SensorErrors.h"
 
+#define CHECK_IF_CASTABLE_TO_SENSOR_ERROR(notification) \
+	(notification->getNotificationType() ==             \
+	 Notification::NotificationType::SENSOR_ERROR)
+
 #define CAST_NOTIFICATION_TO_SENSOR_ERROR(notification, varName) \
-	assert(                                                      \
-		notification->getNotificationType() ==                   \
-		Notification::NotificationType::ERROR                    \
-	);                                                           \
+	assert(CHECK_IF_CASTABLE_TO_SENSOR_ERROR(notification));     \
 	varName = static_cast<const SensorError *>(notification);
 
 #define CHECK_VALID_VALUE_VALID(value)                              \
@@ -21,10 +22,15 @@
 		return;                                                     \
 	}
 
+#define DECOMPOSE_HEX_RGB_R(hexval) ((hexval >> 16) & 0xFF)
+#define DECOMPOSE_HEX_RGB_G(hexval) ((hexval >> 8) & 0xFF)
+#define DECOMPOSE_HEX_RGB_B(hexval) (hexval & 0xFF)
+
 class NotificationHandler {
 	private:
 		NotificationQueue * notificationQueue;
 		LedHandler * ledConstroller;
+		const Notification * prevErrorNotification = NULL;
 
 		NotificationHandler(
 			uint8_t ledPinRed, uint8_t ledPinGreen, uint8_t ledPinBlue
@@ -33,16 +39,6 @@ class NotificationHandler {
 			ledConstroller =
 				LedHandler::getLedHandler(ledPinRed, ledPinGreen, ledPinBlue);
 		}
-
-		struct LedErrorParameter {
-				uint16_t * ledOnMs;
-				uint16_t * ledOffMs;
-				uint8_t size;
-				uint8_t rgbColorRed;
-				uint8_t rgbColorGreen;
-				uint8_t rgbColorBlue;
-				bool loopError;
-		} ledErrorParam = {0};
 
 	public:
 		static NotificationHandler & getErrorHandler(
@@ -97,7 +93,107 @@ class NotificationHandler {
 			notificationQueue->addError(error);
 		}
 
+		int16_t setLEDfromNotification(const Notification & notification) {
+			if (prevErrorNotification == &notification) {
+				return ledConstroller->updateLEDStatus();
+			}
+			uint16_t ledOnMs[]	= {LED_TIME_NOTIFICATION_ON_MS};
+			uint16_t ledOffMs[] = {LED_TIME_NOTIFICATION_OFF_MS};
+			uint8_t arraySize	= sizeof(ledOnMs) / sizeof(ledOnMs[0]);
+			uint8_t colorR =
+				DECOMPOSE_HEX_RGB_R(LED_COLOR_NOTIFICATION_PAIRING);
+			uint8_t colorG =
+				DECOMPOSE_HEX_RGB_G(LED_COLOR_NOTIFICATION_PAIRING);
+			uint8_t colorB =
+				DECOMPOSE_HEX_RGB_B(LED_COLOR_NOTIFICATION_PAIRING);
+			bool loop = true;
+			ledConstroller->setErrorProperties(
+				colorR, colorG, colorB, ledOnMs, ledOffMs, arraySize, loop
+			);
+			return ledConstroller->updateLEDStatus();
+		}
+
+		/**
+		 * Will set the corresponding color and tim intervall for the provided
+		 * sensorError.
+		 * @return The time in ms till the next required execution to
+		 * update LED.
+		 */
+		int16_t setLEDfromSensorError(const SensorError & sensorError) {
+			if (prevErrorNotification == &sensorError) {
+				return ledConstroller->updateLEDStatus();
+			}
+			uint32_t colorCode = 0;
+			bool isHigh =
+				sensorError.getErrorStatus() == SensorErrors::Status::High;
+
+			switch (sensorError.getErrorType()) {
+				case SensorErrors::Type::AirHumidityError:
+					colorCode = LED_COLOR_ERROR_AIR_HUMIDITY;
+					break;
+				case SensorErrors::Type::AirPressureError:
+					colorCode = LED_COLOR_ERROR_AIR_PRESSURE;
+					break;
+				case SensorErrors::Type::AirQualityError:
+					colorCode = LED_COLOR_ERROR_AIR_QUALITY;
+					break;
+				case SensorErrors::Type::AirTemperatureError:
+					colorCode = LED_COLOR_ERROR_AIR_TEMPERATURE;
+					break;
+				case SensorErrors::Type::SoilHumidityError:
+					colorCode = LED_COLOR_ERROR_SOIL_HUMIDITY;
+					break;
+				case SensorErrors::Type::LightIntensityError:
+					colorCode = LED_COLOR_ERROR_LIGHT_INTENSITY;
+					break;
+				default:
+					break;
+			}
+
+			std::vector<uint16_t> ledOnMs;
+			std::vector<uint16_t> ledOffMs;
+			if (isHigh) {
+				ledOnMs.push_back(LED_TIME_ERROR_ON_MS);
+				ledOffMs.push_back(LED_TIME_ERROR_BLINK_PAUSE_MS);
+				ledOnMs.push_back(LED_TIME_ERROR_ON_MS);
+				ledOffMs.push_back(LED_TIME_ERROR_OFF_MS);
+			} else {
+				ledOnMs.push_back(LED_TIME_ERROR_ON_MS);
+				ledOffMs.push_back(LED_TIME_ERROR_OFF_MS);
+			}
+			uint8_t colorR = DECOMPOSE_HEX_RGB_R(colorCode);
+			uint8_t colorG = DECOMPOSE_HEX_RGB_G(colorCode);
+			uint8_t colorB = DECOMPOSE_HEX_RGB_B(colorCode);
+			bool loop	   = true;
+			ledConstroller->setErrorProperties(
+				colorR, colorG, colorB, ledOnMs.data(), ledOffMs.data(),
+				ledOnMs.size(), loop
+			);
+			return ledConstroller->updateLEDStatus();
+		}
+
 	public:
+		/**
+		 * @return -1 if no errors are present.\
+		 * @return Otherwise the time till the next required call to update in
+		 * ms
+		 */
+		int32_t update() {
+			if (notificationQueue->getSize() <= 0) {
+				ledConstroller->disable();
+				return -1;
+			}
+			const Notification * topNotification =
+				notificationQueue->getPrioritisedNotification();
+			if (CHECK_IF_CASTABLE_TO_SENSOR_ERROR(topNotification)) {
+				const SensorError * error;
+				CAST_NOTIFICATION_TO_SENSOR_ERROR(topNotification, error);
+				return setLEDfromSensorError(*error);
+			} else {
+				return setLEDfromNotification(*topNotification);
+			}
+		}
+
 		void addNotification(Notification & notification) {
 			notificationQueue->addError(notification);
 		}

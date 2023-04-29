@@ -32,7 +32,7 @@ class NotificationQueue {
 		const Notification & addError(Notification & notification) {
 			Notification * queueElement;
 			switch (notification.getNotificationType()) {
-				case Notification::NotificationType::ERROR:
+				case Notification::NotificationType::SENSOR_ERROR:
 					queueElement = new SensorError(
 						*static_cast<SensorError *>(&notification)
 					);
@@ -96,7 +96,7 @@ class NotificationQueue {
 				} else {
 					bool isEqual = false;
 					switch (topError->getNotificationType()) {
-						case Notification::NotificationType::ERROR:
+						case Notification::NotificationType::SENSOR_ERROR:
 							isEqual =
 								*static_cast<const SensorError *>(topError) ==
 								*static_cast<const SensorError *>(&toDelete);
@@ -135,7 +135,7 @@ class NotificationQueue {
 			while (!queue.empty()) {
 				const Notification * topNotification = queue.top();
 				if (topNotification->getNotificationType() ==
-					Notification::ERROR) {
+					Notification::SENSOR_ERROR) {
 					const SensorError * topError =
 						static_cast<const SensorError *>(topNotification);
 					if (topError->getErrorType() == errorType) {

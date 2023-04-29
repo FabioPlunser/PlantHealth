@@ -9,7 +9,7 @@ class Notification {
 	public:
 		enum NotificationType {
 			NOTIFICATION = PRIORITY_NOTIFICATIONS,
-			ERROR		 = PRIORITY_ERRORS
+			SENSOR_ERROR = PRIORITY_SENSOR_ERRORS
 		};
 
 	protected:

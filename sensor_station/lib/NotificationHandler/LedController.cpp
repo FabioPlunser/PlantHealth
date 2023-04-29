@@ -16,8 +16,8 @@ class LedHandler {
 		uint8_t valueGreen;
 		uint8_t valueBlue;
 
-		uint16_t * durationOn;
-		uint16_t * durationOff;
+		uint16_t * durationOn  = NULL;
+		uint16_t * durationOff = NULL;
 		uint8_t durationSize;
 		bool loopError;
 
@@ -35,6 +35,13 @@ class LedHandler {
 			pinMode(pinGreen, OUTPUT);
 			pinMode(pinBlue, OUTPUT);
 			setLEDStatus(true);
+		}
+
+		~LedHandler() {
+			if (this->durationOn != NULL) {
+				free(this->durationOn);
+				free(this->durationOff);
+			}
 		}
 
 	public:
@@ -67,31 +74,6 @@ class LedHandler {
 
 		void toggleLEDStatus() { setLEDStatus(!this->isOn); }
 
-	public:
-		void enable() { this->isEnabled = true; }
-
-		void diable() {
-			this->isEnabled = false;
-			setLEDStatus(false);
-		}
-
-		void setErrorProperties(
-			uint8_t valueRed, uint8_t valueGreen, uint8_t valueBlue,
-			uint16_t * durationOn, uint16_t * durationOff, uint8_t durationSize,
-			bool loopError = false
-		) {
-			this->durationOn   = durationOn;
-			this->durationOff  = durationOff;
-			this->durationSize = durationSize;
-			this->valueRed	   = valueRed;
-			this->valueGreen   = valueGreen;
-			this->valueBlue	   = valueBlue;
-			this->loopError	   = loopError;
-			this->isFinished   = false;
-			this->durationIdx  = 0;
-			setLEDStatus(true);
-		}
-
 		uint16_t getMsTillNext() {
 			if (durationIdx >= durationSize) {
 				return 0;
@@ -102,6 +84,44 @@ class LedHandler {
 				return 0;
 			}
 			return timeArray[durationIdx] - passedTime;
+		}
+
+	public:
+		uint16_t enable() {
+			this->isEnabled = true;
+			return updateLEDStatus();
+		}
+
+		void disable() {
+			this->isEnabled = false;
+			setLEDStatus(false);
+		}
+
+		void setErrorProperties(
+			uint8_t valueRed, uint8_t valueGreen, uint8_t valueBlue,
+			uint16_t * durationOn, uint16_t * durationOff, uint8_t durationSize,
+			bool loopError = false
+		) {
+			if (this->durationOn != NULL) {
+				free(this->durationOn);
+				free(this->durationOff);
+			}
+			this->durationOn =
+				(uint16_t *) malloc(sizeof(uint16_t) * durationSize);
+			this->durationOff =
+				(uint16_t *) malloc(sizeof(uint16_t) * durationSize);
+			for (int i = 0; i < durationSize; i++) {
+				this->durationOn[i]	 = durationOn[i];
+				this->durationOff[i] = durationOff[i];
+			}
+			this->durationSize = durationSize;
+			this->valueRed	   = valueRed;
+			this->valueGreen   = valueGreen;
+			this->valueBlue	   = valueBlue;
+			this->loopError	   = loopError;
+			this->isFinished   = false;
+			this->durationIdx  = 0;
+			setLEDStatus(true);
 		}
 
 		uint16_t updateLEDStatus() {

@@ -85,8 +85,24 @@
 	If PIORITY_ERRORS is lower than PRIORITY_NOTIFICATIONS then the notification
    will allways be displayed first.
 */
-#define PRIORITY_ERRORS					 0
+#define PRIORITY_SENSOR_ERRORS			 0
 #define PRIORITY_NOTIFICATIONS			 1
+
+// These are the color codes for the LEDs with time intervall for on and off
+// Colors are in order Red'Green'Blue
+#define LED_COLOR_ERROR_AIR_QUALITY		 0xFF'00'FF
+#define LED_COLOR_ERROR_AIR_TEMPERATURE	 0xFF'00'00
+#define LED_COLOR_ERROR_AIR_HUMIDITY	 0xFF'FF'FF
+#define LED_COLOR_ERROR_AIR_PRESSURE	 0xFF'99'00
+#define LED_COLOR_ERROR_SOIL_HUMIDITY	 0x00'00'FF
+#define LED_COLOR_ERROR_LIGHT_INTENSITY	 0xFF'FF'00
+#define LED_TIME_ERROR_ON_MS			 1000
+#define LED_TIME_ERROR_OFF_MS			 4000
+#define LED_TIME_ERROR_BLINK_PAUSE_MS	 1000
+
+#define LED_COLOR_NOTIFICATION_PAIRING	 0x00'FF'00
+#define LED_TIME_NOTIFICATION_ON_MS		 1000
+#define LED_TIME_NOTIFICATION_OFF_MS	 4000
 
 // Mapping of the arduino pin connections
 #define PIN_PHOTOTRANSISTOR				 A0

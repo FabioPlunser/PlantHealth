@@ -17,7 +17,7 @@ class SensorError : public Notification {
 			uint8_t priority
 		)
 			: Notification(priority) {
-			this->notificationType = NotificationType::ERROR;
+			this->notificationType = NotificationType::SENSOR_ERROR;
 			this->type			   = type;
 			this->status		   = status;
 		}
