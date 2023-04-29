@@ -4,6 +4,7 @@
 #include "../../include/Defines.h"
 #include "LedController.cpp"
 #include "NotificationQueue.cpp"
+#include "PiezoBuzzerController.cpp"
 #include "SensorError.cpp"
 #include "SensorErrors.h"
 
@@ -30,6 +31,7 @@ class NotificationHandler {
 	private:
 		NotificationQueue * notificationQueue;
 		LedHandler * ledConstroller;
+		PiezoBuzzerController * piezoBuzzerController;
 		const Notification * prevErrorNotification = NULL;
 
 		NotificationHandler(
@@ -38,6 +40,8 @@ class NotificationHandler {
 			notificationQueue = NotificationQueue::getNotificationQueue();
 			ledConstroller =
 				LedHandler::getLedHandler(ledPinRed, ledPinGreen, ledPinBlue);
+			piezoBuzzerControlle =
+				PiezoBuzzerController::getInstance(PIN_PIEZO_BUZZER);
 		}
 
 	public:
@@ -179,9 +183,17 @@ class NotificationHandler {
 		 * ms
 		 */
 		int32_t update() {
+			static unsigned long previousTone = 0;
 			if (notificationQueue->getSize() <= 0) {
 				ledConstroller->disable();
 				return -1;
+			}
+			if (millis() - previousTone > PIEZO_BUZZET_TONE_INTERVALL_MS) {
+				previousTone = millis();
+				piezoBuzzerController->startBuzzer(
+					PIEZO_BUZZET_TONE_FREQUENCY_HZ,
+					PIEZO_BUZZET_TONE_DURATION_MS
+				);
 			}
 			const Notification * topNotification =
 				notificationQueue->getPrioritisedNotification();
