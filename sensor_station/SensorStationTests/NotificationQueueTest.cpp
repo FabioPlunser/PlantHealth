@@ -1,6 +1,7 @@
+#include "lib/NotificationHandler/NotificationQueue.cpp"
+
 #include "Colors.h"
 #include "lib/NotificationHandler/Notification.cpp"
-#include "lib/NotificationHandler/NotificationQueue.cpp"
 #include "lib/NotificationHandler/SensorError.cpp"
 #include "lib/NotificationHandler/SensorErrors.h"
 
@@ -262,6 +263,7 @@ int main() {
 		testNotificationQueue_getTopPriorityNotifcation,
 		testNotificationQueue_NotificationHaveHigherPriorityThanError,
 		testNotificationQueue_SensorErrorKeepsDataInQueue};
+
 	for (int i = 0; i < sizeof(tests) / sizeof(tests[0]); i++) {
 		tests[i]();
 		printf("\n");
