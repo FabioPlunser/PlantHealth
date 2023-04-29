@@ -4,9 +4,11 @@ import { BACKEND_URL } from "$env/static/private";
 import { z } from "zod";
 
 let personId: string;
+let username: string;
 
 export const load = (async ({ url, fetch, locals }) => {
   personId = url.searchParams.get("personId") ?? locals.user.personId;
+  username = url.searchParams.get("username") ?? locals.user.username;
 
   let canActiveUserChangeRoles: boolean =
     locals.user.permissions.includes("ADMIN") &&
@@ -46,8 +48,7 @@ export const load = (async ({ url, fetch, locals }) => {
   }
 
   return {
-    username: user.username,
-    email: user.email,
+    username,
     permissions: userPermissions,
     canActiveUserChangeRoles,
   };
@@ -135,7 +136,7 @@ export const actions = {
       }),
     };
 
-    await fetch(`http://${BACKEND_URL}/update-user`)
+    await fetch(`http://${BACKEND_URL}/update-user`, requestOptions)
       .then((response) => {
         if (!response.ok) {
           throw new Error(response.statusText);
