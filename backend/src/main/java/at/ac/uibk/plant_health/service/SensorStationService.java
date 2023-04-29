@@ -35,6 +35,8 @@ public class SensorStationService {
 	private SensorStationPersonReferenceRepository sensorStationPersonReferenceRepository;
 	@Autowired
 	private SensorLimitsRepository sensorLimitsRepository;
+	@Value("${swa.pictures.path}")
+	private String picturesPath;
 
 	public SensorStation findById(UUID id) throws ServiceException {
 		Optional<SensorStation> maybeSensorStation = this.sensorStationRepository.findById(id);
@@ -56,9 +58,6 @@ public class SensorStationService {
 		}
 		return maybeSensorStation.get();
 	}
-
-	@Value("${swa.pictures.path}")
-	private String picturesPath;
 
 	public SensorStation save(SensorStation sensorStation) throws ServiceException {
 		try {
@@ -115,22 +114,9 @@ public class SensorStationService {
 	 * @param sensorStationId
 	 * @return list of base64 encoded pictures
 	 */
-	public List<String> getPictures(UUID sensorStationId) throws ServiceException {
+	public List<PlantPicture> getPictures(UUID sensorStationId) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
-		List<PlantPicture> pictures = sensorStation.getPlantPictures();
-		List<String> picturesBase64 = new ArrayList<>();
-
-		try {
-			for (PlantPicture picture : pictures) {
-				Path path = Paths.get(picturesPath + picture.getPictureName());
-				byte[] pictureBytes = Files.readAllBytes(path);
-				String base64 = Base64.encodeBase64String(pictureBytes);
-				picturesBase64.add(base64);
-			}
-		} catch (Exception e) {
-			throw new ServiceException("Could not read pictures from server", 500);
-		}
-		return picturesBase64;
+		return sensorStation.getPlantPictures();
 	}
 
 	/**
@@ -143,9 +129,9 @@ public class SensorStationService {
 		PlantPicture plantPicture = null;
 		try {
 			byte[] imageByte = Base64.decodeBase64(picture);
-			String pictureName = UUID.randomUUID() + ".png";
-			Path path = Paths.get(picturesPath + pictureName);
-			plantPicture = new PlantPicture(sensorStation, pictureName, LocalDateTime.now());
+			String picturePath = picturesPath + UUID.randomUUID() + ".png";
+			Path path = Paths.get(picturePath);
+			plantPicture = new PlantPicture(sensorStation, picturePath, LocalDateTime.now());
 			Files.createDirectories(path.getParent());
 			Files.write(path, imageByte);
 		} catch (Exception e) {
@@ -171,7 +157,7 @@ public class SensorStationService {
 		SensorStation sensorStation = picture.getSensorStation();
 
 		try {
-			Path path = Paths.get(picturesPath + picture.getPictureName());
+			Path path = Paths.get(picture.getPicturePath());
 			Files.delete(path);
 			plantPictureRepository.delete(picture);
 			sensorStation.getPlantPictures().remove(picture);
@@ -191,7 +177,7 @@ public class SensorStationService {
 		List<PlantPicture> pictures = new ArrayList<>(sensorStation.getPlantPictures());
 		try {
 			for (PlantPicture picture : pictures) {
-				Path path = Paths.get(picturesPath + picture.getPictureName());
+				Path path = Paths.get(picture.getPicturePath());
 				Files.delete(path);
 				plantPictureRepository.delete(picture);
 				sensorStation.getPlantPictures().remove(picture);

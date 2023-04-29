@@ -123,7 +123,8 @@ public class SensorStationController {
 		try {
 			sensorStationService.findById(sensorStationId);
 			return new PlantPictureResponse(
-						   sensorStationService.getPictures(sensorStationId), sensorStationId
+						   sensorStationService.getPictures(sensorStationId),
+						   sensorStationService.findById(sensorStationId)
 			)
 					.toEntity();
 		} catch (ServiceException e) {

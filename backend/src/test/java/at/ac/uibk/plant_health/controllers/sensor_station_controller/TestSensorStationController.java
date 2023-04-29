@@ -2,6 +2,7 @@ package at.ac.uibk.plant_health.controllers.sensor_station_controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -21,6 +22,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -225,9 +227,9 @@ public class TestSensorStationController {
 		List<PlantPicture> plantPictures = new ArrayList<>();
 		try {
 			byte[] imageByte = Base64.decodeBase64(picture);
-			String pictureName = UUID.randomUUID() + ".png";
-			Path path = Paths.get(picturesPath + pictureName);
-			plantPicture = new PlantPicture(sensorStation, pictureName, LocalDateTime.now());
+			String picturePath = picturesPath + UUID.randomUUID() + ".png";
+			Path path = Paths.get(picturePath);
+			plantPicture = new PlantPicture(sensorStation, picturePath, LocalDateTime.now());
 			plantPictureRepository.save(plantPicture);
 			Files.createDirectories(path.getParent());
 			Files.write(path, imageByte);
@@ -244,7 +246,7 @@ public class TestSensorStationController {
 		List<PlantPicture> pictures = sensorStation.getPlantPictures();
 		try {
 			for (PlantPicture picture1 : pictures) {
-				Path path = Paths.get(picturesPath + picture1.getPictureName());
+				Path path = Paths.get(picture1.getPicturePath());
 				Files.delete(path);
 			}
 			sensorStation.setPlantPictures(new ArrayList<>());
@@ -277,8 +279,13 @@ public class TestSensorStationController {
 
 	@Test
 	void getPictures() throws Exception {
+		AccessPoint accessPoint = new AccessPoint(UUID.randomUUID(), "Office1", 50, false);
+		accessPointService.save(accessPoint);
+
 		String bdAddress = StringGenerator.macAddress();
 		SensorStation sensorStation = new SensorStation(bdAddress, 3);
+		sensorStation.setAccessPoint(accessPoint);
+		sensorStation.setName("Plant1");
 		sensorStationService.save(sensorStation);
 
 		createPicture(sensorStation);
@@ -288,14 +295,20 @@ public class TestSensorStationController {
 									   String.valueOf(sensorStation.getDeviceId()))
 								.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
 				.andExpectAll(
-						status().isOk(), jsonPath("$.pictures").exists(),
-						jsonPath("$.pictures[0]").exists(), jsonPath("$.pictures[0]").value(picture)
+						status().isOk(), jsonPath("$.encoding").exists(),
+						jsonPath("$.pictures").exists(), jsonPath("$.encoding").value("base64"),
+						jsonPath("$.pictures").isArray(),
+						jsonPath("$.pictures[0].roomName").value(accessPoint.getRoomName()),
+						jsonPath("$.pictures[0].plantName").value(sensorStation.getName()),
+						jsonPath("$.pictures[0].timeStamp").exists(),
+						jsonPath("$.pictures[0].picture").exists(),
+						jsonPath("$.pictures[0].picture").value(picture)
 				);
 
 		sensorStation = sensorStationService.findByBdAddress(bdAddress);
 		assertEquals(1, sensorStation.getPlantPictures().size());
 
-		sensorStation.getPlantPictures().forEach(p -> System.out.println(p.getPictureName()));
+		sensorStation.getPlantPictures().forEach(p -> System.out.println(p.getPicturePath()));
 
 		deleteAllPictures(sensorStation);
 		assertEquals(0, sensorStation.getPlantPictures().size());
@@ -347,9 +360,9 @@ public class TestSensorStationController {
 		for (int i = 0; i < pictureCount; i++) {
 			try {
 				byte[] imageByte = Base64.decodeBase64(picture);
-				String pictureName = UUID.randomUUID() + ".png";
-				Path path = Paths.get(picturesPath + pictureName);
-				plantPicture = new PlantPicture(sensorStation, pictureName, LocalDateTime.now());
+				String picturePath = picturesPath + UUID.randomUUID() + ".png";
+				Path path = Paths.get(picturePath);
+				plantPicture = new PlantPicture(sensorStation, picturePath, LocalDateTime.now());
 				plantPictureRepository.save(plantPicture);
 				Files.createDirectories(path.getParent());
 				Files.write(path, imageByte);
