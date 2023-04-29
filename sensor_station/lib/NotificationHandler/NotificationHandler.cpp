@@ -14,6 +14,13 @@
 	);                                                           \
 	varName = static_cast<const SensorError *>(notification);
 
+#define CHECK_VALID_VALUE_VALID(value)                              \
+	if (value != ERROR_VALUE_NOTHING && value != ERROR_VALUE_LOW && \
+		value != ERROR_VALUE_HIGH) {                                \
+		ERROR_PRINT("Value was out of range. Value was ", value);   \
+		return;                                                     \
+	}
+
 class NotificationHandler {
 	private:
 		NotificationQueue * notificationQueue;
@@ -47,8 +54,8 @@ class NotificationHandler {
 			return errorHandler;
 		}
 
-	public:
-		void addErrorCode(
+	private:
+		void addSensorError(
 			SensorErrors::Type errorType, SensorErrors::Status errorStatus
 		) {
 			int priority = 0;
@@ -88,6 +95,143 @@ class NotificationHandler {
 			}
 			SensorError error(errorType, errorStatus, priority);
 			notificationQueue->addError(error);
+		}
+
+	public:
+		void addNotification(Notification & notification) {
+			notificationQueue->addError(notification);
+		}
+
+		void updateSoilHumidityValid(uint8_t value) {
+			static uint8_t prevValue = ERROR_VALUE_NOTHING;
+			CHECK_VALID_VALUE_VALID(value);
+			if (value == prevValue) {
+				return;
+			}
+			if (prevValue != ERROR_VALUE_NOTHING) {
+				notificationQueue->deleteErrorFromQueue(
+					SensorErrors::Type::SoilHumidityError
+				);
+			}
+			prevValue = value;
+			if (value == ERROR_VALUE_NOTHING) {
+				return;
+			}
+			addSensorError(
+				SensorErrors::Type::SoilHumidityError,
+				value == ERROR_VALUE_HIGH ? SensorErrors::Status::High
+										  : SensorErrors::Status::Low
+			);
+		}
+
+		void updateAirHumidityValid(uint8_t value) {
+			static uint8_t prevValue = ERROR_VALUE_NOTHING;
+			CHECK_VALID_VALUE_VALID(value);
+			if (value == prevValue) {
+				return;
+			}
+			if (prevValue != ERROR_VALUE_NOTHING) {
+				notificationQueue->deleteErrorFromQueue(
+					SensorErrors::Type::AirHumidityError
+				);
+			}
+			prevValue = value;
+			if (value == ERROR_VALUE_NOTHING) {
+				return;
+			}
+			addSensorError(
+				SensorErrors::Type::AirHumidityError,
+				value == ERROR_VALUE_HIGH ? SensorErrors::Status::High
+										  : SensorErrors::Status::Low
+			);
+		}
+
+		void updateAirPressureValid(uint8_t value) {
+			static uint8_t prevValue = ERROR_VALUE_NOTHING;
+			CHECK_VALID_VALUE_VALID(value);
+			if (value == prevValue) {
+				return;
+			}
+			if (prevValue != ERROR_VALUE_NOTHING) {
+				notificationQueue->deleteErrorFromQueue(
+					SensorErrors::Type::AirPressureError
+				);
+			}
+			prevValue = value;
+			if (value == ERROR_VALUE_NOTHING) {
+				return;
+			}
+			addSensorError(
+				SensorErrors::Type::AirPressureError,
+				value == ERROR_VALUE_HIGH ? SensorErrors::Status::High
+										  : SensorErrors::Status::Low
+			);
+		}
+
+		void updateAirTemperatureValid(uint8_t value) {
+			static uint8_t prevValue = ERROR_VALUE_NOTHING;
+			CHECK_VALID_VALUE_VALID(value);
+			if (value == prevValue) {
+				return;
+			}
+			if (prevValue != ERROR_VALUE_NOTHING) {
+				notificationQueue->deleteErrorFromQueue(
+					SensorErrors::Type::AirTemperatureError
+				);
+			}
+			prevValue = value;
+			if (value == ERROR_VALUE_NOTHING) {
+				return;
+			}
+			addSensorError(
+				SensorErrors::Type::AirTemperatureError,
+				value == ERROR_VALUE_HIGH ? SensorErrors::Status::High
+										  : SensorErrors::Status::Low
+			);
+		}
+
+		void updateAirqualityValid(uint8_t value) {
+			static uint8_t prevValue = ERROR_VALUE_NOTHING;
+			CHECK_VALID_VALUE_VALID(value);
+			if (value == prevValue) {
+				return;
+			}
+			if (prevValue != ERROR_VALUE_NOTHING) {
+				notificationQueue->deleteErrorFromQueue(
+					SensorErrors::Type::AirQualityError
+				);
+			}
+			prevValue = value;
+			if (value == ERROR_VALUE_NOTHING) {
+				return;
+			}
+			addSensorError(
+				SensorErrors::Type::AirQualityError,
+				value == ERROR_VALUE_HIGH ? SensorErrors::Status::High
+										  : SensorErrors::Status::Low
+			);
+		}
+
+		void updateLightIntensityValid(uint8_t value) {
+			static uint8_t prevValue = ERROR_VALUE_NOTHING;
+			CHECK_VALID_VALUE_VALID(value);
+			if (value == prevValue) {
+				return;
+			}
+			if (prevValue != ERROR_VALUE_NOTHING) {
+				notificationQueue->deleteErrorFromQueue(
+					SensorErrors::Type::LightIntensityError
+				);
+			}
+			prevValue = value;
+			if (value == ERROR_VALUE_NOTHING) {
+				return;
+			}
+			addSensorError(
+				SensorErrors::Type::LightIntensityError,
+				value == ERROR_VALUE_HIGH ? SensorErrors::Status::High
+										  : SensorErrors::Status::Low
+			);
 		}
 };
 
