@@ -37,10 +37,10 @@ class NotificationHandler {
 		NotificationHandler(
 			uint8_t ledPinRed, uint8_t ledPinGreen, uint8_t ledPinBlue
 		) {
-			notificationQueue = NotificationQueue::getNotificationQueue();
-			ledConstroller =
+			this->notificationQueue = NotificationQueue::getNotificationQueue();
+			this->ledConstroller =
 				LedHandler::getLedHandler(ledPinRed, ledPinGreen, ledPinBlue);
-			piezoBuzzerControlle =
+			this->piezoBuzzerController =
 				PiezoBuzzerController::getInstance(PIN_PIEZO_BUZZER);
 		}
 

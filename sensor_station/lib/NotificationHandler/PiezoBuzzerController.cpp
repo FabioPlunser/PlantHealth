@@ -1,8 +1,9 @@
 #ifndef PIEZO_BUZZER_TEST_CLASS
 #define PIEZO_BUZZER_TEST_CLASS
 
+#include "../../include/Defines.h"
+
 #include <Arduino.h>
-#include <Defines.h>
 
 class PiezoBuzzerController {
 	private:
@@ -26,7 +27,7 @@ class PiezoBuzzerController {
 		void startBuzzer(unsigned int frequency, unsigned int duration = 1000) {
 			tone(this->buzzerPin, frequency, duration);
 		}
-		void stopBuzzer() { notone(); }
+		void stopBuzzer() { noTone(this->buzzerPin); }
 };
 
 #endif
