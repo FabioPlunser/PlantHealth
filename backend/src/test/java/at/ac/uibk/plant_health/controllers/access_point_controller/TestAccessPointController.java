@@ -92,10 +92,9 @@ public class TestAccessPointController {
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().is(401));
 
-		AccessPoint accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
 		// unlock access point and try again
 		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
-
 		mockMvc.perform(MockMvcRequestBuilders.post("/register-access-point")
 								.param("selfAssignedId", String.valueOf(selfAssignedId))
 								.param("roomName", "Office1")
@@ -160,7 +159,7 @@ public class TestAccessPointController {
 		UUID selfAssignedId = UUID.randomUUID();
 		accessPointService.register(selfAssignedId, "Office1");
 
-		AccessPoint accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/set-unlocked-access-point")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
@@ -171,7 +170,7 @@ public class TestAccessPointController {
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
-		accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
+		accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
 		//
 		mockMvc.perform(MockMvcRequestBuilders.post("/register-access-point")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
@@ -190,7 +189,7 @@ public class TestAccessPointController {
 	void getAccessPointConfig() throws Exception {
 		UUID selfAssignedId = UUID.randomUUID();
 		accessPointService.register(selfAssignedId, "Office1");
-		AccessPoint accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
 		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
 
 		accessPoint = accessPointRepository.findByDeviceId(accessPoint.getDeviceId()).get();
@@ -210,10 +209,10 @@ public class TestAccessPointController {
 	void foundSensorStations() throws Exception {
 		UUID selfAssignedId = UUID.randomUUID();
 		accessPointService.register(selfAssignedId, "Office1");
-		AccessPoint accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
 		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
 
-		accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
+		accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
 
 		ArrayNode sensorStations = mapper.createArrayNode();
 
@@ -235,14 +234,58 @@ public class TestAccessPointController {
 	}
 
 	@Test
+	void scanForSensorStations() throws Exception {
+		Person person = createUserAndLogin(true);
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/scan-for-sensor-stations")
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(person))
+								.param("accessPointId", String.valueOf(accessPoint.getDeviceId()))
+								.param("unlocked", "true")
+								.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
+
+		accessPoint = accessPointRepository.findByDeviceId(accessPoint.getDeviceId()).get();
+		assertTrue(accessPoint.getScanActive());
+	}
+
+	@Test
+	void setTransferInterval() throws Exception {
+		Person person = createUserAndLogin(true);
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
+
+		int transferInterval = 10;
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/set-access-point-transfer-interval")
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(person))
+								.param("accessPointId", String.valueOf(accessPoint.getDeviceId()))
+								.param("transferInterval", String.valueOf(transferInterval))
+								.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
+
+		accessPoint = accessPointRepository.findByDeviceId(accessPoint.getDeviceId()).get();
+		assertEquals(transferInterval, accessPoint.getTransferInterval());
+	}
+
+	@Test
 	void transferData() throws Exception {
 		UUID selfAssignedId = UUID.randomUUID();
 		accessPointService.register(selfAssignedId, "Office1");
-		AccessPoint accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
 		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
 
 		int sensorStationsCount = 2;
-		accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
+		accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
 
 		ArrayNode sensorStations = mapper.createArrayNode();
 
@@ -294,49 +337,5 @@ public class TestAccessPointController {
 
 		assertEquals(sensorMap.size() * sensorStationsCount, sensorDataRepository.findAll().size());
 		assertEquals(sensorMap.size(), sensorRepository.findAll().size());
-	}
-
-	@Test
-	void scanForSensorStations() throws Exception {
-		Person person = createUserAndLogin(true);
-		UUID selfAssignedId = UUID.randomUUID();
-		accessPointService.register(selfAssignedId, "Office1");
-		AccessPoint accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
-		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
-
-		mockMvc.perform(MockMvcRequestBuilders.post("/scan-for-sensor-stations")
-								.header(HttpHeaders.USER_AGENT, "MockTests")
-								.header(HttpHeaders.AUTHORIZATION,
-										AuthGenerator.generateToken(person))
-								.param("accessPointId", String.valueOf(accessPoint.getDeviceId()))
-								.param("unlocked", "true")
-								.contentType(MediaType.APPLICATION_JSON))
-				.andExpectAll(status().isOk());
-
-		accessPoint = accessPointRepository.findByDeviceId(accessPoint.getDeviceId()).get();
-		assertTrue(accessPoint.getScanActive());
-	}
-
-	@Test
-	void setTransferInterval() throws Exception {
-		Person person = createUserAndLogin(true);
-		UUID selfAssignedId = UUID.randomUUID();
-		accessPointService.register(selfAssignedId, "Office1");
-		AccessPoint accessPoint = accessPointService.getAccessPointBySelfAssignedId(selfAssignedId);
-		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
-
-		int transferInterval = 10;
-
-		mockMvc.perform(MockMvcRequestBuilders.post("/set-access-point-transfer-interval")
-								.header(HttpHeaders.USER_AGENT, "MockTests")
-								.header(HttpHeaders.AUTHORIZATION,
-										AuthGenerator.generateToken(person))
-								.param("accessPointId", String.valueOf(accessPoint.getDeviceId()))
-								.param("transferInterval", String.valueOf(transferInterval))
-								.contentType(MediaType.APPLICATION_JSON))
-				.andExpectAll(status().isOk());
-
-		accessPoint = accessPointRepository.findByDeviceId(accessPoint.getDeviceId()).get();
-		assertEquals(transferInterval, accessPoint.getTransferInterval());
 	}
 }

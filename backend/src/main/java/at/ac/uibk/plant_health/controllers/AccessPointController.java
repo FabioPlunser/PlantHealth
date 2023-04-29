@@ -19,6 +19,7 @@ import at.ac.uibk.plant_health.models.exceptions.ServiceException;
 import at.ac.uibk.plant_health.models.rest_responses.*;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.service.AccessPointService;
+import lombok.With;
 
 @RestController
 public class AccessPointController {
@@ -28,21 +29,22 @@ public class AccessPointController {
 	private static final String LOCKED_MESSAGE = "AccessPoint is locked";
 
 	@PublicEndpoint
+	@WriteOperation
 	@PostMapping("/register-access-point")
 	public RestResponseEntity register(
 			@RequestParam(name = "selfAssignedId") final UUID selfAssignedId,
 			@RequestParam(name = "roomName") final String roomName
 	) {
-		if (!accessPointService.isAccessPointRegisteredBySelfAssignedId(selfAssignedId)
-			&& !accessPointService.register(selfAssignedId, roomName)) {
+		try {
+			accessPointService.register(selfAssignedId, roomName);
+			accessPointService.isUnlockedBySelfAssignedId(selfAssignedId);
+		} catch (ServiceException e) {
 			return MessageResponse.builder()
-					.statusCode(500)
-					.message("Could not register AccessPoint")
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
 					.toEntity();
 		}
-		if (!accessPointService.isUnlockedBySelfAssignedId(selfAssignedId)) {
-			return MessageResponse.builder().statusCode(401).message(LOCKED_MESSAGE).toEntity();
-		}
+
 		return TokenResponse.builder()
 				.statusCode(200)
 				.token(accessPointService.getAccessPointAccessToken(selfAssignedId))
@@ -50,6 +52,7 @@ public class AccessPointController {
 	}
 
 	@AnyPermission(Permission.ADMIN)
+	@ReadOperation
 	@GetMapping("/get-access-points")
 	public RestResponseEntity getAccessPoints() {
 		return new AccessPointListResponse(accessPointService.findAllAccessPoints()).toEntity();
@@ -64,22 +67,19 @@ public class AccessPointController {
 			@RequestParam(name = "accessPointId") final UUID accessPointId,
 			@RequestParam(name = "unlocked") final boolean unlocked
 	) {
-		if (accessPointService.isAccessPointRegisteredByDeviceId(accessPointId)) {
-			if (!accessPointService.setUnlocked(unlocked, accessPointId)) {
-				return MessageResponse.builder()
-						.statusCode(500)
-						.message("Could not set AccessPoint to unlocked")
-						.toEntity();
-			}
+		try {
+			accessPointService.findById(accessPointId);
+			accessPointService.setUnlocked(unlocked, accessPointId);
+		} catch (ServiceException e) {
 			return MessageResponse.builder()
-					.statusCode(200)
-					.message("AccessPoint lock set to " + unlocked)
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
 					.toEntity();
 		}
 
 		return MessageResponse.builder()
-				.statusCode(404)
-				.message("AccessPoint not found")
+				.statusCode(200)
+				.message("AccessPoint lock set to " + unlocked)
 				.toEntity();
 	}
 
@@ -87,15 +87,17 @@ public class AccessPointController {
 	@GetMapping("/get-access-point-config")
 	@PrincipalRequired(AccessPoint.class)
 	public RestResponseEntity getAccessPointConfig(AccessPoint accessPoint) {
-		if (accessPointService.isAccessPointRegisteredByDeviceId(accessPoint.getDeviceId())
-			&& accessPointService.isUnlockedByDeviceId(accessPoint.getDeviceId())) {
-			return new AccessPointConfigResponse(accessPoint).toEntity();
+		try {
+			accessPointService.findById(accessPoint.getDeviceId());
+			accessPointService.isUnlockedByDeviceId(accessPoint.getDeviceId());
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
 		}
 
-		return MessageResponse.builder()
-				.statusCode(500)
-				.message("Error occured in backend")
-				.toEntity();
+		return new AccessPointConfigResponse(accessPoint).toEntity();
 	}
 
 	@WriteOperation
@@ -104,20 +106,20 @@ public class AccessPointController {
 	public RestResponseEntity foundSensorStations(
 			AccessPoint accessPoint, @RequestBody final List<SensorStation> sensorStations
 	) {
-		if (!accessPointService.isAccessPointRegisteredByDeviceId(accessPoint.getDeviceId())
-			&& !accessPointService.isUnlockedByDeviceId(accessPoint.getDeviceId())) {
-			return MessageResponse.builder().statusCode(403).message(LOCKED_MESSAGE).toEntity();
-		}
-		if (accessPointService.foundNewSensorStation(accessPoint, sensorStations)) {
+		try {
+			accessPointService.findById(accessPoint.getDeviceId());
+			accessPointService.isUnlockedByDeviceId(accessPoint.getDeviceId());
+			accessPointService.foundNewSensorStation(accessPoint, sensorStations);
+		} catch (ServiceException e) {
 			return MessageResponse.builder()
-					.statusCode(200)
-					.message("Successfully found new SensorStations")
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
 					.toEntity();
 		}
 
 		return MessageResponse.builder()
-				.statusCode(500)
-				.message("Internal server Error")
+				.statusCode(200)
+				.message("Successfully added " + sensorStations.size() + " SensorStations")
 				.toEntity();
 	}
 
@@ -125,20 +127,16 @@ public class AccessPointController {
 	@PostMapping("/scan-for-sensor-stations")
 	public RestResponseEntity scanForSensorStations(@RequestParam(name = "accessPointId")
 													final UUID accessPointId) {
-		if (!accessPointService.isAccessPointRegisteredByDeviceId(accessPointId))
+		try {
+			accessPointService.findById(accessPointId);
+			accessPointService.isUnlockedByDeviceId(accessPointId);
+			accessPointService.startScan(accessPointId);
+		} catch (ServiceException e) {
 			return MessageResponse.builder()
-					.statusCode(404)
-					.message("AccessPoint not registered")
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
 					.toEntity();
-
-		if (!accessPointService.isUnlockedByDeviceId(accessPointId))
-			return MessageResponse.builder().statusCode(401).message(LOCKED_MESSAGE).toEntity();
-
-		if (!accessPointService.startScan(accessPointId))
-			return MessageResponse.builder()
-					.statusCode(500)
-					.message("Could not start scan")
-					.toEntity();
+		}
 
 		return MessageResponse.builder()
 				.statusCode(200)
@@ -153,7 +151,7 @@ public class AccessPointController {
 			@RequestParam("transferInterval") final int transferInterval
 	) {
 		try {
-			accessPointService.isAccessPointRegisteredByDeviceId(accessPointId);
+			accessPointService.findById(accessPointId);
 			accessPointService.setTransferInterval(accessPointId, transferInterval);
 		} catch (ServiceException e) {
 			return MessageResponse.builder()
@@ -173,19 +171,17 @@ public class AccessPointController {
 	public RestResponseEntity transferData(
 			final AccessPoint accessPoint, @RequestBody final List<SensorStation> sensorStationList
 	) {
-		if (!accessPointService.isAccessPointRegisteredBySelfAssignedId(
-					accessPoint.getSelfAssignedId()
-			))
+		try {
+			accessPointService.findById(accessPoint.getDeviceId());
+			accessPointService.isUnlockedByDeviceId(accessPoint.getDeviceId());
+			accessPointService.setSensorStationData(sensorStationList);
+		} catch (ServiceException e) {
 			return MessageResponse.builder()
-					.statusCode(404)
-					.message("AccessPoint not registered")
-					.toEntity();
-		if (!accessPointService.setSensorStationData(sensorStationList)) {
-			return MessageResponse.builder()
-					.statusCode(500)
-					.message("Could not transfer data")
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
 					.toEntity();
 		}
+
 		return MessageResponse.builder()
 				.statusCode(200)
 				.message("Successfully transfered data")
