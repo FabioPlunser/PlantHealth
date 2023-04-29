@@ -13,6 +13,7 @@
     isRendered = true;
   });
 
+  /* TODO update with new error handleing when implemented */
   $: {
     if (data?.message) {
       toast.error(data.message);
@@ -22,7 +23,6 @@
   export let form: ActionData;
 
   let addUserModal = false;
-  let selectedUser: any = null;
 </script>
 
 {#if addUserModal}

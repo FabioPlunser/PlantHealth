@@ -2,16 +2,24 @@ import type { Actions, PageServerLoad } from "./$types";
 import { BACKEND_URL } from "$env/static/private";
 import { fail, redirect, error } from "@sveltejs/kit";
 import { z } from "zod";
+import { createEventDispatcher } from "svelte";
 
 export const load = (async ({ fetch }) => {
-  let res = await fetch(`http://${BACKEND_URL}/get-all-users`);
-  let res_json = await res.json();
-  if (res?.ok) {
-    console.log();
-    return { success: true, users: res_json.items };
-  } else if (!res.ok) {
-    return { success: false, message: res_json.message };
-  }
+  let allUsers;
+  await fetch(`http://${BACKEND_URL}/get-all-users`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      allUsers = data.items;
+    })
+    .catch((error) => {
+      console.error("Error fetching /get-all-permissions", error);
+    });
+  return { users: allUsers };
 }) satisfies PageServerLoad;
 
 const schema = z.object({
