@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { enhance } from "$app/forms";
   import { Html5Qrcode } from "html5-qrcode";
   import { onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
@@ -6,13 +7,17 @@
   import { fly } from "svelte/transition";
   import Input from "$components/ui/Input.svelte";
   import Mobile from "$lib/helper/Mobile.svelte";
+  import { redirect } from "@sveltejs/kit";
 
   let scanning = false;
   let isMobile = false;
   let found = false;
   let rendered = false;
   let html5Qrcode: any = null;
-  let device = null;
+  let device: any = null;
+  let form: any;
+  let sensorStationIdQr: any = null;
+
   if (browser) {
     device = getDeviceType();
   }
@@ -47,12 +52,16 @@
     scanning = false;
   }
 
-  function onScanSuccess(decodedText: any, decodedResult: any) {
-    alert(`Code matched = ${decodedText}`);
-    console.log(decodedText);
-    console.log(decodedResult);
-    // if found a plant stop scanning and redirect to plant photo page
-    stop();
+  async function onScanSuccess(decodedText: any, decodedResult: any) {
+    sensorStationIdQr = new URL(decodedText).searchParams.get(
+      "sensorStationId"
+    );
+    if (sensorStationIdQr === null) {
+      alert("Invalid QR-Code");
+    }
+    console.log(sensorStationIdQr);
+    await stop();
+    form.submit();
   }
 
   function onScanFailure(error: any) {
@@ -77,10 +86,15 @@
     </div>
   {/if}
   {#if !scanning}
-    <div class="w-fit flex justify-center mx-auto">
-      <form>
+    <div class="max-w-xl mx-auto">
+      <form method="POST" bind:this={form} use:enhance>
         <h1 class="flex justify-center text-2xl">Type in Plant Code</h1>
-        <Input name="plantId" type="text" placeholder="123456789" />
+        <Input
+          field="sensorStationId"
+          type="text"
+          value={sensorStationIdQr}
+          placeholder="123456789"
+        />
         <div class="flex justify-center mt-4">
           <button class="btn btn-primary">Find</button>
         </div>

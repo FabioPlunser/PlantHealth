@@ -54,7 +54,9 @@ export const handle = (async ({ event, resolve, locals }) => {
  * Add token to all backend fetches
  */
 export const handleFetch = (({ event, request, fetch }) => {
+  // console.log("handleFetch");
   const { cookies } = event;
+  // console.log("event", event)
   let token = cookies.get("token");
   if (token) {
     token = JSON.parse(token);
