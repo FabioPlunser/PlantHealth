@@ -35,16 +35,16 @@ public class PlantPicture {
 
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
 	@Column(name = "picture_path", nullable = false)
-	private String pictureName;
+	private String picturePath;
 
 	@JdbcTypeCode(SqlTypes.TIMESTAMP)
 	@Column(name = "time_stamp", nullable = false)
 	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	private LocalDateTime timeStamp;
 
-	public PlantPicture(SensorStation sensorStation, String pictureName, LocalDateTime timeStamp) {
+	public PlantPicture(SensorStation sensorStation, String picturePath, LocalDateTime timeStamp) {
 		this.sensorStation = sensorStation;
-		this.pictureName = pictureName;
+		this.picturePath = picturePath;
 		this.timeStamp = timeStamp;
 	}
 
@@ -59,5 +59,11 @@ public class PlantPicture {
 	@Override
 	public int hashCode() {
 		return Objects.hash(pictureId);
+	}
+
+	@Override
+	public String toString() {
+		return "PlantPicture{"
+				+ "pictureName='" + picturePath + '\'' + ", timeStamp=" + timeStamp + '}';
 	}
 }

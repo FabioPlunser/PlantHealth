@@ -7,8 +7,10 @@ import org.springframework.util.MultiValueMap;
 
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class RestResponseEntity extends ResponseEntity<RestResponse> {
 	private static final int DEFAULT_STATUS_CODE = 404;
 

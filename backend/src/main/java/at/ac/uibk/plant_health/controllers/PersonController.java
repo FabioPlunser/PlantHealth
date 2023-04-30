@@ -142,7 +142,7 @@ public class PersonController {
 	 */
 	@WriteOperation
 	@AnyPermission(Permission.ADMIN)
-	@PostMapping("/update-user")
+	@RequestMapping(value = "/update-user", method = {RequestMethod.POST, RequestMethod.PUT})
 	public RestResponseEntity updateUser(
 			@RequestParam(name = "personId") final UUID personId,
 			@RequestParam(name = "username", required = false) final String username,

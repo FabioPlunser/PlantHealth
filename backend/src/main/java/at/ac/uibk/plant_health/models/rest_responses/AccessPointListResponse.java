@@ -22,7 +22,7 @@ public class AccessPointListResponse extends RestResponse {
 	}
 
 	@Getter
-	private class InnerAccessPoint implements Serializable {
+	private static class InnerAccessPoint implements Serializable {
 		private final UUID accessPointId;
 		private final String roomName;
 		private final boolean unlocked;

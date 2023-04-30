@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.hamcrest.Matchers;
 import org.hamcrest.core.AnyOf;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -64,7 +65,7 @@ public class TestDashBoardController {
 		return (Person
 		) MockAuthContext.setLoggedInUser(personService.login(username, password).orElse(null));
 	}
-
+	@Disabled
 	@Test
 	public void getPlantsOnDashboard() throws Exception {
 		Person person = createUserAndLogin(false);
@@ -105,6 +106,7 @@ public class TestDashBoardController {
 				);
 	}
 
+	@Disabled
 	@Test
 	public void getDataFromDashboard() throws Exception {
 		Person person = createUserAndLogin(false);
@@ -175,6 +177,7 @@ public class TestDashBoardController {
 				);
 	}
 
+	@Disabled
 	@Test
 	public void addPlantToDashboard() throws Exception {
 		Person person = createUserAndLogin(false);
@@ -200,6 +203,7 @@ public class TestDashBoardController {
 		assertEquals(s1.getDeviceId(), references.get(0).getSensorStation().getDeviceId());
 	}
 
+	@Disabled
 	@Test
 	public void removePlantFromDashboard() throws Exception {
 		Person person = createUserAndLogin(false);

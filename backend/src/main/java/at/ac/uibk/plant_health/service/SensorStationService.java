@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,27 +36,31 @@ public class SensorStationService {
 	private SensorStationPersonReferenceRepository sensorStationPersonReferenceRepository;
 	@Autowired
 	private SensorLimitsRepository sensorLimitsRepository;
+	@Value("${swa.pictures.path}")
+	private String picturesPath;
 
-	public Optional<SensorStation> findById(UUID id) {
-		return this.sensorStationRepository.findById(id);
+	public SensorStation findById(UUID id) throws ServiceException {
+		Optional<SensorStation> maybeSensorStation = this.sensorStationRepository.findById(id);
+		if (maybeSensorStation.isEmpty()) {
+			throw new ServiceException("Could not find SensorStation", 404);
+		}
+		return maybeSensorStation.get();
 	}
 
 	public List<SensorStation> findAll() {
 		return sensorStationRepository.findAll();
 	}
 
-	public List<SensorStation> findLocked() {
-		return sensorStationRepository.findByIsUnlockedAndIsDeleted(false, false);
+	public SensorStation findByBdAddress(String bdAddress) throws ServiceException {
+		Optional<SensorStation> maybeSensorStation =
+				this.sensorStationRepository.findByBdAddress(bdAddress);
+		if (maybeSensorStation.isEmpty()) {
+			throw new ServiceException("Could not find SensorStation", 404);
+		}
+		return maybeSensorStation.get();
 	}
 
-	public Optional<SensorStation> findByBdAddress(String bdAddress) {
-		return sensorStationRepository.findByBdAddress(bdAddress);
-	}
-
-	@Value("${swa.pictures.path}")
-	private String picturesPath;
-
-	public SensorStation save(SensorStation sensorStation) {
+	public SensorStation save(SensorStation sensorStation) throws ServiceException {
 		try {
 			return sensorStationRepository.save(sensorStation);
 		} catch (Exception e) {
@@ -63,87 +68,17 @@ public class SensorStationService {
 		}
 	}
 
-	public boolean sensorStationExists(UUID sensorStationId) {
-		try {
-			Optional<SensorStation> maybeSensorStation = findById(sensorStationId);
-		} catch (Exception e) {
-			return false;
-		}
-		return true;
-	}
-
 	/**
 	 * Set unlock status of sensor station.
 	 * @param unlocked
 	 * @param sensorStationId
 	 * @return
+	 * @throws ServiceException
 	 */
-	@Transactional
-	public boolean setUnlocked(boolean unlocked, UUID sensorStationId) {
-		Optional<SensorStation> maybeSensorStation = findById(sensorStationId);
-		if (maybeSensorStation.isEmpty()) return false;
-
-		SensorStation sensorStation = maybeSensorStation.get();
+	public void setUnlocked(boolean unlocked, UUID sensorStationId) throws ServiceException {
+		SensorStation sensorStation = findById(sensorStationId);
 		sensorStation.setUnlocked(unlocked);
-		return save(sensorStation) != null;
-	}
-
-	/**
-	 * Get pictures of SensorStation
-	 * @param sensorStationId
-	 * @return list of base64 encoded pictures
-	 */
-	@Transactional
-	public List<String> getPictures(UUID sensorStationId) {
-		Optional<SensorStation> maybeSensorStation = findById(sensorStationId);
-		if (maybeSensorStation.isEmpty())
-			throw new IllegalArgumentException("SensorStation could not be found");
-
-		SensorStation sensorStation = maybeSensorStation.get();
-		List<PlantPicture> pictures = sensorStation.getPlantPictures();
-		List<String> picturesBase64 = new ArrayList<>();
-
-		try {
-			for (PlantPicture picture : pictures) {
-				Path path = Paths.get(picturesPath + picture.getPictureName());
-				byte[] pictureBytes = Files.readAllBytes(path);
-				String base64 = Base64.encodeBase64String(pictureBytes);
-				picturesBase64.add(base64);
-			}
-		} catch (Exception e) {
-			return null;
-		}
-
-		return picturesBase64;
-	}
-
-	/**
-	 * uploadPicture
-	 * @param picture base64 encoded picture
-	 * @return true if upload was successful
-	 */
-	@Transactional
-	public boolean uploadPicture(String picture, UUID sensorStationId) {
-		Optional<SensorStation> maybeSensorStation = findById(sensorStationId);
-		if (maybeSensorStation.isEmpty())
-			throw new IllegalArgumentException("SensorStation could not be found");
-		SensorStation sensorStation = maybeSensorStation.get();
-		PlantPicture plantPicture = null;
-		try {
-			byte[] imageByte = Base64.decodeBase64(picture);
-			String pictureName = UUID.randomUUID() + ".png";
-			Path path = Paths.get(picturesPath + pictureName);
-			plantPicture = new PlantPicture(sensorStation, pictureName, LocalDateTime.now());
-			Files.createDirectories(path.getParent());
-			Files.write(path, imageByte);
-		} catch (Exception e) {
-			return false;
-		}
-		plantPictureRepository.save(plantPicture);
-		List<PlantPicture> sensorStationPictures = sensorStation.getPlantPictures();
-		sensorStationPictures.add(plantPicture);
-		sensorStation.setPlantPictures(sensorStationPictures);
-		return save(sensorStation) != null;
+		save(sensorStation);
 	}
 
 	/**
@@ -156,10 +91,7 @@ public class SensorStationService {
 	public void setSensorLimits(
 			List<SensorLimits> sensorLimits, UUID sensorStationId, Person person
 	) throws ServiceException {
-		Optional<SensorStation> maybeSensorStation = findById(sensorStationId);
-		if (maybeSensorStation.isEmpty())
-			throw new ServiceException("SensorStation not found", 500);
-		SensorStation sensorStation = maybeSensorStation.get();
+		SensorStation sensorStation = findById(sensorStationId);
 		for (SensorLimits limit : sensorLimits) {
 			Optional<Sensor> sensor = sensorRepository.findByType(limit.getSensor().getType());
 			if (sensor.isEmpty())
@@ -170,19 +102,57 @@ public class SensorStationService {
 			limit.setGardener(person);
 			limit.setSensorStation(sensorStation);
 			limit.setTimeStamp(LocalDateTime.now());
-			sensorLimitsRepository.save(limit);
-			//			sensorStation.addSensorLimit(limit);
-			//			save(sensorStation);
+			try {
+				sensorLimitsRepository.save(limit);
+			} catch (Exception e) {
+				throw new ServiceException("Could not save sensor limits", 500);
+			}
+		}
+	}
+
+	/**
+	 * Get pictures of SensorStation
+	 * @param sensorStationId
+	 * @return list of base64 encoded pictures
+	 */
+	public List<PlantPicture> getPictures(UUID sensorStationId) throws ServiceException {
+		SensorStation sensorStation = findById(sensorStationId);
+		return sensorStation.getPlantPictures();
+	}
+
+	public PlantPicture getPicture(UUID pictureId) throws ServiceException {
+		Optional<PlantPicture> maybePicture = plantPictureRepository.findById(pictureId);
+		if (maybePicture.isEmpty()) throw new ServiceException("Picture does not exist", 404);
+		return maybePicture.get();
+	}
+
+	/**
+	 * uploadPicture
+	 * @param picture base64 encoded picture
+	 * @return true if upload was successful
+	 */
+	public void uploadPicture(MultipartFile picture, UUID sensorStationId) throws ServiceException {
+		SensorStation sensorStation = findById(sensorStationId);
+		PlantPicture plantPicture = null;
+		try {
+			String extension = Objects.requireNonNull(picture.getContentType()).split("/")[1];
+			String picturePath = picturesPath + UUID.randomUUID() + "." + extension;
+			Path path = Paths.get(picturePath);
+
+			plantPicture = new PlantPicture(sensorStation, picturePath, LocalDateTime.now());
+			plantPictureRepository.save(plantPicture);
+
+			Files.createDirectories(path.getParent());
+			Files.write(path, picture.getBytes());
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new ServiceException("Could not save picture", 500);
 		}
 
-		Optional<SensorStation> maybeSensorStation2 = findById(sensorStationId);
-		if (maybeSensorStation2.isEmpty())
-			throw new ServiceException("SensorStation not found", 500);
-		SensorStation sensorStation2 = maybeSensorStation2.get();
-		System.out.println(
-				"\u001B[33m"
-				+ "SensorLimitService" + sensorStation.getSensorLimits() + "\u001B[0m"
-		);
+		List<PlantPicture> sensorStationPictures = sensorStation.getPlantPictures();
+		sensorStationPictures.add(plantPicture);
+		sensorStation.setPlantPictures(sensorStationPictures);
+		save(sensorStation);
 	}
 
 	/**
@@ -195,10 +165,10 @@ public class SensorStationService {
 		Optional<PlantPicture> maybePicture = plantPictureRepository.findById(pictureId);
 		if (maybePicture.isEmpty()) throw new ServiceException("Picture does not exist", 404);
 		PlantPicture picture = maybePicture.get();
-
 		SensorStation sensorStation = picture.getSensorStation();
+
 		try {
-			Path path = Paths.get(picturesPath + picture.getPictureName());
+			Path path = Paths.get(picture.getPicturePath());
 			Files.delete(path);
 			plantPictureRepository.delete(picture);
 			sensorStation.getPlantPictures().remove(picture);
@@ -214,56 +184,54 @@ public class SensorStationService {
 	 * @throws ServiceException
 	 */
 	public void deleteAllPictures(UUID sensorStationId) throws ServiceException {
-		Optional<SensorStation> maybeSensorStation = findById(sensorStationId);
-		if (maybeSensorStation.isEmpty())
-			throw new ServiceException("Couldn't find sensor station", 404);
-
-		SensorStation sensorStation = maybeSensorStation.get();
+		SensorStation sensorStation = findById(sensorStationId);
 		List<PlantPicture> pictures = new ArrayList<>(sensorStation.getPlantPictures());
 		try {
 			for (PlantPicture picture : pictures) {
-				Path path = Paths.get(picturesPath + picture.getPictureName());
-				Files.delete(path);
-				plantPictureRepository.delete(picture);
+				try {
+					Path path = Paths.get(picture.getPicturePath());
+					Files.delete(path);
+					plantPictureRepository.delete(picture);
+				} catch (Exception e) {
+					plantPictureRepository.delete(picture);
+					throw new ServiceException("Picture already deleted from server", 500);
+				}
+
 				sensorStation.getPlantPictures().remove(picture);
 			}
 			save(sensorStation);
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new ServiceException("Failed to delete pictue of the server", 500);
+			throw new ServiceException("Failed to delete picture of the server", 500);
 		}
 	}
 
-	@Transactional
-	public boolean addSensorData(SensorStation sensorStation, SensorData data) {
-		if (data == null || sensorStation == null) return false;
-
+	public void addSensorData(SensorStation sensorStation, SensorData data)
+			throws ServiceException {
+		if (data == null || sensorStation == null) throw new ServiceException("Invalid data", 400);
 		Sensor sensor = data.getSensor();
 		Optional<Sensor> maybeSensor = sensorRepository.findByType(sensor.getType());
 		if (maybeSensor.isPresent()) {
 			sensor = maybeSensor.get();
 		} else {
-			System.out.println(sensor);
 			sensor = sensorRepository.save(sensor);
 		}
 
 		data.setSensor(sensor);
 		data.setSensorStation(sensorStation);
 		this.sensorDataRepository.save(data);
-
-		return true;
 	}
 
-	@Transactional
-	public boolean addSensorData(SensorStation sensorStation, List<SensorData> dataList) {
-		if (dataList == null || sensorStation == null) return false;
+	public void addSensorData(SensorStation sensorStation, List<SensorData> dataList)
+			throws ServiceException {
+		if (dataList == null || sensorStation == null)
+			throw new ServiceException("Invalid data", 400);
 
 		for (SensorData data : dataList) {
-			if (!this.addSensorData(sensorStation, data)) {
-				return false;
-			};
+			try {
+				this.addSensorData(sensorStation, data);
+			} catch (ServiceException e) {
+				throw new ServiceException("Could not save sensor data", 500);
+			}
 		}
-
-		return true;
 	}
 }
