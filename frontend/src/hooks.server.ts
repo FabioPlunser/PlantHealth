@@ -71,6 +71,6 @@ export const handleFetch = (({ event, request, fetch }) => {
 
   request.headers.set("Authorization", JSON.stringify(value));
 
-  console.log("request", request.headers);
+  // console.log("request", request.headers.get("Authorization"));
   return fetch(request);
 }) satisfies HandleFetch;

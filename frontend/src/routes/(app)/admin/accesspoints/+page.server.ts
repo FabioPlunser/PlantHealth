@@ -6,7 +6,7 @@ export async function load({ fetch }) {
 
   // console.log("access points", res);
   return {
-    accessPoints: res?.items || [],
+    accessPoints: res?.accessPoints || [],
   };
 }
 
