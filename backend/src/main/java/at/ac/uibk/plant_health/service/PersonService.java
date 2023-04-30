@@ -212,16 +212,4 @@ public class PersonService {
 		}
 	}
 	// endregion
-
-	// region Dashboard
-	public List<SensorStation> getDashboardPlants(Person person) {
-		// TODO
-		return List.of();
-	}
-
-	public boolean removePlantToDashboard(Person person, SensorStation sensorStation) {
-		// TODO
-		return false;
-	}
-	// endregion
 }

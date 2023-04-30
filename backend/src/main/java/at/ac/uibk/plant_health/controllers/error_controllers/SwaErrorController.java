@@ -43,10 +43,6 @@ public class SwaErrorController implements ErrorController {
 	@Autowired
 	private EndpointMatcherUtil endpointMatcherUtil;
 
-	private RedirectResponse generateRedirectFromException(Exception exception) {
-		return generateRedirectFromException(404, exception);
-	}
-
 	private RedirectResponse generateRedirectFromException(int status, Exception exception) {
 		return RedirectResponse.builder()
 				.redirectLocation(String.format(

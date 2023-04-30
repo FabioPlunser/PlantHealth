@@ -211,17 +211,6 @@ public class AccessPointService {
 		accessPoint.setTransferInterval(interval);
 		save(accessPoint);
 	}
-	public boolean reconnectedToSensorStation(
-			AccessPoint accessPoint, SensorStation sensorStation
-	) {
-		// TODO
-		return false;
-	}
-
-	public boolean lostSensorStation(AccessPoint accessPoint, SensorStation sensorStation) {
-		// TODO
-		return false;
-	}
 
 	/**
 	 * Set data of list of SensorStations.
@@ -243,8 +232,6 @@ public class AccessPointService {
 		}
 		return true;
 	}
-
-	public void checkAccessPointConnectivity() {}
 
 	/**
 	 * Find an AccessPoint by its selfAssignedId.
