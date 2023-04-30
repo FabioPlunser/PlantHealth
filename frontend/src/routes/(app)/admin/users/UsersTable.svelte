@@ -55,7 +55,9 @@
 
   let globalFilter = "";
 
-  const options = writable<TableOptions<User>>({
+  let options;
+
+  $: options = writable<TableOptions<User>>({
     data: users,
     columns: defaultColumns,
     getCoreRowModel: getCoreRowModel(),
@@ -79,7 +81,8 @@
     });
   }
 
-  const table = createSvelteTable(options);
+  let table;
+  $: table = createSvelteTable(options);
 
   let timer: NodeJS.Timeout;
   function handleSearch(e: Event) {
