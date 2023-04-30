@@ -139,7 +139,7 @@
         type="search"
         on:keyup={handleSearch}
         on:search={handleSearch}
-        placeholder="Search..."
+        placeholder="Global Search..."
         {...noTypeCheck(null)}
         class="input dark:input-bordered w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
       />

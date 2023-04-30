@@ -9,9 +9,9 @@
 <span>
   {#if isSorted}
     {#if isSorted === "asc"}
-      <i class="bi bi-caret-up w-8" />
+      <i class="bi bi-caret-up-fill w-8" />
     {:else}
-      <i class="bi bi-caret-down" />
+      <i class="bi bi-caret-down-fill" />
     {/if}
   {/if}
 </span>
