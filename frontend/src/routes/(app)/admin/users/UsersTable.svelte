@@ -153,7 +153,7 @@
               {/each}
               <td class="table-cell">
                 <a
-                  href={`/profile?personId=${row.original.personId}&username=${row.original.username}&source=${$page.url}`}
+                  href={`/profile?personId=${row.original.personId}&username=${row.original.username}&userPermissions=${row.original.permissions}&source=${$page.url}`}
                 >
                   <i class="bi bi-pencil-square text-3xl hover:text-gray-500" />
                 </a>

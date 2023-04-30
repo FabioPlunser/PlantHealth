@@ -80,6 +80,7 @@ export const actions = {
 
     let res = await fetch(`http://${BACKEND_URL}/create-user`, requestOptions);
     res = await res.json();
+    console.log(res);
   },
 
   deleteUser: async ({ fetch, event }) => {

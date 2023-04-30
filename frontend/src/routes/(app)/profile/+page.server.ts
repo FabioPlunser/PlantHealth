@@ -5,24 +5,20 @@ import { z } from "zod";
 
 let personId: string;
 let username: string;
+let permissions: string[];
 
 export const load = (async ({ url, fetch, locals }) => {
   personId = url.searchParams.get("personId") ?? locals.user.personId;
   username = url.searchParams.get("username") ?? locals.user.username;
+  permissions =
+    url.searchParams.get("userPermissions")?.split(",") ??
+    locals.user.permissions;
 
   let canActiveUserChangeRoles: boolean =
     locals.user.permissions.includes("ADMIN") &&
     personId !== locals.user.personId;
 
   let userPermissions: { [role: string]: boolean } = {};
-  // TODO: fetch proper backend endpoint
-  //let user = await fetch(`http://${BACKEND_URL}/get-user-info`);
-  let user = {
-    personId: "1123iefefsa",
-    username: "Sakura",
-    email: "sakura@mail.com",
-    permissions: ["USER"],
-  };
 
   if (canActiveUserChangeRoles) {
     await fetch(`http://${BACKEND_URL}/get-all-permissions`)
@@ -35,14 +31,14 @@ export const load = (async ({ url, fetch, locals }) => {
       .then((data) => {
         data.items.forEach((permission: string) => {
           userPermissions[permission.toLowerCase()] =
-            user.permissions.includes(permission);
+            permissions.includes(permission);
         });
       })
       .catch((error) => {
         console.error("Error fetching /get-all-permissions", error);
       });
   } else {
-    user.permissions.forEach((permission) => {
+    permissions.forEach((permission) => {
       userPermissions[permission.toLowerCase()] = true;
     });
   }
@@ -66,21 +62,24 @@ const schema = z.object({
     .email({ message: "Email must be a valid email address" })
     .min(1, { message: "Email is required" })
     .max(64, { message: "Email must be less than 64 characters" })
-    .trim(),
+    .trim()
+    .or(z.literal("")),
 
   password: z
     .string({ required_error: "Password is required" })
     .min(1, { message: " Password is required" })
     .min(6, { message: "Password must be at least 6 characters" })
     .max(32, { message: "Password must be less than 32 characters" })
-    .trim(),
+    .trim()
+    .or(z.literal("")),
 
   passwordConfirm: z
     .string({ required_error: "Password is required" })
     .min(1, { message: "Password is required" })
     .min(6, { message: "Password must be at least 6 characters" })
     .max(32, { message: "Password must be less than 32 characters" })
-    .trim(),
+    .trim()
+    .or(z.literal("")),
 });
 
 /*
@@ -94,7 +93,6 @@ export const actions = {
   updateUser: async ({ url, request, fetch }) => {
     const formData = await request.formData();
     const zodData = schema.safeParse(Object.fromEntries(formData));
-
     if (formData.get("password") !== formData.get("passwordConfirm")) {
       return fail(400, { error: true, errors: "Passwords do not match" });
     }
@@ -125,18 +123,27 @@ export const actions = {
       }
     });
 
-    var requestOptions = {
-      method: "POST",
-      body: JSON.stringify({
-        personId,
-        username: formData.get("username"),
-        email: formData.get("email"),
-        password: formData.get("password"),
-        permissions,
-      }),
-    };
+    let email = formData.get("email");
+    let password = formData.get("password");
+    let params = new URLSearchParams();
 
-    await fetch(`http://${BACKEND_URL}/update-user`, requestOptions)
+    params.set("personId", personId);
+    params.set("username", username);
+    params.set("permissions", permissions.join(","));
+
+    if (email !== "") {
+      params.set("email", email);
+    }
+
+    if (password !== "") {
+      params.set("password", password);
+    }
+
+    let parametersString = "?" + params.toString();
+
+    await fetch(`http://${BACKEND_URL}/update-user` + parametersString, {
+      method: "POST",
+    })
       .then((response) => {
         if (!response.ok) {
           throw new Error(response.statusText);
@@ -144,13 +151,13 @@ export const actions = {
         return response.json();
       })
       .then((data) => {
-        let source = url.searchParams.get("personId");
+        let source = url.searchParams.get("source");
         if (source !== null) {
           throw redirect(307, source);
         }
       })
       .catch((error) => {
-        console.error("Error fetching /get-all-permissions", error);
+        console.error("Error fetching /update-user", error);
       });
   },
 } satisfies Actions;
