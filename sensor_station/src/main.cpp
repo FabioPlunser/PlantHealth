@@ -3,6 +3,7 @@
 
 #ifdef DO_MAIN
 
+#include "../lib/NotificationHandler/SensorErrors.h"
 // #include "../lib/ErrorHandler/SensorErrors.h"
 #include "SensorClasses/AirSensor.cpp"
 #include "SensorClasses/DipSwitch.cpp"
@@ -12,6 +13,7 @@
 #include <Adafruit_BME680.h>
 #include <Arduino.h>
 #include <ArduinoBLE.h>
+#include <NotificationHandler.hpp>
 #include <modules/communication.h>
 
 // ----- Prototypes ----- //
@@ -32,6 +34,7 @@ uint16_t convertToGATT_lightIntensity(uint16_t lightIntensity);
 uint16_t convertToGATT_lightIntensity_notKnown();
 uint16_t luminosityFromVoltage(uint16_t measured);
 void setArduinoPowerStatus();
+bool updateNotificationHandler();
 
 // ----- Global Variables ----- //
 
@@ -39,6 +42,7 @@ AirSensorClass * airSensor;
 HydrometerClass * hydrometer;
 PhototransistorClass * phototransistor;
 DipSwitchClass * dipSwitch;
+NotificationHandler * notificationHandler;
 Adafruit_BME680 bme680;
 
 // ----- Setup ----- //
@@ -51,9 +55,15 @@ void setup() {
 	uint8_t pinConnection[] = {PIN_DIP_1, PIN_DIP_2, PIN_DIP_3, PIN_DIP_4,
 							   PIN_DIP_5, PIN_DIP_6, PIN_DIP_7, PIN_DIP_8};
 	dipSwitch				= new DipSwitchClass(pinConnection, 8);
+	notificationHandler		= NotificationHandler::getInstance(
+		PIN_RGB_RED, PIN_RGB_GREEN, PIN_RGB_BLUE
+	);
 
 	initialize_communication();
 
+	// while (!Serial) {
+	// 	delay(50);
+	// }
 	// while (!Serial) {
 	// 	delay(50);
 	// }
@@ -65,13 +75,15 @@ void setup() {
 
 void loop() {
 	static arduino::String pairedDevice;
-	static bool inPairingMode = false;
+	static bool inPairingMode		= false;
+	static bool notificationPresent = false;
 // Activate pairing mode if button is pressed pressed.
 #if PAIRING_BUTTON_REQUIRED
 	static unsigned long pairingTime = 0;
 	if (digitalRead(PIN_BUTTON_1) == PinStatus::HIGH) {
 		Serial.print("Pairing Button is pressed\n");
 		enable_pairing_mode();
+		set_sensorstation_locked_status(SENSOR_STATION_LOCKED_VALUE);
 		inPairingMode = true;
 		pairingTime	  = millis();
 		// If button is not pressed for "DURATION_IN_PAIRING_MODE_MS" time it
@@ -104,7 +116,10 @@ void loop() {
 			Serial.print("Central device is remembered device.\n");
 			if (central.connected()) {
 				Serial.print("Connected\n");
-				setSensorValuesInBLE();
+				if (get_sensorstation_locked_status() ==
+					SENSOR_STATION_UNLOCKED_VALUE) {
+					setSensorValuesInBLE();
+				}
 				while (central.connected()) {
 					; // TODO: Timeout required
 				}
@@ -115,6 +130,7 @@ void loop() {
 			central.disconnect();
 		}
 		Serial.println("* Disconnected from central device!");
+		notificationPresent = updateNotificationHandler();
 		if (get_sensor_data_read_flag() == true) {
 			clear_sensor_data_read_flag();
 		} else {
@@ -125,17 +141,46 @@ void loop() {
 		}
 
 		Serial.print("Station is unlocked: ");
-		Serial.println(get_sensor_station_locked_status());
+		Serial.println(get_sensorstation_locked_status());
 	}
 	static int i = 0;
 	if (inPairingMode && i++ > 3) {
 		Serial.println("Searching for central device!");
 		i = 0;
 	}
-	delay(1000);
+	if (notificationPresent) {
+		unsigned long startNotificationCheck = millis();
+		int32_t timeTillNext				 = notificationHandler->update();
+		if (timeTillNext < 0) {
+			notificationPresent = false;
+		} else {
+			while ((unsigned long) timeTillNext <
+				   TIME_CHECK_BLE_CENTRAL_PRESENT_MS -
+					   (millis() - startNotificationCheck)) {
+				delay(timeTillNext);
+				timeTillNext = notificationHandler->update();
+			}
+		}
+
+	} else {
+		delay(TIME_CHECK_BLE_CENTRAL_PRESENT_MS);
+	}
 }
 
 // ----- Functions ----- //
+
+/**
+ * @returns True if there is a notification in the queue, else false.
+ */
+bool updateNotificationHandler() {
+	notificationHandler->updateAirHumidityValid(get_air_humidity_valid());
+	notificationHandler->updateAirPressureValid(get_air_pressure_valid());
+	notificationHandler->updateAirTemperatureValid(get_temperature_valid());
+	notificationHandler->updateAirQualityValid(get_air_quality_valid());
+	notificationHandler->updateSoilHumidityValid(get_air_humidity_valid());
+	notificationHandler->updateLightIntensityValid(get_light_intensity_valid());
+	return notificationHandler->update() != -1;
+}
 
 bool setSensorValuesInBLE() {
 	unsigned long startTime = millis();
@@ -211,6 +256,7 @@ uint16_t convertToGATT_soilHumidity(uint16_t humidity) {
 	}
 	return uint16_t(calculation * 100);
 }
+
 uint16_t convertToGATT_soilHumidity_notKnown() { return (uint16_t) 0xFFFF; }
 
 uint16_t convertToGATT_airHumidity(float humidity) {

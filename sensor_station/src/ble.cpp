@@ -488,10 +488,6 @@ void set_sensorstation_id(uint8_t id) {
 	sensor_station_id_characteristic.writeValue(id);
 }
 
-void set_sensorstation_locked_status(bool locked) {
-	sensor_station_unlocked_characteristic.writeValue((uint8_t) locked);
-}
-
 void set_dip_switch_id(uint8_t id) {
 	dip_switch_id_characteristic.writeValue(id);
 }
@@ -504,9 +500,49 @@ uint8_t get_sensor_data_read_flag() {
 	return value;
 }
 
-uint8_t get_sensor_station_locked_status(){
+void set_sensorstation_locked_status(bool locked) {
+	sensor_station_unlocked_characteristic.writeValue((uint8_t) locked);
+}
+
+uint8_t get_sensorstation_locked_status() {
 	uint8_t value;
 	sensor_station_unlocked_characteristic.readValue(value);
+	return value;
+}
+
+uint8_t get_soil_humidity_valid() {
+	uint8_t value;
+	soil_humidity_valid_characteristic.readValue(value);
+	return value;
+}
+
+uint8_t get_air_humidity_valid() {
+	uint8_t value;
+	air_humidity_valid_characteristic.readValue(value);
+	return value;
+}
+
+uint8_t get_air_pressure_valid() {
+	uint8_t value;
+	air_pressure_valid_characteristic.readValue(value);
+	return value;
+}
+
+uint8_t get_temperature_valid() {
+	uint8_t value;
+	temperature_valid_characteristic.readValue(value);
+	return value;
+}
+
+uint8_t get_air_quality_valid() {
+	uint8_t value;
+	air_quality_valid_characteristic.readValue(value);
+	return value;
+}
+
+uint8_t get_light_intensity_valid() {
+	uint8_t value;
+	light_intensity_valid_characteristic.readValue(value);
 	return value;
 }
 
