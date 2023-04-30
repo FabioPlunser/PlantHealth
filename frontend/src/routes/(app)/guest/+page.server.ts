@@ -1,19 +1,13 @@
 import type { Actions } from "./$types";
-
-// export async function load({ params, url }) {
-//   let plantId = url.searchParams.get("plantId");
-//   let plantName: string = "Sakura";
-//   let roomName: string = "Room 1";
-//   // TODO: fetch proper backend endpoint
-//   return {
-//     plantName,
-//     roomName,
-//     pictures: "https://picsum.photos/200/300",
-//   };
-// }
+import { BACKEND_URL } from "$env/static/private";
+import { redirect } from "@sveltejs/kit";
 
 export const actions = {
-  search: async ({ cookies, request, fetch }) => {
-    console.log("search");
+  default: async ({ request, fetch }) => {
+    const formData = await request.formData();
+    throw redirect(
+      303,
+      "/guest/plant?sensorStationId=" + formData.get("sensorStationId")
+    );
   },
 } satisfies Actions;

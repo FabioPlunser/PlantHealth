@@ -1,24 +1,57 @@
 <script lang="ts">
-  type Picture = {
-    imageRef: string;
-    creationDate: Date;
-  };
-  import { fade, fly, slide } from "svelte/transition";
+  import { slide, fade, fly } from "svelte/transition";
+  import Spinner from "$components/ui/Spinner.svelte";
+  import { onMount } from "svelte";
 
-  export let pictures: Picture[];
+  export let fetchPictures: any;
+  $: console.log(fetchPictures);
+
+  // let isLoading = true;
+  // let pictures: any[] = [];
+
+  // fetchPictures.then((data: any) => {
+  //   console.log(data);
+  //   pictures = data;
+  //   isLoading = false;
+  // });
+
+  let rendered = false;
+  onMount(() => {
+    rendered = true;
+  });
 </script>
 
-<div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-4">
-  {#each pictures as { imageRef, creationDate }}
-    <div in:slide={{ duration: 400, axis: "x" }} class="shrink-0 snap-center">
-      <img
-        alt="Plant"
-        class="rounded-xl shadow-xl backdrop-blur-2xl"
-        src={imageRef}
-      />
-      <h1 class="flex justify-center">
-        Date: {creationDate.toLocaleDateString()}
-      </h1>
+{#if rendered}
+  {#await fetchPictures}
+    <div class="flex justify-center mx-auto">
+      <div>
+        <Spinner />
+        <h1 class="mx-auto">Loading Pictures</h1>
+      </div>
     </div>
-  {/each}
-</div>
+  {:then pictures}
+    {#if pictures.length === 0}
+      <div
+        out:fly={{ y: -200, duration: 500 }}
+        class="mt-6 flex justify-center"
+      >
+        <h1 class="font-bold">No pictures found</h1>
+      </div>
+    {:else}
+      <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-4">
+        {#each pictures as { imageRef, creationDate, pictureId }, i (pictureId)}
+          <div in:fly={{ y: -200, duration: 500 }} class="shrink-0 snap-center">
+            <img
+              alt="Plant"
+              class="rounded-xl shadow-xl backdrop-blur-2xl"
+              src={imageRef}
+            />
+            <h1 class="flex justify-center">
+              Date: {creationDate.toLocaleDateString()}
+            </h1>
+          </div>
+        {/each}
+      </div>
+    {/if}
+  {/await}
+{/if}
