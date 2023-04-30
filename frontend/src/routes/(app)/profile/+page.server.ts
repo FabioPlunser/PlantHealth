@@ -6,10 +6,12 @@ import { z } from "zod";
 let personId: string;
 let username: string;
 let permissions: string[];
+let source: string | null;
 
 export const load = (async ({ url, fetch, locals }) => {
   personId = url.searchParams.get("personId") ?? locals.user.personId;
   username = url.searchParams.get("username") ?? locals.user.username;
+  source = url.searchParams.get("source");
   permissions =
     url.searchParams.get("userPermissions")?.split(",") ??
     locals.user.permissions;
@@ -151,13 +153,15 @@ export const actions = {
         return response.json();
       })
       .then((data) => {
-        let source = url.searchParams.get("source");
-        if (source !== null) {
-          throw redirect(307, source);
-        }
+        let time = new Date().toLocaleString();
+        console.log(`${time} : ${data.message}`);
       })
       .catch((error) => {
         console.error("Error fetching /update-user", error);
       });
+    // Redirect if the user was redirected to profile from some other page
+    if (source !== null) {
+      throw redirect(307, source);
+    }
   },
 } satisfies Actions;
