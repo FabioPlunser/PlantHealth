@@ -13,6 +13,7 @@
 #include <Adafruit_BME680.h>
 #include <Arduino.h>
 #include <ArduinoBLE.h>
+#include <CompilerFunctions.hpp>
 #include <NotificationHandler.hpp>
 #include <modules/communication.h>
 
@@ -81,7 +82,7 @@ void loop() {
 #if PAIRING_BUTTON_REQUIRED
 	static unsigned long pairingTime = 0;
 	if (digitalRead(PIN_BUTTON_1) == PinStatus::HIGH) {
-		Serial.print("Pairing Button is pressed\n");
+		DEBUG_PRINT(1, "Pairing Button is pressed\n");
 		enable_pairing_mode();
 		set_sensorstation_locked_status(SENSOR_STATION_LOCKED_VALUE);
 		inPairingMode = true;
@@ -89,7 +90,7 @@ void loop() {
 		// If button is not pressed for "DURATION_IN_PAIRING_MODE_MS" time it
 		// will got back to normal mode
 	} else if (millis() - pairingTime > DURATION_IN_PAIRING_MODE_MS && inPairingMode) {
-		Serial.print("Pairing mode ended\n");
+		DEBUG_PRINT(1, "Pairing mode ended\n");
 		inPairingMode = false;
 	}
 #else
@@ -102,20 +103,20 @@ void loop() {
 		uint8_t dipSwitchId = dipSwitch->getdipSwitchValue();
 		set_dip_switch_id(dipSwitchId);
 		if (inPairingMode) {
-			Serial.print("In pairing mode\n");
-			Serial.print("New device is: ");
 			pairedDevice = central.address();
-			Serial.println(pairedDevice);
+			DEBUG_PRINT(1, "In pairing mode\n");
+			DEBUG_PRINT(1, "New device is: ");
+			DEBUG_PRINTLN(1, pairedDevice);
 			inPairingMode = false;
 		}
-		Serial.println("* Connected to central device!");
-		Serial.print("* Device MAC address: ");
-		Serial.println(central.address());
-		Serial.println(" ");
+		DEBUG_PRINTLN(1, "* Connected to central device!");
+		DEBUG_PRINT(1, "* Device MAC address: ");
+		DEBUG_PRINTLN(1, central.address());
+		DEBUG_PRINTLN(1, " ");
 		if (pairedDevice.compareTo(central.address()) == 0) {
-			Serial.print("Central device is remembered device.\n");
+			DEBUG_PRINT(1, "Central device is remembered device.\n");
 			if (central.connected()) {
-				Serial.print("Connected\n");
+				DEBUG_PRINT(1, "Connected\n");
 				if (get_sensorstation_locked_status() ==
 					SENSOR_STATION_UNLOCKED_VALUE) {
 					setSensorValuesInBLE();
@@ -125,11 +126,11 @@ void loop() {
 				}
 			}
 		} else {
-			Serial.print("Declined connection to ");
-			Serial.println(central.address());
+			DEBUG_PRINT(1, "Declined connection to ");
+			DEBUG_PRINTLN(1, central.address());
 			central.disconnect();
 		}
-		Serial.println("* Disconnected from central device!");
+		DEBUG_PRINTLN(1, "* Disconnected from central device!");
 		notificationPresent = updateNotificationHandler();
 		if (get_sensor_data_read_flag() == true) {
 			clear_sensor_data_read_flag();
@@ -140,15 +141,16 @@ void loop() {
 			);
 		}
 
-		Serial.print("Station is unlocked: ");
-		Serial.println(get_sensorstation_locked_status());
+		DEBUG_PRINT(1, "Station is unlocked: ");
+		DEBUG_PRINTLN(1, get_sensorstation_locked_status());
 	}
 	static int i = 0;
 	if (inPairingMode && i++ > 3) {
-		Serial.println("Searching for central device!");
+		DEBUG_PRINTLN(1, "Searching for central device!");
 		i = 0;
 	}
 	if (notificationPresent) {
+		DEBUG_PRINT_POS(1, "Notifcation is present\n");
 		unsigned long startNotificationCheck = millis();
 		int32_t timeTillNext				 = notificationHandler->update();
 		if (timeTillNext < 0) {
@@ -157,6 +159,7 @@ void loop() {
 			while ((unsigned long) timeTillNext <
 				   TIME_CHECK_BLE_CENTRAL_PRESENT_MS -
 					   (millis() - startNotificationCheck)) {
+				DEBUG_PRINTF_POS(2, "Will wait for %ld ms\n", timeTillNext);
 				delay(timeTillNext);
 				timeTillNext = notificationHandler->update();
 			}
@@ -189,10 +192,10 @@ bool setSensorValuesInBLE() {
 		setSensorValuesFromSensors(&sensorData);
 
 #if PRINT_TIME_READ_SENSOR
-	char buffer[16];
-	Serial.print("Time taken to read sensor values: ");
-	sprintf(buffer, "%.3f.", float(millis() - startTime) / 1000);
-	Serial.println(buffer);
+	DEBUG_PRINTF(
+		0, "Time taken to read sensor values: %.3f.\n",
+		float(millis() - startTime) / 1000
+	);
 #endif
 
 	if (updateError == AirSensorClass::UPDATE_ERROR::NOTHING) {
@@ -241,16 +244,14 @@ AirSensorClass::UPDATE_ERROR setSensorValuesFromSensors(sensor_data_t * str) {
 };
 
 uint16_t convertToGATT_soilHumidity(uint16_t humidity) {
-	Serial.print("Soil humidity = ");
-	Serial.println(humidity);
+	DEBUG_PRINTF(2, "Soil humidity = %u\n", humidity);
 
 	static uint16_t valueHigh = 300;
 	static uint16_t valueLow  = 950;
 	float calculation =
 		100 - ((humidity - valueHigh) / (float) (valueLow - valueHigh) * 100);
 
-	Serial.print("Calculated = ");
-	Serial.println(calculation);
+	DEBUG_PRINTF(2, "Calculated = %lf\n", calculation);
 	if (calculation < 0 || calculation > 100) {
 		return convertToGATT_soilHumidity_notKnown();
 	}
