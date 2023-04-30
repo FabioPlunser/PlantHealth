@@ -4,16 +4,6 @@
   import { onMount } from "svelte";
 
   export let fetchPictures: any;
-  $: console.log(fetchPictures);
-
-  // let isLoading = true;
-  // let pictures: any[] = [];
-
-  // fetchPictures.then((data: any) => {
-  //   console.log(data);
-  //   pictures = data;
-  //   isLoading = false;
-  // });
 
   let rendered = false;
   onMount(() => {

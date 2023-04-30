@@ -15,8 +15,6 @@
   });
   // ----------------------------------------------- //
   export let data;
-  $: console.log(data);
-
   // ----------------------------------------------- //
   let imageToUpload: any;
 
@@ -30,7 +28,7 @@
   }
 
   export let form;
-  $: console.log(form);
+
   let submitting = false;
 
   const addPicture: SubmitFunction = () => {
