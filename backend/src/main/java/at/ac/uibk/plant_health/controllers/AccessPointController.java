@@ -79,7 +79,7 @@ public class AccessPointController {
 
 		return MessageResponse.builder()
 				.statusCode(200)
-				.message("AccessPoint lock set to " + unlocked)
+				.message("AccessPoint unlock set to " + unlocked)
 				.toEntity();
 	}
 
@@ -101,7 +101,7 @@ public class AccessPointController {
 	}
 
 	@WriteOperation
-	@PutMapping("/found-sensor-stations")
+	@PostMapping("/found-sensor-stations")
 	@PrincipalRequired(AccessPoint.class)
 	public RestResponseEntity foundSensorStations(
 			AccessPoint accessPoint, @RequestBody final List<SensorStation> sensorStations

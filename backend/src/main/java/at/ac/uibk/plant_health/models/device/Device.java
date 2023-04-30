@@ -22,7 +22,7 @@ public abstract class Device implements UserDetails, IdentifiedEntity {
 	@Id
 	// NOTE: Classes that extend this should create a Getter with
 	//       @JsonInclude to rename the ID for JSON-Serialisation.
-	@JsonIgnore
+	//	@JsonIgnore
 	@Setter(AccessLevel.PRIVATE)
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
 	@Column(name = "device_id", nullable = false)

@@ -18,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -25,6 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -69,7 +71,8 @@ public class TestSensorStationController {
 	private SensorStationRepository sensorStationRepository;
 	@Autowired
 	private SensorLimitsRepository sensorLimitsRepository;
-
+	@Autowired
+	private WebApplicationContext webApplicationContext;
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -263,11 +266,14 @@ public class TestSensorStationController {
 		SensorStation sensorStation = new SensorStation(bdAddress, 2);
 		sensorStationService.save(sensorStation);
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/upload-sensor-station-picture")
+		MockMultipartFile file = new MockMultipartFile(
+				"picture", "test.png", MediaType.IMAGE_PNG_VALUE, picture.getBytes()
+		);
+		mockMvc.perform(MockMvcRequestBuilders.multipart("/upload-sensor-station-picture")
+								.file(file)
 								.param("sensorStationId",
 									   String.valueOf(sensorStation.getDeviceId()))
-								.content(picture)
-								.contentType(MediaType.APPLICATION_JSON))
+								.contentType(MediaType.MULTIPART_FORM_DATA))
 				.andExpectAll(status().isOk());
 
 		sensorStation = sensorStationService.findByBdAddress(bdAddress);
@@ -295,20 +301,42 @@ public class TestSensorStationController {
 									   String.valueOf(sensorStation.getDeviceId()))
 								.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
 				.andExpectAll(
-						status().isOk(), jsonPath("$.encoding").exists(),
-						jsonPath("$.pictures").exists(), jsonPath("$.encoding").value("base64"),
+						status().isOk(), jsonPath("$.pictures").exists(),
 						jsonPath("$.pictures").isArray(),
-						jsonPath("$.pictures[0].roomName").value(accessPoint.getRoomName()),
-						jsonPath("$.pictures[0].plantName").value(sensorStation.getName()),
+						jsonPath("$.roomName").value(accessPoint.getRoomName()),
+						jsonPath("$.plantName").value(sensorStation.getName()),
 						jsonPath("$.pictures[0].timeStamp").exists(),
-						jsonPath("$.pictures[0].picture").exists(),
-						jsonPath("$.pictures[0].picture").value(picture)
+						jsonPath("$.pictures[0].pictureId").exists()
 				);
 
 		sensorStation = sensorStationService.findByBdAddress(bdAddress);
 		assertEquals(1, sensorStation.getPlantPictures().size());
 
 		sensorStation.getPlantPictures().forEach(p -> System.out.println(p.getPicturePath()));
+
+		deleteAllPictures(sensorStation);
+		assertEquals(0, sensorStation.getPlantPictures().size());
+	}
+
+	@Test
+	void getSensorStationPicture() throws Exception {
+		AccessPoint accessPoint = new AccessPoint(UUID.randomUUID(), "Office1", 50, false);
+		accessPointService.save(accessPoint);
+
+		String bdAddress = StringGenerator.macAddress();
+		SensorStation sensorStation = new SensorStation(bdAddress, 3);
+		sensorStation.setAccessPoint(accessPoint);
+		sensorStation.setName("Plant1");
+		sensorStationService.save(sensorStation);
+
+		createPicture(sensorStation);
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/get-sensor-station-picture")
+								.param("sensorStationId",
+									   String.valueOf(sensorStation.getDeviceId()))
+								.param("pictureId", String.valueOf(plantPicture.getPictureId()))
+								.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_OCTET_STREAM))
+				.andExpectAll(status().isOk());
 
 		deleteAllPictures(sensorStation);
 		assertEquals(0, sensorStation.getPlantPictures().size());

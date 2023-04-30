@@ -223,7 +223,7 @@ public class TestAccessPointController {
 			sensorStations.addPOJO(sensorStation);
 		}
 
-		mockMvc.perform(MockMvcRequestBuilders.put("/found-sensor-stations")
+		mockMvc.perform(MockMvcRequestBuilders.post("/found-sensor-stations")
 								.header(HttpHeaders.USER_AGENT, "AccessPoint")
 								.header(HttpHeaders.AUTHORIZATION,
 										"{ \"token\":\"" + accessPoint.getAccessToken().toString()

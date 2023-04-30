@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -119,25 +120,35 @@ public class SensorStationService {
 		return sensorStation.getPlantPictures();
 	}
 
+	public PlantPicture getPicture(UUID pictureId) throws ServiceException {
+		Optional<PlantPicture> maybePicture = plantPictureRepository.findById(pictureId);
+		if (maybePicture.isEmpty()) throw new ServiceException("Picture does not exist", 404);
+		return maybePicture.get();
+	}
+
 	/**
 	 * uploadPicture
 	 * @param picture base64 encoded picture
 	 * @return true if upload was successful
 	 */
-	public void uploadPicture(String picture, UUID sensorStationId) throws ServiceException {
+	public void uploadPicture(MultipartFile picture, UUID sensorStationId) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
 		PlantPicture plantPicture = null;
 		try {
-			byte[] imageByte = Base64.decodeBase64(picture);
-			String picturePath = picturesPath + UUID.randomUUID() + ".png";
+			String extension = Objects.requireNonNull(picture.getContentType()).split("/")[1];
+			String picturePath = picturesPath + UUID.randomUUID() + "." + extension;
 			Path path = Paths.get(picturePath);
+
 			plantPicture = new PlantPicture(sensorStation, picturePath, LocalDateTime.now());
+			plantPictureRepository.save(plantPicture);
+
 			Files.createDirectories(path.getParent());
-			Files.write(path, imageByte);
+			Files.write(path, picture.getBytes());
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new ServiceException("Could not save picture", 500);
 		}
-		plantPictureRepository.save(plantPicture);
+
 		List<PlantPicture> sensorStationPictures = sensorStation.getPlantPictures();
 		sensorStationPictures.add(plantPicture);
 		sensorStation.setPlantPictures(sensorStationPictures);
@@ -177,9 +188,15 @@ public class SensorStationService {
 		List<PlantPicture> pictures = new ArrayList<>(sensorStation.getPlantPictures());
 		try {
 			for (PlantPicture picture : pictures) {
-				Path path = Paths.get(picture.getPicturePath());
-				Files.delete(path);
-				plantPictureRepository.delete(picture);
+				try {
+					Path path = Paths.get(picture.getPicturePath());
+					Files.delete(path);
+					plantPictureRepository.delete(picture);
+				} catch (Exception e) {
+					plantPictureRepository.delete(picture);
+					throw new ServiceException("Picture already deleted from server", 500);
+				}
+
 				sensorStation.getPlantPictures().remove(picture);
 			}
 			save(sensorStation);
