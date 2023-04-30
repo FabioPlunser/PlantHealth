@@ -72,12 +72,13 @@ export const actions = {
     }
 
     var requestOptions = {
-      method: "POST",
+      method: "PUT",
       body: formData,
     };
 
     await fetch(`http://${BACKEND_URL}/create-user`, requestOptions)
       .then((response) => {
+        console.log(response);
         if (!response.ok) {
           throw new Error(response.statusText);
         }

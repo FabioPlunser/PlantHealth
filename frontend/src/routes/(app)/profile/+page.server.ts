@@ -4,15 +4,13 @@ import { BACKEND_URL } from "$env/static/private";
 import { z } from "zod";
 
 let personId: string;
-let username: string;
-let permissions: string[];
 let source: string | null;
 
 export const load = (async ({ url, fetch, locals }) => {
   personId = url.searchParams.get("personId") ?? locals.user.personId;
-  username = url.searchParams.get("username") ?? locals.user.username;
+  let username = url.searchParams.get("username") ?? locals.user.username;
   source = url.searchParams.get("source");
-  permissions =
+  let permissions =
     url.searchParams.get("userPermissions")?.split(",") ??
     locals.user.permissions;
 
@@ -125,8 +123,10 @@ export const actions = {
       }
     });
 
+    let username = formData.get("username");
     let email = formData.get("email");
     let password = formData.get("password");
+
     let params = new URLSearchParams();
 
     params.set("personId", personId);
