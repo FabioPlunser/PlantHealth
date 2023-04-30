@@ -35,9 +35,7 @@
     on:click={() => (addUserModal = true)}
     in:slide={{ duration: 400, axis: "y" }}>Add User</btn
   >
-  <form method="POST" use:enhance>
-    <div class="flex justify-center">
-      <UsersTable bind:users={data.users} />
-    </div>
-  </form>
+  <div class="flex justify-center">
+    <UsersTable bind:users={data.users} />
+  </div>
 {/if}

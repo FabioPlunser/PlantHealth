@@ -72,7 +72,8 @@ export const actions = {
     }
 
     var requestOptions = {
-      method: "PUT",
+      // change to PUT once backend is up to date
+      method: "POST",
       body: formData,
     };
 

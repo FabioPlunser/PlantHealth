@@ -6,6 +6,7 @@
     getCoreRowModel,
     getSortedRowModel,
     getFilteredRowModel,
+    getPaginationRowModel,
   } from "@tanstack/svelte-table";
   import { writable } from "svelte/store";
   import RolePills from "./RolePills.svelte";
@@ -63,8 +64,13 @@
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     state: {
       globalFilter,
+      pagination: {
+        pageSize: 5,
+        pageIndex: 0,
+      },
     },
   });
 
@@ -76,6 +82,37 @@
         state: {
           ...old.state,
           globalFilter: filter,
+        },
+      };
+    });
+  }
+
+  function setCurrentPage(page: number) {
+    options.update((old: any) => {
+      return {
+        ...old,
+        state: {
+          ...old.state,
+          pagination: {
+            ...old.state?.pagination,
+            pageIndex: page,
+          },
+        },
+      };
+    });
+  }
+
+  function setPageSize(e: Event) {
+    const target = e.target as HTMLInputElement;
+    options.update((old: any) => {
+      return {
+        ...old,
+        state: {
+          ...old.state,
+          pagination: {
+            ...old.state?.pagination,
+            pageSize: parseInt(target.value),
+          },
         },
       };
     });
@@ -98,17 +135,17 @@
 {#if isRendered}
   <div>
     <div class="mb-3" in:slide={{ duration: 400, axis: "y" }}>
-      <!-- TODO: fix input component to support on:search on:keyup-->
-      <Input
+      <input
         type="search"
         on:keyup={handleSearch}
         on:search={handleSearch}
         placeholder="Search..."
         {...noTypeCheck(null)}
+        class="input dark:input-bordered w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
       />
     </div>
     <div in:slide={{ duration: 400, axis: "y" }}>
-      <table class="table border-white">
+      <table class="table border-white w-full">
         <thead class="">
           {#each $table.getHeaderGroups() as headerGroup}
             <tr>
@@ -184,6 +221,63 @@
           {/each}
         </tbody>
       </table>
+    </div>
+
+    <div class=" justify-center flex align-items-center btn-group mt-3">
+      <button
+        class="btn"
+        on:click={() => setCurrentPage(0)}
+        class:is-disabled={!$table.getCanPreviousPage()}
+        disabled={!$table.getCanPreviousPage()}
+      >
+        {"<<"}
+      </button>
+      <button
+        class="btn"
+        on:click={() =>
+          setCurrentPage($table.getState().pagination.pageIndex - 1)}
+        class:is-disabled={!$table.getCanPreviousPage()}
+        disabled={!$table.getCanPreviousPage()}
+      >
+        {"<"}
+      </button>
+      <span class="btn">
+        Page
+        {$table.getState().pagination.pageIndex + 1}
+        {" "}of{" "}
+        {$table.getPageCount()}
+      </span>
+      <button
+        class="btn"
+        on:click={() =>
+          setCurrentPage($table.getState().pagination.pageIndex + 1)}
+        class:is-disabled={!$table.getCanNextPage()}
+        disabled={!$table.getCanNextPage()}
+      >
+        {">"}
+      </button>
+      <button
+        class="btn"
+        on:click={() => setCurrentPage($table.getPageCount() - 1)}
+        class:is-disabled={!$table.getCanNextPage()}
+        disabled={!$table.getCanNextPage()}
+      >
+        {">>"}
+      </button>
+      <select
+        value={$table.getState().pagination.pageSize}
+        on:change={setPageSize}
+        class="btn"
+      >
+        {#each [5, 10, 25, 50] as pageSize}
+          <option value={pageSize}>
+            Show {pageSize}
+          </option>
+        {/each}
+      </select>
+      <span class="btn"
+        >{$table.getPrePaginationRowModel().rows.length} total Rows</span
+      >
     </div>
   </div>
 {/if}
