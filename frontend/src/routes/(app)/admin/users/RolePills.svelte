@@ -2,7 +2,7 @@
   export let roles: string[];
   let rolesToLower = roles.map((role) => role.toUpperCase());
 
-  const getColorClass = (role: string) => {
+  const getRoleClass = (role: string) => {
     if (role === "ADMIN") {
       return "bg-orange-500";
     } else if (role === "GARDENER") {
@@ -21,7 +21,7 @@
       class={`
       badge badge-lg border-none
       text-white text-sm
-      ${getColorClass(role)}
+      ${getRoleClass(role)}
     `}
     >
       {role}

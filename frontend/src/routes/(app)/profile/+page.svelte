@@ -22,6 +22,7 @@
 
   let password: string;
   let passwordConfirm: string;
+  let email: string;
 
   let roles: string[] = Array.from(Object.keys(data.permissions));
 </script>
@@ -46,14 +47,14 @@
         <Input
           type="email"
           field="email"
-          label="Email"
+          label="New Email"
           placeholder="example.mail@planthealth.com"
-          value={data.email}
+          value={email}
         />
         <FormError field="email" {form} />
         <PasswordInput
           field="password"
-          label="Password"
+          label="New Password"
           placeholder="Password"
           value={password}
         />
