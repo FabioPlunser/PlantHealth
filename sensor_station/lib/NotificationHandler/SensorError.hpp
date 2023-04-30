@@ -1,7 +1,7 @@
 #ifndef ERROR_CLASS
 #define ERROR_CLASS
 
-#include "Notification.cpp"
+#include "Notification.hpp"
 #include "SensorErrors.h"
 
 #include <Arduino.h>

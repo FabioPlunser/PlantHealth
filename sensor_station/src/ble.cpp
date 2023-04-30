@@ -510,6 +510,42 @@ uint8_t get_sensorstation_locked_status() {
 	return value;
 }
 
+uint8_t get_soil_humidity_valid() {
+	uint8_t value;
+	soil_humidity_valid_characteristic.readValue(value);
+	return value;
+}
+
+uint8_t get_air_humidity_valid() {
+	uint8_t value;
+	air_humidity_valid_characteristic.readValue(value);
+	return value;
+}
+
+uint8_t get_air_pressure_valid() {
+	uint8_t value;
+	air_pressure_valid_characteristic.readValue(value);
+	return value;
+}
+
+uint8_t get_temperature_valid() {
+	uint8_t value;
+	temperature_valid_characteristic.readValue(value);
+	return value;
+}
+
+uint8_t get_air_quality_valid() {
+	uint8_t value;
+	air_quality_valid_characteristic.readValue(value);
+	return value;
+}
+
+uint8_t get_light_intensity_valid() {
+	uint8_t value;
+	light_intensity_valid_characteristic.readValue(value);
+	return value;
+}
+
 // ---------- Set Flags
 
 void clearAllFlags() {

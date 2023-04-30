@@ -2,10 +2,10 @@
 #define ERROR_HANDLER_CLASS
 
 #include "../../include/Defines.h"
-#include "LedController.cpp"
-#include "NotificationQueue.cpp"
-#include "PiezoBuzzerController.cpp"
-#include "SensorError.cpp"
+#include "LedController.hpp"
+#include "NotificationQueue.hpp"
+#include "PiezoBuzzerController.hpp"
+#include "SensorError.hpp"
 #include "SensorErrors.h"
 
 #define CHECK_IF_CASTABLE_TO_SENSOR_ERROR(notification) \
@@ -45,13 +45,13 @@ class NotificationHandler {
 		}
 
 	public:
-		static NotificationHandler & getErrorHandler(
+		static NotificationHandler * getInstance(
 			uint8_t ledPinRed, uint8_t ledPinGreen, uint8_t ledPinBlue
 		) {
-			static NotificationHandler errorHandler(
+			static NotificationHandler notificationHandler(
 				ledPinRed, ledPinGreen, ledPinBlue
 			);
-			return errorHandler;
+			return &notificationHandler;
 		}
 
 	private:
@@ -298,7 +298,7 @@ class NotificationHandler {
 			);
 		}
 
-		void updateAirqualityValid(uint8_t value) {
+		void updateAirQualityValid(uint8_t value) {
 			static uint8_t prevValue = ERROR_VALUE_NOTHING;
 			CHECK_VALID_VALUE_VALID(value);
 			if (value == prevValue) {

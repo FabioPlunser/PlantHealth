@@ -40,7 +40,15 @@ void clearAllFlags();
 void set_dip_switch_id(uint8_t id);
 void set_sensorstation_id(uint8_t id);
 uint8_t get_sensor_data_read_flag();
+
 void set_sensorstation_locked_status(bool locked);
 uint8_t get_sensorstation_locked_status();
+
+uint8_t get_soil_humidity_valid();
+uint8_t get_air_humidity_valid();
+uint8_t get_air_pressure_valid();
+uint8_t get_temperature_valid();
+uint8_t get_air_quality_valid();
+uint8_t get_light_intensity_valid();
 
 #endif

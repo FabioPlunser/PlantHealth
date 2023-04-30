@@ -1,7 +1,7 @@
 #ifndef ERROR_QUEUE_CLASS
 #define ERROR_QUEUE_CLASS
 
-#include "SensorError.cpp"
+#include "SensorError.hpp"
 #include "SensorErrors.h"
 
 #include <Arduino.h>
