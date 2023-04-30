@@ -56,9 +56,9 @@ public class StartupConfig {
 	public void createBaseAdminUser() {
 		Profile activeProfile = getActiveProfile();
 
-		//		AccessPoint ac = new AccessPoint(UUID.randomUUID(), "Test", 10, false);
-		//		ac.setConnected(true);
-		//		accessPointService.save(ac);
+		AccessPoint ac = new AccessPoint(UUID.randomUUID(), "Test", 10, false);
+		ac.setConnected(true);
+		accessPointService.save(ac);
 
 		switch (activeProfile) {
 						case DEBUG -> {

@@ -61,7 +61,6 @@ public class EndpointMatcherUtil {
 		public static final String ERROR_ENDPOINT = "/error";
 	}
 
-	// TODO: Write Tests for Error Endpoints
 	private final String[] errorEndpoints =
 			// Get all Error Routes defined in this Class using Runtime Reflection
 			Arrays.stream(ErrorEndpoints.class.getDeclaredFields())

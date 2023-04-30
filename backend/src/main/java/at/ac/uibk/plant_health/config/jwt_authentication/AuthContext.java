@@ -65,8 +65,4 @@ public class AuthContext {
 
 		return Optional.empty();
 	}
-
-	public static Optional<String> getPrincipalId() {
-		return getIdentifiedPrincipal().map(IdentifiedEntity::getStringIdentification);
-	}
 }
