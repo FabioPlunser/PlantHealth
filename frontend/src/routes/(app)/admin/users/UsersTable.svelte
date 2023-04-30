@@ -17,6 +17,7 @@
   import { page } from "$app/stores";
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";
+  import { enhance } from "$app/forms";
 
   let isRendered = false;
 
@@ -163,9 +164,16 @@
                   <label class="button">
                     <!-- TODO make delete user action with verification Modal-->
                     <!--on click should call deleteUser action and pass Id-->
-                    <button on:click={() => {}} class="">
-                      <i class="bi bi-trash text-3xl hover:text-red-500" />
-                    </button>
+                    <form method="POST" action="?/deleteUser" use:enhance>
+                      <input
+                        type="hidden"
+                        bind:value={row.original.personId}
+                        name="personId"
+                      />
+                      <button type="submit" class="">
+                        <i class="bi bi-trash text-3xl hover:text-red-500" />
+                      </button>
+                    </form>
                   </label>
                 </div>
               </td>

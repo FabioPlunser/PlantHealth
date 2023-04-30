@@ -5,6 +5,7 @@
   import UsersTable from "./UsersTable.svelte";
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";
+  import { enhance } from "$app/forms";
   export let data: PageData;
 
   let isRendered = false;
@@ -34,7 +35,9 @@
     on:click={() => (addUserModal = true)}
     in:slide={{ duration: 400, axis: "y" }}>Add User</btn
   >
-  <div class="flex justify-center">
-    <UsersTable bind:users={data.users} />
-  </div>
+  <form method="POST" use:enhance>
+    <div class="flex justify-center">
+      <UsersTable bind:users={data.users} />
+    </div>
+  </form>
 {/if}

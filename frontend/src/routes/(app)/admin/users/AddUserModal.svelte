@@ -4,6 +4,7 @@
   import FormError from "$lib/helper/formError.svelte";
   import type { ActionData } from "./$types";
   import { enhance } from "$app/forms";
+  import { invalidate } from "$app/navigation";
 
   export let showModal: boolean;
   export let form: ActionData;
@@ -41,7 +42,13 @@
 
     <div class="flex justify-between mt-4">
       <!-- TODO: modal should not close if input validation failed-->
-      <button type="submit" class="btn btn-primary">Add User</button>
+      <button
+        type="submit"
+        on:click={() => {
+          invalidate("all-users:load");
+        }}
+        class="btn btn-primary">Add User</button
+      >
       <button class="btn btn-info" on:click={() => (showModal = false)}
         >Close</button
       >

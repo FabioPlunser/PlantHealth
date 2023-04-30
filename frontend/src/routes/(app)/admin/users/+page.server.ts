@@ -2,9 +2,9 @@ import type { Actions, PageServerLoad } from "./$types";
 import { BACKEND_URL } from "$env/static/private";
 import { fail, redirect, error } from "@sveltejs/kit";
 import { z } from "zod";
-import { createEventDispatcher } from "svelte";
 
-export const load = (async ({ fetch }) => {
+export const load = (async ({ fetch, depends }) => {
+  depends("all-users:load");
   let allUsers;
   await fetch(`http://${BACKEND_URL}/get-all-users`)
     .then((response) => {
@@ -52,10 +52,9 @@ const schema = z.object({
 });
 
 export const actions = {
-  createUser: async ({ cookies, request, fetch, event }) => {
+  createUser: async ({ cookies, request, fetch, locals }) => {
     const formData = await request.formData();
     const zod = schema.safeParse(Object.fromEntries(formData));
-    console.log(formData);
 
     if (formData.get("password") !== formData.get("passwordConfirm")) {
       return fail(400, { error: true, errors: "Passwords do not match" });
@@ -78,25 +77,50 @@ export const actions = {
       body: formData,
     };
 
-    let res = await fetch(`http://${BACKEND_URL}/create-user`, requestOptions);
-    res = await res.json();
-    console.log(res);
+    await fetch(`http://${BACKEND_URL}/create-user`, requestOptions)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        let time = new Date().toLocaleString();
+        console.log(
+          `${time} : Admin with id: ${locals.user.personId} and username: ${locals.user.username} created a new user`
+        );
+      })
+      .catch((error) => {
+        console.error("Error fetching /update-user", error);
+      });
   },
 
-  deleteUser: async ({ fetch, event }) => {
-    const formData = new FormData();
-    formData.append("id", event.query.get("id"));
+  deleteUser: async ({ fetch, request, locals }) => {
+    const formData = await request.formData();
+    let personId = formData.get("personId");
 
-    var requestOptions = {
-      method: "POST",
-      body: formData,
-    };
-    let res = await fetch(`http://${BACKEND_URL}/delete-user`, requestOptions);
+    let params = new URLSearchParams();
+    params.set("personId", personId);
 
-    res = await res.json();
+    let parametersString = "?" + params.toString();
 
-    if (res.success) {
-      // throw redirect(302, "/");
-    }
+    await fetch(`http://${BACKEND_URL}/delete-user` + parametersString, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        let time = new Date().toLocaleString();
+        console.log(
+          `${time} : Admin with id: ${locals.user.personId} and username: ${locals.user.username} deleted user with id: ${personId}`
+        );
+      })
+      .catch((error) => {
+        console.error("Error fetching /update-user", error);
+      });
   },
 } satisfies Actions;
