@@ -3,7 +3,6 @@ version: "3.9"
 # Docker Reference: https://docs.docker.com/engine/reference/builder/
 
 services:
-
   sveltekit:
     build:
       context: ./frontend
@@ -37,19 +36,18 @@ services:
     image: mysql
     restart: always
     environment:
-      MYSQL_DATABASE: swa
+      MYSQL_HOST: db
+      MYSQL_DATABASE: plant_health
       MYSQL_RANDOM_ROOT_PASSWORD: yes
       MYSQL_USER: spring
       MYSQL_PASSWORD: password
-    # TODO: Expose Port if "DEBUG"-Profile is enabled?
-    # ports:
-    #   - ""
     networks:
       - db-network
     # TODO: How do we enable Caching Sha2-Passwords? Is this enough?
     # NOTE: use of "mysql_native_password" is not recommended: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
     # (this is just an example, not intended to be a production configuration)
     command: --default-authentication-plugin=mysql_native_password
+    expose: [3306]
 
   adminer:
     image: adminer

@@ -1,0 +1,11 @@
+logging:
+  level:
+    web: TRACE
+
+springdoc:
+  # API-Docs is an Endpoint where the Swagger-UI
+  # gets the information about the Endpoints.
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true

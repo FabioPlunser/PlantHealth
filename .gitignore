@@ -27,4 +27,8 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+*.sw?:w
+
+#ccls
+.ccls-cache/
+.ccls

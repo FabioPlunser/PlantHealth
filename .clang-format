@@ -1,0 +1,36 @@
+---
+Language: Cpp
+BasedOnStyle: LLVM
+AlignAfterOpenBracket: BlockIndent
+AlignArrayOfStructures: Left
+AlignConsecutiveAssignments:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+  AlignCompound: true
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+AlignEscapedNewlines: Left
+IncludeBlocks: Regroup
+IndentAccessModifiers: true
+IndentCaseLabels: true
+IndentWidth: 4
+InsertBraces: true
+KeepEmptyLinesAtTheStartOfBlocks: false
+NamespaceIndentation: All
+PointerAlignment: Middle
+QualifierAlignment: Left
+SpaceAfterCStyleCast: true
+SpaceAroundPointerQualifiers: Both
+TabWidth: 4
+UseTab: Always
+---
+Language: Java
+BasedOnStyle: Chromium
+AlignAfterOpenBracket: BlockIndent
+IncludeBlocks: Regroup
+IndentWidth: 4
+TabWidth: 4
+UseTab: Always

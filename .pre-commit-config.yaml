@@ -1,0 +1,39 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: check-added-large-files
+
+  # formatting for c c++ and java
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v15.0.7
+    hooks:
+      - id: clang-format
+        types_or: [c++, c, java]
+
+  # formatting and checking python
+  - repo: https://github.com/psf/black
+    rev: b0d1fba
+    hooks:
+      - id: black
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: b9a7794
+    hooks:
+      - id: flake8
+
+  # formatting for js / ts
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v2.7.1
+    hooks:
+      - id: prettier
+        types_or: [yaml, ts, javascript, svelte]
+        additional_dependencies:
+          - prettier
+          - prettier-plugin-svelte
+          - svelte

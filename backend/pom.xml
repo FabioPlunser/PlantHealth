@@ -3,11 +3,11 @@
         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>at.ac.uibk.swa</groupId>
-    <artifactId>swa</artifactId>
+    <groupId>at.ac.uibk.plant_health</groupId>
+    <artifactId>plant_health</artifactId>
     <version>0.1</version>
 
-    <name>swa</name>
+    <name>plant_health</name>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -40,6 +40,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
             <version>3.0.0</version>
+        </dependency>
+
+        <!-- MySQL specific driver -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
         <!-- Swagger UI -->
@@ -79,15 +85,26 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- In-memory Database -->
+        <!-- Mail Service -->
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.200</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+
+        <!-- Spring Actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
 
-<!-- Test dependencies -->
+        <!-- Test dependencies -->
 
         <!-- Test Framework -->
         <dependency>
@@ -103,9 +120,16 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- In-memory Database used for testing -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
-     <build>
+    <build>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -113,6 +137,15 @@
                     <release>17</release>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>at.ac.uibk.plant_health.SwaApplication</mainClass>
+                </configuration>
+            </plugin>
+
             <!-- Enable jacoco analysis -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -148,4 +181,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

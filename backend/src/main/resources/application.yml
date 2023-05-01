@@ -1,44 +1,46 @@
-
 swa:
   token:
     expiration-duration: 1d
-  admin:
-    base: /src/admin
   api:
-    base: /api
-  error:
-    base: /error
+    base: /
 
 server:
-  port: 3000
+  port: 8080
   servlet:
     context-path: /
 
 logging:
+  #  datasource:
+  #    url: jdbc:mysql://db:3306?createDatabaseIfNotExist=true
   level:
     web: INFO
 
 springdoc:
+  # Disable Swagger in Production
   api-docs:
+    path: /api-docs
     enabled: false
   swagger-ui:
+    path: /swagger
     enabled: false
 
 spring:
   profiles:
-    active: 'prod'
+    active: "prod"
   datasource:
-    driver-class-name: org.h2.Driver
-    url: 'jdbc:h2:mem:testdb'
-  jpa:
-    hibernate:
-      ddl-auto: create
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost/plant_health
+    username: spring
+    password: password
   h2:
     console:
       enabled: false
-
-  mvc:
-    static-path-pattern: '/**'
-
-  resources:
-    static-locations: 'classpath:/static/'
+  jpa:
+    hibernate:
+      dialect: org.hibernate.dialect.MySQLDialect
+      # Create Model Tables on Startup
+      ddl-auto: create
+  web:
+    resources:
+      # Disable static Resource Mapping
+      add-mappings: false

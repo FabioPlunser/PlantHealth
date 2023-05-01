@@ -1,18 +1,15 @@
-import adapter from '@sveltejs/adapter-auto';
-import { vitePreprocess } from '@sveltejs/kit/vite';
-import tailwind from 'tailwindcss'
-import autoprefixer from 'autoprefixer'
+import adapter from "@sveltejs/adapter-node";
+import { vitePreprocess } from "@sveltejs/kit/vite";
 
+import tailwind from "tailwindcss";
+import autoprefixer from "autoprefixer";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
   preprocess: vitePreprocess({
     postcss: {
-			plugins: [
-				tailwind, 
-				autoprefixer
-			]
-		}
+      plugins: [tailwind, autoprefixer],
+    },
   }),
   kit: {
     alias: {
