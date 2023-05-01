@@ -1,0 +1,104 @@
+<server-configuration name="SensorStation">
+   <service name="Sensor Station Info Service" uuid="dea07cc4-d084-11ed-a760-325096b39f47">
+      <characteristic name="DIP Switch" uuid="00002a9a-0000-1000-8000-00805f9b34fb" value="45">
+         <permission name="READ"/>
+         <property name="READ"/>
+      </characteristic>
+      <characteristic name="Battery Status" uuid="00002bed-0000-1000-8000-00805f9b34fb" value="02000046">
+         <permission name="READ"/>
+         <property name="READ"/>
+      </characteristic>
+      <characteristic name="Unlocked" uuid="00002ae2-0000-1000-8000-00805f9b34fb" value="00">
+         <permission name="READ"/>
+         <permission name="WRITE"/>
+         <property name="READ"/>
+         <property name="WRITE"/>
+      </characteristic>
+      <characteristic name="Station ID" uuid="00002abf-0000-1000-8000-00805f9b34fb" value="01020304050607080910111213141516">
+         <permission name="READ"/>
+         <property name="READ"/>
+      </characteristic>
+   </service>
+   <service name="Sensor Data Read Service" uuid="dea07cc4-d084-11ed-a760-325096b39f48">
+      <characteristic name="Sensor Data Read" uuid="00002ae2-0000-1000-8000-00805f9b34fb" value="00">
+         <descriptor configure="CCCD"/>
+         <permission name="READ"/>
+         <permission name="WRITE"/>
+         <property name="READ"/>
+         <property name="WRITE"/>
+         <property name="NOTIFY"/>
+      </characteristic>
+   </service>
+   <service name="Earth Humidity Sensor Service" uuid="dea07cc4-d084-11ed-a760-325096b39f49">
+      <characteristic name="Value" uuid="00002a6f-0000-1000-8000-00805f9b34fb" value="6400">
+         <permission name="READ"/>
+         <property name="READ"/>
+      </characteristic>
+      <characteristic name="Alarm" uuid="00002a9a-0000-1000-8000-00805f9b34fb" value="00">
+         <permission name="READ"/>
+         <permission name="WRITE"/>
+         <property name="READ"/>
+         <property name="WRITE"/>
+      </characteristic>
+   </service>
+   <service name="Air Humidity Sensor Service" uuid="dea07cc4-d084-11ed-a760-325096b39f4a">
+      <characteristic name="Value" uuid="00002a6f-0000-1000-8000-00805f9b34fb" value="C800">
+         <permission name="READ"/>
+         <property name="READ"/>
+      </characteristic>
+      <characteristic name="Alarm" uuid="00002a9a-0000-1000-8000-00805f9b34fb" value="00">
+         <permission name="READ"/>
+         <permission name="WRITE"/>
+         <property name="READ"/>
+         <property name="WRITE"/>
+      </characteristic>
+   </service>
+   <service name="Air Pressure Sensor Service" uuid="dea07cc4-d084-11ed-a760-325096b39f4b">
+      <characteristic name="Value" uuid="00002a6d-0000-1000-8000-00805f9b34fb" value="1E000000">
+         <permission name="READ"/>
+         <property name="READ"/>
+      </characteristic>
+      <characteristic name="Alarm" uuid="00002a9a-0000-1000-8000-00805f9b34fb" value="00">
+         <permission name="READ"/>
+         <permission name="WRITE"/>
+         <property name="READ"/>
+         <property name="WRITE"/>
+      </characteristic>
+   </service>
+   <service name="Temperature Sensor Service" uuid="dea07cc4-d084-11ed-a760-325096b39f4c">
+      <characteristic name="Value" uuid="00002b0d-0000-1000-8000-00805f9b34fb" value="F8">
+         <permission name="READ"/>
+         <property name="READ"/>
+      </characteristic>
+      <characteristic name="Alarm" uuid="00002a9a-0000-1000-8000-00805f9b34fb" value="00">
+         <permission name="READ"/>
+         <permission name="WRITE"/>
+         <property name="READ"/>
+         <property name="WRITE"/>
+      </characteristic>
+   </service>
+   <service name="Air Quality Sensor Service" uuid="dea07cc4-d084-11ed-a760-325096b39f4d">
+      <characteristic name="Value" uuid="00002b04-0000-1000-8000-00805f9b34fb" value="0A">
+         <permission name="READ"/>
+         <property name="READ"/>
+      </characteristic>
+      <characteristic name="Alarm" uuid="00002a9a-0000-1000-8000-00805f9b34fb" value="00">
+         <permission name="READ"/>
+         <permission name="WRITE"/>
+         <property name="READ"/>
+         <property name="WRITE"/>
+      </characteristic>
+   </service>
+   <service name="Light Intensity Sensor Service" uuid="dea07cc4-d084-11ed-a760-325096b39f4e">
+      <characteristic name="Value" uuid="00002aff-0000-1000-8000-00805f9b34fb" value="0600">
+         <permission name="READ"/>
+         <property name="READ"/>
+      </characteristic>
+      <characteristic name="Alarm" uuid="00002a9a-0000-1000-8000-00805f9b34fb" value="00">
+         <permission name="READ"/>
+         <permission name="WRITE"/>
+         <property name="READ"/>
+         <property name="WRITE"/>
+      </characteristic>
+   </service>
+</server-configuration>

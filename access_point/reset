@@ -1,0 +1,15 @@
+#!/bin/bash
+# Resets any configuration to default state
+
+# stop a currently running access point routine
+source stop
+
+# delete cronjob
+current_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+target="$current_dir/start"
+crontab -l 2>/dev/null | grep -v "$target"  | crontab -
+
+# delete configuration and data files
+rm conf.yaml 2>/dev/null
+rm data.db 2>/dev/null
+rm main.log* 2>/dev/null
