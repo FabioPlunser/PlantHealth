@@ -53,16 +53,16 @@ export const actions = {
 
       return fail(400, { error: true, errors });
     }
-
+    formData.delete("passwordConfirm");
+    console.log(formData);
     var requestOptions = {
       method: "POST",
       body: formData,
     };
 
-    let res = await fetch(
-      `http://${BACKEND_URL}/register`,
-      requestOptions
-    ).catch((error) => console.log("error", error));
+    let res = await fetch(`${BACKEND_URL}/register`, requestOptions).catch(
+      (error) => console.log("error", error)
+    );
 
     res = await res.json();
     console.log(res);

@@ -42,7 +42,7 @@ export const actions = {
 
     let res = null;
     try {
-      res = await fetch(`http://${BACKEND_URL}/login`, requestOptions);
+      res = await fetch(`${BACKEND_URL}/login`, requestOptions);
     } catch (error) {
       console.log("login", error);
       return fail(503, { message: "Server connection refused" });

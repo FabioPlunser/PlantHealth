@@ -4,7 +4,7 @@ import { fail, redirect, error } from "@sveltejs/kit";
 import { z } from "zod";
 
 export const load = (async ({ fetch }) => {
-  let res = await fetch(`http://${BACKEND_URL}/get-all-users`);
+  let res = await fetch(`${BACKEND_URL}/get-all-users`);
   let res_json = await res.json();
   if (res?.ok) {
     console.log("SUCCESS");
@@ -70,7 +70,7 @@ export const actions = {
       body: formData,
     };
 
-    let res = await fetch(`http://${BACKEND_URL}/create-user`, requestOptions);
+    let res = await fetch(`${BACKEND_URL}/create-user`, requestOptions);
     res = await res.json();
   },
 
@@ -87,7 +87,7 @@ export const actions = {
       body: formData,
     };
 
-    let res = await fetch(`http://${BACKEND_URL}/delete-user`, requestOptions);
+    let res = await fetch(`${BACKEND_URL}/delete-user`, requestOptions);
 
     res = await res.json();
 
