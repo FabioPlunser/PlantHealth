@@ -2,15 +2,20 @@ package at.ac.uibk.plant_health.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.device.AccessPoint;
 import at.ac.uibk.plant_health.models.device.SensorStation;
+import at.ac.uibk.plant_health.models.exceptions.ServiceException;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import at.ac.uibk.plant_health.repositories.AccessPointRepository;
+import jakarta.persistence.Access;
 
 @Service
 public class AccessPointService {
@@ -18,6 +23,27 @@ public class AccessPointService {
 	private AccessPointRepository accessPointRepository;
 	@Autowired
 	private SensorStationService sensorStationService;
+
+	public AccessPoint findById(UUID id) throws ServiceException {
+		Optional<AccessPoint> maybeAccessPoint = this.accessPointRepository.findById(id);
+		if (maybeAccessPoint.isEmpty()) {
+			throw new ServiceException("Could not find AccessPoint", 404);
+		}
+		return maybeAccessPoint.get();
+	}
+
+	public AccessPoint findBySelfAssignedId(UUID id) throws ServiceException {
+		Optional<AccessPoint> maybeAccessPoint =
+				this.accessPointRepository.findBySelfAssignedId(id);
+		if (maybeAccessPoint.isEmpty()) {
+			throw new ServiceException("Could not find AccessPoint", 404);
+		}
+		return maybeAccessPoint.get();
+	}
+
+	public int updateLastConnection() {
+		return this.accessPointRepository.updateIsConnectedByLastConnection();
+	}
 
 	/**
 	 * Get all AccessPoints.
@@ -30,58 +56,39 @@ public class AccessPointService {
 	/**
 	 * Register a new AccessPoint.
 	 * Check if AccessPoint is Unlocked.
-	 * @param accessPointId
-	 * @param roomName
-	 * @return
+	 * @param selfAssignedId The selfAssignedId of the AccessPoint to register.
+	 * @param roomName The roomName of the AccessPoint to register.
+	 * @throws ServiceException if the AccessPoint could not be registered.
 	 */
-	public boolean register(UUID accessPointId, String roomName) {
-		if (accessPointId == null || roomName == null) return false;
+	public void register(UUID selfAssignedId, String roomName) throws ServiceException {
+		if (selfAssignedId == null || roomName == null) {
+			throw new ServiceException("Could not register AccessPoint", 400);
+		}
 
-		return this.create(accessPointId, roomName);
-	}
-
-	/**
-	 * Get the AccessPoint with the given ID.
-	 * @param accessPointId
-	 * @return
-	 * @throws IllegalArgumentException
-	 */
-	public boolean isUnlocked(UUID accessPointId) throws IllegalArgumentException {
-		Optional<AccessPoint> maybeAccessPoint =
-				accessPointRepository.findBySelfAssignedId(accessPointId);
-		if (maybeAccessPoint.isEmpty())
-			throw new IllegalArgumentException(
-					"AccessPoint with ID " + accessPointId + " does not exist."
-			);
-		AccessPoint accessPoint = maybeAccessPoint.get();
-		return accessPoint.isUnlocked();
-	}
-
-	/**
-	 * Check if the AccessPoint with the given ID is registered.
-	 * @param accessPointId
-	 * @return
-	 */
-	public boolean isAccessPointRegistered(UUID accessPointId) {
-		Optional<AccessPoint> maybeAccessPoint =
-				accessPointRepository.findBySelfAssignedId(accessPointId);
-		return maybeAccessPoint.isPresent();
+		this.create(selfAssignedId, roomName);
 	}
 
 	/**
 	 * Save the given AccessPoint.
 	 * If the AccessPoint with the given ID already exists, don't save it and return false.
-	 *
-	 * @param accessPointId
-	 * @param roomName
+	 * returns false if accessPoint already exists
+	 * @param selfAssignedId The selfAssignedId of the AccessPoint to save.
+	 * @param roomName The roomName of the AccessPoint to save.
+	 * @throws ServiceException if the AccessPoint could not be saved.
 	 */
-	public boolean create(UUID accessPointId, String roomName) {
-		// TODO
-		if (accessPointId == null && roomName == null) {
-			return false;
+	public void create(UUID selfAssignedId, String roomName) throws ServiceException {
+		if (selfAssignedId == null && roomName == null) {
+			throw new ServiceException("Could not create AccessPoint", 400);
 		}
-		AccessPoint accessPoint = new AccessPoint(accessPointId, roomName, false);
-		return save(accessPoint) != null;
+		try {
+			// AccessPoint already exists quietly abort
+			findBySelfAssignedId(selfAssignedId);
+			return;
+		} catch (ServiceException e) {
+			// AccessPoint does not exist
+		}
+		AccessPoint accessPoint = new AccessPoint(selfAssignedId, roomName, false);
+		save(accessPoint);
 	}
 
 	/**
@@ -90,50 +97,59 @@ public class AccessPointService {
 	 *
 	 * @param accessPoint The AccessPoint to save.
 	 * @return the saved AccessPoint
+	 * @throws ServiceException if the AccessPoint could not be saved.
 	 */
-	public AccessPoint save(AccessPoint accessPoint) {
-		// TODO
+	public AccessPoint save(AccessPoint accessPoint) throws ServiceException {
 		try {
 			return accessPointRepository.save(accessPoint);
 		} catch (Exception e) {
-			return null;
+			throw new ServiceException("Could not save AccessPoint", 400);
 		}
 	}
 
 	/**
-	 * Start a scan for SensorStations.
-	 * @param accessPointId
-	 * @return true if the scan flag was set, false otherwise
+	 * Get the AccessPoint with the given selfAssignedId.
+	 * @param selfAssignedId The selfAssignedId of the AccessPoint to get.
+	 * @throws ServiceException if the AccessPoint is locked.
 	 */
-	public boolean startScan(UUID accessPointId) {
-		AccessPoint accessPoint = getAccessPoint(accessPointId);
-		accessPoint.setScanActive(true);
-		return save(accessPoint) != null;
+	public void isUnlockedBySelfAssignedId(UUID selfAssignedId) throws ServiceException {
+		AccessPoint accessPoint = findBySelfAssignedId(selfAssignedId);
+		if (!accessPoint.isUnlocked()) {
+			throw new ServiceException("AccessPoint is locked", 401);
+		}
+	}
+
+	/**
+	 * Get the AccessPoint with the given deviceId.
+	 * @param deviceId The deviceId of the AccessPoint to get.
+	 * @throws ServiceException if the AccessPoint is locked.
+	 */
+	public void isUnlockedByDeviceId(UUID deviceId) throws ServiceException {
+		AccessPoint accessPoint = findById(deviceId);
+		if (!accessPoint.isUnlocked()) {
+			throw new ServiceException("AccessPoint is locked", 401);
+		}
 	}
 
 	/**
 	 * Get the AccessPoint's access token.
-	 * @param accessPointId
+	 * @param selfAssignedId
 	 * @return
 	 */
-	public UUID getAccessPointAccessToken(UUID accessPointId) {
-		AccessPoint accessPoint = getAccessPoint(accessPointId);
+	public UUID getAccessPointAccessToken(UUID selfAssignedId) {
+		AccessPoint accessPoint = findBySelfAssignedId(selfAssignedId);
 		return accessPoint.getAccessToken();
 	}
 
 	/**
 	 *
 	 * @param unlocked
-	 * @param accessPointId
+	 * @param deviceId
 	 * @return true if the AccessPoint was unlocked, false otherwise
 	 */
-	public boolean setUnlocked(boolean unlocked, UUID accessPointId) {
+	public void setUnlocked(boolean unlocked, UUID deviceId) throws ServiceException {
 		AccessPoint accessPoint = null;
-		try {
-			accessPoint = getAccessPoint(accessPointId);
-		} catch (IllegalArgumentException e) {
-			return false;
-		}
+		accessPoint = findById(deviceId);
 
 		if (unlocked) {
 			UUID token = accessPoint.getAccessToken();
@@ -147,45 +163,64 @@ public class AccessPointService {
 			accessPoint.setAccessToken(null);
 		}
 		accessPoint.setUnlocked(unlocked);
-		return save(accessPoint) != null;
+		save(accessPoint);
 	}
 
-	public boolean foundNewSensorStation(
+	/**
+	 * Save and set found SensorStations of the given AccessPoint.
+	 * @param accessPoint AccessPoint which found the SensorStations.
+	 * @param sensorStationList List of found SensorStations.
+	 * @throws ServiceException if the SensorStations could not be saved.
+	 */
+	public void foundNewSensorStation(
 			AccessPoint accessPoint, List<SensorStation> sensorStationList
-	) {
+	) throws ServiceException {
 		sensorStationList.forEach(sensorStation -> {
 			sensorStation.setAccessPoint(accessPoint);
 			sensorStationService.save(sensorStation);
 		});
 		accessPoint.setSensorStations(sensorStationList);
 		accessPoint.setScanActive(false);
-		return save(accessPoint) != null;
-	}
-
-	public boolean reconnectedToSensorStation(
-			AccessPoint accessPoint, SensorStation sensorStation
-	) {
-		// TODO
-		return false;
-	}
-
-	public boolean lostSensorStation(AccessPoint accessPoint, SensorStation sensorStation) {
-		// TODO
-		return false;
+		save(accessPoint);
 	}
 
 	/**
-	 * Find an AccessPoint by its ID.
-	 * @param accessPointId
-	 * @return AccessPoint
+	 * Start a scan for SensorStations.
+	 * @param deviceId The deviceId of the AccessPoint to start the scan for.
+	 * @throws ServiceException if the AccessPoint could not be found.
 	 */
-	private AccessPoint getAccessPoint(UUID accessPointId) {
-		Optional<AccessPoint> maybeAccessPoint =
-				accessPointRepository.findBySelfAssignedId(accessPointId);
-		if (maybeAccessPoint.isEmpty())
-			throw new IllegalArgumentException(
-					"AccessPoint with ID " + accessPointId + " does not exist."
-			);
-		return maybeAccessPoint.get();
+	public void startScan(UUID deviceId) throws ServiceException {
+		AccessPoint accessPoint = findById(deviceId);
+		accessPoint.setScanActive(true);
+		save(accessPoint);
+	}
+
+	/**
+	 * Set the transfer interval of the AccessPoint with the given ID.
+	 * @param accessPointId The ID of the AccessPoint to set the transfer interval for.
+	 * @param interval The interval to set.
+	 * @throws ServiceException if the AccessPoint could not be found.
+	 */
+	public void setTransferInterval(UUID accessPointId, int interval) throws ServiceException {
+		AccessPoint accessPoint = findById(accessPointId);
+		accessPoint.setTransferInterval(interval);
+		save(accessPoint);
+	}
+
+	/**
+	 * Set data of list of SensorStations.
+	 * @param sensorStations List of SensorStations to set data for.
+	 * @throws ServiceException if sensorData could not be set.
+	 */
+	public void setSensorStationData(List<SensorStation> sensorStations) throws ServiceException {
+		try {
+			for (SensorStation sensorStation : sensorStations) {
+				SensorStation dbSensorStation =
+						sensorStationService.findByBdAddress(sensorStation.getBdAddress());
+				sensorStationService.addSensorData(dbSensorStation, sensorStation.getSensorData());
+			}
+		} catch (Exception e) {
+			throw new ServiceException("Could not set SensorStation data.", 500);
+		}
 	}
 }

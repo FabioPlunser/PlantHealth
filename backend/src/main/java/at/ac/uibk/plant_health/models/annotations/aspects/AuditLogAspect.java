@@ -32,7 +32,9 @@ public class AuditLogAspect {
 	public Object logEndpoints(ProceedingJoinPoint jp) throws Throwable {
 		Optional<IdentifiedEntity> principle = AuthContext.getIdentifiedPrincipal();
 
-		String className, callerId;
+		String className;
+		String callerId;
+
 		if (principle.isPresent()) {
 			className = principle.get().getClass().getName();
 			callerId = principle.map(IdentifiedEntity::getStringIdentification).orElse(null);
@@ -41,8 +43,9 @@ public class AuditLogAspect {
 			callerId = null;
 		}
 
-		String endpoint = jp.getSignature().getName(),
-			   controller = jp.getTarget().getClass().getSimpleName(), message = null;
+		String endpoint = jp.getSignature().getName();
+		String controller = jp.getTarget().getClass().getSimpleName();
+		String message = null;
 		Throwable ex = null;
 
 		Object ret;

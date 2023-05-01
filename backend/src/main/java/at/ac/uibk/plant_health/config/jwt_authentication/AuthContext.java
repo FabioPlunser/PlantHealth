@@ -1,17 +1,13 @@
 package at.ac.uibk.plant_health.config.jwt_authentication;
 
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.*;
 
 import at.ac.uibk.plant_health.config.jwt_authentication.authentication_types.TokenAuthentication;
 import at.ac.uibk.plant_health.models.IdentifiedEntity;
-import at.ac.uibk.plant_health.models.user.Authenticable;
-import at.ac.uibk.plant_health.models.user.Person;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -39,8 +35,7 @@ public class AuthContext {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		// Ensure that the Authentication succeeded by ensuring it is not
 		// null and that the Authentication is not anonymous.
-		boolean isAuthenticated = authentication != null
-				&& (authentication instanceof UsernamePasswordAuthenticationToken);
+		boolean isAuthenticated = authentication instanceof UsernamePasswordAuthenticationToken;
 
 		if (!isAuthenticated) return Optional.empty();
 
@@ -69,9 +64,5 @@ public class AuthContext {
 		}
 
 		return Optional.empty();
-	}
-
-	public static Optional<String> getPrincipalId() {
-		return getIdentifiedPrincipal().map(IdentifiedEntity::getStringIdentification);
 	}
 }

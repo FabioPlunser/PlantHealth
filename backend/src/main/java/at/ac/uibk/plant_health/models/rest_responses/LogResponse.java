@@ -16,20 +16,20 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-@NoArgsConstructor(access = AccessLevel.MODULE)
 public class LogResponse extends RestResponse implements Serializable {
-	private List<InnerLog> logs;
+	private final List<InnerLog> logs;
 
 	public LogResponse(List<Log> logs) {
 		this.logs = logs.stream().map(InnerLog::new).toList();
 	}
 
-	private class InnerLog {
-		public Log.LogLevel severity;
-		public LocalDateTime timestamp;
-		public String message;
-		public String className;
-		public String callerId;
+	@Getter
+	private class InnerLog implements Serializable {
+		public final Log.LogLevel severity;
+		public final LocalDateTime timestamp;
+		public final String message;
+		public final String className;
+		public final String callerId;
 
 		public InnerLog(Log log) {
 			this.severity = log.getSeverity();

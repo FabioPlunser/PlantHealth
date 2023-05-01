@@ -1,5 +1,9 @@
 package at.ac.uibk.plant_health.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Constants {
 	/**
 	 * Aspects are ordered:<br/>

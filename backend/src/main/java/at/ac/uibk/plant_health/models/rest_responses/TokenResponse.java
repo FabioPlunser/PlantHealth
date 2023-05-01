@@ -13,9 +13,8 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-@NoArgsConstructor(access = AccessLevel.MODULE)
 public class TokenResponse extends RestResponse implements Serializable {
-	private UUID token;
+	private final UUID token;
 
 	public TokenResponse(UUID token) {
 		this.token = token;

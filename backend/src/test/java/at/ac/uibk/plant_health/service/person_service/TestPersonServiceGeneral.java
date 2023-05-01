@@ -108,7 +108,7 @@ public class TestPersonServiceGeneral {
 		String newPassword = StringGenerator.password();
 		Set<Permission> newPermissions = Set.of(Permission.ADMIN, Permission.USER);
 		assertTrue(
-				personService.update(person, newUsername, newPassword, newPermissions),
+				personService.update(person, newUsername, null, newPassword, newPermissions),
 				"Could not update user"
 		);
 

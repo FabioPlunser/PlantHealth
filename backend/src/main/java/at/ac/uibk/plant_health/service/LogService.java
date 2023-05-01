@@ -24,6 +24,8 @@ public class LogService {
 			this.logRepository.save(log);
 			return true;
 		} catch (Exception e) {
+			// If Logging failed don't rethrow as this would do more harm than good.
+			// Return false to inform the Caller if they want to know.
 		}
 		return false;
 	}

@@ -1,11 +1,14 @@
 package at.ac.uibk.plant_health.models.plant;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import jakarta.persistence.*;
@@ -16,15 +19,21 @@ import lombok.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class SensorData {
+public class SensorData implements Serializable {
 	@Id
+	@Column(name = "sensor_data_id", nullable = false)
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@JsonIgnore
+	private UUID sensorDataId;
+
 	@Column(name = "time_stamp", nullable = false)
 	@JdbcTypeCode(SqlTypes.TIMESTAMP)
+	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	private LocalDateTime timeStamp;
 
-	@JdbcTypeCode(SqlTypes.INTEGER)
+	@JdbcTypeCode(SqlTypes.DOUBLE)
 	@Column(name = "sensor_value", nullable = false)
-	private int value;
+	private double value;
 
 	@JdbcTypeCode(SqlTypes.BOOLEAN)
 	@Column(name = "above_limit", nullable = false)
@@ -34,10 +43,15 @@ public class SensorData {
 	@Column(name = "below_limit", nullable = false)
 	private boolean belowLimit;
 
+	@JdbcTypeCode(SqlTypes.NVARCHAR)
+	@Column(name = "sensor_alarm", nullable = false)
+	private char alarm;
+
 	@ManyToOne
 	@JoinColumn(name = "sensor_id", nullable = false)
 	private Sensor sensor;
 
+	@JsonIgnore
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "sensor_station_id", nullable = false)
 	private SensorStation sensorStation;
@@ -47,24 +61,53 @@ public class SensorData {
 	private boolean isDeleted = false;
 
 	public SensorData(
-			LocalDateTime timeStamp, int value, boolean above, boolean below, Sensor sensor
+			LocalDateTime timeStamp, double value, boolean above, boolean below, char alarm,
+			Sensor sensor, SensorStation sensorStation
 	) {
 		this.timeStamp = timeStamp;
 		this.value = value;
 		this.belowLimit = below;
 		this.aboveLimit = above;
+		this.alarm = alarm;
 		this.sensor = sensor;
+		this.sensorStation = sensorStation;
 	}
 
-	@JsonIgnore
-	public char getAlarm() {
-		return this.aboveLimit ? 'h' : this.belowLimit ? 'l' : 'n';
+	//	@JsonIgnore
+	//	public char getAlarm() {
+	//		if (this.aboveLimit) {
+	//			return 'h';
+	//		} else if (this.belowLimit) {
+	//			return 'l';
+	//		}
+	//		return 'n';
+	//	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (!(obj instanceof SensorData)) {
+			return false;
+		}
+		SensorData other = (SensorData) obj;
+		return this.timeStamp.equals(other.timeStamp) && this.sensor.equals(other.sensor);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.timeStamp.hashCode() + this.sensor.hashCode();
 	}
 
 	@Override
 	public String toString() {
-		return "SensorData [timeStamp=" + timeStamp + ", value=" + value
-				+ ", aboveLimit=" + aboveLimit + ", belowLimit=" + belowLimit + ", sensor=" + sensor
-				+ ", sensorStation=" + sensorStation + ", isDeleted=" + isDeleted + "]";
+		return "SensorData{"
+				+ "timeStamp=" + timeStamp + ", value=" + value + ", aboveLimit=" + aboveLimit
+				+ ", belowLimit=" + belowLimit + ", alarm='" + alarm + '\'' + ", sensor=" + sensor
+				+ ", isDeleted=" + isDeleted + '}';
 	}
 }
