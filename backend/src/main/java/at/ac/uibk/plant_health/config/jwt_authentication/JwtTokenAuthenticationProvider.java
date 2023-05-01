@@ -63,7 +63,6 @@ public class JwtTokenAuthenticationProvider extends AbstractUserDetailsAuthentic
 		);
 
 		RequestInfo info = (RequestInfo) usernamePasswordAuthenticationToken;
-		String userAgent = info.getUserAgent();
 		TokenAuthentication tokenAuthentication = info.getToken();
 
 		// Try to find the User with the given Session Token

@@ -18,7 +18,7 @@ public class RedirectResponse extends RestResponse {
 
 	@NonNull
 	@JsonIgnore
-	private String redirectLocation;
+	private final String redirectLocation;
 
 	private RedirectResponse() {
 		super(HttpStatus.FOUND);

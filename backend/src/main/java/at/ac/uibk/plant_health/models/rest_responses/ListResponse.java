@@ -18,10 +18,9 @@ import lombok.experimental.SuperBuilder;
  */
 @Getter
 @SuperBuilder
-@NoArgsConstructor(access = AccessLevel.MODULE)
 public class ListResponse<T extends Serializable> extends RestResponse implements Serializable {
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private List<T> items;
+	private final List<T> items;
 
 	/**
 	 * Indicate a successful fetch of items.

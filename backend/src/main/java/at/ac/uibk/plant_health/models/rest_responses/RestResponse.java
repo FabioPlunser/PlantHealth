@@ -1,7 +1,6 @@
 package at.ac.uibk.plant_health.models.rest_responses;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -66,14 +65,14 @@ public abstract class RestResponse implements Serializable {
 		/**
 		 * Indicate that an Internal Server Error occured.
 		 */
-		public B not_found() {
+		public B notFound() {
 			return this.statusCode(404);
 		}
 
 		/**
 		 * Indicate that an Internal Server Error occured.
 		 */
-		public B internal_error() {
+		public B internalError() {
 			return this.statusCode(501);
 		}
 

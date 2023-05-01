@@ -43,10 +43,6 @@ public class SwaErrorController implements ErrorController {
 	@Autowired
 	private EndpointMatcherUtil endpointMatcherUtil;
 
-	private RedirectResponse generateRedirectFromException(Exception exception) {
-		return generateRedirectFromException(404, exception);
-	}
-
 	private RedirectResponse generateRedirectFromException(int status, Exception exception) {
 		return RedirectResponse.builder()
 				.redirectLocation(String.format(
@@ -125,7 +121,7 @@ public class SwaErrorController implements ErrorController {
 			HttpServletRequest request, HttpServletResponse response, Exception exception
 	) {
 		return MessageResponse.builder()
-				.internal_error()
+				.internalError()
 				.statusCode(HttpStatus.UNAUTHORIZED)
 				.toEntity();
 	}

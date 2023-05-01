@@ -6,6 +6,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import jakarta.persistence.*;
@@ -43,6 +44,10 @@ public class AccessPoint extends Device {
 
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "accessPoint")
 	private List<SensorStation> sensorStations = new ArrayList<>();
+
+	@JdbcTypeCode(SqlTypes.TIMESTAMP)
+	@Column(name = "last_connection")
+	private LocalDateTime lastConnection;
 	// endregion
 
 	public AccessPoint(
@@ -53,6 +58,7 @@ public class AccessPoint extends Device {
 		this.roomName = roomName;
 		this.transferInterval = transferInterval;
 		this.scanActive = scanActive;
+		this.lastConnection = LocalDateTime.now();
 	}
 
 	public AccessPoint(UUID selfAssignedId, String roomName, boolean scanActive) {
@@ -60,9 +66,10 @@ public class AccessPoint extends Device {
 		this.selfAssignedId = selfAssignedId;
 		this.roomName = roomName;
 		this.scanActive = scanActive;
+		this.lastConnection = LocalDateTime.now();
 	}
 
-	public boolean isScanActive() {
+	public boolean getScanActive() {
 		return this.scanActive;
 	}
 
