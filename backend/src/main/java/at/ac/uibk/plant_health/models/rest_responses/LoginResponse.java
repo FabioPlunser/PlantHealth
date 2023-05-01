@@ -1,15 +1,13 @@
 package at.ac.uibk.plant_health.models.rest_responses;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import org.springframework.security.core.GrantedAuthority;
 
 import java.io.Serializable;
 import java.util.Set;
 import java.util.UUID;
 
-import at.ac.uibk.plant_health.models.Authenticable;
-import at.ac.uibk.plant_health.models.Person;
+import at.ac.uibk.plant_health.models.user.Authenticable;
+import at.ac.uibk.plant_health.models.user.Person;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,20 +16,12 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-@NoArgsConstructor(access = AccessLevel.MODULE)
-@AllArgsConstructor
 public class LoginResponse extends TokenResponse implements Serializable {
-	@Override
-	@JsonInclude
-	public String getType() {
-		return "Login";
-	}
-
-	private UUID personId;
-	private Set<GrantedAuthority> permissions;
+	private final UUID personId;
+	private final Set<GrantedAuthority> permissions;
 
 	public LoginResponse(Authenticable authenticable) {
-		super(true, authenticable.getToken());
+		super(authenticable.getToken());
 		this.personId = authenticable.getId();
 		this.permissions = authenticable.getPermissions();
 	}

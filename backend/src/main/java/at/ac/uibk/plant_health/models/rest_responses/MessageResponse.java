@@ -1,30 +1,36 @@
 package at.ac.uibk.plant_health.models.rest_responses;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.io.Serializable;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-@NoArgsConstructor(access = AccessLevel.MODULE)
 @AllArgsConstructor
 public class MessageResponse extends RestResponse implements Serializable {
-	@Override
-	@JsonInclude
-	public String getType() {
-		return "Message";
-	}
+	protected final String message;
 
-	private String message;
-
-	public MessageResponse(boolean successful, String message) {
-		super(successful);
+	public MessageResponse(int status, String message) {
+		super(status);
 		this.message = message;
 	}
+
+	// region Builder Customization
+	public abstract static class MessageResponseBuilder<
+			C extends MessageResponse, B extends MessageResponse.MessageResponseBuilder<C, B>>
+			extends RestResponseBuilder<C, B> {
+		@Override
+		public B internalError() {
+			super.internalError();
+			return this.message("Internal Server Error!");
+		}
+
+		public B internalError(Exception e) {
+			super.internalError();
+			return this.message(e.getMessage());
+		}
+	}
+	// endregion
 }

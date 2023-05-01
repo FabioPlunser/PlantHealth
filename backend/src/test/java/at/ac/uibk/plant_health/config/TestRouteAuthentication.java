@@ -26,9 +26,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.config.controller.TestController;
-import at.ac.uibk.plant_health.models.Authenticable;
-import at.ac.uibk.plant_health.models.Permission;
-import at.ac.uibk.plant_health.models.Person;
+import at.ac.uibk.plant_health.models.user.Authenticable;
+import at.ac.uibk.plant_health.models.user.Permission;
+import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.repositories.PersonRepository;
 import at.ac.uibk.plant_health.service.PersonService;
 import at.ac.uibk.plant_health.util.AuthGenerator;

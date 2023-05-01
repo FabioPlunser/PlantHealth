@@ -11,7 +11,7 @@ import lombok.*;
 public class UserAuthentication extends TokenAuthentication {
 	private String username;
 
-	protected UserAuthentication(UUID token, String username) {
+	public UserAuthentication(UUID token, String username) {
 		super(token);
 		this.username = username;
 	}

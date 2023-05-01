@@ -1,4 +1,4 @@
-package at.ac.uibk.plant_health.models;
+package at.ac.uibk.plant_health.models.device;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -8,31 +8,38 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.UUID;
 
+import at.ac.uibk.plant_health.models.IdentifiedEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @MappedSuperclass
-public abstract class Device implements UserDetails {
+public abstract class Device implements UserDetails, IdentifiedEntity {
 	// region Fields
 	@Id
 	// NOTE: Classes that extend this should create a Getter with
 	//       @JsonInclude to rename the ID for JSON-Serialisation.
-	@JsonIgnore
+	//	@JsonIgnore
 	@Setter(AccessLevel.PRIVATE)
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
 	@Column(name = "device_id", nullable = false)
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	protected UUID deviceId;
 
-	@Builder.Default
 	@JdbcTypeCode(SqlTypes.BOOLEAN)
+	@Column(name = "is_unlocked", nullable = false)
 	private boolean isUnlocked = false;
+
+	@JdbcTypeCode(SqlTypes.BOOLEAN)
+	@Column(name = "is_connected", nullable = false)
+	private boolean isConnected = false;
+
+	@JdbcTypeCode(SqlTypes.BOOLEAN)
+	@Column(name = "is_deleted", nullable = false)
+	private boolean isDeleted = false;
 	// endregion
 
 	// region equals, hashCode, toString
@@ -85,4 +92,9 @@ public abstract class Device implements UserDetails {
 		return true;
 	}
 	// endregion
+
+	@JsonIgnore
+	public String getStringIdentification() {
+		return this.deviceId.toString();
+	}
 }

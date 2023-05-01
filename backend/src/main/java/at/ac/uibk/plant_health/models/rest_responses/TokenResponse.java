@@ -13,19 +13,10 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-@NoArgsConstructor(access = AccessLevel.MODULE)
-@AllArgsConstructor
 public class TokenResponse extends RestResponse implements Serializable {
-	@Override
-	@JsonInclude
-	public String getType() {
-		return "TokenExpired";
-	}
+	private final UUID token;
 
-	private UUID token;
-
-	public TokenResponse(boolean success, UUID token) {
-		super(success);
+	public TokenResponse(UUID token) {
 		this.token = token;
 	}
 }

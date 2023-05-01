@@ -10,9 +10,11 @@ import java.util.Set;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.config.jwt_authentication.AuthContext;
-import at.ac.uibk.plant_health.config.jwt_authentication.JwtToken;
-import at.ac.uibk.plant_health.models.Permission;
-import at.ac.uibk.plant_health.models.Person;
+import at.ac.uibk.plant_health.config.jwt_authentication.authentication_types.UserAuthentication;
+import at.ac.uibk.plant_health.models.SensorStationPersonReference;
+import at.ac.uibk.plant_health.models.device.SensorStation;
+import at.ac.uibk.plant_health.models.user.Permission;
+import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.repositories.PersonRepository;
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,15 +68,9 @@ public class PersonService {
 	 *
 	 * @return true if user has been logged out, false otherwise
 	 */
-	public boolean logout() {
-		Optional<Person> maybePerson = AuthContext.getCurrentPerson();
-		if (maybePerson.isPresent()) {
-			Person person = maybePerson.get();
-			person.setToken(null);
-			return updateToken(person);
-		} else {
-			return false;
-		}
+	public boolean logout(Person person) {
+		person.setToken(null);
+		return updateToken(person);
 	}
 	// endregion
 
@@ -85,7 +81,7 @@ public class PersonService {
 	 * @param token jwt token of the person to be found
 	 * @return person if found, otherwise nothing
 	 */
-	public Optional<Person> findByUsernameAndToken(JwtToken token) {
+	public Optional<Person> findByUsernameAndToken(UserAuthentication token) {
 		return findByUsernameAndToken(token.getUsername(), token.getToken());
 	}
 
@@ -158,14 +154,16 @@ public class PersonService {
 	 *     otherwise.
 	 */
 	public boolean update(
-			Person person, String username, String password, Set<Permission> permissions
+			Person person, String username, String email, String password, Set<Permission> permissions
 	) {
 		if (person != null && person.getPersonId() != null) {
 			if (username != null) person.setUsername(username);
+			if (email != null) person.setEmail(email);
 			if (permissions != null) person.setPermissions(permissions);
 			if (password != null) person.setPassword(password);
 
-			return save(person) != null;
+			save(person);
+			return true;
 		}
 
 		return false;
@@ -184,10 +182,10 @@ public class PersonService {
 	 * @return true if user was successfully update, false otherwise
 	 */
 	public boolean update(
-			UUID personId, String username, Set<Permission> permissions, String password
+			UUID personId, String username, String email, Set<Permission> permissions, String password
 	) {
 		Optional<Person> maybePerson = findById(personId);
-		return maybePerson.filter(person -> update(person, username, password, permissions))
+		return maybePerson.filter(person -> update(person, username, email, password, permissions))
 				.isPresent();
 	}
 

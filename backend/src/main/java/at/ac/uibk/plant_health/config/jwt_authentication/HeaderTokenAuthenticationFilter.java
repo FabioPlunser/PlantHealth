@@ -1,4 +1,4 @@
-package at.ac.uibk.plant_health.config.filters;
+package at.ac.uibk.plant_health.config.jwt_authentication;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.USER_AGENT;
@@ -20,6 +20,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Filter for trying to get a Bearer Token from a Request.
@@ -27,6 +28,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author David Rieser
  * @see AbstractAuthenticationProcessingFilter
  */
+@Slf4j
 public class HeaderTokenAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 	public HeaderTokenAuthenticationFilter(final RequestMatcher requiresAuth) {
 		super(requiresAuth);
@@ -40,20 +42,25 @@ public class HeaderTokenAuthenticationFilter extends AbstractAuthenticationProce
 		String authorizationHeader = httpServletRequest.getHeader(AUTHORIZATION);
 
 		if (userAgentHeader == null) {
-			throw new AuthenticationCredentialsNotFoundException(
-					"No Token was sent with the Request!"
-			);
-		}
-		if (authorizationHeader == null) {
-			throw new AuthenticationCredentialsNotFoundException(
+			AuthenticationException ex = new AuthenticationCredentialsNotFoundException(
 					"No User Agent was sent with the Request!"
 			);
+			log.warn(ex.getMessage());
+			throw ex;
+		}
+		if (authorizationHeader == null) {
+			AuthenticationException ex = new AuthenticationCredentialsNotFoundException(
+					"No Token was sent with the Request!"
+			);
+			log.warn(ex.getMessage());
+			throw ex;
 		}
 
 		TokenAuthentication tokenAuthentication =
-				AuthenticationFactory.create(userAgentHeader, authorizationHeader);
+				AuthenticationFactory.getAuthentication(userAgentHeader, authorizationHeader);
 		UsernamePasswordAuthenticationToken token =
 				new RequestInfo(userAgentHeader, tokenAuthentication);
+		token.setDetails(tokenAuthentication);
 
 		return getAuthenticationManager().authenticate(token);
 	}

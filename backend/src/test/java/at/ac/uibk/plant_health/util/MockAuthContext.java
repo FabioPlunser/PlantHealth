@@ -6,7 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.config.jwt_authentication.AuthContext;
-import at.ac.uibk.plant_health.models.Authenticable;
+import at.ac.uibk.plant_health.models.user.Authenticable;
 
 public class MockAuthContext {
 	/**
@@ -22,10 +22,10 @@ public class MockAuthContext {
 		SecurityContextHolder.getContext().setAuthentication(
 				new UsernamePasswordAuthenticationToken(user, UUID.randomUUID())
 		);
-		if (AuthContext.getCurrentPerson().isEmpty()) {
+		if (AuthContext.getPrincipal().isEmpty()) {
 			return null;
 		} else {
-			return AuthContext.getCurrentPerson().get();
+			return (Authenticable) AuthContext.getPrincipal().get();
 		}
 	}
 }
