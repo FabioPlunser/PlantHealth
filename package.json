@@ -1,6 +1,12 @@
 {
 	"devDependencies": {
 		"@poppanator/sveltekit-svg": "^3.0.0",
+		"html5-qrcode": "^2.3.8",
 		"zod": "^3.21.4"
+	},
+	"dependencies": {
+		"@tanstack/svelte-table": "^8.8.6",
+		"svelte": "^3.58.0",
+		"vite": "^4.3.1"
 	}
 }
