@@ -4,12 +4,13 @@ import { fail, redirect, error } from "@sveltejs/kit";
 import { z } from "zod";
 
 export const load = (async ({ fetch }) => {
-  let res = await fetch(`http://${BACKEND_URL}/api/get-all-users`);
-  res = await res.json();
-  if (res.success) {
-    return { users: res.users };
-  } else if (!res.success) {
-    return { success: false, message: res.message };
+  let res = await fetch(`http://${BACKEND_URL}/get-all-users`);
+  let res_json = await res.json();
+  if (res?.ok) {
+    console.log("SUCCESS");
+    return { success: true, users: res_json.items };
+  } else if (!res.ok) {
+    return { success: false, message: res_json.message };
   }
 }) satisfies PageServerLoad;
 
@@ -69,12 +70,8 @@ export const actions = {
       body: formData,
     };
 
-    let res = await fetch(
-      `http://${BACKEND_URL}/api/create-user`,
-      requestOptions
-    );
+    let res = await fetch(`http://${BACKEND_URL}/create-user`, requestOptions);
     res = await res.json();
-    console.log(res);
   },
 
   updateUser: async ({ fetch, event }) => {
@@ -90,10 +87,7 @@ export const actions = {
       body: formData,
     };
 
-    let res = await fetch(
-      `http://${BACKEND_URL}/api/delete-user`,
-      requestOptions
-    );
+    let res = await fetch(`http://${BACKEND_URL}/delete-user`, requestOptions);
 
     res = await res.json();
 

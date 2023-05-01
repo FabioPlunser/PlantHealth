@@ -2,15 +2,14 @@
   import { page } from "$app/stores";
   import { fly } from "svelte/transition";
 
-  import PageTransition from "$components/PageTransition.svelte";
+  import PageTransition from "$components/pageTransition.svelte";
   import Mobile from "$helper/Mobile.svelte";
   import Query from "$helper/Query.svelte";
   import toast, { Toaster } from "$components/toast";
 
   import AdminNav from "$components/ui/adminNav.svelte";
   import Nav from "$components/ui/Nav.svelte";
-  import type { LayoutData } from "./$types";
-  export let data: LayoutData = null;
+  export let data;
 
   let links = [
     {
