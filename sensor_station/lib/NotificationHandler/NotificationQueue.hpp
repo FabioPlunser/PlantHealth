@@ -26,6 +26,8 @@ class NotificationQueue {
 		}
 
 	public:
+		bool isEmpty() { return this->queue.empty(); }
+
 		/**
 		 * @return: The error with top priority after adding the error.
 		 */

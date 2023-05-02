@@ -35,7 +35,8 @@ uint16_t convertToGATT_lightIntensity(uint16_t lightIntensity);
 uint16_t convertToGATT_lightIntensity_notKnown();
 uint16_t luminosityFromVoltage(uint16_t measured);
 void setArduinoPowerStatus();
-bool updateNotificationHandler();
+bool updateNotificationHandler_Errors();
+bool updateNotificationHandler_PairingMode(bool active);
 
 // ----- Global Variables ----- //
 
@@ -74,12 +75,7 @@ void setup() {
 
 // ----- Loop ----- //
 
-void loop() {
-	static arduino::String pairedDevice;
-	static bool inPairingMode		= false;
-	static bool notificationPresent = false;
-// Activate pairing mode if button is pressed pressed.
-#if PAIRING_BUTTON_REQUIRED
+void checkPairingStatus(bool & inPairingMode) {
 	static unsigned long pairingTime = 0;
 	if (digitalRead(PIN_BUTTON_1) == PinStatus::HIGH) {
 		DEBUG_PRINT(1, "Pairing Button is pressed\n");
@@ -87,17 +83,19 @@ void loop() {
 		set_sensorstation_locked_status(SENSOR_STATION_LOCKED_VALUE);
 		inPairingMode = true;
 		pairingTime	  = millis();
+
 		// If button is not pressed for "DURATION_IN_PAIRING_MODE_MS" time it
 		// will got back to normal mode
 	} else if (millis() - pairingTime > DURATION_IN_PAIRING_MODE_MS && inPairingMode) {
 		DEBUG_PRINT(1, "Pairing mode ended\n");
 		inPairingMode = false;
 	}
-#else
-	inPairingMode = true;
-	enable_pairing_mode();
-#endif
-	// enable_pairing_mode();
+}
+
+void handleCentralDeviceIfPresent(
+	arduino::String & pairedDevice, bool & inPairingMode,
+	bool & notificationPresent
+) {
 	BLEDevice central = BLE.central();
 	if (central) {
 		uint8_t dipSwitchId = dipSwitch->getdipSwitchValue();
@@ -121,8 +119,9 @@ void loop() {
 					SENSOR_STATION_UNLOCKED_VALUE) {
 					setSensorValuesInBLE();
 				}
-				while (central.connected()) {
-					; // TODO: Timeout required
+				unsigned long connectionStart = millis();
+				while (central.connected() && TIMEOUT_TIME_BLE_CONNECTION_MS >
+												  millis() - connectionStart) {
 				}
 			}
 		} else {
@@ -131,7 +130,7 @@ void loop() {
 			central.disconnect();
 		}
 		DEBUG_PRINTLN(1, "* Disconnected from central device!");
-		notificationPresent = updateNotificationHandler();
+		notificationPresent = updateNotificationHandler_Errors();
 		if (get_sensor_data_read_flag() == true) {
 			clear_sensor_data_read_flag();
 		} else {
@@ -140,19 +139,37 @@ void loop() {
 				get_sensor_data_read_flag()
 			);
 		}
-
-		DEBUG_PRINT(1, "Station is unlocked: ");
-		DEBUG_PRINTLN(1, get_sensorstation_locked_status());
 	}
+	DEBUG_PRINT(1, "Station is unlocked: ");
+	DEBUG_PRINTLN(1, get_sensorstation_locked_status());
+}
+
+void loop() {
+	static arduino::String pairedDevice;
+	static bool inPairingMode		= false;
+	static bool notificationPresent = false;
+// Activate pairing mode if button is pressed pressed.
+#if PAIRING_BUTTON_REQUIRED
+	checkPairingStatus(inPairingMode);
+	updateNotificationHandler_PairingMode(inPairingMode);
+#else
+	inPairingMode = true;
+	enable_pairing_mode();
+#endif
+	// enable_pairing_mode();
+	handleCentralDeviceIfPresent(
+		pairedDevice, inPairingMode, notificationPresent
+	);
+
 	static int i = 0;
 	if (inPairingMode && i++ > 3) {
 		DEBUG_PRINTLN(1, "Searching for central device!");
 		i = 0;
 	}
+	unsigned long startNotificationCheck = millis();
 	if (notificationPresent) {
 		DEBUG_PRINT_POS(1, "Notifcation is present\n");
-		unsigned long startNotificationCheck = millis();
-		int32_t timeTillNext				 = notificationHandler->update();
+		int32_t timeTillNext = notificationHandler->update();
 		if (timeTillNext < 0) {
 			notificationPresent = false;
 		} else {
@@ -164,9 +181,10 @@ void loop() {
 				timeTillNext = notificationHandler->update();
 			}
 		}
-
-	} else {
-		delay(TIME_CHECK_BLE_CENTRAL_PRESENT_MS);
+	}
+	unsigned long passedTime = millis() - startNotificationCheck;
+	if (passedTime < TIME_CHECK_BLE_CENTRAL_PRESENT_MS) {
+		delay(TIME_CHECK_BLE_CENTRAL_PRESENT_MS - passedTime);
 	}
 }
 
@@ -175,14 +193,19 @@ void loop() {
 /**
  * @returns True if there is a notification in the queue, else false.
  */
-bool updateNotificationHandler() {
+bool updateNotificationHandler_Errors() {
 	notificationHandler->updateAirHumidityValid(get_air_humidity_valid());
 	notificationHandler->updateAirPressureValid(get_air_pressure_valid());
 	notificationHandler->updateAirTemperatureValid(get_temperature_valid());
 	notificationHandler->updateAirQualityValid(get_air_quality_valid());
-	notificationHandler->updateSoilHumidityValid(get_air_humidity_valid());
+	notificationHandler->updateSoilHumidityValid(get_soil_humidity_valid());
 	notificationHandler->updateLightIntensityValid(get_light_intensity_valid());
 	return notificationHandler->update() != -1;
+}
+
+bool updateNotificationHandler_PairingMode(bool active) {
+	notificationHandler->updatePairingNotification(active);
+	return !notificationHandler->isEmpty();
 }
 
 bool setSensorValuesInBLE() {

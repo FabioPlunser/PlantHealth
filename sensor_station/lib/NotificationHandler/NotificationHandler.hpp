@@ -206,8 +206,20 @@ class NotificationHandler {
 			}
 		}
 
-		void addNotification(Notification & notification) {
-			notificationQueue->addError(notification);
+		bool isEmpty() { return this->notificationQueue->isEmpty(); }
+
+		void updatePairingNotification(bool isActive) {
+			static bool prevValue = false;
+			if (isActive == prevValue) {
+				return;
+			}
+			Notification notification(NOTIFICATION_PAIRING_MODE_PRIORITY);
+			if (isActive) {
+				notificationQueue->addError(notification);
+			} else {
+				notificationQueue->deleteErrorFromQueue(notification);
+			}
+			prevValue = isActive;
 		}
 
 		void updateSoilHumidityValid(uint8_t value) {
