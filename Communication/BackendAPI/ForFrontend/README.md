@@ -435,13 +435,9 @@ The following Responses can happen on any Endpoint if the given Condition is met
     - PUT
     - POST
 - No additional Headers
-- No Parameters
-- Body:
-    ```json
-        {
-            "id": "[INSERT-PLANT-ID-HERE]"
-        }
-    ```
+- Parameters
+    - "plant-id" = "[INSERT-PLANT-ID-HERE]"
+- No Body
 - Responses:
     - If successful:
         - 200 HTTP Status Code
@@ -462,13 +458,9 @@ The following Responses can happen on any Endpoint if the given Condition is met
     - UPDATE
     - DELETE
 - No additional Headers
-- No Parameters
-- Body:
-    ```json
-        {
-            "id": "[INSERT-PLANT-ID-HERE]"
-        }
-    ```
+- Parameters:
+    - "plant-id" = "[INSERT-PLANT-ID-HERE]"
+- No Body
 - Response:
     - If successful:
         - 200 HTTP Status Code
@@ -767,7 +759,6 @@ See "Upload Plant Picture" (/upload-picture)
 
 - Endpoint: /create-plant-qr-code
 - Methods: 
-    - GET
     - POST
     - PUT
 - No additional Headers
