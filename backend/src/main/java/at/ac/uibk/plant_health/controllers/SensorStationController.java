@@ -39,7 +39,7 @@ public class SensorStationController {
 	public RestResponseEntity getSensorStations(Person person) {
 		if (person.getPermissions().contains(Permission.USER)) {
 			System.out.println("User");
-			return new DashboardSensorStationResponse(sensorStationService.findAll()).toEntity();
+			return new UserSensorStationResponse(sensorStationService.findAll()).toEntity();
 		}
 
 		return new SensorStationResponse(sensorStationService.findAll()).toEntity();
