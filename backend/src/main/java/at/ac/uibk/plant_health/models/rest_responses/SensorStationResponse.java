@@ -13,6 +13,7 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 	private final List<SensorStation> sensorStations;
 
 	public SensorStationResponse(List<SensorStation> sensorStations) {
+		super();
 		this.sensorStations = sensorStations.stream().filter(s -> !s.isDeleted()).toList();
 	}
 }

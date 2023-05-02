@@ -33,9 +33,15 @@ public class SensorStationController {
 	@Autowired
 	private SensorStationService sensorStationService;
 
-	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
+	@AnyPermission({Permission.ADMIN, Permission.GARDENER, Permission.USER})
+	@PrincipalRequired(Person.class)
 	@GetMapping("/get-sensor-stations")
-	public RestResponseEntity getSensorStations() {
+	public RestResponseEntity getSensorStations(Person person) {
+		if (person.getPermissions().contains(Permission.USER)) {
+			System.out.println("User");
+			return new DashboardSensorStationResponse(sensorStationService.findAll()).toEntity();
+		}
+
 		return new SensorStationResponse(sensorStationService.findAll()).toEntity();
 	}
 
@@ -153,19 +159,48 @@ public class SensorStationController {
 			produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
 	)
 	public ResponseEntity<byte[]>
-	getSensorStationPicture(@RequestParam("pictureId") final UUID pictureId) throws Exception {
-		PlantPicture picture = sensorStationService.getPicture(pictureId);
-		String extension = picture.getPicturePath().split("\\.")[1];
-		Path file = Paths.get(picture.getPicturePath());
-		Resource resource = new UrlResource(file.toUri());
-		System.out.println(picture.getPicturePath());
-		System.out.println(resource);
-		System.out.println(file);
-		return ResponseEntity.ok()
-				.contentType(MediaType.parseMediaType("image/" + extension))
-				.header(HttpHeaders.CONTENT_DISPOSITION,
-						"attachment; filename=\"" + resource.getFilename() + "\"")
-				.body(Files.readAllBytes(file));
+	getSensorStationPicture(@RequestParam("pictureId") final UUID pictureId) {
+		try {
+			PlantPicture picture = sensorStationService.getPicture(pictureId);
+			String extension = picture.getPicturePath().split("\\.")[1];
+			String name = picture.getPicturePath().split("\\.")[0];
+			byte[] contents = sensorStationService.convertPictureToByteArray(picture);
+
+			return ResponseEntity.ok()
+					.contentType(MediaType.parseMediaType("image/" + extension))
+					.header(HttpHeaders.CONTENT_DISPOSITION,
+							"attachment; filename=\"" + name + "\"")
+					.body(contents);
+		} catch (ServiceException e) {
+			return ResponseEntity.status(e.getStatusCode()).body(null);
+		}
+	}
+
+	@AnyPermission({Permission.ADMIN, Permission.GARDENER, Permission.USER})
+	@ReadOperation
+	@GetMapping(
+			value = "/get-newest-sensor-station-picture",
+			produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+	)
+	public ResponseEntity<byte[]>
+	getNewestSensorStationPicture(@RequestParam("sensorStationId") final UUID sensorStationId)
+			throws Exception {
+		try {
+			sensorStationService.findById(sensorStationId);
+			PlantPicture picture = sensorStationService.getNewestPicture(sensorStationId);
+
+			String extension = picture.getPicturePath().split("\\.")[1];
+			String name = picture.getPicturePath().split("\\.")[0];
+			byte[] contents = sensorStationService.convertPictureToByteArray(picture);
+
+			return ResponseEntity.ok()
+					.contentType(MediaType.parseMediaType("image/" + extension))
+					.header(HttpHeaders.CONTENT_DISPOSITION,
+							"attachment; filename=\"" + name + "\"")
+					.body(contents);
+		} catch (ServiceException e) {
+			return ResponseEntity.status(e.getStatusCode()).build();
+		}
 	}
 
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
