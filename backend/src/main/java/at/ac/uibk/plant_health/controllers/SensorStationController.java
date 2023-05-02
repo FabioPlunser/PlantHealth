@@ -37,12 +37,11 @@ public class SensorStationController {
 	@PrincipalRequired(Person.class)
 	@GetMapping("/get-sensor-stations")
 	public RestResponseEntity getSensorStations(Person person) {
-		if (person.getPermissions().contains(Permission.USER)) {
-			System.out.println("User");
-			return new UserSensorStationResponse(sensorStationService.findAll()).toEntity();
+		if (person.getPermissions().contains(Permission.ADMIN)
+			|| person.getPermissions().contains(Permission.GARDENER)) {
+			return new SensorStationResponse(sensorStationService.findAll()).toEntity();
 		}
-
-		return new SensorStationResponse(sensorStationService.findAll()).toEntity();
+		return new UserSensorStationResponse(sensorStationService.findAll()).toEntity();
 	}
 
 	@PublicEndpoint

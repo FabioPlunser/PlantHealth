@@ -70,7 +70,7 @@
         </filter>
     </appender>
 
-    <springProfile name="!prod">
+    <springProfile name="prod">
         <root level="DEBUG">
             <appender-ref ref="CONSOLE"/>
         </root>
