@@ -6,13 +6,13 @@
   export let value: any = null;
 </script>
 
-<label class="label">
-  <span class="label-text font-bold">{label}</span>
+<label class="" for={field}>
+  <span class="label-text text-xl font-bold">{label}:</span>
+  <input
+    {value}
+    name={field}
+    {type}
+    {placeholder}
+    class="input input-bordered w-full bg-gray-800 text-white"
+  />
 </label>
-<input
-  {value}
-  name={field}
-  {type}
-  {placeholder}
-  class="input input-bordered w-full bg-gray-800 text-white"
-/>

@@ -34,7 +34,7 @@
     },
     {
       name: "AP",
-      path: "/admin/accessoints",
+      path: "/admin/accesspoints",
       icon: Wifi,
     },
     // {

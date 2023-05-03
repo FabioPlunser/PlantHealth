@@ -20,7 +20,7 @@
     },
     {
       name: "AP",
-      path: "/admin/accessoints",
+      path: "/admin/accesspoints",
     },
     // {
     //   name: "Gardener",
