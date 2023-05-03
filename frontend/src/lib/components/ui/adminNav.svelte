@@ -54,17 +54,15 @@
           {#each icons as icon}
             <div>
               <a href={icon.path}>
-                {#key path}
-                  <div>
-                    <i
-                      class="{icon.icon} animate-spin text-4xl dark:text-white mx-auto shadow-2xl drop-shadow-2xl w-8 rouned-full {path ===
-                      icon.path
-                        ? 'rounded-full text-primary'
-                        : ''}"
-                    />
-                    <h1 class="flex justify-center">{icon.name}</h1>
-                  </div>
-                {/key}
+                <div>
+                  <i
+                    class="{icon.icon} flex justify-center text-4xl dark:text-white mx-auto shadow-2xl drop-shadow-2xl w-8 rouned-full {path ===
+                    icon.path
+                      ? 'rounded-full text-primary'
+                      : ''}"
+                  />
+                  <h1 class="flex justify-center">{icon.name}</h1>
+                </div>
               </a>
             </div>
           {/each}
