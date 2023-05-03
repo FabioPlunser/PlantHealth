@@ -1,8 +1,8 @@
 stages: # List of stages for jobs, and their order of execution
   - pythonTests
   - pythonSonarCheck
-  #- javaTest
-  #- javaSonarCheck
+  - javaTest
+  - javaSonarCheck
   - deployBackend
 
 .before_script_template:
@@ -91,6 +91,8 @@ deployBackend:
   image: gradle:7.5.1-jdk18-alpine
   stage: deployBackend
   script: 
+    - RADLE_USER_HOME="$(pwd)/.gradle"
+    - export GRADLE_USER_HOME
     - echo "Run bootRun"
     - cd backend && SPRING_PROFILES_ACTIVE=dev gradle clean bootRun
   only: 
