@@ -95,3 +95,4 @@ deployBackend:
     - cd backend && SPRING_PROFILES_ACTIVE=dev ./gradlew clean bootRun
   only: 
     - dev
+    - dev-backend
