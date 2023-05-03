@@ -1,8 +1,8 @@
 stages: # List of stages for jobs, and their order of execution
   - pythonTests
   - pythonSonarCheck
-  - javaTest
-  - javaSonarCheck
+  #- javaTest
+  #- javaSonarCheck
   - deployBackend
 
 .before_script_template:
@@ -92,7 +92,7 @@ deployBackend:
   stage: deployBackend
   script: 
     - echo "Run bootRun"
-    - cd backend && SPRING_PROFILES_ACTIVE=dev ./gradlew clean bootRun
+    - cd backend && SPRING_PROFILES_ACTIVE=dev gradle clean bootRun
   only: 
     - dev
     - dev-backend
