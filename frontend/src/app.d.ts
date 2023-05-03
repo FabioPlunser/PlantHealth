@@ -34,10 +34,11 @@ declare module "*.svg?url" {
   const content: string;
   export default content;
 }
-
-export interface User {
-  personId: string;
-  permissions: string[];
-  token: string;
-  username: string;
+declare module global {
+  export interface User {
+    personId: string;
+    permissions: string[];
+    token: string;
+    username: string;
+  }
 }
