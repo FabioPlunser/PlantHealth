@@ -15,7 +15,7 @@ export const actions = {
   // TODO: add validation and error handling (toast messages)
   unlock: async ({ cookies, request, fetch }) => {
     const formData = await request.formData();
-    console.log("unlock", formData.get("accessPointId"));
+
     const res = await fetch(
       `${BACKEND_URL}/set-unlocked-access-point?accessPointId=${formData.get(
         "accessPointId"
@@ -24,11 +24,6 @@ export const actions = {
         method: "POST",
       }
     );
-    const data = await res.json();
-    return {
-      status: res.status,
-      body: JSON.stringify(data),
-    };
   },
 
   // TODO: add validation and error handling (toast messages)

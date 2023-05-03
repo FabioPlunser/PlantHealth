@@ -19,7 +19,7 @@
     },
     {
       name: "Plants", //sensorStations
-      path: "/admin/plants",
+      path: "/admin/sensorstations",
       icon: "bi bi-globe-europe-africa",
     },
     {
@@ -45,7 +45,7 @@
   <Query query="(max-width: 700px)">
     <div class="mx-2" in:fly={{ y: 200, duration: 400 }}>
       <div
-        class=" p-4 rounded-2xl bg-base-100 dark:bg-gray-500 drop-shadow-3xl "
+        class=" p-4 rounded-2xl bg-base-100 border-2 dark:border-none dark:bg-white/10 dark:backdrop-blur-2xl drop-shadow-3xl "
       >
         <div
           class="flex items-center gap-8 justify-center"
@@ -56,9 +56,9 @@
               <a href={icon.path}>
                 <div>
                   <i
-                    class="{icon.icon} flex justify-center text-4xl dark:text-white mx-auto shadow-2xl drop-shadow-2xl w-8 rouned-full {path ===
+                    class="{icon.icon} transform transition-transform active:scale-125 animation-spin flex justify-center text-4xl dark:text-white mx-auto shadow-2xl drop-shadow-2xl w-8 rouned-full {path ===
                     icon.path
-                      ? 'rounded-full text-primary'
+                      ? 'rounded-full text-primary dark:text-primary'
                       : ''}"
                   />
                   <h1 class="flex justify-center">{icon.name}</h1>

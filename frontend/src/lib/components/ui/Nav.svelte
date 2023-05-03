@@ -16,7 +16,7 @@
     },
     {
       name: "Plants", //sensorStations
-      path: "/admin/plants",
+      path: "/admin/sensorstations",
     },
     {
       name: "AP",
@@ -79,7 +79,7 @@ Usage:
             class="navbar flex justify-center text-xl font-bold gap-4 items-center mx-auto"
           >
             {#each AdminLinks as link}
-              {#if $page.url.pathname === link.path}
+              {#if ($page.url.pathname.includes(link.path) && link.path !== "/admin") || $page.url.pathname === link.path}
                 <li>
                   <a class="underline hover:bg-transparent" href={link.path}
                     >{link.name.toUpperCase()}</a

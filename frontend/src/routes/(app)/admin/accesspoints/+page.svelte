@@ -1,7 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { invalidate } from "$app/navigation";
-
+  import { fly } from "svelte/transition";
   import Spinner from "$components/ui/Spinner.svelte";
   // ---------------------------------------------------------
   import { onMount } from "svelte";
@@ -36,7 +36,9 @@
       }
     }
   }
-
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+  async function createQrCode() {}
   // ---------------------------------------------------------
   // ---------------------------------------------------------
 </script>
@@ -46,14 +48,18 @@
     {#if data.accessPoints}
       <div class="flex justify-center mx-auto">
         <div class="grid grid-rows md:grid-cols-3">
-          {#each data.accessPoints as accessPoint}
-            <form method="POST" use:enhance>
+          {#each data.accessPoints as accessPoint, i (accessPoint.accessPointId)}
+            <form
+              in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
+              method="POST"
+              use:enhance
+            >
               <input
                 type="hidden"
                 name="accessPointId"
                 value={accessPoint.accessPointId}
               />
-              <div class="card w-fit h-fit bg-base-100 shadow-2xl">
+              <div class="card w-full min-w-full h-fit bg-base-100 shadow-2xl">
                 <div class="card-body">
                   <label class="" for="transferInterval">
                     <span class="label-text text-xl font-bold"
@@ -95,11 +101,32 @@
                     {:else}
                       <div class="badge badge-error">Disconnected</div>
                     {/if}
-                    <div class="badge badge-success">SensorStations: 10</div>
+                    <div class="tooltip" data-tip="Go to Sensorstations">
+                      <a href="/admin/sensorstations">
+                        <div
+                          class="badge badge-success hover:scale-110 active:scale-125"
+                        >
+                          SensorStations: 10
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+
+                  <div class="flex justify-center m-2">
+                    <div class="flex">
+                      <div class="tooltip" data-tip="Create QR-Code">
+                        <button
+                          disabled
+                          class="transform transition-transform active:scale-110 transf"
+                        >
+                          <i class="bi bi-qr-code-scan text-4xl " />
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
                   <div class="card-actions bottom-0 mx-auto">
-                    <div class="flex gap-4">
+                    <div class="flex gap-4 mx-auto">
                       <button class="btn btn-primary" formaction="?/update"
                         >Update</button
                       >
