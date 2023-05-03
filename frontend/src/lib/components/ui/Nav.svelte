@@ -2,11 +2,41 @@
   import Logo from "$assets/Logo.svg?url";
   import { theme } from "$stores/themeStore";
   import { page } from "$app/stores";
+  import Query from "$helper/Query.svelte";
 
   export let user: string = "Guest";
   export let links: any[] = [];
 
   let profile = false;
+
+  let AdminLinks = [
+    {
+      name: "home",
+      path: "/admin",
+    },
+    {
+      name: "Plants", //sensorStations
+      path: "/admin/plants",
+    },
+    {
+      name: "AP",
+      path: "/admin/accessoints",
+    },
+    // {
+    //   name: "Gardener",
+    //   path: "/admin/gardener",
+    //   icon: Gardener,
+    // },
+    {
+      name: "Users", // includes gardeners
+      path: "/admin/users",
+    },
+
+    {
+      name: "Settings",
+      path: "/admin/settings",
+    },
+  ];
 </script>
 
 <!-- @component
@@ -43,6 +73,30 @@ Usage:
           {/if}
         {/each}
       </ul>
+      <Query query="(min-width: 700px)">
+        {#if user === "ADMIN"}
+          <ul
+            class="navbar flex justify-center text-xl font-bold gap-4 items-center mx-auto"
+          >
+            {#each AdminLinks as link}
+              {#if $page.url.pathname === link.path}
+                <li>
+                  <a class="underline hover:bg-transparent" href={link.path}
+                    >{link.name.toUpperCase()}</a
+                  >
+                </li>
+              {:else}
+                <li>
+                  <a
+                    class="hover:underline hover:bg-transparent"
+                    href={link.path}>{link.name.toUpperCase()}</a
+                  >
+                </li>
+              {/if}
+            {/each}
+          </ul>
+        {/if}
+      </Query>
       <div class="absolute top-0 right-0 mr-4 -mt-4">
         <div class="flex mx-2 gap-4">
           <label tabindex="-1" class="swap swap-rotate">

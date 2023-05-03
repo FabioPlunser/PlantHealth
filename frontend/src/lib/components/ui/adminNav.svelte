@@ -34,7 +34,7 @@
     },
     {
       name: "AP",
-      path: "/admin/accessPoints",
+      path: "/admin/accessoints",
       icon: Wifi,
     },
     // {
@@ -87,22 +87,5 @@
         </div>
       </div>
     </div>
-  </Query>
-
-  <Query query="(min-width: 700px)">
-    <nav
-      class="navbar fixed top-0 flex justify-center mb-12"
-      in:fly={{ y: -200, duration: 400 }}
-    >
-      <div class="flex gap-4">
-        {#each icons as icon}
-          <div>
-            <a href={icon.path}>
-              <h1 class="text-xl font-bold">{icon.name.toUpperCase()}</h1>
-            </a>
-          </div>
-        {/each}
-      </div>
-    </nav>
   </Query>
 {/if}

@@ -1,14 +1,6 @@
 import { BACKEND_URL } from "$env/static/private";
 
-export async function load({ fetch }) {
-  let res = await fetch(`${BACKEND_URL}/get-access-points`);
-  res = await res.json();
-
-  // console.log("access points", res);
-  return {
-    accessPoints: res?.accessPoints || [],
-  };
-}
+export async function load({ fetch }) {}
 
 export const actions = {
   unlock: async ({ cookies, request, fetch }) => {
