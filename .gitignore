@@ -2,7 +2,7 @@ application-secrets.yml
 application.yml
 target
 *.db
-
+build
 # Logs
 logs
 *.log

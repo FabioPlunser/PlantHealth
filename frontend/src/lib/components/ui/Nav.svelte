@@ -2,8 +2,8 @@
   import Logo from "$assets/Logo.svg?url";
   import { theme } from "$stores/themeStore";
   import { page } from "$app/stores";
-  export let user: string = "Guest";
 
+  export let user: string = "Guest";
   export let links: any[] = [];
 
   let profile = false;
@@ -85,7 +85,7 @@ Usage:
               <h1 class="-mt-2 flex justify-center">{user}</h1>
             </div>
             <!-- </a> -->
-            {#if profile}
+            {#if profile && user != "GUEST"}
               <div
                 class="absolute bg-base-300 p-8 rounded-2xl right-0 drop-shadow-2xl z-[999]"
               >

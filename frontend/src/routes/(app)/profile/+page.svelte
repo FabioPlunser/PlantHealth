@@ -2,10 +2,6 @@
   import { enhance } from "$app/forms";
   import FormError from "$helper/formError.svelte";
   import Input from "$components/ui/Input.svelte";
-  import CheckRing from "$lib/assets/icons/checkRing.svg?component";
-  import BooleanButton from "$lib/components/ui/BooleanButton.svelte";
-  import toast from "$components/toast";
-  import PasswordInput from "$lib/components/ui/PasswordInput.svelte";
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";
 
@@ -51,18 +47,18 @@
           value={data.userEmail}
         />
         <FormError field="email" {form} />
-        <PasswordInput field="password" value={data.userPassword} />
+        <!-- <PasswordInput field="password" value={data.userPassword} /> -->
 
         <FormError field="password" {form} />
         <div class="mt-6">
           <ul class="grid w-full gap-6 md:grid-rows-3">
             {#each roles as role}
               <li class="" in:slide={{ duration: 400, axis: "x" }}>
-                <BooleanButton
+                <!-- <BooleanButton
                   text={role}
                   bind:bool={data.userPermissions[role]}
                   disabled={isDisabled}
-                />
+                /> -->
               </li>
             {/each}
           </ul>

@@ -8,6 +8,7 @@
    */
   export let open = false;
   export let closeOnBodyClick = true;
+  export let _class = "";
 
   function handleDispatch() {}
   const previously_focused =
@@ -50,7 +51,7 @@
   >
     <div
       transition:scale={{ duration: 150 }}
-      class="modal-box w-auto relative overflow-auto bg-base-300 max-w-none"
+      class="modal-box w-auto relative overflow-auto bg-base-100 max-w-none {_class}"
     >
       <slot />
     </div>
