@@ -88,11 +88,11 @@ javaSonarCheck-job:
     - dev
 
 deployBackend: 
-  image: gradle:7.5.1-jdk18-alpine
+  image: gradle:alpine
   stage: deployBackend
   script: 
     - echo "Run bootRun"
-    - cd backend && ls && SPRING_PROFILES_ACTIVE=dev gradle bootRun
+    - cd backend && ls && SPRING_PROFILES_ACTIVE=deploy gradle bootRun
   only: 
     - dev
     - dev-backend
