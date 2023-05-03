@@ -94,7 +94,7 @@ deployBackend:
     - RADLE_USER_HOME="$(pwd)/.gradle"
     - export GRADLE_USER_HOME
     - echo "Run bootRun"
-    - cd backend && SPRING_PROFILES_ACTIVE=dev gradle clean bootRun
+    - cd backend && SPRING_PROFILES_ACTIVE=dev gradle bootRun
   only: 
     - dev
     - dev-backend
