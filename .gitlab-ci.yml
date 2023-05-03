@@ -88,6 +88,9 @@ javaSonarCheck-job:
     - dev
 
 deployBackend: 
+  tags: 
+    - gradle
+    - java
   image: gradle:alpine
   stage: deployBackend
   script: 
