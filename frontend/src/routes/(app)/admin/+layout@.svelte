@@ -39,8 +39,9 @@
 <Nav user={"ADMIN"} />
 
 <PageTransition url={$page.url.pathname}>
-  <main class="mx-4 h-screen">
+  <main class="mx-4 mt-14">
     <slot />
+    <div class="pb-24" />
   </main>
 </PageTransition>
 

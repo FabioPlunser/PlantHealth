@@ -132,7 +132,7 @@ Usage:
             <!-- <a> -->
             <div class="cursor-pointer">
               <div class="avatar flex-items-center mt-5">
-                <div class="w-12 rounded-full bg-gray-300 p-2">
+                <div class="w-12 rounded-full bg-base-300 p-2">
                   <img alt="Avatar" src={Logo} />
                 </div>
               </div>
@@ -141,7 +141,7 @@ Usage:
             <!-- </a> -->
             {#if profile && user != "GUEST"}
               <div
-                class="absolute bg-base-300 p-8 rounded-2xl right-0 drop-shadow-2xl z-[999]"
+                class="absolute bg-base-100 p-8 rounded-2xl right-0 drop-shadow-2xl z-[999]"
               >
                 <a
                   data-sveltekit-preload-code

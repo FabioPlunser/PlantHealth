@@ -47,7 +47,7 @@
   <section class="mt-14">
     {#if data.accessPoints}
       <div class="flex justify-center mx-auto">
-        <div class="grid grid-rows md:grid-cols-3">
+        <div class="grid grid-rows md:grid-cols-2 gap-4 xl:grid-cols-3">
           {#each data.accessPoints as accessPoint, i (accessPoint.accessPointId)}
             <form
               in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
@@ -57,7 +57,7 @@
               <input
                 type="hidden"
                 name="accessPointId"
-                value={accessPoint.accessPointId}
+                bind:value={accessPoint.accessPointId}
               />
               <div class="card w-full min-w-full h-fit bg-base-100 shadow-2xl">
                 <div class="card-body">
@@ -126,7 +126,7 @@
                   </div>
 
                   <div class="card-actions bottom-0 mx-auto">
-                    <div class="flex gap-4 mx-auto">
+                    <div class="grid grid-rows md:flex gap-4 mx-auto">
                       <button class="btn btn-primary" formaction="?/update"
                         >Update</button
                       >

@@ -56,7 +56,7 @@
               <a href={icon.path}>
                 <div>
                   <i
-                    class="{icon.icon} transform transition-transform active:scale-125 animation-spin flex justify-center text-4xl dark:text-white mx-auto shadow-2xl drop-shadow-2xl w-8 rouned-full {path ===
+                    class="{icon.icon} transform transition-transform active:scale-125 animation-spin flex justify-center text-4xl mx-auto shadow-2xl drop-shadow-2xl w-8 rouned-full {path ===
                     icon.path
                       ? 'rounded-full text-primary dark:text-primary'
                       : ''}"
