@@ -1,27 +1,74 @@
-
-
 stages: # List of stages for jobs, and their order of execution
-  - test
-  - sonarCheck
-  - deployBackend
+  - pythonTests
+  - pythonSonarCheck
+  - javaTest
+  - javaSonarCheck
 
 .before_script_template:
   before_script:
     - apk add --update maven
 
-unit-test-job: # This job runs in the test stage.
+pythonTests-job:
+  stage: pythonTests
+  image:
+    name: alpine:3.17
+  script:
+    - echo "Installing Python"
+    - apk add --no-cache python3 py3-pip
+    - cd access_point
+    - echo "Creating venv"
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - pip install wheel
+    - pip install -r requirements.txt
+    - echo "Running unit tests"
+    - coverage run
+    - coverage xml
+  allow_failure: false
+  only:
+    - dev-access_point
+    - dev
+
+pythonSonarCheck-job:
+  stage: pythonSonarCheck
+  image:
+    name: sonarsource/sonar-scanner-cli:4.7
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR/code/.sonar}"
+    GIT_DEPTH: "0"
+    GIT_CLEAN_FLAGS: none
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - sonar-scanner
+      -Dsonar.sources=access_point
+      -Dsonar.exclusions=**/tests/**,**/__init__.py
+      -Dsonar.projectKey=${SONAR_PROJECT_KEY}
+      -Dsonar.projectName="${CI_PROJECT_NAME} ${CI_COMMIT_BRANCH}"
+      -Dsonar.python.coverage.reportPaths=access_point/coverage.xml
+  allow_failure: false
+  only:
+    - dev-access_point
+    - dev
+
+javaTest-job: # This job runs in the test stage.
   image: alpine:3.17
   extends: .before_script_template
-  stage: test
+  stage: javaTest
   script:
     - echo "Running unit tests..."
     - cd backend && mvn test
   allow_failure: false
+  only:
+    - dev-backend
+    - dev
 
-sonarqube-check:
+javaSonarCheck-job:
   image: alpine:3.17
   extends: .before_script_template
-  stage: sonarCheck
+  stage: javaSonarCheck
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/code/.sonar"
     GIT_DEPTH: "0"
@@ -34,4 +81,7 @@ sonarqube-check:
     - apk add --update nodejs
     - echo Running sonar analysis for ${SONAR_PROJECT_KEY}
     - cd backend && mvn -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.projectName="${CI_PROJECT_NAME} ${GITLAB_USER_NAME}" --fail-at-end verify sonar:sonar
-  allow_failure: true
+  allow_failure: false
+  only:
+    - dev-backend
+    - dev

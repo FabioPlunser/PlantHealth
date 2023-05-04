@@ -8,6 +8,7 @@
    */
   export let open = false;
   export let closeOnBodyClick = true;
+  export let _class = "";
 
   function handleDispatch() {}
   const previously_focused =
@@ -29,28 +30,28 @@
 
 {#if closeOnBodyClick}
   <div
-    class="modal min-w-fit cursor-pointer max-w-none"
+    class="modal cursor-pointer"
     class:modal-open={open}
     on:keydown={handleKeyDown}
     on:click={close}
   >
     <div
       transition:scale={{ duration: 150 }}
-      class="modal-box w-auto relative overflow-auto bg-base-300 max-w-none"
+      class="modal-box w-fit overflow-auto bg-base-300 {_class}"
     >
       <slot />
     </div>
   </div>
 {:else}
   <div
-    class="modal min-w-fit cursor-pointer max-w-none"
+    class="modal cursor-pointer"
     class:modal-open={open}
     on:keydown={handleKeyDown}
     on:click|self={close}
   >
     <div
       transition:scale={{ duration: 150 }}
-      class="modal-box w-auto relative overflow-auto bg-base-300 max-w-none"
+      class="modal-box w-fit overflow-auto bg-base-100  {_class}"
     >
       <slot />
     </div>

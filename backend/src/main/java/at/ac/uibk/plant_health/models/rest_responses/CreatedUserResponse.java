@@ -17,13 +17,12 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-@NoArgsConstructor(access = AccessLevel.MODULE)
 public class CreatedUserResponse extends RestResponse implements Serializable {
-	private UUID id;
-	private String username;
+	private final UUID id;
+	private final String username;
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private UUID token;
-	private Set<GrantedAuthority> permissions;
+	private final UUID token;
+	private final Set<GrantedAuthority> permissions;
 
 	public CreatedUserResponse(Authenticable authenticable) {
 		this.id = authenticable.getId();

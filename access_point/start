@@ -1,0 +1,17 @@
+#!/bin/bash
+# Starts the main routine for running the access point if it is not running yet
+# Restarts if called every 15th minute (e.g. 0:00am, 0:15am, 0:30am, etc.)
+
+current_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+cd $current_dir
+
+curminute=`date "+%M"`
+if (( $curminute % 15 == 0 )) ; then
+    source stop
+fi
+
+sleep 1
+
+if [ $(pgrep -c "${0##*/}") -le 1 ] ; then
+    venv/bin/python3 access_point.py
+fi

@@ -1,14 +1,15 @@
 <script lang="ts">
-  import type { PageData, ActionData } from "./$types";
   import toast from "$components/toast";
   import AddUserModal from "./AddUserModal.svelte";
   import UsersTable from "./UsersTable.svelte";
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";
   import { enhance } from "$app/forms";
-  export let data: PageData;
+  export let data;
 
   let isRendered = false;
+
+  $: console.log(data);
 
   onMount(() => {
     isRendered = true;
@@ -21,7 +22,7 @@
     }
   }
 
-  export let form: ActionData;
+  export let form;
 
   let addUserModal = false;
 </script>
@@ -30,6 +31,7 @@
   <AddUserModal bind:showModal={addUserModal} {form} />
 {/if}
 {#if isRendered}
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
   <btn
     class="btn btn-primary flex justify-center w-fit mx-auto m-4"
     on:click={() => (addUserModal = true)}

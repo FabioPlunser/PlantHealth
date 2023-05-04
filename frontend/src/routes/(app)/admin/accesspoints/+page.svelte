@@ -1,73 +1,170 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
-
+  import { invalidate } from "$app/navigation";
+  import { fly } from "svelte/transition";
+  import Spinner from "$components/ui/Spinner.svelte";
+  // ---------------------------------------------------------
+  import { onMount } from "svelte";
+  let rendered = false;
+  onMount(() => {
+    rendered = true;
+  });
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
   export let data;
   $: console.log(data);
-  $: console.log(data.accessPoints[0]);
-  let entries = [
-    "roomName",
-    "scanActive",
-    "connected",
-    ~"deleted",
-    "transferInterval",
-    "unlocked",
-  ];
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+  import Input from "$components/ui/Input.svelte";
+  import FormError from "$helper/formError.svelte";
+  import { browser } from "$app/environment";
+  export let form;
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+  async function invalidateAccessPoints() {
+    setTimeout(async () => {
+      console.log("invalidate", new Date().toLocaleTimeString());
+      await invalidate("app:getAccessPoints");
+    }, 1000 * 30);
+  }
+  $: {
+    if (browser) {
+      for (let accessPoint of data.accessPoints) {
+        if (accessPoint.scanActive) {
+          invalidateAccessPoints();
+        }
+      }
+    }
+  }
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+  async function createQrCode() {}
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
 </script>
 
-<section class="mt-14">
-  {#if data.accessPoints}
-    <div class="grid grid-rows gap-6">
-      {#each data.accessPoints as accessPoint, i}
-        <form method="POST" action="?/unlock" use:enhance>
-          <div class="card bg-base-100 shadow-xl w-fit p-5">
-            <div>
-              <h1 class="flex justify-center text-2xl font-bold">
-                AccessPoint: {accessPoint?.id.slice(0, 5)}
-              </h1>
-
-              {#each Object.entries(accessPoint) as [key, value]}
-                {#if entries.includes(key)}
-                  <div class="flex">
-                    <!-- svelte-ignore a11y-label-has-associated-control -->
-                    <label class="label">
-                      <span class="label-text font-bold items-center"
-                        >{key}:</span
-                      >
-                    </label>
-                    <h1 class="ml-2 flex items-center">{value}</h1>
-                  </div>
-                {/if}
-              {/each}
-            </div>
-            <div class="card-actions mt-10 mx-auto">
+{#if rendered}
+  <section class="mt-14">
+    {#if data.accessPoints}
+      <div class="flex justify-center mx-auto">
+        <div class="grid grid-rows md:grid-cols-2 gap-4 xl:grid-cols-3">
+          {#each data.accessPoints as accessPoint, i (accessPoint.accessPointId)}
+            <form
+              in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
+              method="POST"
+              use:enhance
+            >
               <input
                 type="hidden"
                 name="accessPointId"
-                value={accessPoint?.id}
+                bind:value={accessPoint.accessPointId}
               />
-              <button class="btn btn-primary" formaction="?/search"
-                >Search Stations</button
-              >
-              {#if accessPoint?.unlocked}
-                <input type="hidden" name="unlocked" value="false" />
-                <button class="btn btn-error" formaction="?/unlock">Lock</button
-                >
-              {:else}
-                <input type="hidden" name="unlocked" value="true" />
-                <button class="btn btn-primary" formaction="?/unlock"
-                  >Unlock</button
-                >
-              {/if}
-              <button class="btn btn-error" formaction="?/QR-Code">
-                Create-QR-Code
-              </button>
-              <button class="btn btn-info" formaction="?/update">
-                Update
-              </button>
-            </div>
-          </div>
-        </form>
-      {/each}
-    </div>
-  {/if}
-</section>
+              <div class="card w-full min-w-full h-fit bg-base-100 shadow-2xl">
+                <div class="card-body">
+                  <label class="" for="transferInterval">
+                    <span class="label-text text-xl font-bold"
+                      >Transfer Interval:</span
+                    >
+                    <input
+                      bind:value={accessPoint.roomName}
+                      name="roomName"
+                      type="text"
+                      class="input input-bordered w-full bg-gray-800 text-white"
+                    />
+                  </label>
+                  <FormError field="username" {form} />
+                  <!-- <Input type="text" field="transferInterval" label="Transfer Interval" value={accessPoint.transferInterval} /> -->
+                  <label class="" for="transferInterval">
+                    <span class="label-text text-xl font-bold"
+                      >Transfer Interval:</span
+                    >
+                    <div class="flex">
+                      <input
+                        bind:value={accessPoint.transferInterval}
+                        name="transferInterval"
+                        type="number"
+                        class="input input-bordered w-full bg-gray-800 text-white"
+                        min="30"
+                        max="240"
+                      /><span
+                        class="-ml-10 text-white items-center mx-auto my-auto"
+                        >[ s ]</span
+                      >
+                    </div>
+                  </label>
+
+                  <FormError field="username" {form} />
+
+                  <div class="flex justify-center my-2 gap-4">
+                    {#if accessPoint.connected}
+                      <div class="badge badge-success">Connected</div>
+                    {:else}
+                      <div class="badge badge-error">Disconnected</div>
+                    {/if}
+                    <div class="tooltip" data-tip="Go to Sensorstations">
+                      <a href="/admin/sensorstations">
+                        <div
+                          class="badge badge-success hover:scale-110 active:scale-125"
+                        >
+                          SensorStations: 10
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+
+                  <div class="flex justify-center m-2">
+                    <div class="flex">
+                      <div class="tooltip" data-tip="Create QR-Code">
+                        <button
+                          disabled
+                          class="transform transition-transform active:scale-110 transf"
+                        >
+                          <i class="bi bi-qr-code-scan text-4xl " />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card-actions bottom-0 mx-auto">
+                    <div class="grid grid-rows md:flex gap-4 mx-auto">
+                      <button class="btn btn-primary" formaction="?/update"
+                        >Update</button
+                      >
+                      {#if accessPoint.scanActive}
+                        <div
+                          class="flex justify-center items-center gap-1 btn bg-purple-600 border-none"
+                        >
+                          <h1>Scanning:</h1>
+                          <Spinner w={8} h={8} />
+                        </div>
+                      {:else}
+                        <button class="btn btn-error" formaction="?/scan"
+                          >Not Scanning</button
+                        >
+                      {/if}
+                      {#if accessPoint.unlocked}
+                        <button class="btn btn-info" formaction="?/unlock"
+                          >Unlocked</button
+                        >
+                        <input type="hidden" name="unlocked" value="false" />
+                      {:else}
+                        <button class="btn btn-error" formaction="?/unlock"
+                          >Locked</button
+                        >
+                        <input type="hidden" name="unlocked" value="true" />
+                      {/if}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          {/each}
+        </div>
+      </div>
+    {:else}
+      <div class="flex justify-center">
+        <h1 class="text-2xl font-bold">No Access Points found</h1>
+      </div>
+    {/if}
+  </section>
+{/if}

@@ -36,6 +36,8 @@
 
   export let users: User[];
 
+  $: console.log(users);
+
   const defaultColumns: ColumnDef<User>[] = [
     {
       accessorKey: "username",

@@ -3,6 +3,12 @@ swa:
     expiration-duration: 1d
   api:
     base: /
+  scheduling:
+    rate:
+      in:
+        seconds: 15
+  pictures:
+    path: src/main/resources/static/images/
 
 server:
   port: 8080
@@ -29,7 +35,7 @@ spring:
     active: "prod"
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost/plant_health
+    url: jdbc:mysql://db:3306/plant_health?createDatabaseIfNotExist=true
     username: spring
     password: password
   h2:
@@ -44,3 +50,8 @@ spring:
     resources:
       # Disable static Resource Mapping
       add-mappings: false
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB

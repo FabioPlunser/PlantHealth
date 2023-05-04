@@ -4,17 +4,23 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
-import at.ac.uibk.plant_health.models.rest_responses.DashBoardDataResponse;
-import at.ac.uibk.plant_health.models.rest_responses.ListResponse;
-import at.ac.uibk.plant_health.models.rest_responses.RestResponseEntity;
+import at.ac.uibk.plant_health.models.rest_responses.*;
 import at.ac.uibk.plant_health.models.user.Person;
-import at.ac.uibk.plant_health.repositories.PersonRepository;
+import at.ac.uibk.plant_health.service.PersonService;
+import at.ac.uibk.plant_health.service.SensorStationPersonReferenceService;
+import at.ac.uibk.plant_health.service.SensorStationService;
 
 @RestController
 public class DashBoardController {
 	@Autowired
-	private PersonRepository personRepository;
+	private PersonService personService;
+	@Autowired
+	private SensorStationService sensorStationService;
+	@Autowired
+	private SensorStationPersonReferenceService sensorStationPersonReferenceService;
 
 	@PrincipalRequired(Person.class)
 	@GetMapping("/get-dashboard-data")
@@ -24,17 +30,40 @@ public class DashBoardController {
 
 	@PrincipalRequired(Person.class)
 	@RequestMapping(value = "/add-to-dashboard", method = {RequestMethod.PUT, RequestMethod.POST})
-	public RestResponseEntity addPlantToDashboard(Person person
-												  //            @RequestBody final UUID id
+	public RestResponseEntity addPlantToDashboard(
+			Person person, @RequestParam("plant-id") final UUID plantId
 	) {
-		throw new NotImplementedException();
+		//		var maybeSensorStation = this.sensorStationService.findById(plantId);
+		//		if (
+		//			maybeSensorStation.isPresent() &&
+		//			this.sensorStationPersonReferenceService.addPlantToDashboard(
+		//				person, maybeSensorStation.get()
+		//		)) {
+		//			return MessageResponse.builder().ok().toEntity();
+		//
+		//		}
+		//
+		//		return MessageResponse.builder().notFound().message("Could not find
+		// Plant").toEntity();
+		throw new NotImplementedException("Need to rethink this");
 	}
 
 	@PrincipalRequired(Person.class)
-	@RequestMapping(value = "/remove-from-dashboard", method = RequestMethod.DELETE)
-	public RestResponseEntity removePlantFromDashboard(Person person
-													   //            @RequestBody final UUID id
+	@DeleteMapping(value = "/remove-from-dashboard")
+	public RestResponseEntity removeFromDashboard(
+			Person person, @RequestParam("plant-id") final UUID plantId
 	) {
-		throw new NotImplementedException();
+		//		var maybeSensorStation = this.sensorStationService.findById(plantId);
+		//		if (
+		//			maybeSensorStation.isPresent() &&
+		//			this.sensorStationPersonReferenceService.removePlantFromDashboard(
+		//				person, maybeSensorStation.get()
+		//		)) {
+		//			return MessageResponse.builder().ok().toEntity();
+		//		}
+		//
+		//		return MessageResponse.builder().notFound().message("Could not find
+		// Plant").toEntity();
+		throw new NotImplementedException("Need to rethink this");
 	}
 }

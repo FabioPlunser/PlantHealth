@@ -28,7 +28,7 @@
     <Input field="passwordConfirm" type="password" label="Confirm password" />
     <FormError field="passwordConfirm" {form} />
 
-    <label class="label">
+    <label class="label" for="permissions">
       <span class="label-text font-bold">Permission</span>
     </label>
     <select

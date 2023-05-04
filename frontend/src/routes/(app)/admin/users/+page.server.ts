@@ -5,7 +5,8 @@ import { z } from "zod";
 
 export const load = (async ({ fetch, depends }) => {
   let allUsers;
-  await fetch(`http://${BACKEND_URL}/get-all-users`)
+
+  await fetch(`${BACKEND_URL}/get-all-users`)
     .then((response) => {
       if (!response.ok) {
         throw new Error(response.statusText);
@@ -13,10 +14,11 @@ export const load = (async ({ fetch, depends }) => {
       return response.json();
     })
     .then((data) => {
+      console.log(data);
       allUsers = data.items;
     })
     .catch((error) => {
-      console.error("Error fetching /get-all-permissions", error);
+      console.error("Error fetching /get-all-users", error);
     });
   return { users: allUsers };
 }) satisfies PageServerLoad;
@@ -77,7 +79,7 @@ export const actions = {
       body: formData,
     };
 
-    await fetch(`http://${BACKEND_URL}/create-user`, requestOptions)
+    await fetch(`${BACKEND_URL}/create-user`, requestOptions)
       .then((response) => {
         console.log(response);
         if (!response.ok) {
@@ -105,7 +107,7 @@ export const actions = {
 
     let parametersString = "?" + params.toString();
 
-    await fetch(`http://${BACKEND_URL}/delete-user` + parametersString, {
+    await fetch(`${BACKEND_URL}/delete-user` + parametersString, {
       method: "DELETE",
     })
       .then((response) => {

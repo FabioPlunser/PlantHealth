@@ -1,57 +1,42 @@
 <script lang="ts">
   import { page } from "$app/stores";
-  import { fly, slide } from "svelte/transition";
-  import { horizontalSlide } from "$helper/transitions";
-  import Query from "$helper/Query.svelte";
-  import Home from "$assets/icons/home.svg?component";
-  import Plant from "$assets/icons/potted-plant.svg?component";
-  import Gardener from "$assets/icons/gardening-shears.svg?component";
-  import Group from "$assets/icons/group.svg?component";
-  import Settings from "$assets/icons/gear.svg?component";
-  import Wifi from "$assets/icons/wifi.svg?component";
-
+  import { fly, scale } from "svelte/transition";
   import { onMount } from "svelte";
-  import Mobile from "$lib/helper/Mobile.svelte";
-  import Desktop from "$lib/helper/Desktop.svelte";
+
+  import Query from "$helper/Query.svelte";
 
   let rendered = false;
   $: path = $page.url.pathname;
   onMount(() => {
     rendered = true;
   });
-  let size = "45";
 
   let icons = [
     {
-      name: "home",
+      name: "Home",
       path: "/admin",
-      icon: Home,
+      icon: "bi bi-house",
     },
     {
       name: "Plants", //sensorStations
-      path: "/admin/plants",
-      icon: Plant,
+      path: "/admin/sensorstations",
+      icon: "bi bi-globe-europe-africa",
     },
     {
       name: "AP",
-      path: "/admin/accessPoints",
-      icon: Wifi,
+      path: "/admin/accesspoints",
+      icon: "bi bi-router-fill",
     },
-    // {
-    //   name: "Gardener",
-    //   path: "/admin/gardener",
-    //   icon: Gardener,
-    // },
     {
       name: "Users", // includes gardeners
       path: "/admin/users",
-      icon: Group,
+      icon: "bi bi-people-fill",
     },
 
     {
       name: "Settings",
       path: "/admin/settings",
-      icon: Settings,
+      icon: "bi bi-gear",
     },
   ];
 </script>
@@ -60,23 +45,20 @@
   <Query query="(max-width: 700px)">
     <div class="mx-2" in:fly={{ y: 200, duration: 400 }}>
       <div
-        class=" p-4 rounded-2xl bg-base-100 dark:bg-gray-500 drop-shadow-3xl"
+        class=" p-4 rounded-2xl bg-base-100 border-2 dark:border-none dark:bg-white/10 dark:backdrop-blur-2xl drop-shadow-3xl "
       >
         <div
-          class="flex items-center gap-4 justify-center"
+          class="flex items-center gap-8 justify-center"
           in:fly={{ x: -100, duration: 400, delay: 300 }}
         >
           {#each icons as icon}
             <div>
               <a href={icon.path}>
                 <div>
-                  <svelte:component
-                    this={icon.icon}
-                    width={size}
-                    height={size}
-                    class="dark:fill-white mx-auto drop-shadow-2xl {path ===
+                  <i
+                    class="{icon.icon} transform transition-transform active:scale-125 animation-spin flex justify-center text-4xl mx-auto shadow-2xl drop-shadow-2xl w-8 rouned-full {path ===
                     icon.path
-                      ? 'rounded-full bg-primary p-1'
+                      ? 'rounded-full text-primary dark:text-primary'
                       : ''}"
                   />
                   <h1 class="flex justify-center">{icon.name}</h1>
@@ -87,22 +69,5 @@
         </div>
       </div>
     </div>
-  </Query>
-
-  <Query query="(min-width: 700px)">
-    <nav
-      class="navbar fixed top-0 flex justify-center mb-12"
-      in:fly={{ y: -200, duration: 400 }}
-    >
-      <div class="flex gap-4">
-        {#each icons as icon}
-          <div>
-            <a href={icon.path}>
-              <h1 class="text-xl font-bold">{icon.name.toUpperCase()}</h1>
-            </a>
-          </div>
-        {/each}
-      </div>
-    </nav>
   </Query>
 {/if}
