@@ -44,6 +44,7 @@ void handleCentralDeviceIfPresent(
 	arduino::String & pairedDevice, bool & inPairingMode,
 	bool & notificationPresent
 );
+void checkNotificationSilenceButtonPressed();
 
 // ----- Global Variables ----- //
 
@@ -93,6 +94,7 @@ void loop() {
 	inPairingMode = true;
 	enable_pairing_mode();
 #endif
+	checkNotificationSilenceButtonPressed();
 	handleCentralDeviceIfPresent(
 		pairedDevice, inPairingMode, notificationPresent
 	);
@@ -108,6 +110,14 @@ void loop() {
 }
 
 // ----- Functions ----- //
+
+void checkNotificationSilenceButtonPressed() {
+	if (digitalRead(PIN_BUTTON_2) == PinStatus::HIGH) {
+		notificationHandler->silenceNotification(
+			TIME_IN_NOTIFICATION_SILENCE_MODE_MS
+		);
+	}
+}
 
 void checkPairingButtonAndStatus(bool & inPairingMode) {
 	static unsigned long pairingTime = 0;

@@ -97,6 +97,12 @@ class LedHandler {
 			setLEDStatus(false);
 		}
 
+		/**
+		 * This function will disable the led until the next call that will
+		 * modify the led status.
+		 */
+		void silence() { setLEDStatus(false); }
+
 		void setErrorProperties(
 			uint8_t valueRed, uint8_t valueGreen, uint8_t valueBlue,
 			uint16_t * durationOn, uint16_t * durationOff, uint8_t durationSize,

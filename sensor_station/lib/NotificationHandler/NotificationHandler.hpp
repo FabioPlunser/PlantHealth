@@ -33,6 +33,8 @@ class NotificationHandler {
 		LedHandler * ledConstroller;
 		PiezoBuzzerController * piezoBuzzerController;
 		const Notification * prevErrorNotification = NULL;
+		bool inSilentMode						   = false;
+		unsigned long timeOfSilenceEnd			   = 0;
 
 		NotificationHandler(
 			uint8_t ledPinRed, uint8_t ledPinGreen, uint8_t ledPinBlue
@@ -177,36 +179,58 @@ class NotificationHandler {
 		}
 
 	public:
+		bool isEmpty() { return this->notificationQueue->isEmpty(); }
+
+		/**
+		 * This function silences the led and piezo puzzer for the provided time
+		 * or until the top priority error changes.
+		 * @param timeToSilenceMs: Time in ms how long the error should be
+		 * silenced for on button press.
+		 */
+		void silenceNotification(unsigned long timeToSilenceMs) {
+			this->inSilentMode	   = true;
+			this->timeOfSilenceEnd = millis() + timeToSilenceMs;
+			update();
+		}
+
 		/**
 		 * @return -1 if no errors are present.\
-		 * @return Otherwise the time till the next required call to update in
-		 * ms
+		 * @return Otherwise the time till the next required call to update
+		 * in ms
 		 */
 		int32_t update() {
 			static unsigned long previousTone = 0;
-			if (notificationQueue->getSize() <= 0) {
+			if (notificationQueue->isEmpty()) {
 				ledConstroller->disable();
 				return -1;
 			}
-			if (millis() - previousTone > PIEZO_BUZZET_TONE_INTERVALL_MS) {
-				previousTone = millis();
-				piezoBuzzerController->startBuzzer(
-					PIEZO_BUZZET_TONE_FREQUENCY_HZ,
-					PIEZO_BUZZET_TONE_DURATION_MS
-				);
-			}
-			const Notification * topNotification =
-				notificationQueue->getPrioritisedNotification();
-			if (CHECK_IF_CASTABLE_TO_SENSOR_ERROR(topNotification)) {
-				const SensorError * error;
-				CAST_NOTIFICATION_TO_SENSOR_ERROR(topNotification, error);
-				return setLEDfromSensorError(*error);
+			if (this->inSilentMode) {
+				if ((int32_t) millis() - (int32_t) this->timeOfSilenceEnd < 0) {
+					this->inSilentMode = false;
+					return ledConstroller->updateLEDStatus();
+				} else {
+					ledConstroller->silence();
+					return this->timeOfSilenceEnd - millis();
+				}
 			} else {
-				return setLEDfromNotification(*topNotification);
+				if (millis() - previousTone > PIEZO_BUZZET_TONE_INTERVALL_MS) {
+					previousTone = millis();
+					piezoBuzzerController->startBuzzer(
+						PIEZO_BUZZET_TONE_FREQUENCY_HZ,
+						PIEZO_BUZZET_TONE_DURATION_MS
+					);
+				}
+				const Notification * topNotification =
+					notificationQueue->getPrioritisedNotification();
+				if (CHECK_IF_CASTABLE_TO_SENSOR_ERROR(topNotification)) {
+					const SensorError * error;
+					CAST_NOTIFICATION_TO_SENSOR_ERROR(topNotification, error);
+					return setLEDfromSensorError(*error);
+				} else {
+					return setLEDfromNotification(*topNotification);
+				}
 			}
 		}
-
-		bool isEmpty() { return this->notificationQueue->isEmpty(); }
 
 		void updatePairingNotification(bool isActive) {
 			static bool prevValue = false;
