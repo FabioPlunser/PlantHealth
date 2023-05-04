@@ -47,6 +47,9 @@ class NotificationHandler {
 		}
 
 	public:
+		NotificationHandler & operator=(NotificationHandler &) = delete;
+		NotificationHandler(NotificationHandler &)			   = delete;
+
 		static NotificationHandler * getInstance(
 			uint8_t ledPinRed, uint8_t ledPinGreen, uint8_t ledPinBlue
 		) {

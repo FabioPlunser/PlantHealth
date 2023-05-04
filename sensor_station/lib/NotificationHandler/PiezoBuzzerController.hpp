@@ -15,6 +15,9 @@ class PiezoBuzzerController {
 		}
 
 	public:
+		PiezoBuzzerController & operator=(PiezoBuzzerController &) = delete;
+		PiezoBuzzerController(PiezoBuzzerController &)			   = delete;
+
 		static PiezoBuzzerController * getInstance(int pin) {
 			static PiezoBuzzerController controller(pin);
 			return &controller;

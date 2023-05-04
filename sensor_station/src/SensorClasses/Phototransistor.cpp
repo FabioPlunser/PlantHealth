@@ -1,3 +1,6 @@
+#ifndef PHOTOTRANSISTOR_CLASS
+#define PHOTOTRANSISTOR_CLASS
+
 #include <Arduino.h>
 #include <Defines.h>
 
@@ -23,7 +26,7 @@ class PhototransistorClass {
 			tryUpdateValues();
 		}
 
-		uint16_t getLighting_10bit() {
+		uint16_t getLighting_16bit() {
 			tryUpdateValues();
 			return this->lighting;
 		}
@@ -33,3 +36,5 @@ class PhototransistorClass {
 			return ((float) this->lighting) * 100 / ANALOG_READ_MAX_VALUE;
 		}
 };
+
+#endif

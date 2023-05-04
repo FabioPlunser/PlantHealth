@@ -4,11 +4,11 @@
 #ifdef DO_MAIN
 
 #include "../lib/NotificationHandler/SensorErrors.h"
-// #include "../lib/ErrorHandler/SensorErrors.h"
 #include "SensorClasses/AirSensor.cpp"
 #include "SensorClasses/DipSwitch.cpp"
 #include "SensorClasses/Hydrometer.cpp"
 #include "SensorClasses/Phototransistor.cpp"
+#include "SensorClasses/SensorValueHandler.hpp"
 
 #include <Adafruit_BME680.h>
 #include <Arduino.h>
@@ -45,6 +45,7 @@ void handleCentralDeviceIfPresent(
 	bool & notificationPresent
 );
 void checkNotificationSilenceButtonPressed();
+void setValueInVerifiedCentralDevice(BLEDevice & central);
 
 // ----- Global Variables ----- //
 
@@ -54,6 +55,7 @@ PhototransistorClass * phototransistor;
 DipSwitchClass * dipSwitch;
 NotificationHandler * notificationHandler;
 Adafruit_BME680 bme680;
+SensorValueHandlerClass * sensorValueHandler;
 
 // ----- Setup ----- //
 
@@ -67,6 +69,9 @@ void setup() {
 	dipSwitch				= new DipSwitchClass(pinConnection, 8);
 	notificationHandler		= NotificationHandler::getInstance(
 		PIN_RGB_RED, PIN_RGB_GREEN, PIN_RGB_BLUE
+	);
+	sensorValueHandler = SensorValueHandlerClass::getInstance(
+		airSensor, hydrometer, phototransistor
 	);
 
 	initialize_communication();
@@ -84,9 +89,9 @@ void setup() {
 // ----- Loop ----- //
 
 void loop() {
-	static arduino::String pairedDevice;
-	static bool inPairingMode		= false;
-	static bool notificationPresent = false;
+	static arduino::String pairedDevice = "";
+	static bool inPairingMode			= false;
+	static bool notificationPresent		= false;
 #if PAIRING_BUTTON_REQUIRED
 	checkPairingButtonAndStatus(inPairingMode);
 	updateNotificationHandler_PairingMode(inPairingMode);
@@ -136,6 +141,28 @@ void checkPairingButtonAndStatus(bool & inPairingMode) {
 	}
 }
 
+void setValueInVerifiedCentralDevice(BLEDevice & central) {
+	DEBUG_PRINT(1, "Central device is remembered device.\n");
+	if (central.connected()) {
+		DEBUG_PRINT(1, "Connected\n");
+		if (get_sensorstation_locked_status() ==
+			SENSOR_STATION_UNLOCKED_VALUE) {
+			// setSensorValuesInBLE();
+			if (!sensorValueHandler->setAccumulatedSensorValuesInBle()) {
+				DEBUG_PRINT_POS(1, "SensorValueHandler returned false\n");
+				return;
+			}
+			set_sensorstation_id(0);
+			setArduinoPowerStatus();
+			clear_sensor_data_read_flag();
+		}
+		unsigned long connectionStart = millis();
+		while (central.connected() &&
+			   TIMEOUT_TIME_BLE_CONNECTION_MS > millis() - connectionStart) {
+		}
+	}
+}
+
 void handleCentralDeviceIfPresent(
 	arduino::String & pairedDevice, bool & inPairingMode,
 	bool & notificationPresent
@@ -156,18 +183,7 @@ void handleCentralDeviceIfPresent(
 		DEBUG_PRINTLN(1, central.address());
 		DEBUG_PRINTLN(1, " ");
 		if (pairedDevice.compareTo(central.address()) == 0) {
-			DEBUG_PRINT(1, "Central device is remembered device.\n");
-			if (central.connected()) {
-				DEBUG_PRINT(1, "Connected\n");
-				if (get_sensorstation_locked_status() ==
-					SENSOR_STATION_UNLOCKED_VALUE) {
-					setSensorValuesInBLE();
-				}
-				unsigned long connectionStart = millis();
-				while (central.connected() && TIMEOUT_TIME_BLE_CONNECTION_MS >
-												  millis() - connectionStart) {
-				}
-			}
+			setValueInVerifiedCentralDevice(central);
 		} else {
 			DEBUG_PRINT(1, "Declined connection to ");
 			DEBUG_PRINTLN(1, central.address());
@@ -175,9 +191,7 @@ void handleCentralDeviceIfPresent(
 		}
 		DEBUG_PRINTLN(1, "* Disconnected from central device!");
 		notificationPresent = updateNotificationHandler_Errors();
-		if (get_sensor_data_read_flag() == true) {
-			clear_sensor_data_read_flag();
-		} else {
+		if (get_sensor_data_read_flag() == false) {
 			ERROR_PRINT(
 				"Sensor flag was not cleared. Value was ",
 				get_sensor_data_read_flag()
@@ -230,125 +244,10 @@ bool updateNotificationHandler_PairingMode(bool active) {
 	return !notificationHandler->isEmpty();
 }
 
-bool setSensorValuesInBLE() {
-	unsigned long startTime = millis();
-	sensor_data_t sensorData;
-	AirSensorClass::UPDATE_ERROR updateError =
-		setSensorValuesFromSensors(&sensorData);
-
-#if PRINT_TIME_READ_SENSOR
-	DEBUG_PRINTF(
-		0, "Time taken to read sensor values: %.3f.\n",
-		float(millis() - startTime) / 1000
-	);
-#endif
-
-	if (updateError == AirSensorClass::UPDATE_ERROR::NOTHING) {
-		set_sensor_data(sensorData);
-	} else {
-		ERROR_PRINT("Got update Error ", updateError);
-		return false;
-	}
-	clearAllFlags();
-
-	set_sensorstation_locked_status(false);
-	setArduinoPowerStatus();
-	set_sensorstation_id(0);
-	return true;
-}
-
 void setArduinoPowerStatus() {
 	set_battery_level_status(
 		BATTERY_LEVEL_FLAGS_FIELD, BATTERY_POWER_STATE_FIELD, 100
 	);
 }
 
-AirSensorClass::UPDATE_ERROR setSensorValuesFromSensors(sensor_data_t * str) {
-	float pressure = 0, temperature = 0, humidity = 0;
-	uint32_t gas_resistance	 = 0;
-	uint16_t earth_humidity	 = hydrometer->getHumidity_16bit();
-	uint16_t light_intensity = phototransistor->getLighting_10bit();
-
-	AirSensorClass::UPDATE_ERROR updateError = airSensor->getMeasuredValues(
-		&pressure, &gas_resistance, &temperature, &humidity
-	);
-	if (updateError == AirSensorClass::UPDATE_ERROR::NOTHING) {
-		str->air_humidity = convertToGATT_airHumidity(humidity);
-		str->air_quality  = convertToGATT_airQuality(gas_resistance);
-		str->temperature  = convertToGATT_airTemperature(temperature);
-		str->air_pressure = convertToGATT_airPressure(pressure);
-	} else {
-		str->air_humidity = convertToGATT_airHumidity_notKnown();
-		str->air_quality  = convertToGATT_airQuality_notKnown();
-		str->temperature  = convertToGATT_airTemperature_notKnown();
-		str->air_pressure = convertToGATT_airPressure_notKnown();
-	}
-	str->earth_humidity	 = convertToGATT_soilHumidity(earth_humidity);
-	str->light_intensity = convertToGATT_lightIntensity(light_intensity);
-	return updateError;
-};
-
-uint16_t convertToGATT_soilHumidity(uint16_t humidity) {
-	DEBUG_PRINTF(2, "Soil humidity = %u\n", humidity);
-
-	static uint16_t valueHigh = 300;
-	static uint16_t valueLow  = 950;
-	float calculation =
-		100 - ((humidity - valueHigh) / (float) (valueLow - valueHigh) * 100);
-
-	DEBUG_PRINTF(2, "Calculated = %lf\n", calculation);
-	if (calculation < 0 || calculation > 100) {
-		return convertToGATT_soilHumidity_notKnown();
-	}
-	return uint16_t(calculation * 100);
-}
-
-uint16_t convertToGATT_soilHumidity_notKnown() { return (uint16_t) 0xFFFF; }
-
-uint16_t convertToGATT_airHumidity(float humidity) {
-	if (humidity < 0 || humidity > 100) {
-		return convertToGATT_airHumidity_notKnown();
-	}
-	return uint16_t(humidity * 100);
-}
-uint16_t convertToGATT_airHumidity_notKnown() { return (uint16_t) 0xFFFF; }
-
-uint32_t convertToGATT_airPressure(float pressure) {
-	return uint32_t(pressure * 10);
-}
-uint32_t convertToGATT_airPressure_notKnown() { return (uint8_t) 0xFFFF'FFFF; }
-
-uint8_t convertToGATT_airQuality(float gas_resistance) {
-	const float calibrationValue = 146000;
-	return (uint8_t) (100 - (gas_resistance / calibrationValue) * 100);
-}
-uint8_t convertToGATT_airQuality_notKnown() { return (uint8_t) 0xFF; }
-
-int8_t convertToGATT_airTemperature(float temperature) {
-	if (temperature < -64 || temperature > 63) {
-		return convertToGATT_airTemperature_notKnown();
-	}
-	return int8_t(temperature);
-}
-int8_t convertToGATT_airTemperature_notKnown() { return (int8_t) 0x7F; }
-
-uint16_t convertToGATT_lightIntensity(uint16_t lightIntensity) {
-	uint16_t luminosity = luminosityFromVoltage(lightIntensity);
-	if (luminosity > 65534) {
-		return convertToGATT_lightIntensity_notKnown();
-	}
-	return luminosity;
-}
-uint16_t convertToGATT_lightIntensity_notKnown() { return (uint16_t) 0xFFFF; }
-
-uint16_t luminosityFromVoltage(uint16_t measured) {
-	const float R	= 2200;
-	const float Vin = 3.3;
-	float Vout		= float(measured) / 1023 * Vin; // Convert analog to voltage
-	float diodaResistance =
-		(R * (Vin - Vout)) / Vout; // Convert voltage to resistance
-	return 500 / (diodaResistance / 1000
-				 ); // Convert resitance to kOhm and afterwards to lumen
-					// TODO: Check 500 as max luminosity
-}
 #endif

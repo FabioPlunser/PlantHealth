@@ -1,3 +1,6 @@
+#ifndef DIP_SWITCH_CLASS
+#define DIP_SWITCH_CLASS
+
 #include <Arduino.h>
 #include <Defines.h>
 
@@ -31,3 +34,5 @@ class DipSwitchClass {
 			return currentStatus;
 		}
 };
+
+#endif
