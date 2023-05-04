@@ -19,12 +19,43 @@
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";
   import { enhance } from "$app/forms";
+  import Query from "$lib/helper/Query.svelte";
 
+  let query =
+    "((min-width: 481px) and (max-width: 1280px)) or (min-width: 1281px)";
   let isRendered = false;
+  let mql;
+  let mqlListener;
+  let wasMounted = false;
+  let isMediaTabletOrDesktop = false;
 
   onMount(() => {
     isRendered = true;
+    wasMounted = true;
+    return () => {
+      removeActiveListener();
+    };
   });
+
+  $: {
+    if (wasMounted) {
+      removeActiveListener();
+      addNewListener(query);
+    }
+  }
+
+  function addNewListener(query) {
+    mql = window.matchMedia(query);
+    mqlListener = (v) => (isMediaTabletOrDesktop = v.matches);
+    mql.addListener(mqlListener);
+    isMediaTabletOrDesktop = mql.matches;
+  }
+
+  function removeActiveListener() {
+    if (mql && mqlListener) {
+      mql.removeListener(mqlListener);
+    }
+  }
 
   type User = {
     personId: string;
@@ -36,9 +67,7 @@
 
   export let users: User[];
 
-  $: console.log(users);
-
-  const defaultColumns: ColumnDef<User>[] = [
+  let columns = [
     {
       accessorKey: "username",
       header: () => flexRender(TextCell, { text: "Username" }),
@@ -56,19 +85,30 @@
     },
   ];
 
-  let globalFilter = "";
+  $: columnVisibility = isMediaTabletOrDesktop
+    ? {
+        username: true,
+        email: true,
+        permissions: true,
+      }
+    : {
+        username: true,
+        email: false,
+        permissions: false,
+      };
 
-  let options;
+  let globalFilter = "";
 
   $: options = writable<TableOptions<User>>({
     data: users,
-    columns: defaultColumns,
+    columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     state: {
       globalFilter,
+      columnVisibility,
       pagination: {
         pageSize: 5,
         pageIndex: 0,
@@ -135,7 +175,7 @@
 </script>
 
 {#if isRendered}
-  <div>
+  <div class="overflow-auto">
     <div class="mb-3" in:slide={{ duration: 400, axis: "y" }}>
       <input
         type="search"
@@ -147,7 +187,7 @@
       />
     </div>
     <div in:slide={{ duration: 400, axis: "y" }}>
-      <table class="table border-white w-full">
+      <table class="table table-auto w-full">
         <thead class="">
           {#each $table.getHeaderGroups() as headerGroup}
             <tr>
@@ -244,9 +284,8 @@
         {"<"}
       </button>
       <span class="btn">
-        Page
         {$table.getState().pagination.pageIndex + 1}
-        {" "}of{" "}
+        /
         {$table.getPageCount()}
       </span>
       <button
@@ -266,20 +305,22 @@
       >
         {">>"}
       </button>
-      <select
-        value={$table.getState().pagination.pageSize}
-        on:change={setPageSize}
-        class="btn"
-      >
-        {#each [5, 10, 25, 50] as pageSize}
-          <option value={pageSize}>
-            Show {pageSize}
-          </option>
-        {/each}
-      </select>
-      <span class="btn"
-        >{$table.getPrePaginationRowModel().rows.length} total Rows</span
-      >
+      {#if isMediaTabletOrDesktop}
+        <select
+          value={$table.getState().pagination.pageSize}
+          on:change={setPageSize}
+          class="btn"
+        >
+          {#each [5, 10, 25, 50] as pageSize}
+            <option value={pageSize}>
+              Show {pageSize}
+            </option>
+          {/each}
+        </select>
+        <span class="btn">
+          {$table.getPrePaginationRowModel().rows.length} total Rows
+        </span>
+      {/if}
     </div>
   </div>
 {/if}

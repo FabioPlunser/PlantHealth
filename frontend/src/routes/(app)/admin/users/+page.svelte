@@ -38,6 +38,6 @@
     in:slide={{ duration: 400, axis: "y" }}>Add User</btn
   >
   <div class="flex justify-center">
-    <UsersTable bind:users={data.users} />
+    <UsersTable users={data.users} />
   </div>
 {/if}

@@ -14,7 +14,6 @@ export const load = (async ({ fetch, depends }) => {
       return response.json();
     })
     .then((data) => {
-      console.log(data);
       allUsers = data.items;
     })
     .catch((error) => {
@@ -81,7 +80,6 @@ export const actions = {
 
     await fetch(`${BACKEND_URL}/create-user`, requestOptions)
       .then((response) => {
-        console.log(response);
         if (!response.ok) {
           throw new Error(response.statusText);
         }
