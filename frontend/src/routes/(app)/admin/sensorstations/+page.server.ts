@@ -1,11 +1,13 @@
 import { BACKEND_URL } from "$env/static/private";
+import { error } from "svelte/internal";
 
 // TODO: add validation and error handling (toast messages)
 export async function load({ locals, fetch, request, depends }) {
   let res = await fetch(`${BACKEND_URL}/get-sensor-stations`);
-  console.log(res);
+  if (!res.ok) {
+    throw new error("Could not get sensor stations");
+  }
   res = await res.json();
-  console.log(res);
 
   depends("app:getSensorStations");
   return {

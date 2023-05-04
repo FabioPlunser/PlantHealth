@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { enhance } from "$app/forms";
+  import { enhance, type SubmitFunction } from "$app/forms";
   import { invalidate } from "$app/navigation";
   import { fly } from "svelte/transition";
   import Spinner from "$components/ui/Spinner.svelte";
@@ -12,17 +12,17 @@
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   export let data;
-  $: console.log(data);
+  let accessPoints = data.accessPoints;
+
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  import Input from "$components/ui/Input.svelte";
   import FormError from "$helper/formError.svelte";
   import { browser } from "$app/environment";
   export let form;
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   async function invalidateAccessPoints() {
-    setTimeout(async () => {
+    await setTimeout(async () => {
       console.log("invalidate", new Date().toLocaleTimeString());
       await invalidate("app:getAccessPoints");
     }, 1000 * 30);
@@ -45,10 +45,10 @@
 
 {#if rendered}
   <section class="mt-14">
-    {#if data.accessPoints}
+    {#if accessPoints}
       <div class="flex justify-center mx-auto">
         <div class="grid grid-rows md:grid-cols-2 gap-4 xl:grid-cols-3">
-          {#each data.accessPoints as accessPoint, i (accessPoint.accessPointId)}
+          {#each accessPoints as accessPoint, i (accessPoint.accessPointId)}
             <form
               in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
               method="POST"
@@ -62,11 +62,9 @@
               <div class="card w-full min-w-full h-fit bg-base-100 shadow-2xl">
                 <div class="card-body">
                   <label class="" for="transferInterval">
-                    <span class="label-text text-xl font-bold"
-                      >Transfer Interval:</span
-                    >
+                    <span class="label-text text-xl font-bold">Room:</span>
                     <input
-                      bind:value={accessPoint.roomName}
+                      value={accessPoint.roomName}
                       name="roomName"
                       type="text"
                       class="input input-bordered w-full bg-gray-800 text-white"
@@ -80,7 +78,7 @@
                     >
                     <div class="flex">
                       <input
-                        bind:value={accessPoint.transferInterval}
+                        value={accessPoint.transferInterval}
                         name="transferInterval"
                         type="number"
                         class="input input-bordered w-full bg-gray-800 text-white"
@@ -132,10 +130,14 @@
                       >
                       {#if accessPoint.scanActive}
                         <div
-                          class="flex justify-center items-center gap-1 btn bg-purple-600 border-none"
+                          class="flex justify-center items-center gap-1 btn bg-purple-700 border-none"
                         >
                           <h1>Scanning:</h1>
-                          <Spinner w={8} h={8} />
+                          <Spinner
+                            w={8}
+                            h={8}
+                            fill="dark:fill-white dark:text-black"
+                          />
                         </div>
                       {:else}
                         <button class="btn btn-error" formaction="?/scan"

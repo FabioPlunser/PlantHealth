@@ -39,7 +39,7 @@
               >
                 <div class="absolute top-0 right-0 m-4">
                   <a
-                    href="sensorstations/sensorstation?sensorStationdId={sensorStation?.sensorStationId}"
+                    href="sensorstations/sensorstation?sensorStationId={sensorStation?.sensorStationId}"
                   >
                     <button
                       class="transform transition-transform hover:rotate-90 active:scale-125 animate-spin"
