@@ -52,7 +52,7 @@ const schema = z.object({
 });
 
 export const actions = {
-  createUser: async ({ cookies, request, fetch, locals }) => {
+  createUser: async ({ request, fetch, locals }) => {
     const formData = await request.formData();
     const zod = schema.safeParse(Object.fromEntries(formData));
 
@@ -96,7 +96,7 @@ export const actions = {
       });
   },
 
-  deleteUser: async ({ fetch, request, locals }) => {
+  deleteUser: async ({ request, fetch, locals }) => {
     const formData = await request.formData();
     let personId = formData.get("personId");
 
