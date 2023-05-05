@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -82,7 +83,7 @@ public class AccessPointService {
 		}
 		try {
 			// AccessPoint already exists quietly abort
-			findBySelfAssignedId(selfAssignedId);
+			setLastConnection(findBySelfAssignedId(selfAssignedId));
 			return;
 		} catch (ServiceException e) {
 			// AccessPoint does not exist
@@ -138,6 +139,7 @@ public class AccessPointService {
 	 */
 	public UUID getAccessPointAccessToken(UUID selfAssignedId) {
 		AccessPoint accessPoint = findBySelfAssignedId(selfAssignedId);
+		setLastConnection(accessPoint);
 		return accessPoint.getAccessToken();
 	}
 
@@ -181,6 +183,7 @@ public class AccessPointService {
 		});
 		accessPoint.setSensorStations(sensorStationList);
 		accessPoint.setScanActive(false);
+		setLastConnection(accessPoint);
 		save(accessPoint);
 	}
 
@@ -191,7 +194,21 @@ public class AccessPointService {
 	 */
 	public void startScan(UUID deviceId) throws ServiceException {
 		AccessPoint accessPoint = findById(deviceId);
+		if (!accessPoint.isConnected()) {
+			throw new ServiceException("AccessPoint is not connected", 400);
+		}
 		accessPoint.setScanActive(true);
+		save(accessPoint);
+	}
+
+	/**
+	 * Stop a scan for SensorStations.
+	 * @param deviceId The deviceId of the AccessPoint to stop the scan for.
+	 * @throws ServiceException if the AccessPoint could not be found.
+	 */
+	public void stopScan(UUID deviceId) throws ServiceException {
+		AccessPoint accessPoint = findById(deviceId);
+		accessPoint.setScanActive(false);
 		save(accessPoint);
 	}
 
@@ -207,20 +224,37 @@ public class AccessPointService {
 		save(accessPoint);
 	}
 
+	public void updateAccessPointInfo(UUID deviceId, String roomName, int transferInterval)
+			throws ServiceException {
+		AccessPoint accessPoint = findById(deviceId);
+		accessPoint.setRoomName(roomName);
+		accessPoint.setTransferInterval(transferInterval);
+		if (accessPoint.isConnected()) accessPoint.setConnected(true);
+		save(accessPoint);
+	}
+
 	/**
 	 * Set data of list of SensorStations.
 	 * @param sensorStations List of SensorStations to set data for.
 	 * @throws ServiceException if sensorData could not be set.
 	 */
-	public void setSensorStationData(List<SensorStation> sensorStations) throws ServiceException {
+	public void setSensorStationData(List<SensorStation> sensorStations, AccessPoint accessPoint)
+			throws ServiceException {
 		try {
 			for (SensorStation sensorStation : sensorStations) {
 				SensorStation dbSensorStation =
 						sensorStationService.findByBdAddress(sensorStation.getBdAddress());
 				sensorStationService.addSensorData(dbSensorStation, sensorStation.getSensorData());
 			}
+			setLastConnection(accessPoint);
 		} catch (Exception e) {
 			throw new ServiceException("Could not set SensorStation data.", 500);
 		}
+	}
+
+	private void setLastConnection(AccessPoint accesspoint) {
+		accesspoint.setLastConnection(LocalDateTime.now());
+		accesspoint.setConnected(true);
+		save(accesspoint);
 	}
 }

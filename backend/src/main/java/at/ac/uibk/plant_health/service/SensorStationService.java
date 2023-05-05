@@ -154,6 +154,17 @@ public class SensorStationService {
 		sensorStation.setPlantPictures(sensorStationPictures);
 		save(sensorStation);
 	}
+	public byte[] convertPictureToByteArray(PlantPicture picture) throws ServiceException {
+		try {
+			return Files.readAllBytes(Paths.get(picture.getPicturePath()));
+		} catch (Exception e) {
+			throw new ServiceException("Could not get picture resource", 500);
+		}
+	}
+	public String getPictureName(UUID pictureId) throws ServiceException {
+		PlantPicture picture = getPicture(pictureId);
+		return picture.getPicturePath().split("/")[2];
+	}
 
 	/**
 	 * Delete specific picture of sensor station
@@ -219,6 +230,17 @@ public class SensorStationService {
 		data.setSensor(sensor);
 		data.setSensorStation(sensorStation);
 		this.sensorDataRepository.save(data);
+	}
+
+	public PlantPicture getNewestPicture(UUID sensorStationId) throws ServiceException {
+		try {
+			SensorStation sensorStation = findById(sensorStationId);
+			return plantPictureRepository.findDistinctFirstBySensorStationOrderByTimeStampDesc(
+					sensorStation
+			);
+		} catch (Exception e) {
+			throw new ServiceException("Could not get newest picture", 500);
+		}
 	}
 
 	public void addSensorData(SensorStation sensorStation, List<SensorData> dataList)

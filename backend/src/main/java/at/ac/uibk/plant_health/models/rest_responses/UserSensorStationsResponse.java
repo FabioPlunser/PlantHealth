@@ -4,14 +4,15 @@ import java.io.Serializable;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
+import at.ac.uibk.plant_health.models.user.Person;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class UserSensorStationResponse extends RestResponse implements Serializable {
+public class UserSensorStationsResponse extends RestResponse implements Serializable {
 	private final List<InnerResponse> sensorStations;
-	public UserSensorStationResponse(List<SensorStation> sensorStations) {
+	public UserSensorStationsResponse(List<SensorStation> sensorStations, Person person) {
 		this.sensorStations = sensorStations.stream()
 									  .filter(s -> !s.isDeleted() && s.isUnlocked())
 									  .map(InnerResponse::new)
