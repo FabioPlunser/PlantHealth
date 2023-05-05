@@ -10,16 +10,13 @@
   } from "@tanstack/svelte-table";
   import { writable } from "svelte/store";
   import RolePills from "./RolePills.svelte";
-  import Edit from "$lib/assets/icons/edit.svg?component";
   import TextCell from "./TextCell.svelte";
   import SortSymbol from "./SortSymbol.svelte";
   import type { NodeJS } from "node:types";
-  import Input from "$lib/components/ui/Input.svelte";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";
   import { enhance } from "$app/forms";
-  import Query from "$lib/helper/Query.svelte";
 
   let query =
     "((min-width: 481px) and (max-width: 1280px)) or (min-width: 1281px)";
@@ -208,9 +205,6 @@
                       />
                       <SortSymbol isSorted={header.column.getIsSorted()} />
                     </div>
-                    <!--
-                  <SortDown class="dark:fill-white fill-black"/>
-                -->
                   {/if}
                 </th>
               {/each}
@@ -252,7 +246,14 @@
                         bind:value={row.original.personId}
                         name="personId"
                       />
-                      <button type="submit" class="">
+                      <button
+                        type="submit"
+                        on:click={() => {
+                          return confirm(
+                            `You will delete user ${row.original.username} permanently!`
+                          );
+                        }}
+                      >
                         <i class="bi bi-trash text-3xl hover:text-red-500" />
                       </button>
                     </form>
