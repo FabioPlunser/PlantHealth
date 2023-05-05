@@ -24,7 +24,7 @@
   // ----------------------------------
   // ----------------------------------
   function setCookie(id: any) {
-    document.cookie = `sensorStationId=${id}`;
+    document.cookie = `sensorStationId=${id}; path=/;`;
   }
   // ---------------------------------------------------------
   // ---------------------------------------------------------
@@ -95,7 +95,7 @@
                   .includes(searchByDipSwitchId)}
                 <form
                   in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
-                  out:fly|self={{ y: 200, duration: 200 }}
+                  out:fly|local|self={{ y: 200, duration: 200 }}
                   method="POST"
                   use:enhance
                 >

@@ -44,6 +44,7 @@
   }
   // ---------------------------------------------------------
   // ---------------------------------------------------------
+  $: console.log(data);
 </script>
 
 {#if rendered}
@@ -133,15 +134,22 @@
                       >
                       {#if accessPoint.scanActive}
                         <div
-                          class="flex justify-center items-center gap-1 btn bg-purple-700 border-none"
+                          class="flex disable justify-center text-white items-center gap-1 btn hover:bg-purple-700 bg-purple-700 border-none"
                         >
                           <h1>Scanning:</h1>
                           <Spinner
                             w={8}
                             h={8}
-                            fill="dark:fill-white dark:text-black"
+                            fill="dark:fill-white fill-info"
+                            background="text-black"
                           />
                         </div>
+                      {:else if !accessPoint.connected || !accessPoint.unlocked}
+                        <button
+                          disabled
+                          class="btn btn-error"
+                          formaction="?/scan">Not Scanning</button
+                        >
                       {:else}
                         <button class="btn btn-error" formaction="?/scan"
                           >Not Scanning</button
