@@ -250,7 +250,7 @@
                         type="submit"
                         on:click={() => {
                           return confirm(
-                            `You will delete user ${row.original.username} permanently!`
+                            `You will delete this user ${row.original.username.toUpperCase()} permanently!`
                           );
                         }}
                       >

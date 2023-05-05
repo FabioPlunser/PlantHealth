@@ -1,4 +1,4 @@
-import type { Actions } from "./$types";
+import type { Actions, PageServerLoad } from "./$types";
 import { BACKEND_URL } from "$env/static/private";
 import { fail, redirect, error } from "@sveltejs/kit";
 import { z } from "zod";
@@ -9,7 +9,7 @@ export const load = (async ({ fetch, depends }) => {
   await fetch(`${BACKEND_URL}/get-all-users`)
     .then((response) => {
       if (!response.ok) {
-        throw new Error(response.statusText);
+        throw new error(response.statusText);
       }
       return response.json();
     })
@@ -81,7 +81,7 @@ export const actions = {
     await fetch(`${BACKEND_URL}/create-user`, requestOptions)
       .then((response) => {
         if (!response.ok) {
-          throw new Error(response.statusText);
+          throw new error(response.status, response.statusText);
         }
         return response.json();
       })
@@ -90,9 +90,6 @@ export const actions = {
         console.log(
           `${time} : Admin with id: ${locals.user.personId} and username: ${locals.user.username} created a new user`
         );
-      })
-      .catch((error) => {
-        console.error("Error fetching /update-user", error);
       });
   },
 
@@ -110,7 +107,7 @@ export const actions = {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new error(response.statusText);
+          throw new error(response.status, response.statusText);
         }
         return response.json();
       })
@@ -119,9 +116,6 @@ export const actions = {
         console.log(
           `${time} : Admin with id: ${locals.user.personId} and username: ${locals.user.username} deleted user with id: ${personId}`
         );
-      })
-      .catch((error) => {
-        console.error("Error fetching /update-user", error);
       });
   },
 } satisfies Actions;
