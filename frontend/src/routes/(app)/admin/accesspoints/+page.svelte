@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { enhance, type SubmitFunction } from "$app/forms";
+  import { enhance } from "$app/forms";
   import { invalidate } from "$app/navigation";
   import { fly } from "svelte/transition";
+  import { apSensorStations } from "$stores/apSensorStations";
   import Spinner from "$components/ui/Spinner.svelte";
   // ---------------------------------------------------------
   import { onMount } from "svelte";
@@ -12,8 +13,8 @@
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   export let data;
-  let accessPoints = data.accessPoints;
-
+  $: accessPoints = data.accessPoints;
+  $: $apSensorStations = [];
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   import FormError from "$helper/formError.svelte";
@@ -38,7 +39,9 @@
   }
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  async function createQrCode() {}
+  function setSensorStations(accessPoint: any) {
+    $apSensorStations = accessPoint.sensorStations.sensorStations;
+  }
   // ---------------------------------------------------------
   // ---------------------------------------------------------
 </script>
@@ -52,12 +55,16 @@
             <form
               in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
               method="POST"
-              use:enhance
+              use:enhance={() => {
+                return async ({ update }) => {
+                  await update({ reset: false });
+                };
+              }}
             >
               <input
                 type="hidden"
                 name="accessPointId"
-                bind:value={accessPoint.accessPointId}
+                value={accessPoint.accessPointId}
               />
               <div class="card w-full min-w-full h-fit bg-base-100 shadow-2xl">
                 <div class="card-body">
@@ -65,6 +72,7 @@
                     <span class="label-text text-xl font-bold">Room:</span>
                     <input
                       value={accessPoint.roomName}
+                      placeholder={accessPoint.roomName}
                       name="roomName"
                       type="text"
                       class="input input-bordered w-full bg-gray-800 text-white"
@@ -74,20 +82,18 @@
                   <!-- <Input type="text" field="transferInterval" label="Transfer Interval" value={accessPoint.transferInterval} /> -->
                   <label class="" for="transferInterval">
                     <span class="label-text text-xl font-bold"
-                      >Transfer Interval:</span
+                      >Transfer Interval [s]:</span
                     >
                     <div class="flex">
                       <input
                         value={accessPoint.transferInterval}
+                        placeholder={accessPoint.transferInterval}
                         name="transferInterval"
                         type="number"
                         class="input input-bordered w-full bg-gray-800 text-white"
                         min="30"
                         max="240"
-                      /><span
-                        class="-ml-10 text-white items-center mx-auto my-auto"
-                        >[ s ]</span
-                      >
+                      />
                     </div>
                   </label>
 
@@ -99,28 +105,25 @@
                     {:else}
                       <div class="badge badge-error">Disconnected</div>
                     {/if}
-                    <div class="tooltip" data-tip="Go to Sensorstations">
-                      <a href="/admin/sensorstations">
-                        <div
-                          class="badge badge-success hover:scale-110 active:scale-125"
-                        >
-                          SensorStations: 10
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-
-                  <div class="flex justify-center m-2">
-                    <div class="flex">
-                      <div class="tooltip" data-tip="Create QR-Code">
-                        <button
-                          disabled
-                          class="transform transition-transform active:scale-110 transf"
-                        >
-                          <i class="bi bi-qr-code-scan text-4xl " />
-                        </button>
+                    {#if accessPoint.sensorStations.sensorStations.length > 0}
+                      <div class="tooltip" data-tip="Go to Sensorstations">
+                        <a href="/admin/sensorstations">
+                          <button
+                            on:click={() => setSensorStations(accessPoint)}
+                            class="badge badge-success hover:scale-110 active:scale-125"
+                          >
+                            SensorStations: {accessPoint.sensorStations
+                              .sensorStations.length}
+                          </button>
+                          <!-- </a> -->
+                        </a>
                       </div>
-                    </div>
+                    {:else}
+                      <div class="badge badge-success">
+                        SensorStations: {accessPoint.sensorStations
+                          .sensorStations.length}
+                      </div>
+                    {/if}
                   </div>
 
                   <div class="card-actions bottom-0 mx-auto">

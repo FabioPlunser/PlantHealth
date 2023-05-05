@@ -1,8 +1,16 @@
 import { BACKEND_URL } from "$env/static/private";
-import { error } from "svelte/internal";
+import { error } from "@sveltejs/kit";
 
 // TODO: add validation and error handling (toast messages)
-export async function load({ locals, fetch, request, depends }) {
+export async function load({ locals, fetch, request, depends, url }) {
+  let referer = request.headers.get("referer");
+  let origin = url.origin;
+  let fromAccessPoints = false;
+
+  if (referer === `${origin}/admin/accesspoints`) {
+    fromAccessPoints = true;
+  }
+
   let res = await fetch(`${BACKEND_URL}/get-sensor-stations`);
   if (!res.ok) {
     throw new error("Could not get sensor stations");
@@ -11,6 +19,7 @@ export async function load({ locals, fetch, request, depends }) {
 
   depends("app:getSensorStations");
   return {
+    fromAccessPoints,
     sensorStations: res.sensorStations,
   };
 }
@@ -38,4 +47,4 @@ export const actions = {
   delete: async ({ cookies, request, fetch }) => {
     console.log("delete");
   },
-} satisfies Actions;
+};
