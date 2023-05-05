@@ -35,9 +35,9 @@ public class SensorStationController {
 	public RestResponseEntity getSensorStations(Person person) {
 		if (person.getPermissions().contains(Permission.ADMIN)
 			|| person.getPermissions().contains(Permission.GARDENER)) {
-			return new SensorStationResponse(sensorStationService.findAll()).toEntity();
+			return new SensorStationsResponse(sensorStationService.findAll()).toEntity();
 		}
-		return new UserSensorStationResponse(sensorStationService.findAll()).toEntity();
+		return new UserSensorStationsResponse(sensorStationService.findAll()).toEntity();
 	}
 
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})

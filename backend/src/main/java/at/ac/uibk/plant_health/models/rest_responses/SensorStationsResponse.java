@@ -14,7 +14,6 @@ public class SensorStationsResponse extends RestResponse implements Serializable
 	private final List<InnerResponse> sensorStations;
 
 	public SensorStationsResponse(List<SensorStation> sensorStations) {
-		super();
 		this.sensorStations = sensorStations.stream()
 									  .filter(s -> !s.isDeleted())
 									  .map(InnerResponse::new)

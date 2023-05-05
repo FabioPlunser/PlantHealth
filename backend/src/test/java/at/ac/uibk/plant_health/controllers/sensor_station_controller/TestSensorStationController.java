@@ -12,6 +12,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,11 +33,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Stream;
 
 import at.ac.uibk.plant_health.models.device.AccessPoint;
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.plant.Sensor;
+import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
 import at.ac.uibk.plant_health.models.user.Permission;
@@ -82,12 +88,14 @@ public class TestSensorStationController {
 	@Value("${swa.pictures.path}")
 	private String picturesPath;
 
-	private Person createUserAndLogin(boolean alsoAdmin) {
+	private Person createUserAndLogin(boolean alsoAdmin, boolean gardener) {
 		String username = StringGenerator.username();
 		String password = StringGenerator.password();
 		Set<GrantedAuthority> permissions = new java.util.HashSet<>(Set.of(Permission.USER));
 		if (alsoAdmin) {
 			permissions.add(Permission.ADMIN);
+		} else if (gardener) {
+			permissions.add(Permission.GARDENER);
 		}
 		Person person = new Person(username, StringGenerator.email(), password, permissions);
 		assertTrue(personService.create(person), "Unable to create user");
@@ -97,8 +105,13 @@ public class TestSensorStationController {
 
 	@Test
 	void getSensorStations() throws Exception {
-		Person person = createUserAndLogin(true);
 		// precondition accessPoint has found and reported multiple sensorStations
+		Person person = createUserAndLogin(true, false);
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+
 		int sensorStationCount = 5;
 		for (int i = 0; i < sensorStationCount; i++) {
 			String bdAddress = StringGenerator.macAddress();
@@ -107,6 +120,8 @@ public class TestSensorStationController {
 		}
 		List<SensorStation> sensorStations =
 				sensorStationService.findAll().stream().filter(s -> !s.isDeleted()).toList();
+		accessPointService.foundNewSensorStation(accessPoint, sensorStations);
+
 		mockMvc.perform(MockMvcRequestBuilders.get("/get-sensor-stations")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
@@ -115,6 +130,34 @@ public class TestSensorStationController {
 				.andExpectAll(
 						status().isOk(), jsonPath("$.sensorStations").exists(),
 						jsonPath("$.sensorStations.length()").value(sensorStations.size())
+				);
+	}
+
+	@Test
+	void getSensorStation() throws Exception {
+		// precondition accessPoint has found and reported multiple sensorStations
+		Person person = createUserAndLogin(true, false);
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+
+		String bdAddress = StringGenerator.macAddress();
+		SensorStation sensorStation = new SensorStation(bdAddress, 255);
+		sensorStationService.save(sensorStation);
+		sensorStation = sensorStationService.findByBdAddress(bdAddress);
+		accessPointService.foundNewSensorStation(accessPoint, List.of(sensorStation));
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/get-sensor-station")
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(person))
+								.param("sensorStationId",
+									   String.valueOf(sensorStation.getDeviceId()))
+								.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(
+						status().isOk(), jsonPath("$.sensorStation").exists(),
+						jsonPath("$.sensors").exists()
 				);
 	}
 
@@ -143,15 +186,15 @@ public class TestSensorStationController {
 	}
 
 	@Test
-	void setUnlockSensorStation() throws Exception {
-		Person person = createUserAndLogin(true);
+	void setUnlockedSensorStation() throws Exception {
+		Person person = createUserAndLogin(true, false);
 		// precondition accessPoint has found and reported at least one sensor station
 		String bdAddress = StringGenerator.macAddress();
 		SensorStation sensorStation = new SensorStation(bdAddress, 1);
 		sensorStationService.save(sensorStation);
 		sensorStation = sensorStationService.findByBdAddress(bdAddress);
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/set-unlock-sensor-station")
+		mockMvc.perform(MockMvcRequestBuilders.post("/set-unlocked-sensor-station")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(person))
@@ -166,7 +209,7 @@ public class TestSensorStationController {
 
 	@Test
 	void setSensorLimitsAdmin() throws Exception {
-		Person person = createUserAndLogin(true);
+		Person person = createUserAndLogin(true, false);
 		// precondition accessPoint has found and reported at least one sensor station
 		String bdAddress = StringGenerator.macAddress();
 		SensorStation sensorStation = new SensorStation(bdAddress, 4);
@@ -188,7 +231,9 @@ public class TestSensorStationController {
 					sensorMap.keySet().toArray()[i].toString(),
 					sensorMap.values().toArray()[i].toString()
 			);
-			sensorRepository.save(sensor);
+			if (!sensorRepository.findAll().contains(sensor)) {
+				sensorRepository.save(sensor);
+			}
 			ObjectNode sensorJson = mapper.createObjectNode();
 			sensorJson.put("type", sensorMap.keySet().toArray()[i].toString());
 			sensorJson.put("unit", sensorMap.values().toArray()[i].toString());
@@ -221,6 +266,68 @@ public class TestSensorStationController {
 		assertEquals(sensorMap.size(), sensorLimits.size());
 		assertEquals(sensorLimits.size(), sensorStation.getSensorLimits().size());
 		assertEquals(sensorLimits, sensorStation.getSensorLimits());
+	}
+
+	@Test
+	void getSensorStationData() throws Exception {
+		// precondition user is logged in and AccessPoint has found at least one sensor station
+		Person person = createUserAndLogin(true, false);
+
+		AccessPoint accessPoint = new AccessPoint(UUID.randomUUID(), "Office1", 50, false);
+		accessPointService.save(accessPoint);
+
+		String bdAddress = StringGenerator.macAddress();
+		SensorStation sensorStation = new SensorStation(bdAddress, 1);
+		accessPointService.foundNewSensorStation(accessPoint, List.of(sensorStation));
+		sensorStation = sensorStationService.findByBdAddress(bdAddress);
+
+		Map<String, String> sensorMap = new HashMap<>();
+		sensorMap.put("TEMPERATURE", "°C");
+		sensorMap.put("HUMIDITY", "%");
+		sensorMap.put("PRESSURE", "hPa");
+		sensorMap.put("SOILHUMIDITY", "%");
+		sensorMap.put("LIGHTINTENSITY", "lux");
+		sensorMap.put("GASPRESSURE", "ppm");
+
+		List<Sensor> sensors = new ArrayList<>();
+		for (int i = 0; i < sensorMap.size(); i++) {
+			Sensor sensor = new Sensor(
+					sensorMap.keySet().toArray()[i].toString(),
+					sensorMap.values().toArray()[i].toString()
+			);
+			sensorRepository.save(sensor);
+			sensors.add(sensor);
+		}
+		List<SensorData> sensorDataList = new ArrayList<>();
+		for (int d = 0; d < 14; d++) {
+			for (int i = 0; i < sensorMap.size(); i++) {
+				SensorData sensorData = new SensorData(
+						LocalDateTime.now().minusDays(d), rand.nextFloat(), rand.nextBoolean(),
+						rand.nextBoolean(), 'h', sensors.get(i), sensorStation
+
+				);
+				sensorDataRepository.save(sensorData);
+				sensorDataList.add(sensorData);
+			}
+		}
+
+		sensorStation.setSensorData(sensorDataList);
+		sensorStationService.save(sensorStation);
+
+		var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+		var from = LocalDateTime.now().minusDays(12).format(formatter);
+		var to = LocalDateTime.now().format(formatter);
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/get-sensor-station-data")
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(person))
+								.param("sensorStationId",
+									   String.valueOf(sensorStation.getDeviceId()))
+								.param("from", from)
+								.param("to", to)
+								.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
 	}
 
 	private void createPicture(SensorStation sensorStation) {
@@ -342,7 +449,7 @@ public class TestSensorStationController {
 
 	@Test
 	void deletePictureAdmin() throws Exception {
-		Person person = createUserAndLogin(true);
+		Person person = createUserAndLogin(true, false);
 		// precondition accessPoint has found and reported at least one sensor station
 		String bdAddress = StringGenerator.macAddress();
 		SensorStation sensorStation = new SensorStation(bdAddress, 4);
@@ -374,7 +481,7 @@ public class TestSensorStationController {
 
 	@Test
 	void deleteAllPicturesAdmin() throws Exception {
-		Person person = createUserAndLogin(true);
+		Person person = createUserAndLogin(true, false);
 		// precondition accessPoint has found and reported at least one sensor station
 		String bdAddress = StringGenerator.macAddress();
 		SensorStation sensorStation = new SensorStation(bdAddress, 4);

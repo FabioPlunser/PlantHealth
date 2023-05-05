@@ -144,27 +144,6 @@ public class AccessPointController {
 				.toEntity();
 	}
 
-	@AnyPermission(Permission.ADMIN)
-	@PostMapping("/stop-scan-for-sensor-stations")
-	public RestResponseEntity stopScanForSensorStations(@RequestParam(name = "accessPointId")
-														final UUID accessPointId) {
-		try {
-			accessPointService.findById(accessPointId);
-			accessPointService.isUnlockedByDeviceId(accessPointId);
-			accessPointService.stopScan(accessPointId);
-		} catch (ServiceException e) {
-			return MessageResponse.builder()
-					.statusCode(e.getStatusCode())
-					.message(e.getMessage())
-					.toEntity();
-		}
-
-		return MessageResponse.builder()
-				.statusCode(200)
-				.message("Successfully stopped scan")
-				.toEntity();
-	}
-
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
 	@PostMapping("/set-access-point-transfer-interval")
 	public RestResponseEntity setAPTransferInterval(

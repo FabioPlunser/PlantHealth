@@ -90,6 +90,7 @@ public class AccessPointService {
 		}
 		AccessPoint accessPoint = new AccessPoint(selfAssignedId, roomName, false);
 		save(accessPoint);
+		setLastConnection(findBySelfAssignedId(selfAssignedId));
 	}
 
 	/**
@@ -229,7 +230,6 @@ public class AccessPointService {
 		AccessPoint accessPoint = findById(deviceId);
 		accessPoint.setRoomName(roomName);
 		accessPoint.setTransferInterval(transferInterval);
-		if (accessPoint.isConnected()) accessPoint.setConnected(true);
 		save(accessPoint);
 	}
 
@@ -252,7 +252,7 @@ public class AccessPointService {
 		}
 	}
 
-	private void setLastConnection(AccessPoint accesspoint) {
+	public void setLastConnection(AccessPoint accesspoint) {
 		accesspoint.setLastConnection(LocalDateTime.now());
 		accesspoint.setConnected(true);
 		save(accesspoint);
