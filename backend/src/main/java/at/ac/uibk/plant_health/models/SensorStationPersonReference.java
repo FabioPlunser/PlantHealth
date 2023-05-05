@@ -14,7 +14,7 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "plant_person_reference")
+@Table(name = "sensor_station_person_reference")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class SensorStationPersonReference implements Serializable {

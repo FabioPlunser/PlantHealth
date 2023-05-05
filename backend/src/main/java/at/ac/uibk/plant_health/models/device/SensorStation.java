@@ -10,9 +10,9 @@ import java.io.Serializable;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.SensorStationPersonReference;
-import at.ac.uibk.plant_health.models.plant.PlantPicture;
 import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
+import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -55,7 +55,7 @@ public class SensorStation extends Device implements Serializable {
 			fetch = FetchType.EAGER, mappedBy = "sensorStation", orphanRemoval = true,
 			cascade = CascadeType.ALL
 	)
-	private List<PlantPicture> plantPictures = new ArrayList<>();
+	private List<SensorStationPicture> plantPictures = new ArrayList<>();
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

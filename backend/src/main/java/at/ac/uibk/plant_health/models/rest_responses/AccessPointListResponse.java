@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.device.AccessPoint;
+import at.ac.uibk.plant_health.models.device.SensorStation;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,17 +25,23 @@ public class AccessPointListResponse extends RestResponse {
 	@Getter
 	private static class InnerAccessPoint implements Serializable {
 		private final UUID accessPointId;
+		private final UUID selfAssignedId;
 		private final String roomName;
 		private final boolean unlocked;
 		private final boolean scanActive;
+		private final boolean connected;
 		private final int transferInterval;
+		private final SensorStationsResponse sensorStations;
 
 		public InnerAccessPoint(AccessPoint accessPoint) {
 			this.accessPointId = accessPoint.getDeviceId();
+			this.selfAssignedId = accessPoint.getSelfAssignedId();
 			this.roomName = accessPoint.getRoomName();
 			this.unlocked = accessPoint.isUnlocked();
 			this.scanActive = accessPoint.getScanActive();
+			this.connected = accessPoint.isConnected();
 			this.transferInterval = accessPoint.getTransferInterval();
+			this.sensorStations = new SensorStationsResponse(accessPoint.getSensorStations());
 		}
 	}
 }
