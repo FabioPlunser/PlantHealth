@@ -50,6 +50,17 @@ class SensorValueHandlerClass {
 		}
 
 	public:
+		void setWeightCalculatorFunction(double (*weightFunction
+		)(unsigned long timeNow, unsigned long timeLastUpdate,
+		  unsigned long timeLastReset)) {
+			airTemperatureAccumulator->setWeightFunction(weightFunction);
+			airHumidityAccumulator->setWeightFunction(weightFunction);
+			airPressureAccumulator->setWeightFunction(weightFunction);
+			airQualityAccumulator->setWeightFunction(weightFunction);
+			soilHumidityAccumulator->setWeightFunction(weightFunction);
+			luminosityAccumulator->setWeightFunction(weightFunction);
+		}
+
 		static SensorValueHandlerClass * getInstance(
 			AirSensorClass * airSensor, HydrometerClass * hydrometer,
 			PhototransistorClass * phototransistor

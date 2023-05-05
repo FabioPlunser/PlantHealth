@@ -10,26 +10,37 @@ class ValueAccumulatorClass {
 		double totalWeights				= 0;
 		unsigned long lastUpdate;
 		unsigned long lastReset;
-		double (*calculateWheight)(double lastUpdate, double lastReset);
+		double (*calculateWheight
+		)(unsigned long timeNow, unsigned long timeLastUpdate,
+		  unsigned long timeLastReset);
 
 		// ---------- Constructors ---------- //
 	public:
 		ValueAccumulatorClass() { this->calculateWheight = NULL; }
 		ValueAccumulatorClass(double (*calculateWheight
-		)(double lastUpdate, double lastReset)) {
+		)(unsigned long timeNow, unsigned long timeLastUpdate,
+		  unsigned long timeLastReset)) {
 			this->calculateWheight = calculateWheight;
 		}
 
 		// ---------- Functions ---------- //
 
 	private:
-		double getWeightFactor() {
+		double getWeightFactor(unsigned long timeOfMeasurement) {
 			return this->calculateWheight == NULL
 					   ? 1
-					   : calculateWheight(lastUpdate, lastReset);
+					   : calculateWheight(
+							 timeOfMeasurement, lastUpdate, lastReset
+						 );
 		}
 
 	public:
+		void setWeightFunction(double (*calculateWheight
+		)(unsigned long timeNow, unsigned long timeLastUpdate,
+		  unsigned long timeLastReset)) {
+			this->calculateWheight = calculateWheight;
+		}
+
 		void reset() {
 			accumulatedWeightedValue = 0;
 			totalWeights			 = 0;
@@ -38,10 +49,10 @@ class ValueAccumulatorClass {
 		}
 
 		void addValue(double value) {
-			double weight			 = getWeightFactor();
+			lastUpdate				 = millis();
+			double weight			 = getWeightFactor(lastUpdate);
 			accumulatedWeightedValue += value * weight;
 			totalWeights			 += weight;
-			lastUpdate				 = millis();
 		}
 
 		double getTotalWeight() { return this->totalWeights; }

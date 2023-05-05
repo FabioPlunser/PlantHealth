@@ -15,25 +15,10 @@
 #include <ArduinoBLE.h>
 #include <CompilerFunctions.hpp>
 #include <NotificationHandler.hpp>
+#include <cmath>
 #include <modules/communication.h>
 
 // ----- Prototypes ----- //
-
-bool setSensorValuesInBLE();
-AirSensorClass::UPDATE_ERROR setSensorValuesFromSensors(sensor_data_t * str);
-uint16_t convertToGATT_soilHumidity(uint16_t humidity);
-uint16_t convertToGATT_soilHumidity_notKnown();
-uint16_t convertToGATT_airHumidity(float humidity);
-uint16_t convertToGATT_airHumidity_notKnown();
-uint32_t convertToGATT_airPressure(float pressure);
-uint32_t convertToGATT_airPressure_notKnown();
-uint8_t convertToGATT_airQuality(float gas_resistance);
-uint8_t convertToGATT_airQuality_notKnown();
-int8_t convertToGATT_airTemperature(float temperature);
-int8_t convertToGATT_airTemperature_notKnown();
-uint16_t convertToGATT_lightIntensity(uint16_t lightIntensity);
-uint16_t convertToGATT_lightIntensity_notKnown();
-uint16_t luminosityFromVoltage(uint16_t measured);
 
 void setArduinoPowerStatus();
 bool updateNotificationHandler_Errors();
@@ -46,6 +31,14 @@ void handleCentralDeviceIfPresent(
 );
 void checkNotificationSilenceButtonPressed();
 void setValueInVerifiedCentralDevice(BLEDevice & central);
+unsigned long calculateTimeBetweenMeasures(
+	unsigned long now, unsigned long firstMeasure, unsigned long timeMin,
+	unsigned long timeMax, unsigned long totalTillMax
+);
+double sensorValueWeightCalculationFunction(
+	unsigned long timeNow, unsigned long timeLastUpdate,
+	unsigned long timeLastReset
+);
 
 // ----- Global Variables ----- //
 
@@ -73,12 +66,12 @@ void setup() {
 	sensorValueHandler = SensorValueHandlerClass::getInstance(
 		airSensor, hydrometer, phototransistor
 	);
+	sensorValueHandler->setWeightCalculatorFunction(
+		sensorValueWeightCalculationFunction
+	);
 
 	initialize_communication();
 
-	// while (!Serial) {
-	// 	delay(50);
-	// }
 	// while (!Serial) {
 	// 	delay(50);
 	// }
@@ -89,9 +82,12 @@ void setup() {
 // ----- Loop ----- //
 
 void loop() {
-	static arduino::String pairedDevice = "";
-	static bool inPairingMode			= false;
-	static bool notificationPresent		= false;
+	static arduino::String pairedDevice			   = "";
+	static bool inPairingMode					   = false;
+	static bool notificationPresent				   = false;
+	static unsigned long timeBetweenMeasures	   = 0;
+	static unsigned long previousDataTransmission  = millis();
+	static unsigned long previousSensorMeasurement = millis();
 #if PAIRING_BUTTON_REQUIRED
 	checkPairingButtonAndStatus(inPairingMode);
 	updateNotificationHandler_PairingMode(inPairingMode);
@@ -103,6 +99,11 @@ void loop() {
 	handleCentralDeviceIfPresent(
 		pairedDevice, inPairingMode, notificationPresent
 	);
+	// If sensor data got transmitted we want to measure new values directly.
+	if (get_sensor_data_read_flag() == SENSOR_DATA_READ_VALUE) {
+		timeBetweenMeasures		 = 0;
+		previousDataTransmission = millis();
+	}
 
 	static int i = 0;
 	if (inPairingMode && i++ > 3) {
@@ -111,10 +112,47 @@ void loop() {
 	}
 	unsigned long remainingSleepTime =
 		handleNotificationIfPresent(notificationPresent);
+	// If the time between sensor measurements passed the next measurement will
+	// done.
+	if (millis() - previousSensorMeasurement > timeBetweenMeasures) {
+		unsigned long sensorReadStart = millis();
+		timeBetweenMeasures			  = calculateTimeBetweenMeasures(
+			  sensorReadStart, previousDataTransmission,
+			  TIME_BETWEEN_SENSOR_MEASUREMENTS_MIN_S,
+			  TIME_BETWEEN_SENSOR_MEASUREMENTS_MAX_S,
+			  TIME_IT_TAKES_TO_REACH_MAX_MEASUREMENT
+		  );
+		sensorValueHandler->addSensorValuesToAccumulator();
+		// Substract time it took to measur sensor values from remaining sleep
+		// time
+		unsigned long passedTime = millis() - sensorReadStart;
+		remainingSleepTime		 = remainingSleepTime < passedTime
+									   ? 0
+									   : remainingSleepTime - passedTime;
+	}
 	delay(remainingSleepTime);
 }
 
 // ----- Functions ----- //
+
+double sensorValueWeightCalculationFunction(
+	unsigned long timeNow, unsigned long timeLastUpdate,
+	unsigned long timeLastReset
+) {
+	return (double) timeNow - timeLastUpdate;
+}
+
+unsigned long calculateTimeBetweenMeasures(
+	unsigned long now, unsigned long firstMeasure, unsigned long timeMin,
+	unsigned long timeMax, unsigned long totalTillMax
+) {
+	float normedValue = float(now - firstMeasure) / totalTillMax;
+	if (normedValue > 1) {
+		return timeMax;
+	}
+	float waitFactor = pow((std::sin(PI / 2 * normedValue)), 2);
+	return (unsigned long) (waitFactor * (timeMax - timeMin) + timeMin);
+}
 
 void checkNotificationSilenceButtonPressed() {
 	if (digitalRead(PIN_BUTTON_2) == PinStatus::HIGH) {
@@ -191,7 +229,7 @@ void handleCentralDeviceIfPresent(
 		}
 		DEBUG_PRINTLN(1, "* Disconnected from central device!");
 		notificationPresent = updateNotificationHandler_Errors();
-		if (get_sensor_data_read_flag() == false) {
+		if (get_sensor_data_read_flag() == SENSOR_DATA_NOT_READ_VALUE) {
 			ERROR_PRINT(
 				"Sensor flag was not cleared. Value was ",
 				get_sensor_data_read_flag()
