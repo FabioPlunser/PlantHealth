@@ -62,8 +62,6 @@ javaTest-job: # This job runs in the test stage.
     - cd backend && mvn test
   allow_failure: false
   only:
-    - dev-backend
-    - dev
 
 javaSonarCheck-job:
   image: alpine:3.17
@@ -82,6 +80,3 @@ javaSonarCheck-job:
     - echo Running sonar analysis for ${SONAR_PROJECT_KEY}
     - cd backend && mvn -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.projectName="${CI_PROJECT_NAME} ${GITLAB_USER_NAME}" --fail-at-end verify sonar:sonar
   allow_failure: false
-  only:
-    - dev-backend
-    - dev
