@@ -13,7 +13,7 @@ export async function load({ locals, fetch, request, depends, url }) {
 
   let res = await fetch(`${BACKEND_URL}/get-sensor-stations`);
   if (!res.ok) {
-    throw new error("Could not get sensor stations");
+    throw new error(res.status, "Could not get sensor stations");
   }
   res = await res.json();
 

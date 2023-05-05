@@ -36,6 +36,7 @@ export async function load({ locals, fetch }) {
 
   let dashboard = await fetch(`${BACKEND_URL}/get-dashboard`);
   dashboard = await dashboard.json();
+  dashboard = { sensorStations: [] };
 
   for (let sensorStation of dashboard?.sensorStations) {
     console.log("sensorStation", sensorStation);

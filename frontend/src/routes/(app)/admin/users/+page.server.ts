@@ -6,7 +6,7 @@ import { z } from "zod";
 export async function load({ fetch, depends }) {
   let res = await fetch(`${BACKEND_URL}/get-all-users`);
   if (!res.ok) {
-    throw new error(res.error);
+    throw new error(res.status, res.error);
   }
   res = await res.json();
   console.log("server", res);

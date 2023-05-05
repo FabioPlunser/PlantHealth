@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from "./$types";
-import { fail, redirect } from "@sveltejs/kit";
+import { fail, redirect, error } from "@sveltejs/kit";
 import { BACKEND_URL } from "$env/static/private";
 import { z } from "zod";
 
@@ -25,7 +25,7 @@ export const load = (async ({ url, fetch, locals }) => {
     await fetch(`http://${BACKEND_URL}/get-all-permissions`)
       .then((response) => {
         if (!response.ok) {
-          throw new error(response.statusText);
+          throw new error(response.status, response.statusText);
         }
         return response.json();
       })
@@ -149,7 +149,7 @@ export const actions = {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new error(response.statusText);
+          throw new error(response.status, response.statusText);
         }
         return response.json();
       })
