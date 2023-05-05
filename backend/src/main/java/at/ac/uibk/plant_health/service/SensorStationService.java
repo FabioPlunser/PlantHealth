@@ -1,12 +1,8 @@
 package at.ac.uibk.plant_health.service;
 
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Files;
@@ -17,10 +13,10 @@ import java.util.*;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.exceptions.ServiceException;
-import at.ac.uibk.plant_health.models.plant.PlantPicture;
 import at.ac.uibk.plant_health.models.plant.Sensor;
 import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
+import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
 import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.repositories.*;
 
@@ -117,18 +113,18 @@ public class SensorStationService {
 	 * @param sensorStationId
 	 * @return list of base64 encoded pictures
 	 */
-	public List<PlantPicture> getPictures(UUID sensorStationId) throws ServiceException {
+	public List<SensorStationPicture> getPictures(UUID sensorStationId) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
 		return sensorStation.getPlantPictures();
 	}
 
-	public PlantPicture getPicture(UUID pictureId) throws ServiceException {
-		Optional<PlantPicture> maybePicture = plantPictureRepository.findById(pictureId);
+	public SensorStationPicture getPicture(UUID pictureId) throws ServiceException {
+		Optional<SensorStationPicture> maybePicture = plantPictureRepository.findById(pictureId);
 		if (maybePicture.isEmpty()) throw new ServiceException("Picture does not exist", 404);
 		return maybePicture.get();
 	}
 
-	public PlantPicture getNewestPicture(UUID sensorStationId) throws ServiceException {
+	public SensorStationPicture getNewestPicture(UUID sensorStationId) throws ServiceException {
 		try {
 			SensorStation sensorStation = findById(sensorStationId);
 			return plantPictureRepository.findDistinctFirstBySensorStationOrderByTimeStampDesc(
@@ -146,13 +142,14 @@ public class SensorStationService {
 	 */
 	public void uploadPicture(MultipartFile picture, UUID sensorStationId) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
-		PlantPicture plantPicture = null;
+		SensorStationPicture plantPicture = null;
 		try {
 			String extension = Objects.requireNonNull(picture.getContentType()).split("/")[1];
 			String picturePath = picturesPath + UUID.randomUUID() + "." + extension;
 			Path path = Paths.get(picturePath);
 
-			plantPicture = new PlantPicture(sensorStation, picturePath, LocalDateTime.now());
+			plantPicture =
+					new SensorStationPicture(sensorStation, picturePath, LocalDateTime.now());
 			plantPictureRepository.save(plantPicture);
 
 			Files.createDirectories(path.getParent());
@@ -161,24 +158,13 @@ public class SensorStationService {
 			throw new ServiceException("Could not save picture", 500);
 		}
 
-		List<PlantPicture> sensorStationPictures = sensorStation.getPlantPictures();
+		List<SensorStationPicture> sensorStationPictures = sensorStation.getPlantPictures();
 		sensorStationPictures.add(plantPicture);
 		sensorStation.setPlantPictures(sensorStationPictures);
 		save(sensorStation);
 	}
-	public byte[] convertPictureToByteArray(PlantPicture picture) throws ServiceException {
-		try {
-			return Files.readAllBytes(Paths.get(picture.getPicturePath()));
-		} catch (Exception e) {
-			throw new ServiceException("Could not get picture resource", 500);
-		}
-	}
-	public String getPictureName(UUID pictureId) throws ServiceException {
-		PlantPicture picture = getPicture(pictureId);
-		return picture.getPicturePath().split("/")[2];
-	}
 
-	public byte[] convertPictureToByteArray(PlantPicture picture) throws ServiceException {
+	public byte[] convertPictureToByteArray(SensorStationPicture picture) throws ServiceException {
 		try {
 			return Files.readAllBytes(Paths.get(picture.getPicturePath()));
 		} catch (Exception e) {
@@ -187,7 +173,7 @@ public class SensorStationService {
 	}
 
 	public String getPictureName(UUID pictureId) throws ServiceException {
-		PlantPicture picture = getPicture(pictureId);
+		SensorStationPicture picture = getPicture(pictureId);
 		return picture.getPicturePath().split("/")[2];
 	}
 
@@ -198,9 +184,9 @@ public class SensorStationService {
 	 * @throws ServiceException
 	 */
 	public void deletePicture(UUID pictureId) throws ServiceException {
-		Optional<PlantPicture> maybePicture = plantPictureRepository.findById(pictureId);
+		Optional<SensorStationPicture> maybePicture = plantPictureRepository.findById(pictureId);
 		if (maybePicture.isEmpty()) throw new ServiceException("Picture does not exist", 404);
-		PlantPicture picture = maybePicture.get();
+		SensorStationPicture picture = maybePicture.get();
 		SensorStation sensorStation = picture.getSensorStation();
 
 		try {
@@ -221,9 +207,9 @@ public class SensorStationService {
 	 */
 	public void deleteAllPictures(UUID sensorStationId) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
-		List<PlantPicture> pictures = new ArrayList<>(sensorStation.getPlantPictures());
+		List<SensorStationPicture> pictures = new ArrayList<>(sensorStation.getPlantPictures());
 		try {
-			for (PlantPicture picture : pictures) {
+			for (SensorStationPicture picture : pictures) {
 				try {
 					Path path = Paths.get(picture.getPicturePath());
 					Files.delete(path);
@@ -255,17 +241,6 @@ public class SensorStationService {
 		data.setSensor(sensor);
 		data.setSensorStation(sensorStation);
 		this.sensorDataRepository.save(data);
-	}
-
-	public PlantPicture getNewestPicture(UUID sensorStationId) throws ServiceException {
-		try {
-			SensorStation sensorStation = findById(sensorStationId);
-			return plantPictureRepository.findDistinctFirstBySensorStationOrderByTimeStampDesc(
-					sensorStation
-			);
-		} catch (Exception e) {
-			throw new ServiceException("Could not get newest picture", 500);
-		}
 	}
 
 	public void addSensorData(SensorStation sensorStation, List<SensorData> dataList)

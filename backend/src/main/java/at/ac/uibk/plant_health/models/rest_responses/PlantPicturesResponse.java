@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
-import at.ac.uibk.plant_health.models.plant.PlantPicture;
+import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
 import lombok.Getter;
 
 @Getter
@@ -15,7 +15,7 @@ public class PlantPicturesResponse extends RestResponse implements Serializable 
 	private final String roomName;
 	private final String plantName;
 
-	public PlantPicturesResponse(List<PlantPicture> pictures, SensorStation sensorStation) {
+	public PlantPicturesResponse(List<SensorStationPicture> pictures, SensorStation sensorStation) {
 		super();
 		this.pictures = pictures.stream().map(InnerPlantPicture::new).toList();
 		this.roomName = sensorStation.getAccessPoint().getRoomName();
@@ -27,7 +27,7 @@ public class PlantPicturesResponse extends RestResponse implements Serializable 
 		private final UUID pictureId;
 		private final LocalDateTime timeStamp;
 
-		public InnerPlantPicture(PlantPicture picture) {
+		public InnerPlantPicture(SensorStationPicture picture) {
 			this.pictureId = picture.getPictureId();
 			this.timeStamp = picture.getTimeStamp();
 		}

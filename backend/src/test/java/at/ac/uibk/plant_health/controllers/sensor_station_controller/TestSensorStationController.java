@@ -23,9 +23,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.file.Files;
@@ -36,9 +34,9 @@ import java.util.*;
 
 import at.ac.uibk.plant_health.models.device.AccessPoint;
 import at.ac.uibk.plant_health.models.device.SensorStation;
-import at.ac.uibk.plant_health.models.plant.PlantPicture;
 import at.ac.uibk.plant_health.models.plant.Sensor;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
+import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.repositories.*;
@@ -48,7 +46,6 @@ import at.ac.uibk.plant_health.service.SensorStationService;
 import at.ac.uibk.plant_health.util.AuthGenerator;
 import at.ac.uibk.plant_health.util.MockAuthContext;
 import at.ac.uibk.plant_health.util.StringGenerator;
-import jakarta.persistence.Access;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -81,7 +78,7 @@ public class TestSensorStationController {
 
 	private final String picture =
 			"iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAIAAADTED8xAAADMElEQVR4nOzVwQnAIBQFQYXff81RUkQCOyDj1YOPnbXWPmeTRef+/3O/OyBjzh3CD95BfqICMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMO0TAAD//2Anhf4QtqobAAAAAElFTkSuQmCC";
-	PlantPicture plantPicture;
+	SensorStationPicture plantPicture;
 	@Value("${swa.pictures.path}")
 	private String picturesPath;
 
@@ -227,12 +224,13 @@ public class TestSensorStationController {
 	}
 
 	private void createPicture(SensorStation sensorStation) {
-		List<PlantPicture> plantPictures = new ArrayList<>();
+		List<SensorStationPicture> plantPictures = new ArrayList<>();
 		try {
 			byte[] imageByte = Base64.decodeBase64(picture);
 			String picturePath = picturesPath + UUID.randomUUID() + ".png";
 			Path path = Paths.get(picturePath);
-			plantPicture = new PlantPicture(sensorStation, picturePath, LocalDateTime.now());
+			plantPicture =
+					new SensorStationPicture(sensorStation, picturePath, LocalDateTime.now());
 			plantPictureRepository.save(plantPicture);
 			Files.createDirectories(path.getParent());
 			Files.write(path, imageByte);
@@ -246,9 +244,9 @@ public class TestSensorStationController {
 	}
 
 	private void deleteAllPictures(SensorStation sensorStation) throws Exception {
-		List<PlantPicture> pictures = sensorStation.getPlantPictures();
+		List<SensorStationPicture> pictures = sensorStation.getPlantPictures();
 		try {
-			for (PlantPicture picture1 : pictures) {
+			for (SensorStationPicture picture1 : pictures) {
 				Path path = Paths.get(picture1.getPicturePath());
 				Files.delete(path);
 			}
@@ -352,8 +350,8 @@ public class TestSensorStationController {
 
 		createPicture(sensorStation);
 
-		List<PlantPicture> pictures = plantPictureRepository.findAll();
-		PlantPicture picture1 = pictures.get(0);
+		List<SensorStationPicture> pictures = plantPictureRepository.findAll();
+		SensorStationPicture picture1 = pictures.get(0);
 
 		assertEquals(pictures.size(), sensorStation.getPlantPictures().size());
 
@@ -384,13 +382,14 @@ public class TestSensorStationController {
 
 		int pictureCount = 10;
 
-		List<PlantPicture> plantPictures = new ArrayList<>();
+		List<SensorStationPicture> plantPictures = new ArrayList<>();
 		for (int i = 0; i < pictureCount; i++) {
 			try {
 				byte[] imageByte = Base64.decodeBase64(picture);
 				String picturePath = picturesPath + UUID.randomUUID() + ".png";
 				Path path = Paths.get(picturePath);
-				plantPicture = new PlantPicture(sensorStation, picturePath, LocalDateTime.now());
+				plantPicture =
+						new SensorStationPicture(sensorStation, picturePath, LocalDateTime.now());
 				plantPictureRepository.save(plantPicture);
 				Files.createDirectories(path.getParent());
 				Files.write(path, imageByte);
@@ -403,7 +402,7 @@ public class TestSensorStationController {
 		sensorStation.setPlantPictures(plantPictures);
 		sensorStationService.save(sensorStation);
 
-		List<PlantPicture> pictures = plantPictureRepository.findAll();
+		List<SensorStationPicture> pictures = plantPictureRepository.findAll();
 		assertEquals(pictures.size(), sensorStation.getPlantPictures().size());
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/delete-all-sensor-station-pictures")

@@ -17,8 +17,8 @@ import at.ac.uibk.plant_health.models.annotations.AnyPermission;
 import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
 import at.ac.uibk.plant_health.models.annotations.PublicEndpoint;
 import at.ac.uibk.plant_health.models.exceptions.ServiceException;
-import at.ac.uibk.plant_health.models.plant.PlantPicture;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
+import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
 import at.ac.uibk.plant_health.models.rest_responses.*;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
@@ -193,7 +193,7 @@ public class SensorStationController {
 	public ResponseEntity<byte[]>
 	getSensorStationPicture(@RequestParam("pictureId") final UUID pictureId) {
 		try {
-			PlantPicture picture = sensorStationService.getPicture(pictureId);
+			SensorStationPicture picture = sensorStationService.getPicture(pictureId);
 			String extension = picture.getPicturePath().split("\\.")[1];
 			String name = picture.getPicturePath().split("\\.")[0];
 			byte[] contents = sensorStationService.convertPictureToByteArray(picture);
@@ -219,7 +219,7 @@ public class SensorStationController {
 			throws Exception {
 		try {
 			sensorStationService.findById(sensorStationId);
-			PlantPicture picture = sensorStationService.getNewestPicture(sensorStationId);
+			SensorStationPicture picture = sensorStationService.getNewestPicture(sensorStationId);
 
 			String extension = picture.getPicturePath().split("\\.")[1];
 			String name = picture.getPicturePath().split("\\.")[0];

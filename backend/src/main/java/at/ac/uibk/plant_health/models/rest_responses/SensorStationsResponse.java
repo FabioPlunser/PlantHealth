@@ -5,9 +5,6 @@ import java.util.*;
 import java.util.List;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
-import at.ac.uibk.plant_health.models.plant.PlantPicture;
-import at.ac.uibk.plant_health.models.plant.SensorData;
-import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 

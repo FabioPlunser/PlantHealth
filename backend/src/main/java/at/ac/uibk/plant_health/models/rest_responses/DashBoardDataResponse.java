@@ -2,21 +2,16 @@ package at.ac.uibk.plant_health.models.rest_responses;
 
 import static java.util.stream.Collectors.groupingBy;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.SensorStationPersonReference;
 import at.ac.uibk.plant_health.models.device.SensorStation;
-import at.ac.uibk.plant_health.models.plant.PlantPicture;
 import at.ac.uibk.plant_health.models.plant.SensorData;
+import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
 import at.ac.uibk.plant_health.models.user.Person;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Getter
@@ -55,7 +50,7 @@ public class DashBoardDataResponse extends RestResponse implements Serializable 
 			this.roomName = sensorStation.getAccessPoint().getRoomName();
 			this.pictureIds = sensorStation.getPlantPictures()
 									  .stream()
-									  .map(PlantPicture::getPictureId)
+									  .map(SensorStationPicture::getPictureId)
 									  .toList();
 			this.sensorStationId = sensorStation.getDeviceId();
 		}

@@ -5,11 +5,13 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
-import at.ac.uibk.plant_health.models.plant.PlantPicture;
+import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
 
-public interface PlantPictureRepository extends CrudRepository<PlantPicture, UUID> {
+public interface PlantPictureRepository extends CrudRepository<SensorStationPicture, UUID> {
 	@Override
-	List<PlantPicture> findAll();
+	List<SensorStationPicture> findAll();
 
-	PlantPicture findDistinctFirstBySensorStationOrderByTimeStampDesc(SensorStation sensorStation);
+	SensorStationPicture findDistinctFirstBySensorStationOrderByTimeStampDesc(
+			SensorStation sensorStation
+	);
 }

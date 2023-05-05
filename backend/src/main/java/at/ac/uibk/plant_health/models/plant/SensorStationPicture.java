@@ -19,7 +19,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class PlantPicture {
+public class SensorStationPicture {
 	@Id
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -42,7 +42,9 @@ public class PlantPicture {
 	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	private LocalDateTime timeStamp;
 
-	public PlantPicture(SensorStation sensorStation, String picturePath, LocalDateTime timeStamp) {
+	public SensorStationPicture(
+			SensorStation sensorStation, String picturePath, LocalDateTime timeStamp
+	) {
 		this.sensorStation = sensorStation;
 		this.picturePath = picturePath;
 		this.timeStamp = timeStamp;
@@ -52,7 +54,7 @@ public class PlantPicture {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		PlantPicture that = (PlantPicture) o;
+		SensorStationPicture that = (SensorStationPicture) o;
 		return Objects.equals(pictureId, that.pictureId);
 	}
 
@@ -63,7 +65,7 @@ public class PlantPicture {
 
 	@Override
 	public String toString() {
-		return "PlantPicture{"
+		return "SensorStationPicture{"
 				+ "pictureName='" + picturePath + '\'' + ", timeStamp=" + timeStamp + '}';
 	}
 }
