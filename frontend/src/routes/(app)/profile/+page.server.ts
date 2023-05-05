@@ -10,6 +10,7 @@ export const load = (async ({ url, fetch, locals }) => {
   personId = url.searchParams.get("personId") ?? locals.user.personId;
   let username = url.searchParams.get("username") ?? locals.user.username;
   source = url.searchParams.get("source");
+
   let permissions =
     url.searchParams.get("userPermissions")?.split(",") ??
     locals.user.permissions;
@@ -24,7 +25,7 @@ export const load = (async ({ url, fetch, locals }) => {
     await fetch(`http://${BACKEND_URL}/get-all-permissions`)
       .then((response) => {
         if (!response.ok) {
-          throw new Error(response.statusText);
+          throw new error(response.statusText);
         }
         return response.json();
       })
@@ -148,7 +149,7 @@ export const actions = {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error(response.statusText);
+          throw new error(response.statusText);
         }
         return response.json();
       })

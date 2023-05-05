@@ -1,4 +1,4 @@
-import type { Actions, PageServerLoad } from "./$types";
+import type { Actions } from "./$types";
 import { BACKEND_URL } from "$env/static/private";
 import { fail, redirect, error } from "@sveltejs/kit";
 import { z } from "zod";
@@ -110,7 +110,7 @@ export const actions = {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error(response.statusText);
+          throw new error(response.statusText);
         }
         return response.json();
       })

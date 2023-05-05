@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { invalidate } from "$app/navigation";
   import { fly } from "svelte/transition";
+  import { apSensorStations } from "$stores/apSensorStations";
   import Spinner from "$components/ui/Spinner.svelte";
   // ---------------------------------------------------------
   import { onMount } from "svelte";
@@ -12,17 +13,17 @@
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   export let data;
-  $: console.log(data);
+  $: accessPoints = data.accessPoints;
+  $: $apSensorStations = [];
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  import Input from "$components/ui/Input.svelte";
   import FormError from "$helper/formError.svelte";
   import { browser } from "$app/environment";
   export let form;
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   async function invalidateAccessPoints() {
-    setTimeout(async () => {
+    await setTimeout(async () => {
       console.log("invalidate", new Date().toLocaleTimeString());
       await invalidate("app:getAccessPoints");
     }, 1000 * 30);
@@ -38,35 +39,40 @@
   }
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  async function createQrCode() {}
+  function setSensorStations(accessPoint: any) {
+    $apSensorStations = accessPoint.sensorStations.sensorStations;
+  }
   // ---------------------------------------------------------
   // ---------------------------------------------------------
 </script>
 
 {#if rendered}
   <section class="mt-14">
-    {#if data.accessPoints}
+    {#if accessPoints}
       <div class="flex justify-center mx-auto">
         <div class="grid grid-rows md:grid-cols-2 gap-4 xl:grid-cols-3">
-          {#each data.accessPoints as accessPoint, i (accessPoint.accessPointId)}
+          {#each accessPoints as accessPoint, i (accessPoint.accessPointId)}
             <form
               in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
               method="POST"
-              use:enhance
+              use:enhance={() => {
+                return async ({ update }) => {
+                  await update({ reset: false });
+                };
+              }}
             >
               <input
                 type="hidden"
                 name="accessPointId"
-                bind:value={accessPoint.accessPointId}
+                value={accessPoint.accessPointId}
               />
               <div class="card w-full min-w-full h-fit bg-base-100 shadow-2xl">
                 <div class="card-body">
                   <label class="" for="transferInterval">
-                    <span class="label-text text-xl font-bold"
-                      >Transfer Interval:</span
-                    >
+                    <span class="label-text text-xl font-bold">Room:</span>
                     <input
-                      bind:value={accessPoint.roomName}
+                      value={accessPoint.roomName}
+                      placeholder={accessPoint.roomName}
                       name="roomName"
                       type="text"
                       class="input input-bordered w-full bg-gray-800 text-white"
@@ -76,20 +82,18 @@
                   <!-- <Input type="text" field="transferInterval" label="Transfer Interval" value={accessPoint.transferInterval} /> -->
                   <label class="" for="transferInterval">
                     <span class="label-text text-xl font-bold"
-                      >Transfer Interval:</span
+                      >Transfer Interval [s]:</span
                     >
                     <div class="flex">
                       <input
-                        bind:value={accessPoint.transferInterval}
+                        value={accessPoint.transferInterval}
+                        placeholder={accessPoint.transferInterval}
                         name="transferInterval"
                         type="number"
                         class="input input-bordered w-full bg-gray-800 text-white"
                         min="30"
                         max="240"
-                      /><span
-                        class="-ml-10 text-white items-center mx-auto my-auto"
-                        >[ s ]</span
-                      >
+                      />
                     </div>
                   </label>
 
@@ -101,28 +105,25 @@
                     {:else}
                       <div class="badge badge-error">Disconnected</div>
                     {/if}
-                    <div class="tooltip" data-tip="Go to Sensorstations">
-                      <a href="/admin/sensorstations">
-                        <div
-                          class="badge badge-success hover:scale-110 active:scale-125"
-                        >
-                          SensorStations: 10
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-
-                  <div class="flex justify-center m-2">
-                    <div class="flex">
-                      <div class="tooltip" data-tip="Create QR-Code">
-                        <button
-                          disabled
-                          class="transform transition-transform active:scale-110 transf"
-                        >
-                          <i class="bi bi-qr-code-scan text-4xl " />
-                        </button>
+                    {#if accessPoint.sensorStations.sensorStations.length > 0}
+                      <div class="tooltip" data-tip="Go to Sensorstations">
+                        <a href="/admin/sensorstations">
+                          <button
+                            on:click={() => setSensorStations(accessPoint)}
+                            class="badge badge-success hover:scale-110 active:scale-125"
+                          >
+                            SensorStations: {accessPoint.sensorStations
+                              .sensorStations.length}
+                          </button>
+                          <!-- </a> -->
+                        </a>
                       </div>
-                    </div>
+                    {:else}
+                      <div class="badge badge-success">
+                        SensorStations: {accessPoint.sensorStations
+                          .sensorStations.length}
+                      </div>
+                    {/if}
                   </div>
 
                   <div class="card-actions bottom-0 mx-auto">
@@ -132,10 +133,14 @@
                       >
                       {#if accessPoint.scanActive}
                         <div
-                          class="flex justify-center items-center gap-1 btn bg-purple-600 border-none"
+                          class="flex justify-center items-center gap-1 btn bg-purple-700 border-none"
                         >
                           <h1>Scanning:</h1>
-                          <Spinner w={8} h={8} />
+                          <Spinner
+                            w={8}
+                            h={8}
+                            fill="dark:fill-white dark:text-black"
+                          />
                         </div>
                       {:else}
                         <button class="btn btn-error" formaction="?/scan"
