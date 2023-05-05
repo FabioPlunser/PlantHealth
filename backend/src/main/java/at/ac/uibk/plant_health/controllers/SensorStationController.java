@@ -29,14 +29,15 @@ public class SensorStationController {
 	@Autowired
 	private SensorStationService sensorStationService;
 
-	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
+	@AnyPermission({Permission.ADMIN, Permission.GARDENER, Permission.USER})
+	@PrincipalRequired(Person.class)
 	@GetMapping("/get-sensor-stations")
 	public RestResponseEntity getSensorStations(Person person) {
 		if (person.getPermissions().contains(Permission.ADMIN)
 			|| person.getPermissions().contains(Permission.GARDENER)) {
-			return new SensorStationsResponse(sensorStationService.findAll()).toEntity();
+			return new SensorStationResponse(sensorStationService.findAll()).toEntity();
 		}
-		return new UserSensorStationsResponse(sensorStationService.findAll(), person).toEntity();
+		return new UserSensorStationResponse(sensorStationService.findAll()).toEntity();
 	}
 
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
@@ -214,11 +215,12 @@ public class SensorStationController {
 			produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
 	)
 	public ResponseEntity<byte[]>
-	getNewestSensorStationPicture(@RequestParam("sensorStationId") final UUID sensorStationId) {
+	getNewestSensorStationPicture(@RequestParam("sensorStationId") final UUID sensorStationId)
+			throws Exception {
 		try {
 			sensorStationService.findById(sensorStationId);
 			PlantPicture picture = sensorStationService.getNewestPicture(sensorStationId);
-			if (picture == null) throw new ServiceException("No picture found", 404);
+
 			String extension = picture.getPicturePath().split("\\.")[1];
 			String name = picture.getPicturePath().split("\\.")[0];
 			byte[] contents = sensorStationService.convertPictureToByteArray(picture);

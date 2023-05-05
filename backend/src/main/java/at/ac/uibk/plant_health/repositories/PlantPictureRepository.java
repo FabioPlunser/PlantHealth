@@ -4,9 +4,12 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.*;
 
+import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.plant.PlantPicture;
 
 public interface PlantPictureRepository extends CrudRepository<PlantPicture, UUID> {
 	@Override
 	List<PlantPicture> findAll();
+
+	PlantPicture findDistinctFirstBySensorStationOrderByTimeStampDesc(SensorStation sensorStation);
 }

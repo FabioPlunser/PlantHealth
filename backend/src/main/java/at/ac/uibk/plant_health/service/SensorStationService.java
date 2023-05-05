@@ -3,6 +3,8 @@ package at.ac.uibk.plant_health.service;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -126,6 +128,17 @@ public class SensorStationService {
 		return maybePicture.get();
 	}
 
+	public PlantPicture getNewestPicture(UUID sensorStationId) throws ServiceException {
+		try {
+			SensorStation sensorStation = findById(sensorStationId);
+			return plantPictureRepository.findDistinctFirstBySensorStationOrderByTimeStampDesc(
+					sensorStation
+			);
+		} catch (Exception e) {
+			throw new ServiceException("Could not get newest picture", 500);
+		}
+	}
+
 	/**
 	 * uploadPicture
 	 * @param picture base64 encoded picture
@@ -145,7 +158,6 @@ public class SensorStationService {
 			Files.createDirectories(path.getParent());
 			Files.write(path, picture.getBytes());
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new ServiceException("Could not save picture", 500);
 		}
 
@@ -161,6 +173,19 @@ public class SensorStationService {
 			throw new ServiceException("Could not get picture resource", 500);
 		}
 	}
+	public String getPictureName(UUID pictureId) throws ServiceException {
+		PlantPicture picture = getPicture(pictureId);
+		return picture.getPicturePath().split("/")[2];
+	}
+
+	public byte[] convertPictureToByteArray(PlantPicture picture) throws ServiceException {
+		try {
+			return Files.readAllBytes(Paths.get(picture.getPicturePath()));
+		} catch (Exception e) {
+			throw new ServiceException("Could not get picture resource", 500);
+		}
+	}
+
 	public String getPictureName(UUID pictureId) throws ServiceException {
 		PlantPicture picture = getPicture(pictureId);
 		return picture.getPicturePath().split("/")[2];

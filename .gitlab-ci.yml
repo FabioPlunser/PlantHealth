@@ -3,6 +3,7 @@ stages: # List of stages for jobs, and their order of execution
   - pythonSonarCheck
   - javaTest
   - javaSonarCheck
+  - deployBackend
 
 .before_script_template:
   before_script:
@@ -80,3 +81,19 @@ javaSonarCheck-job:
     - echo Running sonar analysis for ${SONAR_PROJECT_KEY}
     - cd backend && mvn -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.projectName="${CI_PROJECT_NAME} ${GITLAB_USER_NAME}" --fail-at-end verify sonar:sonar
   allow_failure: false
+  only:
+    - dev-backend
+    - dev
+
+deployBackend:
+  tags:
+    - gradle
+    - java
+  image: gradle:alpine
+  stage: deployBackend
+  script:
+    - echo "Run bootRun"
+    - cd backend && ls && SPRING_PROFILES_ACTIVE=deploy gradle bootRun
+  only:
+    - dev
+    - dev-backend
