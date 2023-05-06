@@ -138,18 +138,20 @@
                       <h1>
                         DipSwitch: <span>{sensorStation.dipSwitchId}</span>
                       </h1>
-                      <div class="flex gap-4">
-                        {#if sensorStation.connected}
-                          <div class="badge badge-success">Connected</div>
-                        {:else}
-                          <div class="badge badge-error">Disconnected</div>
-                        {/if}
+                      <div class="grid grid-rows gap-1">
+                        <div class="mx-auto">
+                          {#if sensorStation.connected}
+                            <div class="badge badge-success">Connected</div>
+                          {:else}
+                            <div class="badge badge-error">Disconnected</div>
+                          {/if}
+                        </div>
                         <button
-                          class="badge badge-primary active:scale-110"
                           type="button"
                           on:click={() =>
                             createQrCode(sensorStation.sensorStationId)}
-                          >Download QR-Code</button
+                        >
+                          <i class="bi bi-qr-code-scan text-4xl" /></button
                         >
                       </div>
                       <div class="flex justify-center my-2 mx-auto gap-4">
