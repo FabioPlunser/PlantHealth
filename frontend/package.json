@@ -22,7 +22,6 @@
     "autoprefixer": "^10.4.14",
     "chart.js": "^4.2.1",
     "daisyui": "^2.51.5",
-    "handlebars": "^4.7.7",
     "html5-qrcode": "^2.3.8",
     "jspdf": "^2.5.1",
     "postcss": "^8.4.21",
