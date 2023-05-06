@@ -99,6 +99,11 @@ function generateQrCodePdfBlob(data: QrCodePdfData): Blob {
   return pdf.output("blob");
 }
 
+/**
+ * Creates a base64 encoded image of a QR code for a given URL.
+ * @param {string} url - The URL to be encoded in the QR code.
+ * @returns {string} The base64 encoded image of the QR code.
+ */
 function createQrCode(url: string): string {
   let typeNumber: TypeNumber = 0;
   let errorCorrectionLevel: ErrorCorrectionLevel = "H";
