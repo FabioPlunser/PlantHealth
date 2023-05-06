@@ -3,10 +3,9 @@
   import { fly } from "svelte/transition";
   import { invalidate } from "$app/navigation";
   import { apSensorStations } from "$stores/apSensorStations";
-
-  // ----------------------------------
-  // ----------------------------------
   import { onMount } from "svelte";
+  // ----------------------------------
+  // ----------------------------------
   let rendered = false;
   onMount(() => {
     if (!rendered) {
@@ -28,9 +27,6 @@
   }
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  async function createQrCode(sensorStationId: string) {}
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
   let searchByRoomName = "";
   let searchByMacAddress = "";
   let searchByDipSwitchId = "";
@@ -40,6 +36,10 @@
   $: console.log(data);
 </script>
 
+<a
+  href="http://localhost:3000/api/get-sensor-station-qr-code?sensorStationId=e5dc8654-255e-4fdd-b58e-8160f3a8fd7c&roomName=Office1&plantName=Sakura"
+  >create</a
+>
 {#if rendered}
   {#if data.sensorStations}
     {#if data.sensorStations.length > 0}
