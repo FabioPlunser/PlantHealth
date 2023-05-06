@@ -2,14 +2,14 @@
   export let w = 12;
   export let h = 12;
   export let fill = "fill-blue-600";
-  export let background = "dark:text-gray-600";
+  export let background = "text-gray-600";
 </script>
 
 <div class="flex justify-center">
   <div role="status">
     <svg
       aria-hidden="true"
-      class="w-{w} h-{h} mr-15 text-gray-200 animate-spin  {fill} {background}"
+      class="w-{w} h-{h} mr-15 animate-spin  {fill} {background}"
       viewBox="0 0 100 101"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

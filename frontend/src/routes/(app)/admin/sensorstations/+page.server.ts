@@ -22,6 +22,7 @@ export async function load({ locals, fetch, request, depends, url }) {
     fromAccessPoints,
     sensorStations: res.sensorStations,
   };
+  ü;
 }
 
 export const actions = {
