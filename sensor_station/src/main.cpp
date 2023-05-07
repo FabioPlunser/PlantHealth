@@ -23,7 +23,7 @@
 void setArduinoPowerStatus();
 bool updateNotificationHandler_Errors();
 bool updateNotificationHandler_PairingMode(bool active);
-unsigned long handleNotificationIfPresent(bool & notificationPresent);
+unsigned long handleNotificationIfPresent(bool notificationPresent);
 void checkPairingButtonAndStatus(bool & inPairingMode);
 void handleCentralDeviceIfPresent(
 	arduino::String & pairedDevice, bool & inPairingMode
@@ -241,14 +241,12 @@ void handleCentralDeviceIfPresent(
 	DEBUG_PRINTLN(1, get_sensorstation_locked_status());
 }
 
-unsigned long handleNotificationIfPresent(bool & notificationPresent) {
+unsigned long handleNotificationIfPresent(bool notificationPresent) {
 	unsigned long startNotificationCheck = millis();
 	if (notificationPresent) {
 		DEBUG_PRINT_POS(1, "Notifcation is present\n");
 		int32_t timeTillNext = notificationHandler->update();
-		if (timeTillNext < 0) {
-			notificationPresent = false;
-		} else {
+		if (timeTillNext > 0) {
 			while ((unsigned long) timeTillNext <
 				   TIME_CHECK_BLE_CENTRAL_PRESENT_MS -
 					   (millis() - startNotificationCheck)) {
