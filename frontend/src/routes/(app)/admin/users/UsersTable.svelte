@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ColumnDef, TableOptions } from "@tanstack/svelte-table";
+  import type { TableOptions } from "@tanstack/svelte-table";
   import {
     createSvelteTable,
     flexRender,
@@ -13,10 +13,10 @@
   import TextCell from "./TextCell.svelte";
   import SortSymbol from "./SortSymbol.svelte";
   import type { NodeJS } from "node:types";
-  import { page } from "$app/stores";
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";
   import { enhance } from "$app/forms";
+  import HrefWithIcon from "./HrefWithIcon.svelte";
 
   let query =
     "((min-width: 481px) and (max-width: 1280px)) or (min-width: 1281px)";
@@ -80,19 +80,32 @@
       header: () => flexRender(TextCell, { text: "Permissions" }),
       cell: (info) => flexRender(RolePills, { roles: info.getValue() }),
     },
+    {
+      accessorKey: "_", // NOTE: blanc accessor so we get the row
+      header: () => flexRender(TextCell, { text: "Edit" }),
+      cell: ({ row }) =>
+        flexRender(HrefWithIcon, {
+          href: `/profile?personId=${row.original.personId}&username=${row.originalusername}&userPermissions=${row.original.permissions}`,
+          iconClass: "bi bi-pencil-square text-3xl hover:text-gray-500",
+        }),
+    },
   ];
 
+  let defaultColumnVisibility = {
+    username: true,
+    email: true,
+    permissions: true,
+    edit: true,
+  };
+
+  let mobileColumnVisibility = {
+    email: false,
+    permissions: false,
+  };
+
   $: columnVisibility = isMediaTabletOrDesktop
-    ? {
-        username: true,
-        email: true,
-        permissions: true,
-      }
-    : {
-        username: true,
-        email: false,
-        permissions: false,
-      };
+    ? defaultColumnVisibility
+    : mobileColumnVisibility;
 
   let globalFilter = "";
 
@@ -208,7 +221,6 @@
                   {/if}
                 </th>
               {/each}
-              <th>EDIT</th>
               <th>DELETE</th>
             </tr>
           {/each}
@@ -228,13 +240,6 @@
                   </div>
                 </td>
               {/each}
-              <td class="table-cell">
-                <a
-                  href={`/profile?personId=${row.original.personId}&username=${row.original.username}&userPermissions=${row.original.permissions}&source=${$page.url}`}
-                >
-                  <i class="bi bi-pencil-square text-3xl hover:text-gray-500" />
-                </a>
-              </td>
               <td class="table-cell">
                 <div>
                   <label class="button">
