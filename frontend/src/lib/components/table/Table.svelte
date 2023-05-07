@@ -58,7 +58,8 @@
    */
   export let columns;
   /**
-   * column visibility if media is not mobile default = {}
+   * column visibility if media is not mobile
+   * @default {}
    * @type {ColumnVisibility}
    */
   export let defaultColumnVisibility: ColumnVisibility = {};
