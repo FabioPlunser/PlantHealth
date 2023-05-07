@@ -132,14 +132,22 @@ class LedHandler {
 
 		uint16_t updateLEDStatus() {
 			if (isFinished || !isEnabled) {
+				DEBUG_PRINTF_POS(
+					3, "Wait time was 0. isFinished = %d, isEnabled = %d.\n",
+					isFinished, isEnabled
+				);
 				return 0;
 			}
 			uint16_t remainingTime = getMsTillNext();
+			DEBUG_PRINTF_POS(3, "Remaining time = %u\n", remainingTime);
 			if (remainingTime > 0) {
+				DEBUG_PRINT_POS(3, "Return time.\n");
 				return remainingTime;
 			}
 			if (durationIdx >= durationSize) {
+				DEBUG_PRINT_POS(3, "Index overflow.\n");
 				if (!loopError) {
+					DEBUG_PRINT_POS(3, "Led gets stopped.\n");
 					setLEDStatus(false);
 					this->isFinished = true;
 					return 0;
@@ -147,8 +155,10 @@ class LedHandler {
 				this->durationIdx = 0;
 			}
 			toggleLEDStatus();
+			DEBUG_PRINT_POS(3, "Led got toggled.\n");
 			if (this->isOn) {
 				durationIdx++;
+				DEBUG_PRINT_POS(3, "Index got moved.\n");
 			}
 			return getMsTillNext();
 		}

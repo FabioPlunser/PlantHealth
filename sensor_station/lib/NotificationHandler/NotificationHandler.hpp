@@ -223,12 +223,12 @@ class NotificationHandler {
 					return this->timeOfSilenceEnd - millis();
 				}
 			} else {
-				if (millis() - previousTone > PIEZO_BUZZET_TONE_INTERVALL_MS) {
+				if (millis() - previousTone > PIEZO_BUZZER_TONE_INTERVALL_MS) {
 					DEBUG_PRINT_POS(3, "Buzzer tone.\n");
 					previousTone = millis();
 					piezoBuzzerController->startBuzzer(
-						PIEZO_BUZZET_TONE_FREQUENCY_HZ,
-						PIEZO_BUZZET_TONE_DURATION_MS
+						PIEZO_BUZZER_TONE_FREQUENCY_HZ,
+						PIEZO_BUZZER_TONE_DURATION_MS
 					);
 				}
 				const Notification * topNotification =
