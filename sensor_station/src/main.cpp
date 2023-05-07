@@ -95,7 +95,7 @@ void loop() {
 	inPairingMode = true;
 	enable_pairing_mode();
 #endif
-	// checkNotificationSilenceButtonPressed();
+	checkNotificationSilenceButtonPressed();
 	handleCentralDeviceIfPresent(pairedDevice, inPairingMode);
 	// If sensor data got transmitted we want to measure new values directly.
 	if (get_sensor_data_read_flag() == SENSOR_DATA_READ_VALUE) {

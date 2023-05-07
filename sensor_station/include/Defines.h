@@ -65,7 +65,7 @@
 #define DURATION_IN_PAIRING_MODE_MS			   (5 * 60'000)
 #define TIME_CHECK_BLE_CENTRAL_PRESENT_MS	   1000
 #define TIMEOUT_TIME_BLE_CONNECTION_MS		   5000
-#define TIME_IN_NOTIFICATION_SILENCE_MODE_MS   (1000 * 60 * 30)
+#define TIME_IN_NOTIFICATION_SILENCE_MODE_MS   (30 * 60'000)
 #define TIME_BETWEEN_SENSOR_MEASUREMENTS_MIN_S 30
 #define TIME_BETWEEN_SENSOR_MEASUREMENTS_MAX_S (5 * 60)
 #define TIME_IT_TAKES_TO_REACH_MAX_MEASUREMENT (30 * 60)
@@ -170,8 +170,8 @@
 #define PIN_DIP_7							   D6
 #define PIN_DIP_8							   D5 // Highest
 
-#define PIN_BUTTON_1						   D4 // R
+#define PIN_BUTTON_1						   D4 // L
 #define PIN_BUTTON_2						   D3 // M
-#define PIN_BUTTON_3						   D2 // L
+#define PIN_BUTTON_3						   D2 // R
 
 #endif
