@@ -49,7 +49,14 @@
  * If set to TRUE the arduino will wait in the setup till a serial connection
  * for debug prints is present.
  */
-#define WAIT_FOR_SERIAL_CONNECTION			   TRUE
+#define WAIT_FOR_SERIAL_CONNECTION			   FALSE
+
+/**
+ * If this is set to true the led and piezo buzzer will never output anything.
+ * Useful if a plant is placed where someone wants to sleep, but not recommended
+ * since there will be no notification on the device if something is not right.
+ */
+#define ALWAYS_IN_SILENT_MODE				   TRUE
 
 // ---------------------------
 // |    Predefined Values    |

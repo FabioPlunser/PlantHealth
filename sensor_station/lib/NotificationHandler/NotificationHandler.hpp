@@ -234,22 +234,14 @@ class NotificationHandler {
 				ledConstroller->disable();
 				return -1;
 			}
+#if ALWAYS_IN_SILENT_MODE
+			this->inSilentMode	   = true;
+			this->timeOfSilenceEnd = millis() + 100'000;
+#endif
 			if (this->inSilentMode) {
 				DEBUG_PRINT_POS(3, "In silent mode.\n");
 				if ((int32_t) this->timeOfSilenceEnd - (int32_t) millis() < 0) {
 					DEBUG_PRINT_POS(3, "Silent mode ended.\n");
-					// DEBUG_PRINTF_POS(
-					// 	3, "Millis = %lu, silenceEnd = %lu.\n", millis(),
-					// 	this->timeOfSilenceEnd
-					// );
-					// DEBUG_PRINTF_POS(
-					// 	3, "Result = %ld\n",
-					// 	(int32_t) millis() - (int32_t) this->timeOfSilenceEnd
-					// );
-					// DEBUG_PRINTF_POS(
-					// 	3, "Result = %ld\n",
-					// 	(int32_t) (millis() - this->timeOfSilenceEnd)
-					// );
 					this->inSilentMode = false;
 					return ledConstroller->updateLEDStatus();
 				} else {
