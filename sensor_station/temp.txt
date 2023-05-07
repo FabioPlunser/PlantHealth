@@ -1,0 +1,74 @@
+15:50:40:319 -> src/main.cpp -> 168 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 1.
+15:50:40:320 -> src/main.cpp -> 281 updateNotificationHandler_PairingMode: Update notification with value 1
+15:50:40:320 -> lib/NotificationHandler/NotificationHandler.hpp -> 265 updatePairingNotification: Error gets added to queue.
+15:50:40:322 -> Station is unlocked: 0
+
+15:50:40:322 -> src/main.cpp -> 247 handleNotificationIfPresent: Notifcation is present
+15:50:40:323 -> lib/NotificationHandler/LedController.hpp -> 146 updateLEDStatus: Remaining time = 0
+15:50:40:323 -> lib/NotificationHandler/LedController.hpp -> 162 updateLEDStatus: Led got toggled.
+15:50:40:324 -> lib/NotificationHandler/LedController.hpp -> 89 getMsTillNext: Time till next is 4000
+15:50:40:325 -> lib/NotificationHandler/LedController.hpp -> 168 updateLEDStatus: Time till next change is 4000.
+15:50:40:329 -> lib/NotificationHandler/NotificationHandler.hpp -> 248 update: Found notification with time 4000.
+15:50:42:171 -> src/main.cpp -> 168 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 1.
+15:50:42:172 -> src/main.cpp -> 281 updateNotificationHandler_PairingMode: Update notification with value 1
+15:50:42:173 -> lib/NotificationHandler/NotificationHandler.hpp -> 260 updatePairingNotification: Is active with same value as previous. Value was 1
+15:50:42:174 -> Station is unlocked: 0
+
+15:50:42:174 -> src/main.cpp -> 247 handleNotificationIfPresent: Notifcation is present
+15:50:42:175 -> lib/NotificationHandler/LedController.hpp -> 89 getMsTillNext: Time till next is 1000
+15:50:42:175 -> lib/NotificationHandler/LedController.hpp -> 146 updateLEDStatus: Remaining time = 1000
+15:50:42:176 -> lib/NotificationHandler/LedController.hpp -> 148 updateLEDStatus: Return time.
+15:50:42:177 -> lib/NotificationHandler/NotificationHandler.hpp -> 248 update: Found notification with time 1000.
+15:50:44:019 -> src/main.cpp -> 168 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 1.
+15:50:44:019 -> src/main.cpp -> 281 updateNotificationHandler_PairingMode: Update notification with value 1
+15:50:44:024 -> lib/NotificationHandler/NotificationHandler.hpp -> 260 updatePairingNotification: Is active with same value as previous. Value was 1
+15:50:44:024 -> Station is unlocked: 0
+
+15:50:44:025 -> src/main.cpp -> 247 handleNotificationIfPresent: Notifcation is present
+15:50:44:025 -> lib/NotificationHandler/LedController.hpp -> 146 updateLEDStatus: Remaining time = 0
+15:50:44:027 -> lib/NotificationHandler/LedController.hpp -> 162 updateLEDStatus: Led got toggled.
+15:50:44:028 -> lib/NotificationHandler/LedController.hpp -> 89 getMsTillNext: Time till next is 3999
+15:50:44:031 -> lib/NotificationHandler/LedController.hpp -> 168 updateLEDStatus: Time till next change is 3999.
+15:50:44:038 -> lib/NotificationHandler/NotificationHandler.hpp -> 248 update: Found notification with time 3999.
+15:50:45:882 -> src/main.cpp -> 168 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 1.
+15:50:45:882 -> src/main.cpp -> 281 updateNotificationHandler_PairingMode: Update notification with value 1
+15:50:45:886 -> lib/NotificationHandler/NotificationHandler.hpp -> 260 updatePairingNotification: Is active with same value as previous. Value was 1
+15:50:45:890 -> Station is unlocked: 0
+15:50:45:890 -> src/main.cpp -> 247 handleNotificationIfPresent: Notifcation is present
+15:50:45:891 -> lib/NotificationHandler/NotificationHandler.hpp -> 227 update: Buzzer tone.
+15:50:45:892 -> lib/NotificationHandler/LedController.hpp -> 89 getMsTillNext: Time till next is 1000
+15:50:45:893 -> lib/NotificationHandler/LedController.hpp -> 146 updateLEDStatus: Remaining time = 1000
+15:50:45:894 -> lib/NotificationHandler/LedController.hpp -> 148 updateLEDStatus: Return time.
+15:50:45:895 -> lib/NotificationHandler/NotificationHandler.hpp -> 248 update: Found notification with time 1000.
+15:50:47:737 -> src/main.cpp -> 168 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 1.
+15:50:47:737 -> src/main.cpp -> 281 updateNotificationHandler_PairingMode: Update notification with value 1
+15:50:47:741 -> lib/NotificationHandler/NotificationHandler.hpp -> 260 updatePairingNotification: Is active with same value as previous. Value was 1
+15:50:47:741 -> Station is unlocked: 0
+15:50:47:741 -> Searching for central device!
+15:50:47:742 -> src/main.cpp -> 247 handleNotificationIfPresent: Notifcation is present
+15:50:47:742 -> lib/NotificationHandler/LedController.hpp -> 146 updateLEDStatus: Remaining time = 0
+15:50:47:745 -> lib/NotificationHandler/LedController.hpp -> 162 updateLEDStatus: Led got toggled.
+15:50:47:750 -> lib/NotificationHandler/LedController.hpp -> 89 getMsTillNext: Time till next is 3995
+15:50:47:751 -> lib/NotificationHandler/LedController.hpp -> 168 updateLEDStatus: Time till next change is 3995.
+15:50:47:751 -> lib/NotificationHandler/NotificationHandler.hpp -> 248 update: Found notification with time 3995.
+15:50:49:599 -> src/main.cpp -> 168 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 1.
+15:50:49:599 -> src/main.cpp -> 281 updateNotificationHandler_PairingMode: Update notification with value 1
+15:50:49:602 -> lib/NotificationHandler/NotificationHandler.hpp -> 260 updatePairingNotification: Is active with same value as previous. Value was 1
+15:50:49:602 -> Station is unlocked: 0
+15:50:49:603 -> src/main.cpp -> 247 handleNotificationIfPresent: Notifcation is present
+15:50:49:605 -> lib/NotificationHandler/LedController.hpp -> 89 getMsTillNext: Time till next is 1000
+15:50:49:606 -> lib/NotificationHandler/LedController.hpp -> 146 updateLEDStatus: Remaining time = 1000
+15:50:49:607 -> lib/NotificationHandler/LedController.hpp -> 148 updateLEDStatus: Return time.
+15:50:49:607 -> lib/NotificationHandler/NotificationHandler.hpp -> 248 update: Found notification with time 1000.
+15:50:51:450 -> src/main.cpp -> 168 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 1.
+15:50:51:450 -> src/main.cpp -> 281 updateNotificationHandler_PairingMode: Update notification with value 1
+15:50:51:455 -> lib/NotificationHandler/NotificationHandler.hpp -> 260 updatePairingNotification: Is active with same value as previous. Value was 1
+15:50:51:456 -> Station is unlocked: 0
+15:50:51:456 -> src/main.cpp -> 247 handleNotificationIfPresent: Notifcation is present
+15:50:51:457 -> lib/NotificationHandler/LedController.hpp -> 146 updateLEDStatus: Remaining time = 0
+15:50:51:458 -> lib/NotificationHandler/LedController.hpp -> 162 updateLEDStatus: Led got toggled.
+15:50:51:458 -> lib/NotificationHandler/LedController.hpp -> 89 getMsTillNext: Time till next is 3999
+15:50:51:459 -> lib/NotificationHandler/LedController.hpp -> 168 updateLEDStatus: Time till next change is 3999.
+15:50:51:460 -> lib/NotificationHandler/NotificationHandler.hpp -> 248 update: Found notification with time 3999.
+15:50:53:307 -> src/main.cpp -> 168 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 1.
+15:50:53:307 -> src/main.cpp -> 281 updateNot

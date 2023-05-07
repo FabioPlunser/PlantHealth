@@ -76,10 +76,15 @@ class LedHandler {
 
 		uint16_t getMsTillNext() {
 			if (durationIdx >= durationSize) {
+				DEBUG_PRINT(1, "Overflow\n");
 				return 0;
 			}
 			uint16_t * timeArray	 = isOn ? durationOn : durationOff;
 			unsigned long passedTime = millis() - prevChangeTime;
+			DEBUG_PRINTF_POS(3, "Passed time = %lu.\n", passedTime);
+			DEBUG_PRINTF(3, "Time to wait = %u.\n", timeArray[durationIdx]);
+			DEBUG_PRINTF(3, "Index = %u.\n", durationIdx);
+			DEBUG_PRINTF(3, "Array is duration%s.\n", isOn ? "On" : "Off");
 			if (passedTime > timeArray[durationIdx]) {
 				return 0;
 			}
