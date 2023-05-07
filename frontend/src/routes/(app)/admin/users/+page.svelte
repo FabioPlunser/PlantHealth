@@ -74,7 +74,6 @@
     },
   ];
   // ---------------------------------------------------------
-  let defaultColumnVisibility: ColumnVisibility = {};
   let mobileColumnVisibility: ColumnVisibility = {
     email: false,
     permissions: false,
