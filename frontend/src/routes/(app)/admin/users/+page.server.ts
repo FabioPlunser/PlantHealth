@@ -9,15 +9,12 @@ export const load = (async ({ fetch, depends }) => {
   await fetch(`${BACKEND_URL}/get-all-users`)
     .then((response) => {
       if (!response.ok) {
-        throw new error(response.statusText);
+        throw new error(response.status, response.statusText);
       }
       return response.json();
     })
     .then((data) => {
       allUsers = data.items;
-    })
-    .catch((error) => {
-      console.error("Error fetching /get-all-users", error);
     });
   return { users: allUsers };
 }) satisfies PageServerLoad;
