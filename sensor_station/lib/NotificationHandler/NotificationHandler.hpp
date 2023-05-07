@@ -103,9 +103,14 @@ class NotificationHandler {
 		}
 
 		int16_t setLEDfromNotification(const Notification & notification) {
-			if (*prevErrorNotification == notification) {
+			if (prevErrorNotification != NULL &&
+				*prevErrorNotification == notification) {
+				DEBUG_PRINT_POS(
+					3, "Notification was the same as the previous one."
+				)
 				return ledConstroller->updateLEDStatus();
 			}
+			DEBUG_PRINT_POS(3, "New notification set.")
 			uint16_t ledOnMs[]	= {LED_TIME_NOTIFICATION_ON_MS};
 			uint16_t ledOffMs[] = {LED_TIME_NOTIFICATION_OFF_MS};
 			uint8_t arraySize	= sizeof(ledOnMs) / sizeof(ledOnMs[0]);
