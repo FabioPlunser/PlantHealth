@@ -36,10 +36,6 @@
   $: console.log(data);
 </script>
 
-<a
-  href="http://localhost:3000/api/get-sensor-station-qr-code?sensorStationId=e5dc8654-255e-4fdd-b58e-8160f3a8fd7c&roomName=Office1&plantName=Sakura"
-  >create</a
->
 {#if rendered}
   {#if data.sensorStations}
     {#if data.sensorStations.length > 0}
@@ -146,13 +142,13 @@
                             <div class="badge badge-error">Disconnected</div>
                           {/if}
                         </div>
-                        <button
-                          type="button"
-                          on:click={() =>
-                            createQrCode(sensorStation.sensorStationId)}
-                        >
-                          <i class="bi bi-qr-code-scan text-4xl" /></button
-                        >
+                        <div class="mx-auto">
+                          <a
+                            href="http://localhost:3000/api/get-sensor-station-qr-code?sensorStationId=e5dc8654-255e-4fdd-b58e-8160f3a8fd7c&roomName=Office1&plantName=Sakura"
+                          >
+                            <i class="bi bi-qr-code-scan text-4xl" />
+                          </a>
+                        </div>
                       </div>
                       <div class="flex justify-center my-2 mx-auto gap-4">
                         <button type="submit" class="btn btn-primary"
