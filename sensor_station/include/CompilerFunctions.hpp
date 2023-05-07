@@ -9,13 +9,15 @@
 	Serial.println(value);
 
 #define DEBUG_PRINT(level, text)      \
-	if (level >= DEBUG_PRINT_LEVEL) { \
+	if (level <= DEBUG_PRINT_LEVEL) { \
 		Serial.print(text);           \
 	}
 
-#define DEBUG_PRINTLN(level, text) \
-	DEBUG_PRINT(level, text);      \
-	Serial.println();
+#define DEBUG_PRINTLN(level, text)    \
+	DEBUG_PRINT(level, text);         \
+	if (level <= DEBUG_PRINT_LEVEL) { \
+		Serial.println();             \
+	}
 
 #define DEBUG_PRINTF(level, formattedText, ...)                         \
 	if (DEBUG_PRINT_LEVEL >= level) {                                   \
@@ -28,7 +30,7 @@
 	}
 
 #define DEBUG_PRINT_POSITION(level)   \
-	if (level >= DEBUG_PRINT_LEVEL) { \
+	if (level <= DEBUG_PRINT_LEVEL) { \
 		Serial.print(__FILE__);       \
 		Serial.print(" -> ");         \
 		Serial.print(__LINE__);       \

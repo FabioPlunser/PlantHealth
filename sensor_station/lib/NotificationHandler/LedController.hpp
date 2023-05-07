@@ -76,13 +76,19 @@ class LedHandler {
 
 		uint16_t getMsTillNext() {
 			if (durationIdx >= durationSize) {
+				DEBUG_PRINT(1, "Overflow\n");
 				return 0;
 			}
 			uint16_t * timeArray	 = isOn ? durationOn : durationOff;
-			unsigned long passedTime = millis();
+			unsigned long passedTime = millis() - prevChangeTime;
+			DEBUG_PRINTF_POS(3, "Passed time = %lu.\n", passedTime);
 			if (passedTime > timeArray[durationIdx]) {
 				return 0;
 			}
+			DEBUG_PRINTF_POS(
+				3, "Time till next is %lu\n",
+				timeArray[durationIdx] - passedTime
+			);
 			return timeArray[durationIdx] - passedTime;
 		}
 
@@ -132,14 +138,22 @@ class LedHandler {
 
 		uint16_t updateLEDStatus() {
 			if (isFinished || !isEnabled) {
+				DEBUG_PRINTF_POS(
+					3, "Wait time was 0. isFinished = %d, isEnabled = %d.\n",
+					isFinished, isEnabled
+				);
 				return 0;
 			}
 			uint16_t remainingTime = getMsTillNext();
+			DEBUG_PRINTF_POS(3, "Remaining time = %u\n", remainingTime);
 			if (remainingTime > 0) {
+				DEBUG_PRINT_POS(3, "Return time.\n");
 				return remainingTime;
 			}
 			if (durationIdx >= durationSize) {
+				DEBUG_PRINT_POS(3, "Index overflow.\n");
 				if (!loopError) {
+					DEBUG_PRINT_POS(3, "Led gets stopped.\n");
 					setLEDStatus(false);
 					this->isFinished = true;
 					return 0;
@@ -147,10 +161,14 @@ class LedHandler {
 				this->durationIdx = 0;
 			}
 			toggleLEDStatus();
+			DEBUG_PRINT_POS(3, "Led got toggled.\n");
 			if (this->isOn) {
 				durationIdx++;
+				DEBUG_PRINT_POS(3, "Index got moved.\n");
 			}
-			return getMsTillNext();
+			uint16_t timeTillNext = getMsTillNext();
+			DEBUG_PRINTF_POS(3, "Time till next change is %u.\n", timeTillNext);
+			return timeTillNext;
 		}
 };
 

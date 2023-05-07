@@ -23,11 +23,10 @@
 void setArduinoPowerStatus();
 bool updateNotificationHandler_Errors();
 bool updateNotificationHandler_PairingMode(bool active);
-unsigned long handleNotificationIfPresent(bool & notificationPresent);
+unsigned long handleNotificationIfPresent(bool notificationPresent);
 void checkPairingButtonAndStatus(bool & inPairingMode);
 void handleCentralDeviceIfPresent(
-	arduino::String & pairedDevice, bool & inPairingMode,
-	bool & notificationPresent
+	arduino::String & pairedDevice, bool & inPairingMode
 );
 void checkNotificationSilenceButtonPressed();
 void setValueInVerifiedCentralDevice(BLEDevice & central);
@@ -72,9 +71,11 @@ void setup() {
 
 	initialize_communication();
 
-	// while (!Serial) {
-	// 	delay(50);
-	// }
+#if WAIT_FOR_SERIAL_CONNECTION
+	while (!Serial) {
+		delay(50);
+	}
+#endif
 
 	delay(1000);
 }
@@ -83,8 +84,7 @@ void setup() {
 
 void loop() {
 	static arduino::String pairedDevice			   = "";
-	static bool inPairingMode					   = false;
-	static bool notificationPresent				   = false;
+	static bool inPairingMode					   = true;
 	static unsigned long timeBetweenMeasures	   = 0;
 	static unsigned long previousDataTransmission  = millis();
 	static unsigned long previousSensorMeasurement = millis();
@@ -96,9 +96,7 @@ void loop() {
 	enable_pairing_mode();
 #endif
 	checkNotificationSilenceButtonPressed();
-	handleCentralDeviceIfPresent(
-		pairedDevice, inPairingMode, notificationPresent
-	);
+	handleCentralDeviceIfPresent(pairedDevice, inPairingMode);
 	// If sensor data got transmitted we want to measure new values directly.
 	if (get_sensor_data_read_flag() == SENSOR_DATA_READ_VALUE) {
 		timeBetweenMeasures		 = 0;
@@ -111,7 +109,7 @@ void loop() {
 		i = 0;
 	}
 	unsigned long remainingSleepTime =
-		handleNotificationIfPresent(notificationPresent);
+		handleNotificationIfPresent(!notificationHandler->isEmpty());
 	// If the time between sensor measurements passed the next measurement will
 	// done.
 	if (millis() - previousSensorMeasurement > timeBetweenMeasures) {
@@ -164,8 +162,12 @@ void checkNotificationSilenceButtonPressed() {
 
 void checkPairingButtonAndStatus(bool & inPairingMode) {
 	static unsigned long pairingTime = 0;
+	DEBUG_PRINTF_POS(
+		3, "Checking pairing button and status. In pairing mode value is %d.\n",
+		inPairingMode
+	);
 	if (digitalRead(PIN_BUTTON_1) == PinStatus::HIGH) {
-		DEBUG_PRINT(1, "Pairing Button is pressed\n");
+		DEBUG_PRINT_POS(2, "Pairing Button is pressed\n");
 		enable_pairing_mode();
 		set_sensorstation_locked_status(SENSOR_STATION_LOCKED_VALUE);
 		inPairingMode = true;
@@ -202,8 +204,7 @@ void setValueInVerifiedCentralDevice(BLEDevice & central) {
 }
 
 void handleCentralDeviceIfPresent(
-	arduino::String & pairedDevice, bool & inPairingMode,
-	bool & notificationPresent
+	arduino::String & pairedDevice, bool & inPairingMode
 ) {
 	BLEDevice central = BLE.central();
 	if (central) {
@@ -228,7 +229,7 @@ void handleCentralDeviceIfPresent(
 			central.disconnect();
 		}
 		DEBUG_PRINTLN(1, "* Disconnected from central device!");
-		notificationPresent = updateNotificationHandler_Errors();
+		updateNotificationHandler_Errors();
 		if (get_sensor_data_read_flag() == SENSOR_DATA_NOT_READ_VALUE) {
 			ERROR_PRINT(
 				"Sensor flag was not cleared. Value was ",
@@ -240,21 +241,19 @@ void handleCentralDeviceIfPresent(
 	DEBUG_PRINTLN(1, get_sensorstation_locked_status());
 }
 
-unsigned long handleNotificationIfPresent(bool & notificationPresent) {
+unsigned long handleNotificationIfPresent(bool notificationPresent) {
 	unsigned long startNotificationCheck = millis();
 	if (notificationPresent) {
 		DEBUG_PRINT_POS(1, "Notifcation is present\n");
 		int32_t timeTillNext = notificationHandler->update();
-		if (timeTillNext < 0) {
-			notificationPresent = false;
-		} else {
-			while ((unsigned long) timeTillNext <
-				   TIME_CHECK_BLE_CENTRAL_PRESENT_MS -
-					   (millis() - startNotificationCheck)) {
-				DEBUG_PRINTF_POS(2, "Will wait for %ld ms\n", timeTillNext);
-				delay(timeTillNext);
-				timeTillNext = notificationHandler->update();
-			}
+
+		while (timeTillNext > 0 && (unsigned long) timeTillNext <
+									   TIME_CHECK_BLE_CENTRAL_PRESENT_MS -
+										   (millis() - startNotificationCheck)
+		) {
+			DEBUG_PRINTF_POS(2, "Will wait for %ld ms\n", timeTillNext);
+			delay(timeTillNext);
+			timeTillNext = notificationHandler->update();
 		}
 	}
 	unsigned long passedTime = millis() - startNotificationCheck;
@@ -278,6 +277,7 @@ bool updateNotificationHandler_Errors() {
 }
 
 bool updateNotificationHandler_PairingMode(bool active) {
+	DEBUG_PRINTF_POS(4, "Update notification with value %d\n", active);
 	notificationHandler->updatePairingNotification(active);
 	return !notificationHandler->isEmpty();
 }

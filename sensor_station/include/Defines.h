@@ -16,7 +16,7 @@
  * 3 -> Even more notifications. (Not used so far)
  * 4 -> Full call stack of every function call. (Not implemented so far)
  */
-#define DEBUG_PRINT_LEVEL 3
+#define DEBUG_PRINT_LEVEL 4
 
 /* If DO_HARDWARE_TEST is defined the hardware tests will be executet to test
  all the connected devices of the Arduino. Otherwise the main programm will be
@@ -43,7 +43,20 @@
  * device that was connected previously. If false no button press is required to
  * pair it and it will always send data to a device that connects.
  */
-#define PAIRING_BUTTON_REQUIRED				   FALSE
+#define PAIRING_BUTTON_REQUIRED				   TRUE
+
+/**
+ * If set to TRUE the arduino will wait in the setup till a serial connection
+ * for debug prints is present.
+ */
+#define WAIT_FOR_SERIAL_CONNECTION			   FALSE
+
+/**
+ * If this is set to true the led and piezo buzzer will never output anything.
+ * Useful if a plant is placed where someone wants to sleep, but not recommended
+ * since there will be no notification on the device if something is not right.
+ */
+#define ALWAYS_IN_SILENT_MODE				   TRUE
 
 // ---------------------------
 // |    Predefined Values    |
@@ -59,7 +72,7 @@
 #define DURATION_IN_PAIRING_MODE_MS			   (5 * 60'000)
 #define TIME_CHECK_BLE_CENTRAL_PRESENT_MS	   1000
 #define TIMEOUT_TIME_BLE_CONNECTION_MS		   5000
-#define TIME_IN_NOTIFICATION_SILENCE_MODE_MS   (1000 * 60 * 30)
+#define TIME_IN_NOTIFICATION_SILENCE_MODE_MS   (30 * 60'000)
 #define TIME_BETWEEN_SENSOR_MEASUREMENTS_MIN_S 30
 #define TIME_BETWEEN_SENSOR_MEASUREMENTS_MAX_S (5 * 60)
 #define TIME_IT_TAKES_TO_REACH_MAX_MEASUREMENT (30 * 60)
@@ -138,9 +151,9 @@
 #define LED_TIME_NOTIFICATION_ON_MS			   1000
 #define LED_TIME_NOTIFICATION_OFF_MS		   4000
 
-#define PIEZO_BUZZET_TONE_INTERVALL_MS		   15'000
-#define PIEZO_BUZZET_TONE_DURATION_MS		   100
-#define PIEZO_BUZZET_TONE_FREQUENCY_HZ		   3'000
+#define PIEZO_BUZZER_TONE_INTERVALL_MS		   15'000
+#define PIEZO_BUZZER_TONE_DURATION_MS		   100
+#define PIEZO_BUZZER_TONE_FREQUENCY_HZ		   3'000
 
 // ---------------------
 // |    Pin Mapping    |
@@ -164,8 +177,8 @@
 #define PIN_DIP_7							   D6
 #define PIN_DIP_8							   D5 // Highest
 
-#define PIN_BUTTON_1						   D4 // R
+#define PIN_BUTTON_1						   D4 // L
 #define PIN_BUTTON_2						   D3 // M
-#define PIN_BUTTON_3						   D2 // L
+#define PIN_BUTTON_3						   D2 // R
 
 #endif

@@ -8,9 +8,9 @@
 #include "SensorError.hpp"
 #include "SensorErrors.h"
 
-#define CHECK_IF_CASTABLE_TO_SENSOR_ERROR(notification) \
-	(notification->getNotificationType() ==             \
-	 Notification::NotificationType::SENSOR_ERROR)
+#define CHECK_IF_CASTABLE_TO_SENSOR_ERROR(notification)             \
+	(notification != NULL && notification->getNotificationType() == \
+								 Notification::NotificationType::SENSOR_ERROR)
 
 #define CAST_NOTIFICATION_TO_SENSOR_ERROR(notification, varName) \
 	assert(CHECK_IF_CASTABLE_TO_SENSOR_ERROR(notification));     \
@@ -103,9 +103,14 @@ class NotificationHandler {
 		}
 
 		int16_t setLEDfromNotification(const Notification & notification) {
-			if (prevErrorNotification == &notification) {
+			if (prevErrorNotification != NULL &&
+				*prevErrorNotification == notification) {
+				DEBUG_PRINT_POS(
+					3, "Notification was the same as the previous one."
+				)
 				return ledConstroller->updateLEDStatus();
 			}
+			DEBUG_PRINT_POS(3, "New notification set.")
 			uint16_t ledOnMs[]	= {LED_TIME_NOTIFICATION_ON_MS};
 			uint16_t ledOffMs[] = {LED_TIME_NOTIFICATION_OFF_MS};
 			uint8_t arraySize	= sizeof(ledOnMs) / sizeof(ledOnMs[0]);
@@ -119,6 +124,11 @@ class NotificationHandler {
 			ledConstroller->setErrorProperties(
 				colorR, colorG, colorB, ledOnMs, ledOffMs, arraySize, loop
 			);
+			if (prevErrorNotification != NULL) {
+				delete (prevErrorNotification);
+				prevErrorNotification = NULL;
+			}
+			prevErrorNotification = new Notification(notification);
 			return ledConstroller->updateLEDStatus();
 		}
 
@@ -129,8 +139,16 @@ class NotificationHandler {
 		 * update LED.
 		 */
 		int16_t setLEDfromSensorError(const SensorError & sensorError) {
-			if (prevErrorNotification == &sensorError) {
-				return ledConstroller->updateLEDStatus();
+			if (CHECK_IF_CASTABLE_TO_SENSOR_ERROR(prevErrorNotification)) {
+				const SensorError * prevSensorError;
+				CAST_NOTIFICATION_TO_SENSOR_ERROR(
+					prevErrorNotification, prevSensorError
+				);
+				if (prevSensorError != NULL &&
+					*prevSensorError == sensorError) {
+					DEBUG_PRINT_POS(3, "Led got updated without changes\n");
+					return ledConstroller->updateLEDStatus();
+				}
 			}
 			uint32_t colorCode = 0;
 			bool isHigh =
@@ -178,6 +196,14 @@ class NotificationHandler {
 				colorR, colorG, colorB, ledOnMs.data(), ledOffMs.data(),
 				ledOnMs.size(), loop
 			);
+			DEBUG_PRINTF_POS(
+				3, "Led controller got set. Is high was %d.\n", isHigh
+			);
+			if (prevErrorNotification != NULL) {
+				delete (prevErrorNotification);
+				prevErrorNotification = NULL;
+			}
+			prevErrorNotification = new Notification(sensorError);
 			return ledConstroller->updateLEDStatus();
 		}
 
@@ -204,11 +230,18 @@ class NotificationHandler {
 		int32_t update() {
 			static unsigned long previousTone = 0;
 			if (notificationQueue->isEmpty()) {
+				DEBUG_PRINT_POS(3, "Queue is empty.\n");
 				ledConstroller->disable();
 				return -1;
 			}
+#if ALWAYS_IN_SILENT_MODE
+			this->inSilentMode	   = true;
+			this->timeOfSilenceEnd = millis() + 100'000;
+#endif
 			if (this->inSilentMode) {
-				if ((int32_t) millis() - (int32_t) this->timeOfSilenceEnd < 0) {
+				DEBUG_PRINT_POS(3, "In silent mode.\n");
+				if ((int32_t) this->timeOfSilenceEnd - (int32_t) millis() < 0) {
+					DEBUG_PRINT_POS(3, "Silent mode ended.\n");
 					this->inSilentMode = false;
 					return ledConstroller->updateLEDStatus();
 				} else {
@@ -216,34 +249,49 @@ class NotificationHandler {
 					return this->timeOfSilenceEnd - millis();
 				}
 			} else {
-				if (millis() - previousTone > PIEZO_BUZZET_TONE_INTERVALL_MS) {
+				if (millis() - previousTone > PIEZO_BUZZER_TONE_INTERVALL_MS) {
+					DEBUG_PRINT_POS(3, "Buzzer tone.\n");
 					previousTone = millis();
 					piezoBuzzerController->startBuzzer(
-						PIEZO_BUZZET_TONE_FREQUENCY_HZ,
-						PIEZO_BUZZET_TONE_DURATION_MS
+						PIEZO_BUZZER_TONE_FREQUENCY_HZ,
+						PIEZO_BUZZER_TONE_DURATION_MS
 					);
 				}
 				const Notification * topNotification =
 					notificationQueue->getPrioritisedNotification();
+				int16_t timeToWait;
 				if (CHECK_IF_CASTABLE_TO_SENSOR_ERROR(topNotification)) {
 					const SensorError * error;
 					CAST_NOTIFICATION_TO_SENSOR_ERROR(topNotification, error);
-					return setLEDfromSensorError(*error);
+					timeToWait = setLEDfromSensorError(*error);
+					DEBUG_PRINTF_POS(
+						3, "Found error with time %d.\n", timeToWait
+					);
 				} else {
-					return setLEDfromNotification(*topNotification);
+					timeToWait = setLEDfromNotification(*topNotification);
+					DEBUG_PRINTF_POS(
+						3, "Found notification with time %d.\n", timeToWait
+					);
 				}
+				return timeToWait;
 			}
 		}
 
 		void updatePairingNotification(bool isActive) {
 			static bool prevValue = false;
 			if (isActive == prevValue) {
+				DEBUG_PRINTF_POS(
+					3, "Is active with same value as previous. Value was %d\n",
+					isActive
+				);
 				return;
 			}
 			Notification notification(NOTIFICATION_PAIRING_MODE_PRIORITY);
 			if (isActive) {
+				DEBUG_PRINT_POS(3, "Error gets added to queue.\n");
 				notificationQueue->addError(notification);
 			} else {
+				DEBUG_PRINT_POS(3, "Error gets removed from queue.\n");
 				notificationQueue->deleteErrorFromQueue(notification);
 			}
 			prevValue = isActive;
