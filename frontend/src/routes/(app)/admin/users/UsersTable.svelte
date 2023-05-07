@@ -23,7 +23,7 @@
   let mql;
   let mqlListener;
   let wasMounted = false;
-  let isMediaTabletOrDesktop = false;
+  let isMediaNotMobile = false;
 
   onMount(() => {
     isRendered = true;
@@ -42,9 +42,9 @@
 
   function addNewListener(query) {
     mql = window.matchMedia(query);
-    mqlListener = (v) => (isMediaTabletOrDesktop = v.matches);
+    mqlListener = (v) => (isMediaNotMobile = v.matches);
     mql.addListener(mqlListener);
-    isMediaTabletOrDesktop = mql.matches;
+    isMediaNotMobile = mql.matches;
   }
 
   function removeActiveListener() {
@@ -114,7 +114,7 @@
     permissions: false,
   };
 
-  $: columnVisibility = isMediaTabletOrDesktop
+  $: columnVisibility = isMediaNotMobile
     ? defaultColumnVisibility
     : mobileColumnVisibility;
 
@@ -296,7 +296,7 @@
       >
         {">>"}
       </button>
-      {#if isMediaTabletOrDesktop}
+      {#if isMediaNotMobile}
         <select
           value={$table.getState().pagination.pageSize}
           on:change={setPageSize}
