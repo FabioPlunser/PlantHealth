@@ -8,9 +8,9 @@
 #include "SensorError.hpp"
 #include "SensorErrors.h"
 
-#define CHECK_IF_CASTABLE_TO_SENSOR_ERROR(notification) \
-	(notification->getNotificationType() ==             \
-	 Notification::NotificationType::SENSOR_ERROR)
+#define CHECK_IF_CASTABLE_TO_SENSOR_ERROR(notification)             \
+	(notification != NULL && notification->getNotificationType() == \
+								 Notification::NotificationType::SENSOR_ERROR)
 
 #define CAST_NOTIFICATION_TO_SENSOR_ERROR(notification, varName) \
 	assert(CHECK_IF_CASTABLE_TO_SENSOR_ERROR(notification));     \
@@ -124,6 +124,11 @@ class NotificationHandler {
 			ledConstroller->setErrorProperties(
 				colorR, colorG, colorB, ledOnMs, ledOffMs, arraySize, loop
 			);
+			if (prevErrorNotification != NULL) {
+				delete (prevErrorNotification);
+				prevErrorNotification = NULL;
+			}
+			prevErrorNotification = new Notification(notification);
 			return ledConstroller->updateLEDStatus();
 		}
 
@@ -134,9 +139,16 @@ class NotificationHandler {
 		 * update LED.
 		 */
 		int16_t setLEDfromSensorError(const SensorError & sensorError) {
-			if (prevErrorNotification == &sensorError) {
-				DEBUG_PRINT_POS(3, "Led got updated without changes\n");
-				return ledConstroller->updateLEDStatus();
+			if (CHECK_IF_CASTABLE_TO_SENSOR_ERROR(prevErrorNotification)) {
+				const SensorError * prevSensorError;
+				CAST_NOTIFICATION_TO_SENSOR_ERROR(
+					prevErrorNotification, prevSensorError
+				);
+				if (prevSensorError != NULL &&
+					*prevSensorError == sensorError) {
+					DEBUG_PRINT_POS(3, "Led got updated without changes\n");
+					return ledConstroller->updateLEDStatus();
+				}
 			}
 			uint32_t colorCode = 0;
 			bool isHigh =
@@ -187,6 +199,11 @@ class NotificationHandler {
 			DEBUG_PRINTF_POS(
 				3, "Led controller got set. Is high was %d.\n", isHigh
 			);
+			if (prevErrorNotification != NULL) {
+				delete (prevErrorNotification);
+				prevErrorNotification = NULL;
+			}
+			prevErrorNotification = new Notification(sensorError);
 			return ledConstroller->updateLEDStatus();
 		}
 
