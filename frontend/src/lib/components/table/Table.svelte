@@ -9,22 +9,17 @@
     getPaginationRowModel,
   } from "@tanstack/svelte-table";
   import { writable } from "svelte/store";
-  import RolePills from "./RolePills.svelte";
-  import TextCell from "./TextCell.svelte";
   import SortSymbol from "./SortSymbol.svelte";
   import type { NodeJS } from "node:types";
-  import { page } from "$app/stores";
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";
-  import { enhance } from "$app/forms";
 
-  let query =
-    "((min-width: 481px) and (max-width: 1280px)) or (min-width: 1281px)";
+  let query = "(min-width: 580px)";
   let isRendered = false;
   let mql;
   let mqlListener;
   let wasMounted = false;
-  let isMediaTabletOrDesktop = false;
+  let isMediaNotMobile = false;
 
   onMount(() => {
     isRendered = true;
@@ -43,9 +38,9 @@
 
   function addNewListener(query) {
     mql = window.matchMedia(query);
-    mqlListener = (v) => (isMediaTabletOrDesktop = v.matches);
+    mqlListener = (v) => (isMediaNotMobile = v.matches);
     mql.addListener(mqlListener);
-    isMediaTabletOrDesktop = mql.matches;
+    isMediaNotMobile = mql.matches;
   }
 
   function removeActiveListener() {
@@ -54,50 +49,34 @@
     }
   }
 
-  type User = {
-    personId: string;
-    username: string;
-    token: string;
-    permissions: string[];
-    email: string;
-  };
+  /**
+   * Array\<T\> where T is the datatype of the object to be displayed
+   */
+  export let data;
+  /**
+   * Array\<ColumnDef\<T\>\> where T is the datatype of the object to be displayed
+   */
+  export let columns;
+  /**
+   * column visibility if media is not mobile
+   * @default {}
+   * @type {ColumnVisibility}
+   */
+  export let defaultColumnVisibility: ColumnVisibility = {};
+  /**
+   * column visibility if media is mobile
+   * @type {ColumnVisibility}
+   */
+  export let mobileColumnVisibility: ColumnVisibility;
 
-  export let users: User[];
-
-  let columns = [
-    {
-      accessorKey: "username",
-      header: () => flexRender(TextCell, { text: "Username" }),
-      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
-    },
-    {
-      accessorKey: "email",
-      header: () => flexRender(TextCell, { text: "Email" }),
-      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
-    },
-    {
-      accessorKey: "permissions",
-      header: () => flexRender(TextCell, { text: "Permissions" }),
-      cell: (info) => flexRender(RolePills, { roles: info.getValue() }),
-    },
-  ];
-
-  $: columnVisibility = isMediaTabletOrDesktop
-    ? {
-        username: true,
-        email: true,
-        permissions: true,
-      }
-    : {
-        username: true,
-        email: false,
-        permissions: false,
-      };
+  $: columnVisibility = isMediaNotMobile
+    ? defaultColumnVisibility
+    : mobileColumnVisibility;
 
   let globalFilter = "";
 
   $: options = writable<TableOptions<User>>({
-    data: users,
+    data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -172,7 +151,7 @@
 </script>
 
 {#if isRendered}
-  <div class="overflow-auto">
+  <div>
     <div class="mb-3" in:slide={{ duration: 400, axis: "y" }}>
       <input
         type="search"
@@ -208,8 +187,6 @@
                   {/if}
                 </th>
               {/each}
-              <th>EDIT</th>
-              <th>DELETE</th>
             </tr>
           {/each}
         </thead>
@@ -228,38 +205,6 @@
                   </div>
                 </td>
               {/each}
-              <td class="table-cell">
-                <a
-                  href={`/profile?personId=${row.original.personId}&username=${row.original.username}&userPermissions=${row.original.permissions}&source=${$page.url}`}
-                >
-                  <i class="bi bi-pencil-square text-3xl hover:text-gray-500" />
-                </a>
-              </td>
-              <td class="table-cell">
-                <div>
-                  <label class="button">
-                    <!-- TODO make delete user action with verification Modal-->
-                    <!--on click should call deleteUser action and pass Id-->
-                    <form method="POST" action="?/deleteUser" use:enhance>
-                      <input
-                        type="hidden"
-                        bind:value={row.original.personId}
-                        name="personId"
-                      />
-                      <button
-                        type="submit"
-                        on:click={() => {
-                          return confirm(
-                            `You will delete this user ${row.original.username.toUpperCase()} permanently!`
-                          );
-                        }}
-                      >
-                        <i class="bi bi-trash text-3xl hover:text-red-500" />
-                      </button>
-                    </form>
-                  </label>
-                </div>
-              </td>
             </tr>
           {/each}
         </tbody>
@@ -306,13 +251,13 @@
       >
         {">>"}
       </button>
-      {#if isMediaTabletOrDesktop}
+      {#if isMediaNotMobile}
         <select
           value={$table.getState().pagination.pageSize}
           on:change={setPageSize}
           class="btn"
         >
-          {#each [5, 10, 25, 50] as pageSize}
+          {#each [5, 10, 20] as pageSize}
             <option value={pageSize}>
               Show {pageSize}
             </option>
