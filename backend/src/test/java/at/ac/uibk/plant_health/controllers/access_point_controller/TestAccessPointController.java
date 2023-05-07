@@ -154,7 +154,7 @@ public class TestAccessPointController {
 	}
 
 	@Test
-	void setUnlockAccessPoint() throws Exception {
+	void setUnlockedAccessPoint() throws Exception {
 		Person person = createUserAndLogin(true);
 		UUID selfAssignedId = UUID.randomUUID();
 		accessPointService.register(selfAssignedId, "Office1");
@@ -235,11 +235,14 @@ public class TestAccessPointController {
 
 	@Test
 	void scanForSensorStations() throws Exception {
+		// precondition AccessPoint is registered and connected
 		Person person = createUserAndLogin(true);
 		UUID selfAssignedId = UUID.randomUUID();
 		accessPointService.register(selfAssignedId, "Office1");
 		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
 		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
+		accessPoint = accessPointService.findById(accessPoint.getDeviceId());
+		accessPointService.setLastConnection(accessPoint);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/scan-for-sensor-stations")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
@@ -275,6 +278,28 @@ public class TestAccessPointController {
 
 		accessPoint = accessPointRepository.findByDeviceId(accessPoint.getDeviceId()).get();
 		assertEquals(transferInterval, accessPoint.getTransferInterval());
+	}
+
+	@Test
+	void updateAccessPoint() throws Exception {
+		Person person = createUserAndLogin(true);
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/update-access-point")
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(person))
+								.param("accessPointId", String.valueOf(accessPoint.getDeviceId()))
+								.param("roomName", "Office2")
+								.param("transferInterval", "10")
+								.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
+
+		accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+		assertEquals(10, accessPoint.getTransferInterval());
+		assertEquals("Office2", accessPoint.getRoomName());
 	}
 
 	@Test

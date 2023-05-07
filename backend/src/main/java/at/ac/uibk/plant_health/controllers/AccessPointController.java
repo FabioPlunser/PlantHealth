@@ -147,8 +147,8 @@ public class AccessPointController {
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
 	@PostMapping("/set-access-point-transfer-interval")
 	public RestResponseEntity setAPTransferInterval(
-			@RequestParam("accessPointId") final UUID accessPointId,
-			@RequestParam("transferInterval") final int transferInterval
+			@RequestParam(name = "accessPointId") final UUID accessPointId,
+			@RequestParam(name = "transferInterval") final int transferInterval
 	) {
 		try {
 			accessPointService.findById(accessPointId);
@@ -166,6 +166,29 @@ public class AccessPointController {
 				.toEntity();
 	}
 
+	@AnyPermission({Permission.ADMIN})
+	@PostMapping("/update-access-point")
+	public RestResponseEntity updateAccessPoint(
+			@RequestParam(name = "accessPointId") final UUID accessPointId,
+			@RequestParam(name = "roomName") final String roomName,
+			@RequestParam(name = "transferInterval") final int transferInterval
+	) {
+		try {
+			accessPointService.findById(accessPointId);
+			accessPointService.updateAccessPointInfo(accessPointId, roomName, transferInterval);
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
+
+		return MessageResponse.builder()
+				.statusCode(200)
+				.message("Successfully updated access point info")
+				.toEntity();
+	}
+
 	@PostMapping("/transfer-data")
 	@PrincipalRequired(AccessPoint.class)
 	public RestResponseEntity transferData(
@@ -174,7 +197,7 @@ public class AccessPointController {
 		try {
 			accessPointService.findById(accessPoint.getDeviceId());
 			accessPointService.isUnlockedByDeviceId(accessPoint.getDeviceId());
-			accessPointService.setSensorStationData(sensorStationList);
+			accessPointService.setSensorStationData(sensorStationList, accessPoint);
 		} catch (ServiceException e) {
 			return MessageResponse.builder()
 					.statusCode(e.getStatusCode())
