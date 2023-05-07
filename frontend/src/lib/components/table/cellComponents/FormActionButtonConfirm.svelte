@@ -8,8 +8,6 @@
 </script>
 
 <label class="button">
-  <!-- TODO make delete user action with verification Modal-->
-  <!--on click should call deleteUser action and pass Id-->
   <form {method} {action} use:enhance>
     <input type="hidden" bind:value={formActionValue} name="personId" />
     <button

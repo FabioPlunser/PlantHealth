@@ -4,7 +4,7 @@ import { fail, redirect, error } from "@sveltejs/kit";
 import { z } from "zod";
 
 export const load = (async ({ fetch, depends }) => {
-  let allUsers;
+  let allUsers: User[];
 
   await fetch(`${BACKEND_URL}/get-all-users`)
     .then((response) => {

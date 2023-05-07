@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { TableOptions } from "@tanstack/svelte-table";
+  import type { ColumnDef, TableOptions } from "@tanstack/svelte-table";
   import {
     createSvelteTable,
     flexRender,
@@ -9,14 +9,10 @@
     getPaginationRowModel,
   } from "@tanstack/svelte-table";
   import { writable } from "svelte/store";
-  import RolePills from "./RolePills.svelte";
-  import TextCell from "./TextCell.svelte";
-  import SortSymbol from "./SortSymbol.svelte";
+  import SortSymbol from "$components/table/SortSymbol.svelte";
   import type { NodeJS } from "node:types";
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";
-  import HrefWithIcon from "./HrefWithIcon.svelte";
-  import FormActionButtonConfirm from "./FormActionButtonConfirm.svelte";
 
   let query = "(min-width: 580px)";
   let isRendered = false;
@@ -53,66 +49,24 @@
     }
   }
 
-  type User = {
-    personId: string;
-    username: string;
-    token: string;
-    permissions: string[];
-    email: string;
-  };
-
-  export let users: User[];
-
-  let columns = [
-    {
-      accessorKey: "username",
-      header: () => flexRender(TextCell, { text: "Username" }),
-      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
-    },
-    {
-      accessorKey: "email",
-      header: () => flexRender(TextCell, { text: "Email" }),
-      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
-    },
-    {
-      accessorKey: "permissions",
-      header: () => flexRender(TextCell, { text: "Permissions" }),
-      cell: (info) => flexRender(RolePills, { roles: info.getValue() }),
-    },
-    {
-      accessorKey: "_", // NOTE: blanc accessor so we get the row
-      header: () => flexRender(TextCell, { text: "Edit" }),
-      cell: ({ row }) =>
-        flexRender(HrefWithIcon, {
-          href: `/profile?personId=${row.original.personId}&username=${row.originalusername}&userPermissions=${row.original.permissions}`,
-          iconClass: "bi bi-pencil-square text-3xl hover:text-gray-500",
-        }),
-    },
-    {
-      accessorKey: "_", // NOTE: blanc accessor so we get the row
-      header: () => flexRender(TextCell, { text: "Delete" }),
-      cell: ({ row }) =>
-        flexRender(FormActionButtonConfirm, {
-          method: "POST",
-          action: "?/deleteUser",
-          formActionValue: row.original.personId,
-          confirmMessage: `You will delete this user ${row.original.username.toUpperCase()} permanently!`,
-          iconClass: "bi bi-trash text-3xl hover:text-red-500",
-        }),
-    },
-  ];
-
-  let defaultColumnVisibility = {
-    username: true,
-    email: true,
-    permissions: true,
-    edit: true,
-  };
-
-  let mobileColumnVisibility = {
-    email: false,
-    permissions: false,
-  };
+  /**
+   * Array\<T\> where T is the datatype of the object to be displayed
+   */
+  export let data;
+  /**
+   * Array\<ColumnDef\<T\>\> where T is the datatype of the object to be displayed
+   */
+  export let columns;
+  /**
+   * column visibility if media is not mobile default = {}
+   * @type {ColumnVisibility}
+   */
+  export let defaultColumnVisibility: ColumnVisibility = {};
+  /**
+   * column visibility if media is mobile
+   * @type {ColumnVisibility}
+   */
+  export let mobileColumnVisibility: ColumnVisibility;
 
   $: columnVisibility = isMediaNotMobile
     ? defaultColumnVisibility
@@ -121,7 +75,7 @@
   let globalFilter = "";
 
   $: options = writable<TableOptions<User>>({
-    data: users,
+    data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
