@@ -239,7 +239,8 @@ class NotificationHandler {
 			static bool prevValue = false;
 			if (isActive == prevValue) {
 				DEBUG_PRINTF_POS(
-					3, "Is active was previous value. Value was %d\n", isActive
+					3, "Is active with same value as previous. Value was %d\n",
+					isActive
 				);
 				return;
 			}

@@ -26,8 +26,7 @@ bool updateNotificationHandler_PairingMode(bool active);
 unsigned long handleNotificationIfPresent(bool & notificationPresent);
 void checkPairingButtonAndStatus(bool & inPairingMode);
 void handleCentralDeviceIfPresent(
-	arduino::String & pairedDevice, bool & inPairingMode,
-	bool & notificationPresent
+	arduino::String & pairedDevice, bool & inPairingMode
 );
 void checkNotificationSilenceButtonPressed();
 void setValueInVerifiedCentralDevice(BLEDevice & central);
@@ -86,7 +85,6 @@ void setup() {
 void loop() {
 	static arduino::String pairedDevice			   = "";
 	static bool inPairingMode					   = true;
-	static bool notificationPresent				   = false;
 	static unsigned long timeBetweenMeasures	   = 0;
 	static unsigned long previousDataTransmission  = millis();
 	static unsigned long previousSensorMeasurement = millis();
@@ -98,9 +96,7 @@ void loop() {
 	enable_pairing_mode();
 #endif
 	// checkNotificationSilenceButtonPressed();
-	handleCentralDeviceIfPresent(
-		pairedDevice, inPairingMode, notificationPresent
-	);
+	handleCentralDeviceIfPresent(pairedDevice, inPairingMode);
 	// If sensor data got transmitted we want to measure new values directly.
 	if (get_sensor_data_read_flag() == SENSOR_DATA_READ_VALUE) {
 		timeBetweenMeasures		 = 0;
@@ -113,7 +109,7 @@ void loop() {
 		i = 0;
 	}
 	unsigned long remainingSleepTime =
-		handleNotificationIfPresent(notificationPresent);
+		handleNotificationIfPresent(!notificationHandler->isEmpty());
 	// If the time between sensor measurements passed the next measurement will
 	// done.
 	if (millis() - previousSensorMeasurement > timeBetweenMeasures) {
@@ -167,7 +163,7 @@ void checkNotificationSilenceButtonPressed() {
 void checkPairingButtonAndStatus(bool & inPairingMode) {
 	static unsigned long pairingTime = 0;
 	DEBUG_PRINTF_POS(
-		3, "Checking pairing buttone and status. Button value is here %d.\n",
+		3, "Checking pairing buttoe and status. In pairing mode value is %d.\n",
 		inPairingMode
 	);
 	if (digitalRead(PIN_BUTTON_1) == PinStatus::HIGH) {
@@ -208,8 +204,7 @@ void setValueInVerifiedCentralDevice(BLEDevice & central) {
 }
 
 void handleCentralDeviceIfPresent(
-	arduino::String & pairedDevice, bool & inPairingMode,
-	bool & notificationPresent
+	arduino::String & pairedDevice, bool & inPairingMode
 ) {
 	BLEDevice central = BLE.central();
 	if (central) {
@@ -234,7 +229,7 @@ void handleCentralDeviceIfPresent(
 			central.disconnect();
 		}
 		DEBUG_PRINTLN(1, "* Disconnected from central device!");
-		notificationPresent = updateNotificationHandler_Errors();
+		updateNotificationHandler_Errors();
 		if (get_sensor_data_read_flag() == SENSOR_DATA_NOT_READ_VALUE) {
 			ERROR_PRINT(
 				"Sensor flag was not cleared. Value was ",
