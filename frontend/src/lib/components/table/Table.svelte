@@ -9,7 +9,7 @@
     getPaginationRowModel,
   } from "@tanstack/svelte-table";
   import { writable } from "svelte/store";
-  import SortSymbol from "$components/table/SortSymbol.svelte";
+  import SortSymbol from "./SortSymbol.svelte";
   import type { NodeJS } from "node:types";
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";

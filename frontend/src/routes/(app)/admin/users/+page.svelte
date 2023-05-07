@@ -4,10 +4,12 @@
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";
   import Table from "$components/table/Table.svelte";
-  import RoleBadges from "$components/table/cellComponents/RoleBadges.svelte";
-  import TextCell from "$components/table/cellComponents/TextCell.svelte";
-  import HrefWithIcon from "$components/table/cellComponents/HrefWithIcon.svelte";
-  import FormActionButtonConfirm from "$components/table/cellComponents/FormActionButtonConfirm.svelte";
+  import {
+    RoleBadges,
+    TextCell,
+    HrefWithIcon,
+    FormActionButtonConfirm,
+  } from "$components/table/cellComponents";
   import { flexRender } from "@tanstack/svelte-table";
   import type { ColumnDef } from "@tanstack/svelte-table";
 
