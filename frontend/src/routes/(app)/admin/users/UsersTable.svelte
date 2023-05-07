@@ -196,7 +196,7 @@
 </script>
 
 {#if isRendered}
-  <div class="overflow-auto">
+  <div>
     <div class="mb-3" in:slide={{ duration: 400, axis: "y" }}>
       <input
         type="search"
@@ -302,7 +302,7 @@
           on:change={setPageSize}
           class="btn"
         >
-          {#each [5, 10, 25, 50] as pageSize}
+          {#each [5, 10, 20] as pageSize}
             <option value={pageSize}>
               Show {pageSize}
             </option>
