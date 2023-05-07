@@ -156,6 +156,7 @@ export const actions = {
       });
 
     // NOTE: Redirect if the user was redirected to profile from some other page
+    console.log(request.headers.get("referer"));
     if (source !== null) {
       throw redirect(307, source);
     }
