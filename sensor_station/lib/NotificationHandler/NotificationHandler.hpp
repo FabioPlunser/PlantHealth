@@ -103,7 +103,7 @@ class NotificationHandler {
 		}
 
 		int16_t setLEDfromNotification(const Notification & notification) {
-			if (prevErrorNotification == &notification) {
+			if (*prevErrorNotification == notification) {
 				return ledConstroller->updateLEDStatus();
 			}
 			uint16_t ledOnMs[]	= {LED_TIME_NOTIFICATION_ON_MS};

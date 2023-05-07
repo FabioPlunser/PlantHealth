@@ -246,15 +246,14 @@ unsigned long handleNotificationIfPresent(bool notificationPresent) {
 	if (notificationPresent) {
 		DEBUG_PRINT_POS(1, "Notifcation is present\n");
 		int32_t timeTillNext = notificationHandler->update();
-		if (timeTillNext > 0) {
-			while (timeTillNext > 0 &&
-				   (unsigned long) timeTillNext <
-					   TIME_CHECK_BLE_CENTRAL_PRESENT_MS -
-						   (millis() - startNotificationCheck)) {
-				DEBUG_PRINTF_POS(2, "Will wait for %ld ms\n", timeTillNext);
-				delay(timeTillNext);
-				timeTillNext = notificationHandler->update();
-			}
+
+		while (timeTillNext > 0 && (unsigned long) timeTillNext <
+									   TIME_CHECK_BLE_CENTRAL_PRESENT_MS -
+										   (millis() - startNotificationCheck)
+		) {
+			DEBUG_PRINTF_POS(2, "Will wait for %ld ms\n", timeTillNext);
+			delay(timeTillNext);
+			timeTillNext = notificationHandler->update();
 		}
 	}
 	unsigned long passedTime = millis() - startNotificationCheck;
