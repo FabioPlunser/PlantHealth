@@ -79,7 +79,7 @@ class LedHandler {
 				return 0;
 			}
 			uint16_t * timeArray	 = isOn ? durationOn : durationOff;
-			unsigned long passedTime = millis();
+			unsigned long passedTime = millis() - prevChangeTime;
 			if (passedTime > timeArray[durationIdx]) {
 				return 0;
 			}
@@ -160,7 +160,9 @@ class LedHandler {
 				durationIdx++;
 				DEBUG_PRINT_POS(3, "Index got moved.\n");
 			}
-			return getMsTillNext();
+			uint16_t timeTillNext = getMsTillNext();
+			DEBUG_PRINTF_POS(3, "Time till next change is %u.\n", timeTillNext);
+			return timeTillNext;
 		}
 };
 

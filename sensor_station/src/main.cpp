@@ -163,7 +163,7 @@ void checkNotificationSilenceButtonPressed() {
 void checkPairingButtonAndStatus(bool & inPairingMode) {
 	static unsigned long pairingTime = 0;
 	DEBUG_PRINTF_POS(
-		3, "Checking pairing buttoe and status. In pairing mode value is %d.\n",
+		3, "Checking pairing button and status. In pairing mode value is %d.\n",
 		inPairingMode
 	);
 	if (digitalRead(PIN_BUTTON_1) == PinStatus::HIGH) {
