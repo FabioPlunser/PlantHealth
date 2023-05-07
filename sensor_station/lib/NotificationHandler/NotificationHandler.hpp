@@ -130,6 +130,7 @@ class NotificationHandler {
 		 */
 		int16_t setLEDfromSensorError(const SensorError & sensorError) {
 			if (prevErrorNotification == &sensorError) {
+				DEBUG_PRINT_POS(3, "Led got updated without changes\n");
 				return ledConstroller->updateLEDStatus();
 			}
 			uint32_t colorCode = 0;
@@ -178,6 +179,9 @@ class NotificationHandler {
 				colorR, colorG, colorB, ledOnMs.data(), ledOffMs.data(),
 				ledOnMs.size(), loop
 			);
+			DEBUG_PRINTF_POS(
+				3, "Led controller got set. Is high was %d.\n", isHigh
+			);
 			return ledConstroller->updateLEDStatus();
 		}
 
@@ -204,11 +208,14 @@ class NotificationHandler {
 		int32_t update() {
 			static unsigned long previousTone = 0;
 			if (notificationQueue->isEmpty()) {
+				DEBUG_PRINT_POS(3, "Queue is empty.\n");
 				ledConstroller->disable();
 				return -1;
 			}
 			if (this->inSilentMode) {
+				DEBUG_PRINT_POS(3, "In silent mode.\n");
 				if ((int32_t) millis() - (int32_t) this->timeOfSilenceEnd < 0) {
+					DEBUG_PRINT_POS(3, "Silent mode ended.\n");
 					this->inSilentMode = false;
 					return ledConstroller->updateLEDStatus();
 				} else {
@@ -217,6 +224,7 @@ class NotificationHandler {
 				}
 			} else {
 				if (millis() - previousTone > PIEZO_BUZZET_TONE_INTERVALL_MS) {
+					DEBUG_PRINT_POS(3, "Buzzer tone.\n");
 					previousTone = millis();
 					piezoBuzzerController->startBuzzer(
 						PIEZO_BUZZET_TONE_FREQUENCY_HZ,
@@ -225,13 +233,21 @@ class NotificationHandler {
 				}
 				const Notification * topNotification =
 					notificationQueue->getPrioritisedNotification();
+				int16_t timeToWait;
 				if (CHECK_IF_CASTABLE_TO_SENSOR_ERROR(topNotification)) {
 					const SensorError * error;
 					CAST_NOTIFICATION_TO_SENSOR_ERROR(topNotification, error);
-					return setLEDfromSensorError(*error);
+					timeToWait = setLEDfromSensorError(*error);
+					DEBUG_PRINTF_POS(
+						3, "Found error with time %d.\n", timeToWait
+					);
 				} else {
-					return setLEDfromNotification(*topNotification);
+					timeToWait = setLEDfromNotification(*topNotification);
+					DEBUG_PRINTF_POS(
+						3, "Found notification with time %d.\n", timeToWait
+					);
 				}
+				return timeToWait;
 			}
 		}
 
