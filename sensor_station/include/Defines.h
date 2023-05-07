@@ -43,7 +43,7 @@
  * device that was connected previously. If false no button press is required to
  * pair it and it will always send data to a device that connects.
  */
-#define PAIRING_BUTTON_REQUIRED				   FALSE
+#define PAIRING_BUTTON_REQUIRED				   TRUE
 
 // ---------------------------
 // |    Predefined Values    |

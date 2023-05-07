@@ -83,7 +83,7 @@ void setup() {
 
 void loop() {
 	static arduino::String pairedDevice			   = "";
-	static bool inPairingMode					   = false;
+	static bool inPairingMode					   = true;
 	static bool notificationPresent				   = false;
 	static unsigned long timeBetweenMeasures	   = 0;
 	static unsigned long previousDataTransmission  = millis();
