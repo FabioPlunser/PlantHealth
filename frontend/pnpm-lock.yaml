@@ -43,6 +43,9 @@ devDependencies:
   svelte:
     specifier: ^3.58.0
     version: 3.58.0
+  svelte-chartjs:
+    specifier: ^3.1.2
+    version: 3.1.2(chart.js@4.2.1)(svelte@3.58.0)
   svelte-check:
     specifier: ^3.2.0
     version: 3.2.0(postcss@8.4.21)(svelte@3.58.0)
@@ -2661,6 +2664,19 @@ packages:
         integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==,
       }
     engines: { node: ">= 0.4" }
+    dev: true
+
+  /svelte-chartjs@3.1.2(chart.js@4.2.1)(svelte@3.58.0):
+    resolution:
+      {
+        integrity: sha512-3+6gY2IJ9Ua8R9pk3iS1ypa7Z9OoXCJb9oPwIfTp7caJM+X+RrWnH2CTkGAq7FeSxc2nnmW08tYN88Q8Y+5M+w==,
+      }
+    peerDependencies:
+      chart.js: ^3.5.0 || ^4.0.0
+      svelte: ^3.45.0
+    dependencies:
+      chart.js: 4.2.1
+      svelte: 3.58.0
     dev: true
 
   /svelte-check@3.2.0(postcss@8.4.21)(svelte@3.58.0):

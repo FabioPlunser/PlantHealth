@@ -37,7 +37,7 @@
   <PictureModel bind:open={picturesModal} pictures={data.pictures} />
   <SensorLimitsModal bind:open={sensorLimitsModal} {sensorStation} {sensors} />
   <SensorDataModal bind:open={sensorDataModal} data={data.data} />
-  <section in:fly={{ y: -200, duration: 200 }} class="h-screen">
+  <section in:fly={{ y: -200, duration: 200 }}>
     <button
       on:click={() => history.back()}
       class="transform transition-transform active:scale-110 mb-2"

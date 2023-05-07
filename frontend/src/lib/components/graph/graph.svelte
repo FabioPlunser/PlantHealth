@@ -1,5 +1,8 @@
 <script lang="ts">
-  // import { Line } from 'svelte-chartjs';
+  import Line from "$lib/components/graph/wrapper/Line.svelte";
+
+  export let width = 300;
+  export let height = 300;
 
   import {
     Chart as ChartJS,
@@ -21,10 +24,11 @@
     PointElement,
     CategoryScale
   );
+
   export let data: any;
+  export let options: any;
 </script>
 
-<!-- 
-<div>
-  <Line {data} options={{ responsive: true }} />
-</div> -->
+<div class="w-full h-full">
+  <Line {data} {options} />
+</div>

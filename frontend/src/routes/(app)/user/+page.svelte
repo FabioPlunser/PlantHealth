@@ -1,6 +1,6 @@
 <script lang="ts">
   import SensorstationModal from "./SensorstationModal.svelte";
-  import SensorStation from "$lib/components/ui/SensorStation.svelte";
+  import SensorStation from "$lib/components/ui/SensorStation/SensorStation.svelte";
 
   //---------------------------------------------------
   export let data;
@@ -15,7 +15,8 @@
   let sensorStationModel = false;
   //---------------------------------------------------
 
-  // $: console.log(data);
+  $: console.log(data.dashboard);
+  $: console.log(data.sensorStations);
 </script>
 
 {#if rendered}

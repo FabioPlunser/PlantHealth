@@ -70,7 +70,7 @@ export const handleFetch = (({ event, request, fetch }) => {
   };
 
   request.headers.set("Authorization", JSON.stringify(value));
-
+  console.log(request.headers.get("Authorization"));
   // console.log("request", request.headers.get("Authorization"));
   return fetch(request);
 }) satisfies HandleFetch;
