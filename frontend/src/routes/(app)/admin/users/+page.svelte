@@ -10,6 +10,7 @@
     HrefWithIcon,
     FormActionButtonConfirm,
   } from "$components/table/cellComponents";
+  import { page } from "$app/stores";
   import { flexRender } from "@tanstack/svelte-table";
   import type { ColumnDef } from "@tanstack/svelte-table";
 
@@ -55,7 +56,7 @@
       header: () => flexRender(TextCell, { text: "Edit" }),
       cell: ({ row }) =>
         flexRender(HrefWithIcon, {
-          href: `/profile?personId=${row.original.personId}&username=${row.original.username}&userPermissions=${row.original.permissions}`,
+          href: `/profile?personId=${row.original.personId}&username=${row.original.username}&userPermissions=${row.original.permissions}&source=${$page.url}`,
           iconClass: "bi bi-pencil-square text-3xl hover:text-gray-500",
         }),
     },
