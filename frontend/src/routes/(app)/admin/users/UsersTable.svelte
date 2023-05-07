@@ -18,8 +18,7 @@
   import HrefWithIcon from "./HrefWithIcon.svelte";
   import FormActionButtonConfirm from "./FormActionButtonConfirm.svelte";
 
-  let query =
-    "((min-width: 481px) and (max-width: 1280px)) or (min-width: 1281px)";
+  let query = "(min-width: 580px)";
   let isRendered = false;
   let mql;
   let mqlListener;
