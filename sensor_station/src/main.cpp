@@ -95,7 +95,7 @@ void loop() {
 	inPairingMode = true;
 	enable_pairing_mode();
 #endif
-	checkNotificationSilenceButtonPressed();
+	// checkNotificationSilenceButtonPressed();
 	handleCentralDeviceIfPresent(
 		pairedDevice, inPairingMode, notificationPresent
 	);
@@ -164,8 +164,12 @@ void checkNotificationSilenceButtonPressed() {
 
 void checkPairingButtonAndStatus(bool & inPairingMode) {
 	static unsigned long pairingTime = 0;
+	DEBUG_PRINTF_POS(
+		3, "Checking pairing buttone and status. Button value is here %d.\n",
+		inPairingMode
+	);
 	if (digitalRead(PIN_BUTTON_1) == PinStatus::HIGH) {
-		DEBUG_PRINT(1, "Pairing Button is pressed\n");
+		DEBUG_PRINT_POS(2, "Pairing Button is pressed\n");
 		enable_pairing_mode();
 		set_sensorstation_locked_status(SENSOR_STATION_LOCKED_VALUE);
 		inPairingMode = true;
@@ -278,6 +282,7 @@ bool updateNotificationHandler_Errors() {
 }
 
 bool updateNotificationHandler_PairingMode(bool active) {
+	DEBUG_PRINTF_POS(4, "Update notification with value %d\n", active);
 	notificationHandler->updatePairingNotification(active);
 	return !notificationHandler->isEmpty();
 }

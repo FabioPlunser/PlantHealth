@@ -238,12 +238,17 @@ class NotificationHandler {
 		void updatePairingNotification(bool isActive) {
 			static bool prevValue = false;
 			if (isActive == prevValue) {
+				DEBUG_PRINTF_POS(
+					3, "Is active was previous value. Value was %d\n", isActive
+				);
 				return;
 			}
 			Notification notification(NOTIFICATION_PAIRING_MODE_PRIORITY);
 			if (isActive) {
+				DEBUG_PRINT_POS(3, "Error gets added to queue.\n");
 				notificationQueue->addError(notification);
 			} else {
+				DEBUG_PRINT_POS(3, "Error gets removed from queue.\n");
 				notificationQueue->deleteErrorFromQueue(notification);
 			}
 			prevValue = isActive;
