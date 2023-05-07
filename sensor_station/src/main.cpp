@@ -72,9 +72,11 @@ void setup() {
 
 	initialize_communication();
 
-	// while (!Serial) {
-	// 	delay(50);
-	// }
+#if WAIT_FOR_SERIAL_CONNECTION
+	while (!Serial) {
+		delay(50);
+	}
+#endif
 
 	delay(1000);
 }

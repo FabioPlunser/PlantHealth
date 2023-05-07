@@ -45,6 +45,12 @@
  */
 #define PAIRING_BUTTON_REQUIRED				   TRUE
 
+/**
+ * If set to TRUE the arduino will wait in the setup till a serial connection
+ * for debug prints is present.
+ */
+#define WAIT_FOR_SERIAL_CONNECTION			   TRUE
+
 // ---------------------------
 // |    Predefined Values    |
 // ---------------------------
