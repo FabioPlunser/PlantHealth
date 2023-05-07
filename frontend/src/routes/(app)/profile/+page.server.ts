@@ -22,7 +22,7 @@ export const load = (async ({ url, fetch, locals }) => {
   let userPermissions: { [role: string]: boolean } = {};
 
   if (canActiveUserChangeRoles) {
-    await fetch(`http://${BACKEND_URL}/get-all-permissions`)
+    await fetch(`${BACKEND_URL}/get-all-permissions`)
       .then((response) => {
         if (!response.ok) {
           throw new error(response.status, response.statusText);
@@ -34,9 +34,6 @@ export const load = (async ({ url, fetch, locals }) => {
           userPermissions[permission.toLowerCase()] =
             permissions.includes(permission);
         });
-      })
-      .catch((error) => {
-        console.error("Error fetching /get-all-permissions", error);
       });
   } else {
     permissions.forEach((permission) => {
@@ -144,7 +141,7 @@ export const actions = {
 
     let parametersString = "?" + params.toString();
 
-    await fetch(`http://${BACKEND_URL}/update-user` + parametersString, {
+    await fetch(`${BACKEND_URL}/update-user` + parametersString, {
       method: "POST",
     })
       .then((response) => {
@@ -156,11 +153,9 @@ export const actions = {
       .then((data) => {
         let time = new Date().toLocaleString();
         console.log(`${time} : ${data.message}`);
-      })
-      .catch((error) => {
-        console.error("Error fetching /update-user", error);
       });
-    // Redirect if the user was redirected to profile from some other page
+
+    // NOTE: Redirect if the user was redirected to profile from some other page
     if (source !== null) {
       throw redirect(307, source);
     }
