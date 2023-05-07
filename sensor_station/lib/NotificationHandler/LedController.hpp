@@ -83,6 +83,10 @@ class LedHandler {
 			if (passedTime > timeArray[durationIdx]) {
 				return 0;
 			}
+			DEBUG_PRINTF_POS(
+				3, "Time till next is %lu\n",
+				timeArray[durationIdx] - passedTime
+			);
 			return timeArray[durationIdx] - passedTime;
 		}
 
