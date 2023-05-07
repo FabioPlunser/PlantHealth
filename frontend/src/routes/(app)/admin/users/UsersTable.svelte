@@ -15,8 +15,8 @@
   import type { NodeJS } from "node:types";
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";
-  import { enhance } from "$app/forms";
   import HrefWithIcon from "./HrefWithIcon.svelte";
+  import FormActionButtonConfirm from "./FormActionButtonConfirm.svelte";
 
   let query =
     "((min-width: 481px) and (max-width: 1280px)) or (min-width: 1281px)";
@@ -87,6 +87,18 @@
         flexRender(HrefWithIcon, {
           href: `/profile?personId=${row.original.personId}&username=${row.originalusername}&userPermissions=${row.original.permissions}`,
           iconClass: "bi bi-pencil-square text-3xl hover:text-gray-500",
+        }),
+    },
+    {
+      accessorKey: "_", // NOTE: blanc accessor so we get the row
+      header: () => flexRender(TextCell, { text: "Delete" }),
+      cell: ({ row }) =>
+        flexRender(FormActionButtonConfirm, {
+          method: "POST",
+          action: "?/deleteUser",
+          formActionValue: row.original.personId,
+          confirmMessage: `You will delete this user ${row.original.username.toUpperCase()} permanently!`,
+          iconClass: "bi bi-trash text-3xl hover:text-red-500",
         }),
     },
   ];
@@ -221,7 +233,6 @@
                   {/if}
                 </th>
               {/each}
-              <th>DELETE</th>
             </tr>
           {/each}
         </thead>
@@ -240,31 +251,6 @@
                   </div>
                 </td>
               {/each}
-              <td class="table-cell">
-                <div>
-                  <label class="button">
-                    <!-- TODO make delete user action with verification Modal-->
-                    <!--on click should call deleteUser action and pass Id-->
-                    <form method="POST" action="?/deleteUser" use:enhance>
-                      <input
-                        type="hidden"
-                        bind:value={row.original.personId}
-                        name="personId"
-                      />
-                      <button
-                        type="submit"
-                        on:click={() => {
-                          return confirm(
-                            `You will delete this user ${row.original.username.toUpperCase()} permanently!`
-                          );
-                        }}
-                      >
-                        <i class="bi bi-trash text-3xl hover:text-red-500" />
-                      </button>
-                    </form>
-                  </label>
-                </div>
-              </td>
             </tr>
           {/each}
         </tbody>
