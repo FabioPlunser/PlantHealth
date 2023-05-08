@@ -1,16 +1,23 @@
-import type { Actions } from "./$types";
+import type { Actions, PageServerLoad } from "./$types";
 import { BACKEND_URL } from "$env/static/private";
 import { fail, redirect, error } from "@sveltejs/kit";
 import { z } from "zod";
 
-export async function load({ fetch, depends }) {
-  let res = await fetch(`${BACKEND_URL}/get-all-users`);
-  if (!res.ok) {
-    throw new error(res.error);
-  }
-  res = await res.json();
-  return { users: res.items };
-}
+export const load = (async ({ fetch, depends }) => {
+  let allUsers: User[];
+
+  await fetch(`${BACKEND_URL}/get-all-users`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new error(response.status, response.statusText);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      allUsers = data.items;
+    });
+  return { users: allUsers };
+}) satisfies PageServerLoad;
 
 const schema = z.object({
   username: z
@@ -41,78 +48,71 @@ const schema = z.object({
     .trim(),
 });
 
-// export const actions = {
-//   createUser: async ({ cookies, request, fetch, locals }) => {
-//     const formData = await request.formData();
-//     const zod = schema.safeParse(Object.fromEntries(formData));
+export const actions = {
+  createUser: async ({ request, fetch, locals }) => {
+    const formData = await request.formData();
+    const zod = schema.safeParse(Object.fromEntries(formData));
 
-//     if (formData.get("password") !== formData.get("passwordConfirm")) {
-//       return fail(400, { error: true, errors: "Passwords do not match" });
-//     }
+    if (formData.get("password") !== formData.get("passwordConfirm")) {
+      return fail(400, { error: true, errors: "Passwords do not match" });
+    }
 
-//     if (!zod.success) {
-//       // Loop through the errors array and create a custom errors array
-//       const errors = zod.error.errors.map((error) => {
-//         return {
-//           field: error.path[0],
-//           message: error.message,
-//         };
-//       });
+    if (!zod.success) {
+      // Loop through the errors array and create a custom errors array
+      const errors = zod.error.errors.map((error) => {
+        return {
+          field: error.path[0],
+          message: error.message,
+        };
+      });
 
-//       return fail(400, { error: true, errors });
-//     }
+      return fail(400, { error: true, errors });
+    }
 
-//     var requestOptions = {
-//       // change to PUT once backend is up to date
-//       method: "POST",
-//       body: formData,
-//     };
+    var requestOptions = {
+      // change to PUT once backend is up to date
+      method: "POST",
+      body: formData,
+    };
 
-//     await fetch(`${BACKEND_URL}/create-user`, requestOptions)
-//       .then((response) => {
-//         console.log(response);
-//         if (!response.ok) {
-//           throw new error(response.statusText);
-//         }
-//         return response.json();
-//       })
-//       .then((data) => {
-//         let time = new Date().toLocaleString();
-//         console.log(
-//           `${time} : Admin with id: ${locals.user.personId} and username: ${locals.user.username} created a new user`
-//         );
-//       })
-//       .catch((error) => {
-//         console.error("Error fetching /update-user", error);
-//       });
-//   },
+    await fetch(`${BACKEND_URL}/create-user`, requestOptions)
+      .then((response) => {
+        if (!response.ok) {
+          throw new error(response.status, response.statusText);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        let time = new Date().toLocaleString();
+        console.log(
+          `${time} : Admin with id: ${locals.user.personId} and username: ${locals.user.username} created a new user`
+        );
+      });
+  },
 
-//   deleteUser: async ({ fetch, request, locals }) => {
-//     const formData = await request.formData();
-//     let personId = formData.get("personId");
+  deleteUser: async ({ request, fetch, locals }) => {
+    const formData = await request.formData();
+    let personId = formData.get("personId");
 
-//     let params = new URLSearchParams();
-//     params.set("personId", personId);
+    let params = new URLSearchParams();
+    params.set("personId", personId);
 
-//     let parametersString = "?" + params.toString();
+    let parametersString = "?" + params.toString();
 
-//     await fetch(`${BACKEND_URL}/delete-user` + parametersString, {
-//       method: "DELETE",
-//     })
-//       .then((response) => {
-//         if (!response.ok) {
-//           throw new error(response.statusText);
-//         }
-//         return response.json();
-//       })
-//       .then((data) => {
-//         let time = new Date().toLocaleString();
-//         console.log(
-//           `${time} : Admin with id: ${locals.user.personId} and username: ${locals.user.username} deleted user with id: ${personId}`
-//         );
-//       })
-//       .catch((error) => {
-//         console.error("Error fetching /update-user", error);
-//       });
-//   },
-// } satisfies Actions;
+    await fetch(`${BACKEND_URL}/delete-user` + parametersString, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new error(response.status, response.statusText);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        let time = new Date().toLocaleString();
+        console.log(
+          `${time} : Admin with id: ${locals.user.personId} and username: ${locals.user.username} deleted user with id: ${personId}`
+        );
+      });
+  },
+} satisfies Actions;
