@@ -37,7 +37,7 @@ public class SensorStationController {
 			|| person.getPermissions().contains(Permission.GARDENER)) {
 			return new SensorStationsResponse(sensorStationService.findAll()).toEntity();
 		}
-		return new UserSensorStationsResponse(sensorStationService.findAll()).toEntity();
+		return new UserSensorStationsResponse(sensorStationService.findAll(), person).toEntity();
 	}
 
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})

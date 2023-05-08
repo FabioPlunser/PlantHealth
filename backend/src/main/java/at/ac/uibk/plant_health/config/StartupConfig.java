@@ -5,14 +5,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 
 import java.util.UUID;
 
-import at.ac.uibk.plant_health.models.device.AccessPoint;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
-import at.ac.uibk.plant_health.service.AccessPointService;
 import at.ac.uibk.plant_health.service.PersonService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,9 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 public class StartupConfig {
 	@Autowired
 	private PersonService personService;
-
-	@Autowired
-	private AccessPointService accessPointService;
 
 	/**
 	 * Injected Name of the Active Profile specified in the Application
