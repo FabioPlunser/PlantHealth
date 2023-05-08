@@ -31,9 +31,9 @@ public class SensorData implements Serializable {
 	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	private LocalDateTime timeStamp;
 
-	@JdbcTypeCode(SqlTypes.DOUBLE)
+	@JdbcTypeCode(SqlTypes.FLOAT)
 	@Column(name = "sensor_value", nullable = false)
-	private double value;
+	private float value;
 
 	@JdbcTypeCode(SqlTypes.BOOLEAN)
 	@Column(name = "above_limit", nullable = false)
@@ -61,7 +61,7 @@ public class SensorData implements Serializable {
 	private boolean isDeleted = false;
 
 	public SensorData(
-			LocalDateTime timeStamp, double value, boolean above, boolean below, char alarm,
+			LocalDateTime timeStamp, float value, boolean above, boolean below, char alarm,
 			Sensor sensor, SensorStation sensorStation
 	) {
 		this.timeStamp = timeStamp;

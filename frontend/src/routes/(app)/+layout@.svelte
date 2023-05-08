@@ -7,7 +7,7 @@
 </script>
 
 <Toaster />
-<Nav user={data.permissions} />
+<Nav user={data?.permission} />
 <PageTransition url={$page.url.pathname}>
   <main class="mx-4 h-screen">
     <slot />

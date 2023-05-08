@@ -22,13 +22,17 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
+import at.ac.uibk.plant_health.models.device.AccessPoint;
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.plant.Sensor;
 import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
+import at.ac.uibk.plant_health.service.AccessPointService;
 import at.ac.uibk.plant_health.service.PersonService;
 import at.ac.uibk.plant_health.service.SensorStationPersonReferenceService;
 import at.ac.uibk.plant_health.service.SensorStationService;
@@ -45,6 +49,8 @@ public class TestDashBoardController {
 	private PersonService personService;
 	@Autowired
 	private SensorStationService sensorStationService;
+	@Autowired
+	private AccessPointService accessPointService;
 	@Autowired
 	private SensorStationPersonReferenceService sensorStationPersonReferenceService;
 	@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
@@ -65,18 +71,24 @@ public class TestDashBoardController {
 		return (Person
 		) MockAuthContext.setLoggedInUser(personService.login(username, password).orElse(null));
 	}
-	@Disabled
 	@Test
 	public void getPlantsOnDashboard() throws Exception {
 		Person person = createUserAndLogin(false);
+
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
+
 		SensorStation s1 = new SensorStation(StringGenerator.macAddress(), 1);
 		SensorStation s2 = new SensorStation(StringGenerator.macAddress(), 2);
 
 		s1.setName("SensorStation 1");
 		s2.setName("SensorStation 2");
+		accessPointService.foundNewSensorStation(accessPoint, List.of(s1, s2));
 
-		sensorStationService.save(s1);
-		sensorStationService.save(s2);
+		s1 = sensorStationService.findByBdAddress(s1.getBdAddress());
+		s2 = sensorStationService.findByBdAddress(s2.getBdAddress());
 
 		sensorStationPersonReferenceService.addPlantToDashboard(person, s1);
 		sensorStationPersonReferenceService.addPlantToDashboard(person, s2);
@@ -90,19 +102,14 @@ public class TestDashBoardController {
 										AuthGenerator.generateToken(person))
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(
-						status().isOk(), jsonPath("$.plants").isArray(),
+						status().isOk(), jsonPath("$.sensorStations").isArray(),
 
-						jsonPath("$.plants[0]").exists(), jsonPath("$.plants[1]").exists(),
-						jsonPath("$.plants[2]").doesNotExist(),
+						jsonPath("$.sensorStations[0]").exists(),
+						jsonPath("$.sensorStations[1]").exists(),
+						jsonPath("$.sensorStations[2]").doesNotExist(),
 
-						jsonPath("$.plants[0].plant-name").value(nameMatcher),
-						jsonPath("$.plants[1].plant-name").value(nameMatcher),
-
-						jsonPath("$.plants[0].values").isArray(),
-						jsonPath("$.plants[0].values").isEmpty(),
-
-						jsonPath("$.plants[1].values").isArray(),
-						jsonPath("$.plants[1].values").isEmpty()
+						jsonPath("$.sensorStations[0].name").value(nameMatcher),
+						jsonPath("$.sensorStations[1].name").value(nameMatcher)
 				);
 	}
 
@@ -177,20 +184,26 @@ public class TestDashBoardController {
 				);
 	}
 
-	@Disabled
 	@Test
 	public void addPlantToDashboard() throws Exception {
 		Person person = createUserAndLogin(false);
-		SensorStation s1 = new SensorStation(StringGenerator.macAddress(), 1);
 
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
+
+		SensorStation s1 = new SensorStation(StringGenerator.macAddress(), 1);
+		accessPointService.foundNewSensorStation(accessPoint, List.of(s1));
+
+		s1 = sensorStationService.findByBdAddress(s1.getBdAddress());
 		s1.setName("SensorStation 1");
-		sensorStationService.save(s1);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/add-to-dashboard")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(person))
-								.param("plant-id", s1.getDeviceId().toString())
+								.param("sensorStationId", s1.getDeviceId().toString())
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
@@ -203,12 +216,19 @@ public class TestDashBoardController {
 		assertEquals(s1.getDeviceId(), references.get(0).getSensorStation().getDeviceId());
 	}
 
-	@Disabled
 	@Test
 	public void removePlantFromDashboard() throws Exception {
 		Person person = createUserAndLogin(false);
-		SensorStation s1 = new SensorStation(StringGenerator.macAddress(), 1);
 
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
+
+		SensorStation s1 = new SensorStation(StringGenerator.macAddress(), 1);
+		accessPointService.foundNewSensorStation(accessPoint, List.of(s1));
+
+		s1 = sensorStationService.findByBdAddress(s1.getBdAddress());
 		s1.setName("SensorStation 1");
 		sensorStationService.save(s1);
 
@@ -218,7 +238,7 @@ public class TestDashBoardController {
 								.header(HttpHeaders.USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(person))
-								.param("plant-id", s1.getDeviceId().toString())
+								.param("sensorStationId", s1.getDeviceId().toString())
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
