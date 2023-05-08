@@ -27,9 +27,8 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 
 @Component
-@Profile("!PROD & !PRODUCTION & !TEST")
+@Profile("!prod & !test & !Prod & !Test & !PROD & !TEST")
 public class DumpConfig {
-
     @Autowired
     private PersonService personService;
     @Autowired
