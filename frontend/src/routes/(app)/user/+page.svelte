@@ -1,7 +1,6 @@
 <script lang="ts">
   import SensorstationModal from "./SensorstationModal.svelte";
   import SensorStation from "$lib/components/ui/SensorStation/SensorStation.svelte";
-  import Grid from "./Grid.svelte";
   //---------------------------------------------------
   export let data;
   //---------------------------------------------------
