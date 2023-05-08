@@ -9,66 +9,82 @@
     getPaginationRowModel,
   } from "@tanstack/svelte-table";
   import { writable } from "svelte/store";
-  import RolePills from "./RolePills.svelte";
-  import Edit from "$lib/assets/icons/edit.svg?component";
-  import TextCell from "./TextCell.svelte";
   import SortSymbol from "./SortSymbol.svelte";
   import type { NodeJS } from "node:types";
-  import Input from "$lib/components/ui/Input.svelte";
-  import { page } from "$app/stores";
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";
-  import { enhance } from "$app/forms";
 
+  let query = "(min-width: 580px)";
   let isRendered = false;
+  let mql;
+  let mqlListener;
+  let wasMounted = false;
+  let isMediaNotMobile = false;
 
   onMount(() => {
     isRendered = true;
+    wasMounted = true;
+    return () => {
+      removeActiveListener();
+    };
   });
 
-  type User = {
-    personId: string;
-    username: string;
-    token: string;
-    permissions: string[];
-    email: string;
-  };
+  $: {
+    if (wasMounted) {
+      removeActiveListener();
+      addNewListener(query);
+    }
+  }
 
-  export let users: User[];
+  function addNewListener(query) {
+    mql = window.matchMedia(query);
+    mqlListener = (v) => (isMediaNotMobile = v.matches);
+    mql.addListener(mqlListener);
+    isMediaNotMobile = mql.matches;
+  }
 
-  $: console.log(users);
+  function removeActiveListener() {
+    if (mql && mqlListener) {
+      mql.removeListener(mqlListener);
+    }
+  }
 
-  const defaultColumns: ColumnDef<User>[] = [
-    {
-      accessorKey: "username",
-      header: () => flexRender(TextCell, { text: "Username" }),
-      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
-    },
-    {
-      accessorKey: "email",
-      header: () => flexRender(TextCell, { text: "Email" }),
-      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
-    },
-    {
-      accessorKey: "permissions",
-      header: () => flexRender(TextCell, { text: "Permissions" }),
-      cell: (info) => flexRender(RolePills, { roles: info.getValue() }),
-    },
-  ];
+  /**
+   * Array\<T\> where T is the datatype of the object to be displayed
+   */
+  export let data;
+  /**
+   * Array\<ColumnDef\<T\>\> where T is the datatype of the object to be displayed
+   */
+  export let columns;
+  /**
+   * column visibility if media is not mobile
+   * @default {}
+   * @type {ColumnVisibility}
+   */
+  export let defaultColumnVisibility: ColumnVisibility = {};
+  /**
+   * column visibility if media is mobile
+   * @type {ColumnVisibility}
+   */
+  export let mobileColumnVisibility: ColumnVisibility;
+
+  $: columnVisibility = isMediaNotMobile
+    ? defaultColumnVisibility
+    : mobileColumnVisibility;
 
   let globalFilter = "";
 
-  let options;
-
   $: options = writable<TableOptions<User>>({
-    data: users,
-    columns: defaultColumns,
+    data,
+    columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     state: {
       globalFilter,
+      columnVisibility,
       pagination: {
         pageSize: 5,
         pageIndex: 0,
@@ -147,7 +163,7 @@
       />
     </div>
     <div in:slide={{ duration: 400, axis: "y" }}>
-      <table class="table border-white w-full">
+      <table class="table table-auto w-full">
         <thead class="">
           {#each $table.getHeaderGroups() as headerGroup}
             <tr>
@@ -168,14 +184,9 @@
                       />
                       <SortSymbol isSorted={header.column.getIsSorted()} />
                     </div>
-                    <!--
-                  <SortDown class="dark:fill-white fill-black"/>
-                -->
                   {/if}
                 </th>
               {/each}
-              <th>EDIT</th>
-              <th>DELETE</th>
             </tr>
           {/each}
         </thead>
@@ -194,31 +205,6 @@
                   </div>
                 </td>
               {/each}
-              <td class="table-cell">
-                <a
-                  href={`/profile?personId=${row.original.personId}&username=${row.original.username}&userPermissions=${row.original.permissions}&source=${$page.url}`}
-                >
-                  <i class="bi bi-pencil-square text-3xl hover:text-gray-500" />
-                </a>
-              </td>
-              <td class="table-cell">
-                <div>
-                  <label class="button">
-                    <!-- TODO make delete user action with verification Modal-->
-                    <!--on click should call deleteUser action and pass Id-->
-                    <form method="POST" action="?/deleteUser" use:enhance>
-                      <input
-                        type="hidden"
-                        bind:value={row.original.personId}
-                        name="personId"
-                      />
-                      <button type="submit" class="">
-                        <i class="bi bi-trash text-3xl hover:text-red-500" />
-                      </button>
-                    </form>
-                  </label>
-                </div>
-              </td>
             </tr>
           {/each}
         </tbody>
@@ -244,9 +230,8 @@
         {"<"}
       </button>
       <span class="btn">
-        Page
         {$table.getState().pagination.pageIndex + 1}
-        {" "}of{" "}
+        /
         {$table.getPageCount()}
       </span>
       <button
@@ -266,20 +251,22 @@
       >
         {">>"}
       </button>
-      <select
-        value={$table.getState().pagination.pageSize}
-        on:change={setPageSize}
-        class="btn"
-      >
-        {#each [5, 10, 25, 50] as pageSize}
-          <option value={pageSize}>
-            Show {pageSize}
-          </option>
-        {/each}
-      </select>
-      <span class="btn"
-        >{$table.getPrePaginationRowModel().rows.length} total Rows</span
-      >
+      {#if isMediaNotMobile}
+        <select
+          value={$table.getState().pagination.pageSize}
+          on:change={setPageSize}
+          class="btn"
+        >
+          {#each [5, 10, 20] as pageSize}
+            <option value={pageSize}>
+              Show {pageSize}
+            </option>
+          {/each}
+        </select>
+        <span class="btn">
+          {$table.getPrePaginationRowModel().rows.length} total Rows
+        </span>
+      {/if}
     </div>
   </div>
 {/if}

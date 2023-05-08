@@ -11,7 +11,7 @@ export async function load({ locals, fetch }) {
 
   let sensorStations = res?.sensorStations;
 
-  for (let foundSensorStation of res?.sensorStations) {
+  /*for (let foundSensorStation of res?.sensorStations) {
     // console.log("foundSensorStation", foundSensorStation);
     foundSensorStation.picture = new Promise(async (resolve, reject) => {
       let res = await fetch(
@@ -33,10 +33,10 @@ export async function load({ locals, fetch }) {
     sensorStations[sensorStations.indexOf(foundSensorStation)] =
       foundSensorStation;
   }
-
+*/
   let dashboard = await fetch(`${BACKEND_URL}/get-dashboard`);
   dashboard = await dashboard.json();
-
+  /*
   for (let sensorStation of dashboard?.sensorStations) {
     console.log("sensorStation", sensorStation);
     // let pictures = [];
@@ -86,7 +86,7 @@ export async function load({ locals, fetch }) {
   }
 
   // console.log("dashboard", dashboard);
-
+*/
   return {
     dashboard,
     sensorStations: sensorStations,
