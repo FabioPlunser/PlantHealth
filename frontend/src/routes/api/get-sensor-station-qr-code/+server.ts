@@ -16,6 +16,7 @@ type QrCodePdfData = {
   plantName: string;
   logoBase64: string;
   qrcodeBase64: string;
+  sensorStationId: string;
   url: string;
 };
 
@@ -42,6 +43,7 @@ export async function GET({ url }: RequestEvent) {
     plantName,
     logoBase64,
     qrcodeBase64,
+    sensorStationId,
     url: URL,
   };
 
@@ -93,8 +95,10 @@ function generateQrCodePdfBlob(data: QrCodePdfData): Blob {
   pdf.addImage(data.qrcodeBase64, "PNG", x4, 75, 50, 50);
 
   pdf.setFontSize(6);
-  let x5 = pdf.internal.pageSize.width / 2 - pdf.getTextWidth(data.url) / 2;
-  pdf.text(data.url, x5, 135);
+  let x5 =
+    pdf.internal.pageSize.width / 2 -
+    pdf.getTextWidth(data.sensorStationId) / 2;
+  pdf.text(`ID = ${data.sensorStationId}`, x5, 135);
 
   return pdf.output("blob");
 }
