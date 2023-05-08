@@ -74,18 +74,18 @@ class NotificationHandler {
 					break;
 				case SensorErrors::Type::AirPressureError:
 					priority = errorStatus == SensorErrors::Status::High
-								   ? AIR_TEMPERATURE_TO_HIGH_PRIORITY
-								   : AIR_TEMPERATURE_TO_LOW_PRIORITY;
-					break;
-				case SensorErrors::Type::AirQualityError:
-					priority = errorStatus == SensorErrors::Status::High
 								   ? AIR_PRESSURE_TO_HIGH_PRIORITY
 								   : AIR_PRESSURE_TO_LOW_PRIORITY;
 					break;
-				case SensorErrors::Type::AirTemperatureError:
+				case SensorErrors::Type::AirQualityError:
 					priority = errorStatus == SensorErrors::Status::High
 								   ? AIR_QUALITY_TO_HIGH_PRIORITY
 								   : AIR_QUALITY_TO_LOW_PRIORITY;
+					break;
+				case SensorErrors::Type::AirTemperatureError:
+					priority = errorStatus == SensorErrors::Status::High
+								   ? AIR_TEMPERATURE_TO_HIGH_PRIORITY
+								   : AIR_TEMPERATURE_TO_LOW_PRIORITY;
 					break;
 				case SensorErrors::Type::SoilHumidityError:
 					priority = errorStatus == SensorErrors::Status::High
@@ -94,8 +94,8 @@ class NotificationHandler {
 					break;
 				case SensorErrors::Type::LightIntensityError:
 					priority = errorStatus == SensorErrors::Status::High
-								   ? AIR_HUMIDITY_TO_HIGH_PRIORITY
-								   : AIR_HUMIDITY_TO_LOW_PRIORITY;
+								   ? LUMINOSITY_TO_HIGH_PRIORITY
+								   : LUMINOSITY_TO_LOW_PRIORITY;
 					break;
 				default:
 					break;

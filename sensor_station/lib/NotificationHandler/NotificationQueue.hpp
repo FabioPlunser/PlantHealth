@@ -21,17 +21,22 @@ class NotificationQueue {
 		NotificationQueue(NotificationQueue &)			   = delete;
 
 		static NotificationQueue * getNotificationQueue() {
+			DEBUG_PRINT_POS(4, "\n");
 			static NotificationQueue notificationQueue;
 			return &notificationQueue;
 		}
 
 	public:
-		bool isEmpty() { return this->queue.empty(); }
+		bool isEmpty() {
+			DEBUG_PRINT_POS(4, "\n");
+			return this->queue.empty();
+		}
 
 		/**
 		 * @return: The error with top priority after adding the error.
 		 */
 		const Notification & addError(Notification & notification) {
+			DEBUG_PRINT_POS(4, "\n");
 			Notification * queueElement;
 			switch (notification.getNotificationType()) {
 				case Notification::NotificationType::SENSOR_ERROR:
@@ -50,10 +55,12 @@ class NotificationQueue {
 		}
 
 		const Notification * getPrioritisedNotification() const {
+			DEBUG_PRINT_POS(4, "\n");
 			return queue.top();
 		}
 
 		void deletePrioritisedNotification() {
+			DEBUG_PRINT_POS(4, "\n");
 			const Notification * notificationToDelete = queue.top();
 			queue.pop();
 			delete (notificationToDelete);
@@ -61,12 +68,16 @@ class NotificationQueue {
 		}
 
 		void clearAllErrors() {
+			DEBUG_PRINT_POS(4, "\n");
 			while (!queue.empty()) {
 				deletePrioritisedNotification();
 			}
 		}
 
-		uint8_t getSize() { return queue.size(); }
+		uint8_t getSize() {
+			DEBUG_PRINT_POS(4, "\n");
+			return queue.size();
+		}
 
 		/**
 		 * Deletes all errors that are the same as toDelete in the error queue
@@ -76,6 +87,7 @@ class NotificationQueue {
 		 * @return Number of elements deleted
 		 */
 		uint8_t deleteErrorFromQueue(Notification & toDelete) {
+			DEBUG_PRINT_POS(4, "\n");
 			// List to store the values we don't wand to delete.
 			std::list<const Notification *> list;
 			uint8_t numDeleted = 0;
@@ -114,8 +126,8 @@ class NotificationQueue {
 					} else {
 						list.push_front(topError);
 					}
-					queue.pop();
 				}
+				queue.pop();
 			}
 			while (list.size() > 0) {
 				queue.push(list.front());
@@ -131,6 +143,7 @@ class NotificationQueue {
 		 * @return Number of errors deleted.
 		 */
 		uint8_t deleteErrorFromQueue(SensorErrors::Type errorType) {
+			DEBUG_PRINT_POS(4, "\n");
 			// List to store the values we don't wand to delete.
 			decltype(queue) newQueue;
 			uint8_t numDeleted = 0;

@@ -61,16 +61,6 @@ class ValueAccumulatorClass {
 			lastUpdate				 = timeStamp;
 			accumulatedWeightedValue += value * weight;
 			totalWeights			 += weight;
-			DEBUG_PRINTF_POS(
-				3,
-				"Value was %lf. Weight = %lf. Accumulated weighted value is "
-				"now %lf. Total weight is now %lf\n",
-				value, weight, accumulatedWeightedValue, totalWeights
-			);
-			DEBUG_PRINTF_POS(
-				3, "Mean would now be %lf.\n",
-				accumulatedWeightedValue / totalWeights
-			);
 		}
 
 		double getTotalWeight() { return this->totalWeights; }
