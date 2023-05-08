@@ -67,7 +67,7 @@ class Sensor:
     # determined by GATT characteristic UUID
     VALUE_FIELD_SPECIFICATIONS : dict[str, tuple[ScalarField, str]]= {
         '2a6f': (ScalarField(1, -2, 0, 2, min=0.0, max=100.0), '%'),
-        '2a6d': (ScalarField(1, -1, 0, 4), 'Pa'),
+        '2a6d': (ScalarField(1, -3, 0, 4), 'hPa'), # GATT standard: Pa, but hPa better for UI
         '2b0d': (ScalarField(1, 0, -1, 1, min=-64.0, max=63.0), '°C'),
         '2b04': (ScalarField(1, 0, -1, 1, min=0.0, max=100.0), '%'),
         '2aff': (ScalarField(1, 0, 0, 2, min=0.0, max=65534.0), 'lm')
