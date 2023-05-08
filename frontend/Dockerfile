@@ -9,6 +9,7 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install 
 
 COPY . ./
+COPY ./.env ./.env
 RUN pnpm run build
 
 EXPOSE 3000
