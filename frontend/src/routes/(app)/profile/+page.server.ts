@@ -6,10 +6,10 @@ import { z } from "zod";
 let personId: string;
 let source: string | null;
 
-export const load = (async ({ url, fetch, locals }) => {
+export const load = (async ({ request, url, fetch, locals }) => {
   personId = url.searchParams.get("personId") ?? locals.user.personId;
   let username = url.searchParams.get("username") ?? locals.user.username;
-  source = url.searchParams.get("source");
+  source = request.headers.get("referer");
 
   let permissions =
     url.searchParams.get("userPermissions")?.split(",") ??
@@ -156,7 +156,6 @@ export const actions = {
       });
 
     // NOTE: Redirect if the user was redirected to profile from some other page
-    console.log(request.headers.get("referer"));
     if (source !== null) {
       throw redirect(307, source);
     }
