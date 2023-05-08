@@ -2,7 +2,6 @@
   import { enhance } from "$app/forms";
   import FormError from "$helper/formError.svelte";
   import Input from "$components/ui/Input.svelte";
-  import CheckRing from "$lib/assets/icons/checkRing.svg?component";
   import BooleanButton from "$lib/components/ui/BooleanButton.svelte";
   import toast from "$components/toast";
   import PasswordInput from "$lib/components/ui/PasswordInput.svelte";
@@ -17,20 +16,22 @@
     isRendered = true;
   });
 
-  const isDisabled: boolean = !data.isActiveUserAdmin;
+  const isDisabled: boolean = !data.canActiveUserChangeRoles;
 
   export let form;
 
-  let roles: string[] = Array.from(Object.keys(data.userPermissions));
-</script>
+  let password: string;
+  let passwordConfirm: string;
+  let email: string;
 
-<h1>Profile</h1>
+  let roles: string[] = Array.from(Object.keys(data.permissions));
+</script>
 
 {#if isRendered}
   <section class="w-full">
     <form
       method="POST"
-      action="?/profile"
+      action="?/updateUser"
       class="flex justify-center"
       use:enhance
     >
@@ -46,21 +47,35 @@
         <Input
           type="email"
           field="email"
-          label="Email"
+          label="New Email"
           placeholder="example.mail@planthealth.com"
-          value={data.userEmail}
+          value={email}
         />
         <FormError field="email" {form} />
-        <PasswordInput field="password" value={data.userPassword} />
+        <PasswordInput
+          field="password"
+          label="New Password"
+          placeholder="Password"
+          value={password}
+        />
 
         <FormError field="password" {form} />
+
+        <PasswordInput
+          field="passwordConfirm"
+          label="Confirm Password"
+          placeholder="Confirm Password"
+          value={passwordConfirm}
+        />
+        <FormError field="passwordConfirm" {form} />
         <div class="mt-6">
           <ul class="grid w-full gap-6 md:grid-rows-3">
             {#each roles as role}
               <li class="" in:slide={{ duration: 400, axis: "x" }}>
                 <BooleanButton
+                  field={`permission[${role}]`}
                   text={role}
-                  bind:bool={data.userPermissions[role]}
+                  bind:bool={data.permissions[role]}
                   disabled={isDisabled}
                 />
               </li>
@@ -68,11 +83,14 @@
           </ul>
         </div>
         <div class="flex justify-center mt-6">
+          <!-- TODO if admin came from admin/users redirect back to it-->
           <button
             type="submit"
             class="btn btn-primary"
-            in:slide={{ duration: 400, axis: "x" }}>submit</button
+            in:slide={{ duration: 400, axis: "x" }}
           >
+            submit
+          </button>
         </div>
       </div>
     </form>

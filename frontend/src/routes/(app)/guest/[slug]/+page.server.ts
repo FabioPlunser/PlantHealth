@@ -1,8 +1,6 @@
 import { BACKEND_URL } from "$env/static/private";
 import type { Actions } from "./$types";
-import { sleep } from "$helper/sleep";
 
-import fs from "fs";
 export async function load({ locals, params, url, fetch }) {
   let error = "";
 
@@ -43,7 +41,6 @@ export async function load({ locals, params, url, fetch }) {
         let buffer = Buffer.from(arrayBuffer);
         let encodedImage =
           "data:image/" + res.type + ";base64," + buffer.toString("base64");
-
         let picture: Picture = {
           imageRef: "",
           creationDate: new Date(),
@@ -54,7 +51,6 @@ export async function load({ locals, params, url, fetch }) {
         picture.pictureId = possiblePicture.pictureId;
         pictures.push(picture);
       }
-      // await sleep(50);
       return pictures;
     } catch (e) {
       error = e.message;

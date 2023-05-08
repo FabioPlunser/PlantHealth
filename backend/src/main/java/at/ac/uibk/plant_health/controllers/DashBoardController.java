@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
+import at.ac.uibk.plant_health.models.exceptions.ServiceException;
 import at.ac.uibk.plant_health.models.rest_responses.*;
 import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.service.PersonService;
@@ -29,41 +30,53 @@ public class DashBoardController {
 	}
 
 	@PrincipalRequired(Person.class)
-	@RequestMapping(value = "/add-to-dashboard", method = {RequestMethod.PUT, RequestMethod.POST})
-	public RestResponseEntity addPlantToDashboard(
-			Person person, @RequestParam("plant-id") final UUID plantId
-	) {
-		//		var maybeSensorStation = this.sensorStationService.findById(plantId);
-		//		if (
-		//			maybeSensorStation.isPresent() &&
-		//			this.sensorStationPersonReferenceService.addPlantToDashboard(
-		//				person, maybeSensorStation.get()
-		//		)) {
-		//			return MessageResponse.builder().ok().toEntity();
-		//
-		//		}
-		//
-		//		return MessageResponse.builder().notFound().message("Could not find
-		// Plant").toEntity();
-		throw new NotImplementedException("Need to rethink this");
+	@GetMapping("/get-dashboard")
+	public RestResponseEntity getDashboard(Person person) {
+		return new DashBoardDataResponse(person).toEntity();
 	}
 
 	@PrincipalRequired(Person.class)
-	@DeleteMapping(value = "/remove-from-dashboard")
-	public RestResponseEntity removeFromDashboard(
-			Person person, @RequestParam("plant-id") final UUID plantId
+	@RequestMapping(value = "/add-to-dashboard", method = {RequestMethod.PUT, RequestMethod.POST})
+	public RestResponseEntity addPlantToDashboard(
+			Person person, @RequestParam("sensorStationId") final UUID sensorStationId
 	) {
-		//		var maybeSensorStation = this.sensorStationService.findById(plantId);
-		//		if (
-		//			maybeSensorStation.isPresent() &&
-		//			this.sensorStationPersonReferenceService.removePlantFromDashboard(
-		//				person, maybeSensorStation.get()
-		//		)) {
-		//			return MessageResponse.builder().ok().toEntity();
-		//		}
-		//
-		//		return MessageResponse.builder().notFound().message("Could not find
-		// Plant").toEntity();
-		throw new NotImplementedException("Need to rethink this");
+		try {
+			sensorStationPersonReferenceService.addPlantToDashboard(
+					person, sensorStationService.findById(sensorStationId)
+			);
+			return MessageResponse.builder()
+					.statusCode(200)
+					.message("Successfully added sensor station to dashboard")
+					.toEntity();
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
+	}
+
+	@PrincipalRequired(Person.class)
+	@RequestMapping(
+			value = "/remove-from-dashboard", method = {RequestMethod.DELETE, RequestMethod.POST}
+	)
+	public RestResponseEntity
+	removeFromDashboard(
+			Person person, @RequestParam("sensorStationId") final UUID sensorStationId
+	) {
+		try {
+			sensorStationPersonReferenceService.removePlantFromDashboard(
+					person, sensorStationService.findById(sensorStationId)
+			);
+			return MessageResponse.builder()
+					.statusCode(200)
+					.message("Successfully removed sensor station from dashboard")
+					.toEntity();
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
 	}
 }

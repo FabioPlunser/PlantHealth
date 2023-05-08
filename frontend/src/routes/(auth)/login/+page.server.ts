@@ -40,14 +40,7 @@ export const actions = {
       body: formData,
     };
 
-    let res = null;
-    try {
-      res = await fetch(`${BACKEND_URL}/login`, requestOptions);
-    } catch (error) {
-      console.log("login", error);
-      return fail(503, { message: "Server connection refused" });
-      return { success: false };
-    }
+    let res = await fetch(`${BACKEND_URL}/login`, requestOptions);
 
     if (res.status >= 200 && res.status < 300) {
       res = await res.json();

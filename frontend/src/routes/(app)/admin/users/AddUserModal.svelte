@@ -4,6 +4,7 @@
   import FormError from "$lib/helper/formError.svelte";
   import type { ActionData } from "./$types";
   import { enhance } from "$app/forms";
+  import { invalidate } from "$app/navigation";
 
   export let showModal: boolean;
   export let form: ActionData;
@@ -27,17 +28,27 @@
     <Input field="passwordConfirm" type="password" label="Confirm password" />
     <FormError field="passwordConfirm" {form} />
 
-    <label class="label">
+    <label class="label" for="permissions">
       <span class="label-text font-bold">Permission</span>
     </label>
-    <select name="permissions" class="select w-full text-white bg-gray-800">
+    <select
+      name="permissions"
+      class="select w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
+    >
       <option selected>USER</option>
       <option>GARDENER</option>
       <option>ADMIN</option>
     </select>
 
     <div class="flex justify-between mt-4">
-      <button type="submit" class="btn btn-primary">Add User</button>
+      <!-- TODO: modal should not close if input validation failed-->
+      <button
+        type="submit"
+        on:click={() => {
+          invalidate("all-users:load");
+        }}
+        class="btn btn-primary">Add User</button
+      >
       <button class="btn btn-info" on:click={() => (showModal = false)}
         >Close</button
       >

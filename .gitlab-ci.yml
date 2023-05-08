@@ -61,9 +61,6 @@ javaTest-job: # This job runs in the test stage.
     - echo "Running unit tests..."
     - cd backend && mvn test
   allow_failure: false
-  only:
-    - dev-backend
-    - dev
 
 javaSonarCheck-job:
   image: alpine:3.17

@@ -3,15 +3,20 @@ import { BACKEND_URL } from "$env/static/private";
 import { fail, redirect, error } from "@sveltejs/kit";
 import { z } from "zod";
 
-export const load = (async ({ fetch }) => {
-  let res = await fetch(`${BACKEND_URL}/get-all-users`);
-  let res_json = await res.json();
-  if (res?.ok) {
-    console.log("SUCCESS");
-    return { success: true, users: res_json.items };
-  } else if (!res.ok) {
-    return { success: false, message: res_json.message };
-  }
+export const load = (async ({ fetch, depends }) => {
+  let allUsers: User[];
+
+  await fetch(`${BACKEND_URL}/get-all-users`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new error(response.status, response.statusText);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      allUsers = data.items;
+    });
+  return { users: allUsers };
 }) satisfies PageServerLoad;
 
 const schema = z.object({
@@ -44,10 +49,9 @@ const schema = z.object({
 });
 
 export const actions = {
-  createUser: async ({ cookies, request, fetch, event }) => {
+  createUser: async ({ request, fetch, locals }) => {
     const formData = await request.formData();
     const zod = schema.safeParse(Object.fromEntries(formData));
-    console.log(formData);
 
     if (formData.get("password") !== formData.get("passwordConfirm")) {
       return fail(400, { error: true, errors: "Passwords do not match" });
@@ -66,33 +70,49 @@ export const actions = {
     }
 
     var requestOptions = {
+      // change to PUT once backend is up to date
       method: "POST",
       body: formData,
     };
 
-    let res = await fetch(`${BACKEND_URL}/create-user`, requestOptions);
-    res = await res.json();
+    await fetch(`${BACKEND_URL}/create-user`, requestOptions)
+      .then((response) => {
+        if (!response.ok) {
+          throw new error(response.status, response.statusText);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        let time = new Date().toLocaleString();
+        console.log(
+          `${time} : Admin with id: ${locals.user.personId} and username: ${locals.user.username} created a new user`
+        );
+      });
   },
 
-  updateUser: async ({ fetch, event }) => {
-    const formData = new FormData();
-  },
+  deleteUser: async ({ request, fetch, locals }) => {
+    const formData = await request.formData();
+    let personId = formData.get("personId");
 
-  deleteUser: async ({ fetch, event }) => {
-    const formData = new FormData();
-    formData.append("id", event.query.get("id"));
+    let params = new URLSearchParams();
+    params.set("personId", personId);
 
-    var requestOptions = {
-      method: "POST",
-      body: formData,
-    };
+    let parametersString = "?" + params.toString();
 
-    let res = await fetch(`${BACKEND_URL}/delete-user`, requestOptions);
-
-    res = await res.json();
-
-    if (res.success) {
-      // throw redirect(302, "/");
-    }
+    await fetch(`${BACKEND_URL}/delete-user` + parametersString, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new error(response.status, response.statusText);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        let time = new Date().toLocaleString();
+        console.log(
+          `${time} : Admin with id: ${locals.user.personId} and username: ${locals.user.username} deleted user with id: ${personId}`
+        );
+      });
   },
 } satisfies Actions;

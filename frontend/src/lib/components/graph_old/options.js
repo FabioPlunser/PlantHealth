@@ -20,8 +20,8 @@ export let darkOptions = {
         color: "white",
       },
       grid: {
-          color: "white",
-        },
+        color: "white",
+      },
     },
     y: {
       ticks: {
@@ -56,8 +56,8 @@ export let lightOptions = {
         color: "#abaaa9",
       },
       grid: {
-          color: "#abaaa9",
-        },
+        color: "#abaaa9",
+      },
     },
     y: {
       ticks: {
