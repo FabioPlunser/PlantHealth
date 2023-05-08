@@ -16,7 +16,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Getter
 public class SensorStationDataResponse extends RestResponse implements Serializable {
-	private final List<InnerSensors> sensors;
+	private final List<InnerSensors> data;
+	private final List<SensorData> allData;
 	private final UUID sensorStationId;
 
 	public SensorStationDataResponse(
@@ -24,16 +25,17 @@ public class SensorStationDataResponse extends RestResponse implements Serializa
 	) {
 		this.sensorStationId = sensorStation.getDeviceId();
 
-		this.sensors = sensorStation.getSensorData()
-							   .stream()
-							   .filter(data
-									   -> data.getTimeStamp().isAfter(from)
-											   && data.getTimeStamp().isBefore(to))
-							   .collect(groupingBy(SensorData::getSensor))
-							   .entrySet()
-							   .stream()
-							   .map(InnerSensors::new)
-							   .toList();
+		this.data = sensorStation.getSensorData()
+							.stream()
+							.filter(data
+									-> data.getTimeStamp().isAfter(from)
+											&& data.getTimeStamp().isBefore(to))
+							.collect(groupingBy(SensorData::getSensor))
+							.entrySet()
+							.stream()
+							.map(InnerSensors::new)
+							.toList();
+		this.allData = sensorStation.getSensorData();
 	}
 
 	@Getter

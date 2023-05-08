@@ -325,6 +325,7 @@ public class TestAccessPointController {
 		for (int i = 0; i < sensorStationsCount; i++) {
 			String BdAddress = StringGenerator.macAddress();
 			SensorStation sS = new SensorStation(BdAddress, 255 - i);
+			sS.setUnlocked(true);
 			sensorStationService.save(sS);
 
 			ObjectNode sensorStation = mapper.createObjectNode();
