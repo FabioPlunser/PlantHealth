@@ -99,7 +99,7 @@ public class DumpConfig {
 
                 s.setSensorLimits(sensors.stream().map(sensor -> {
                     var sl = new SensorLimits(
-                            LocalDateTime.now(), (float) i, (float) i + 50, i + 60,
+                            LocalDateTime.now(), 25, 75, i + 60,
                             sensor, gardeners.get(i % gardeners.size()), s
                     );
                     sl.setDeleted((i & 0x1) == 0);
@@ -107,9 +107,12 @@ public class DumpConfig {
                 }).toList());
 
                 var sensorData = IntStream.range(0, num_sensor_data).mapToObj(j -> {
-                    boolean above = (j & 0x4) > 0, below = (j & 0x8) > 0;
-                    char alarm = above ? (below ? 'b' : 'h') : (below ? 'l' : 'n');
-                    return Stream.of(new SensorData(LocalDateTime.now(), i * 50 + j, above, below, alarm, sensors.get(j % sensors.size()), s));
+                    int sensor_idx = j % sensors.size();
+                    float value = (float) (Math.random() * 100);
+                    var limits = s.getSensorLimits().get(sensor_idx);
+                    boolean above = value > limits.getUpperLimit(), below = value < limits.getLowerLimit();
+                    char alarm = above ?  'h' : (below ? 'l' : 'n');
+                    return Stream.of(new SensorData(LocalDateTime.now(), i * 50 + j, above, below, alarm, sensors.get(sensor_idx), s));
                 }).flatMap(Function.identity()).toList();
                 s.setSensorData(sensorData);
 
