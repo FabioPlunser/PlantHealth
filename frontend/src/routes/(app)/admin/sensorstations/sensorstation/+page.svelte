@@ -22,7 +22,6 @@
   export let data;
   let sensorStation = data.sensorStation;
   let sensors = data.sensors;
-  $: console.log(data);
   // ----------------------------------
   // ----------------------------------
   let sensorDataModal = false;
@@ -30,7 +29,6 @@
   let picturesModal = false;
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  $: console.log(data);
 </script>
 
 {#if rendered}

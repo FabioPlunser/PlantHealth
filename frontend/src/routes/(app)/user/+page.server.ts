@@ -2,10 +2,29 @@ import { BACKEND_URL } from "$env/static/private";
 import type { Actions } from "./$types";
 import { redirect } from "@sveltejs/kit";
 
-let from = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000); // standard fetch of last 14 days;
-let to = new Date(Date.now() + 2 * 1000 * 60 * 60);
+// let from = new Date(Date.now() - 24 * 60 * 60 * 1000); // standard fetch of last 14 days;
+// let to = new Date(Date.now());
 
-export async function load({ locals, fetch }) {
+export async function load({ locals, fetch, cookies }) {
+  let from = cookies.get("from");
+  let to = cookies.get("to");
+
+  console.log("Load-from-cookies", from);
+  console.log("Load-to-cookies", to);
+
+  if (!from || !to) {
+    from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    to = new Date(Date.now());
+    cookies.set("from", from, { path: "/" });
+    cookies.set("to", to, { path: "/" });
+  } else {
+    from = new Date(from);
+    to = new Date(to);
+  }
+
+  console.log("load-from", from);
+  console.log("load-to", to);
+
   let res = await fetch(`${BACKEND_URL}/get-sensor-stations`);
   res = await res.json();
 
@@ -36,7 +55,7 @@ export async function load({ locals, fetch }) {
   dashboard = await dashboard.json();
 
   for (let sensorStation of dashboard.sensorStations) {
-    console.log("dashboard", sensorStation);
+    // console.log("dashboard", sensorStation);
     sensorStation.data = new Promise(async (resolve, reject) => {
       let res = await fetch(
         `${BACKEND_URL}/get-sensor-station-data?sensorStationId=${
@@ -46,11 +65,11 @@ export async function load({ locals, fetch }) {
         }`
       );
       if (res.status != 200) {
-        console.log("res", res);
+        // console.log("res", res);
         resolve(null);
       }
       res = await res.json();
-      console.log("sensorStationData", res);
+      // console.log("sensorStationData", res);
       resolve(res);
     });
   }
@@ -78,6 +97,10 @@ export async function load({ locals, fetch }) {
 
   return {
     dashboard,
+    dates: {
+      from,
+      to,
+    },
     sensorStations: sensorStations,
   };
 }
@@ -105,15 +128,28 @@ export const actions = {
       }
     );
     res = await res.json();
-    console.log("removeFromDashboard", res);
+    // console.log("removeFromDashboard", res);
   },
 
-  updateFromTo: async ({ request, fetch, url }) => {
+  updateFromTo: async ({ request, fetch, url, cookies }) => {
     let formData = await request.formData();
-    from = formData.get("from");
-    to = formData.get("to");
+    let _from = formData.get("from");
+    let _to = formData.get("to");
 
-    console.log("from", from);
-    console.log("to", to);
+    console.log("UpdateFromTo");
+    console.log("from", _from);
+    console.log("to", _to);
+
+    _from = new Date(_from);
+    _to = new Date(_to);
+
+    console.log("from", _from);
+    console.log("to", _to);
+
+    cookies.set("from", _from, { path: "/" });
+    cookies.set("to", _to, { path: "/" });
+
+    console.log("Cookies-from", new Date(cookies.get("from")));
+    console.log("Cookies-to", new Date(cookies.get("to")));
   },
 } satisfies Actions;

@@ -9,7 +9,6 @@ export async function load({ fetch, depends }) {
     throw new error(res.error);
   }
   res = await res.json();
-  console.log("server", res);
   return { users: res.items };
 }
 

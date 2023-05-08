@@ -1,8 +1,6 @@
 <script lang="ts">
-  import Line from "$lib/components/graph/wrapper/Line.svelte";
-
-  export let width = 300;
-  export let height = 300;
+  // import Line from "$lib/components/graph/wrapper/Line.svelte";
+  import { Line } from "$components/graph/wrapper";
 
   import {
     Chart as ChartJS,

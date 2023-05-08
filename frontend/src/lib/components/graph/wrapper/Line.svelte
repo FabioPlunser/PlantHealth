@@ -6,8 +6,6 @@
   ChartJs.register(LineController);
 
   export let chart: any = null;
-  export let width = 300;
-  export let height = 300;
 
   $: props = $$props;
 

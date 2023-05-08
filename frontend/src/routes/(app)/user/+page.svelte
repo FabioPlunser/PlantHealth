@@ -1,7 +1,7 @@
 <script lang="ts">
   import SensorstationModal from "./SensorstationModal.svelte";
   import SensorStation from "$lib/components/ui/SensorStation/SensorStation.svelte";
-
+  import Grid from "./Grid.svelte";
   //---------------------------------------------------
   export let data;
   //---------------------------------------------------
@@ -15,8 +15,7 @@
   let sensorStationModel = false;
   //---------------------------------------------------
 
-  $: console.log(data.dashboard);
-  $: console.log(data.sensorStations);
+  $: console.log(data);
 </script>
 
 {#if rendered}
@@ -24,6 +23,8 @@
     data={data?.sensorStations}
     bind:showModal={sensorStationModel}
   />
+
+  <!-- <Grid/> -->
 
   <section>
     <div class="flex justify-center">
@@ -34,9 +35,9 @@
     </div>
 
     <div class="flex justify-center mt-20">
-      <div class="gap-4 grid jusitfy-center">
+      <div class="gap-4 grid jusitfy-center w-full">
         {#each data?.dashboard?.sensorStations as sensorStation}
-          <SensorStation {sensorStation} />
+          <SensorStation {sensorStation} dates={data.dates} />
         {/each}
       </div>
     </div>

@@ -5,10 +5,11 @@
   import SensorStationMobile from "./SensorStationMobile.svelte";
 
   export let sensorStation: any;
+  export let dates: any;
 </script>
 
 <Mobile>
-  <SensorStationMobile {sensorStation} />
+  <SensorStationMobile {sensorStation} {dates} />
 </Mobile>
 
 <Desktop>

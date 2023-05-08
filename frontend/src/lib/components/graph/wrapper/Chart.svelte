@@ -2,6 +2,7 @@
   import { onMount, afterUpdate, onDestroy } from "svelte";
   import { Chart } from "chart.js";
   import { theme } from "$stores/themeStore";
+  import { browser } from "$app/environment";
 
   $: props = $$props;
 
@@ -12,16 +13,14 @@
     datasets: [],
   };
 
-  export let options: any = {};
+  export let options: any = {
+    responsive: true,
+    maintainAspectRatio: false,
+  };
   export let plugins: any[] = [];
 
   export let updateMode: any = undefined;
   export let chart: any = null;
-
-  export let width: number = 300;
-  export let height: number = 300;
-
-  console.log("chartOptions", options);
 
   onMount(() => {
     chart = new Chart(canvasRef, {
@@ -46,14 +45,14 @@
   });
 </script>
 
-<div class="chart min-w-xl">
-  <canvas bind:this={canvasRef} {...props} />
+<div
+  style="width: 100%; height: 0; position: relative"
+  class="pb-[60%] sm:pb-[45%]"
+>
+  <canvas
+    id="chart"
+    bind:this={canvasRef}
+    {...props}
+    style="position: absolute; width: 100%; height: 100%;"
+  />
 </div>
-
-<style>
-  .chart {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
-</style>

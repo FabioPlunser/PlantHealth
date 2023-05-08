@@ -1,131 +1,65 @@
 <script lang="ts">
+  import { fly } from "svelte/transition";
   import Graph from "./Graph.svelte";
-  import Desktop from "$helper/Desktop.svelte";
-  import Mobile from "$helper/Mobile.svelte";
+  import { sensorsStore } from "$stores/sensorsStore";
+  import { onMount } from "svelte";
+  import MediaQuery from "$helper/MediaQuery.svelte";
+  import { createGraphData } from "$components/graph/helper";
+  import Spinner from "$components/ui/Spinner.svelte";
 
   export let data: any;
+  export let loading = false;
 
-  let sensors = [
-    {
-      type: "TEMPERATURE",
-      icon: "bi-thermometer-half",
-      google: "",
-    },
-    {
-      type: "HUMIDITY",
-      icon: "bi-droplet-half",
-      google: "",
-    },
-    {
-      type: "LIGHTINTENSITY",
-      icon: "bi-sun",
-      google: "",
-    },
-    {
-      type: "PRESSURE",
-      icon: "",
-      google: "speed",
-    },
-    {
-      type: "GASPRESSURE",
-      icon: "",
-      google: "nest_thermostat_zirconium_eu",
-    },
-    {
-      type: "SOILHUMIDITY",
-      icon: "bi-moisture",
-      google: "",
-    },
-  ];
-
+  let sensors = $sensorsStore;
   let currentSensor: any = sensors[0].type;
-
   let graphData: any = {};
 
   data.then(async (res: any) => {
-    createGraphData(res.data);
+    graphData = createGraphData(res.data);
   });
 
-  function createGraphData(data: any) {
-    // console.log(data);
-    for (let sensor of data) {
-      let sensorType = sensor.sensorType;
-      let sensorUnit = sensor.sensorUnit;
-      let labels = [];
-      let datasets = [];
-
-      let sensorData: any = [];
-      for (let data of sensor.values) {
-        let label = new Date(data.timestamp).toLocaleTimeString();
-        labels.push(label);
-        // console.log(data.value);
-        // sensorData data.value in an array seperated by ,
-        sensorData.push(data.value);
-      }
-      let dataset = {
-        label: sensorType,
-        fill: true,
-        lineTension: 0.5,
-        backgroundColor: "rgba(75,192,192,0.4)",
-        borderColor: "rgba(75,192,192,1)",
-        data: sensorData,
-      };
-      datasets.push(dataset);
-
-      graphData[sensorType] = {
-        labels: labels,
-        datasets: datasets,
-      };
-    }
-  }
-
-  $: console.log(currentSensor);
-
-  // $: console.log("graphData", graphData);
+  export let options = {
+    responsive: true,
+  };
 </script>
 
 <div>
   <div class="md:flex items-center">
-    <div class="w-[340px] h-full">
-      <Graph data={graphData?.[currentSensor]} />
-    </div>
-    <Desktop>
-      <div class="aboslute right-0 ml-2">
-        <div
-          class="bg-green-400 mx-2 my-auto shadow-2xl rounded-3xl grid grid-rows gap-4 p-4 h-min w-min"
-        >
-          {#each sensors as sensor, i (i)}
-            <div class="tooltip" data-tip={sensor.type}>
-              <button on:click={() => (currentSensor = sensor.type)}>
-                <i
-                  class="bi {sensor.icon} transform transition-transform active:scale-110 material-symbols-outlined text-4xl hover:text-white dark:text-white hover:dark:text-black {sensor.type ===
-                  currentSensor
-                    ? 'text-blue-500 dark:text-blue-500'
-                    : ''}">{sensor?.google}</i
-                >
-              </button>
-            </div>
-          {/each}
+    <div class="w-full h-full">
+      {#if loading}
+        <div class="mb-2">
+          <Spinner />
         </div>
-      </div>
-    </Desktop>
-    <Mobile>
-      <div
-        class="bg-green-400 my-auto mx-auto shadow-2xl rounded-2xl p-4 flex flex-cols gap-4"
-      >
-        {#each sensors as sensor, i (i)}
-          <div class="tooltip" data-tip={sensor.type}>
-            <button on:click={() => (currentSensor = sensor.type)}>
-              <i
-                class="bi {sensor.icon} flex items-center my-auto transform transition-transform active:scale-110 material-symbols-outlined text-4xl hover:text-white dark:text-white hover:dark:text-black {sensor.type ===
-                currentSensor
-                  ? 'text-blue-500 dark:text-blue-500'
-                  : ''}">{sensor?.google}</i
-              >
-            </button>
-          </div>
-        {/each}
-      </div>
-    </Mobile>
+      {:else if Object.keys(graphData).length === 0}
+        <h1 class="font-bold text-4xl flex justify-center">No data found</h1>
+      {:else}
+        <MediaQuery query="(width <= 640px)" let:matches>
+          {#key matches}
+            <Graph data={graphData?.[currentSensor]} {options} />
+          {/key}
+        </MediaQuery>
+      {/if}
+    </div>
+
+    <div
+      class="bg-green-400 mx-auto shadow-2xl rounded-2xl flex justify-center items-ceter gap-4 md:grid md:flex-none md:justify-normal md:gap-2 p-2"
+    >
+      {#each sensors as sensor, i (i)}
+        <div
+          in:fly|self={{ y: -50, duration: 50, delay: 100 * i }}
+          class="tooltip"
+          data-tip={sensor.type}
+        >
+          <button on:click={() => (currentSensor = sensor.type)}>
+            <i
+              class="bi {sensor.icon} transform transition-transform active:scale-110 material-symbols-outlined text-4xl hover:text-white hover:dark:text-black
+              {sensor.type === currentSensor ? 'text-black' : 'text-white'}"
+            >
+              {sensor?.google}
+            </i>
+          </button>
+        </div>
+      {/each}
+    </div>
   </div>
 </div>

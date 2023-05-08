@@ -6,16 +6,32 @@
   import Spinner from "$components/ui/Spinner.svelte";
 
   export let sensorStation: any;
+  export let data: any;
+
+  let loading = false;
 
   let showPictures = false;
+
+  const customEnhance: SubmitFunction = () => {
+    loading = true;
+    return async ({ update }) => {
+      await setTimeout(async () => {
+        await update();
+        loading = false;
+      }, 2000);
+    };
+  };
+
+  let width = 0;
 </script>
 
-<div class="inline-grid">
+<div class="">
   <div
-    in:fly|self={{ y: -200, duration: 300 }}
-    class="bg-base-100 shadow-2xl rounded-2xl p-4 m-4 w-full h-full"
+    in:fly|self={{ y: -200, duration: 200 }}
+    class="card bg-base-100 shadow-2xl rounded-2xl p-4 sm:max-w-10/12 2xl:max-w-8/12 mx-auto"
+    bind:clientWidth={width}
   >
-    <div class="absolute top-0 right-0 m-4">
+    <div class="absolute top-ß right-0 m-4">
       <form method="POST" action="?/removeFromDashboard" use:enhance>
         <input
           type="hidden"
@@ -27,60 +43,25 @@
         </button>
       </form>
     </div>
-    <div class="mt-12" />
-    <h1 class="flex justify-center text-2xl">Name: {sensorStation.name}</h1>
-    <h1 class="flex justify-center text-2xl">
-      Room: {sensorStation.roomName}
-    </h1>
-    <div>
-      <Graphs data={sensorStation.data} />
+
+    <div class="font-bold text-xl">
+      <h1>Room: {sensorStation.roomName}</h1>
+      <h1>Name: {sensorStation.name}</h1>
     </div>
-    <div class="w-full h-full mt-8">
-      <div class="absolute bottom-0 right-0 mr-2">
-        <div class="gap-4 flex items-center">
-          <button>
-            <i
-              class="bi bi-calendar-event-fill text-2xl hover:text-primary shadow-2xl"
-            />
-          </button>
-          <button on:click={() => (showPictures = !showPictures)}>
-            <i
-              class="bi bi-card-image text-3xl hover:text-primary shadow-2xl"
-            />
-          </button>
-        </div>
+    <h1>CardSize: width: {width}</h1>
+    <div class="">
+      <div class="">
+        {#if loading}
+          <Spinner />
+        {:else}
+          <Graphs data={sensorStation.data} {width} />
+        {/if}
       </div>
+    </div>
+    <div class="w-full h-full mt-2">
+      <form method="POST" action="?/updateFromTo" use:enhance={customEnhance}>
+        <div class="grid grid-rows justify-center items-center gap-2" />
+      </form>
     </div>
   </div>
-  {#if showPictures}
-    <div
-      in:fly={{ y: -50, duration: 300 }}
-      out:fly={{ y: -50, duration: 300 }}
-      class="mt-2"
-    >
-      <div
-        class="bg-base-100 shadow-2xl rounded-2xl p-4 m-4 backdrop-blur-2xl w-full h-full"
-      >
-        <div class="carousel space-x-4 w-96">
-          {#if sensorStation.pictures}
-            {#each sensorStation?.pictures as picture}
-              {#await picture}
-                <Spinner />
-              {:then data}
-                <div class="carousel-item">
-                  <img
-                    src={data.encodedImage}
-                    alt="SensorStationPicture"
-                    class="w-48 h-64 rounded-2xl shadow-xl"
-                  />
-                </div>
-              {/await}
-            {/each}
-          {:else}
-            <h1>Not Pictures found</h1>
-          {/if}
-        </div>
-      </div>
-    </div>
-  {/if}
 </div>

@@ -36,8 +36,6 @@
   let searchByDipSwitchId = "";
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  $: console.log(searchByDipSwitchId);
-  $: console.log(data);
 </script>
 
 {#if rendered}
