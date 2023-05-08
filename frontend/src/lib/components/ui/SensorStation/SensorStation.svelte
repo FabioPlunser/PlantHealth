@@ -1,17 +1,170 @@
 <script lang="ts">
-  import Desktop from "$helper/Desktop.svelte";
-  import Mobile from "$helper/Mobile.svelte";
-  import SensorStationDesktop from "./SensorStationDesktop.svelte";
-  import SensorStationMobile from "./SensorStationMobile.svelte";
-
+  import { onMount } from "svelte";
+  import { fly } from "svelte/transition";
+  import { enhance } from "$app/forms";
+  import type { SubmitFunction } from "$app/forms";
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  import Graphs from "$components/graph/Graphs.svelte";
+  import Spinner from "$components/ui/Spinner.svelte";
+  import DateInput from "$components/datepicker/DateInput.svelte";
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  let rendered = false;
+  onMount(() => {
+    rendered = true;
+  });
+  // ---------------------------------------------------
+  // ---------------------------------------------------
   export let sensorStation: any;
   export let dates: any;
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  let loading = false;
+  let showPictures = false;
+  let newDates = dates;
+  let dateNow = new Date(Date.now()).toLocaleDateString();
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  const customEnhance: SubmitFunction = () => {
+    loading = true;
+    return async ({ update }) => {
+      // await setTimeout(async () => {
+      await update();
+      loading = false;
+      // }, 2000);
+    };
+  };
+
+  $: console.log(sensorStation);
 </script>
 
-<Mobile>
-  <SensorStationMobile {sensorStation} {dates} />
-</Mobile>
+{#if rendered}
+  <section>
+    <div class="flex justify-center">
+      <div class="m-0 p-0 w-full sm:max-w-10/12 2xl:max-w-8/12">
+        <div
+          in:fly|self={{ y: -200, duration: 200 }}
+          class="card bg-base-100 shadow-2xl rounded-2xl p-4 mx-auto"
+        >
+          <div class="absolute top-ß right-0 m-4">
+            <form method="POST" action="?/removeFromDashboard" use:enhance>
+              <input
+                type="hidden"
+                name="sensorStationId"
+                value={sensorStation.sensorStationId}
+              />
+              <button type="submit">
+                <i class="bi bi-trash text-3xl hover:text-primary shadow-2xl" />
+              </button>
+            </form>
+          </div>
+          <div class="font-bold text-xl">
+            <h1>Room: {sensorStation.roomName}</h1>
+            <h1>Name: {sensorStation.name}</h1>
+          </div>
+          <div class="">
+            <div class="">
+              {#if loading}
+                <Spinner />
+              {:else}
+                <Graphs data={sensorStation.data} />
+              {/if}
+            </div>
+          </div>
+          <div class="w-full h-full mt-2">
+            <form
+              method="POST"
+              action="?/updateFromTo"
+              use:enhance={customEnhance}
+            >
+              <div
+                class="grid grid-rows xs:flex justify-center items-center gap-2"
+              >
+                <div class="flex gap-2">
+                  <label class="my-auto">
+                    From:
+                    <input
+                      type="hidden"
+                      name="from"
+                      bind:value={newDates.from}
+                    />
+                    {#key sensorStation}
+                      <DateInput
+                        format="dd.MM.yyyy"
+                        placeholder={dateNow}
+                        bind:value={newDates.from}
+                      />
+                    {/key}
+                  </label>
+                </div>
+                <div class="flex gap-2">
+                  <label class="my-auto">
+                    To:
+                    <input type="hidden" name="to" bind:value={newDates.to} />
+                    {#key sensorStation}
+                      <DateInput
+                        format="dd.MM.yyyy"
+                        placeholder={dateNow}
+                        bind:value={newDates.to}
+                      />
+                    {/key}
+                  </label>
+                </div>
+                <div class="my-auto flex items-center mt-6">
+                  <button
+                    class="btn btn-primary flex items-center"
+                    type="submit"
+                  >
+                    Update
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="absolute bottom-0 right-0 mb-6 mr-7">
+            <button
+              on:click={() => (showPictures = !showPictures)}
+              class="hover:text-primary active:scale-125"
+            >
+              <i class="bi bi-image text-3xl" />
+            </button>
+          </div>
+        </div>
+        {#if showPictures}
+          <div
+            in:fly={{ y: -50, duration: 32 }}
+            out:fly={{ y: -50, duration: 300 }}
+            class="-mt-2"
+          >
+            <div class="bg-base-100 shadow-2xl rounded-2xl">
+              <div class="p-4 m-4">
+                <div class="carousel space-x-4">
+                  {#if sensorStation.pictures}
+                    {#each sensorStation?.pictures as picture}
+                      {#await picture}
+                        <Spinner />
+                      {:then data}
+                        <div class="carousel-item">
+                          <img
+                            src={data.encodedImage}
+                            alt="SensorStationPicture"
+                            class="w-48 h-64 rounded-2xl shadow-xl"
+                          />
+                        </div>
+                      {/await}
+                    {/each}
+                  {:else}
+                    <h1>Not Pictures found</h1>
+                  {/if}
+                </div>
+              </div>
+            </div>
+          </div>
+        {/if}
+      </div>
+    </div>
+  </section>
+{/if}
 
-<Desktop>
-  <SensorStationDesktop {sensorStation} />
-</Desktop>
+<!-- <SensorStationDesktop {sensorStation} {dates} /> -->

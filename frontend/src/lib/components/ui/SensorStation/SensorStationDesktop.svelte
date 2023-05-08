@@ -6,7 +6,7 @@
   import Spinner from "$components/ui/Spinner.svelte";
 
   export let sensorStation: any;
-  export let data: any;
+  export let dates: any;
 
   let loading = false;
 

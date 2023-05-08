@@ -14,12 +14,21 @@
   let currentSensor: any = sensors[0].type;
   let graphData: any = {};
 
-  data.then(async (res: any) => {
-    graphData = createGraphData(res.data);
-  });
+  data
+    .then(async (res: any) => {
+      console.log;
+      graphData = createGraphData(res.data);
+    })
+    .catch((err: any) => {
+      console.log(err);
+    });
 
   export let options = {
     responsive: true,
+    interaction: {
+      intersect: false,
+      axis: "x",
+    },
   };
 </script>
 

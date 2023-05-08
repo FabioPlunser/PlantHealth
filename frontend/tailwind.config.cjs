@@ -5,6 +5,10 @@ module.exports = {
   darkMode: "class",
   theme: {
     extend: {
+      screens: {
+        xs: "480px",
+        "3xl": "1600px",
+      },
       dropShadow: {
         "3xl": "0 35px 35px rgba(0, 0, 0, 0.25)",
         "4xl": [

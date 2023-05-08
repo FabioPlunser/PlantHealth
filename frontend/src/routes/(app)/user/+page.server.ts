@@ -2,15 +2,19 @@ import { BACKEND_URL } from "$env/static/private";
 import type { Actions } from "./$types";
 import { redirect } from "@sveltejs/kit";
 
-// let from = new Date(Date.now() - 24 * 60 * 60 * 1000); // standard fetch of last 14 days;
-// let to = new Date(Date.now());
+interface Dashboard {
+  sensorStations: [
+    {
+      data: Promise;
+      name: string;
+      [key: string]: any;
+    }
+  ];
+}
 
 export async function load({ locals, fetch, cookies }) {
   let from = cookies.get("from");
   let to = cookies.get("to");
-
-  console.log("Load-from-cookies", from);
-  console.log("Load-to-cookies", to);
 
   if (!from || !to) {
     from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -21,9 +25,6 @@ export async function load({ locals, fetch, cookies }) {
     from = new Date(from);
     to = new Date(to);
   }
-
-  console.log("load-from", from);
-  console.log("load-to", to);
 
   let res = await fetch(`${BACKEND_URL}/get-sensor-stations`);
   res = await res.json();
@@ -51,11 +52,10 @@ export async function load({ locals, fetch, cookies }) {
       foundSensorStation;
   }
 
-  let dashboard = await fetch(`${BACKEND_URL}/get-dashboard`);
+  let dashboard: Dashboard = await fetch(`${BACKEND_URL}/get-dashboard`);
   dashboard = await dashboard.json();
 
   for (let sensorStation of dashboard.sensorStations) {
-    // console.log("dashboard", sensorStation);
     sensorStation.data = new Promise(async (resolve, reject) => {
       let res = await fetch(
         `${BACKEND_URL}/get-sensor-station-data?sensorStationId=${
@@ -65,35 +65,14 @@ export async function load({ locals, fetch, cookies }) {
         }`
       );
       if (res.status != 200) {
-        // console.log("res", res);
+        console.log(res);
         resolve(null);
       }
       res = await res.json();
-      // console.log("sensorStationData", res);
+      console.log(res);
       resolve(res);
     });
   }
-  // sensorStation.data = new Promise(async (resolve, reject) => {
-  //   let res = await fetch(
-  //     `${BACKEND_URL}/get-sensor-station-data?sensorStationId=${
-  //       sensorStation.sensorStationId
-  //     }&from=${from.toISOString().split(".")[0]}&to=${
-  //       to.toISOString().split(".")[0]
-  //     }`
-  //   );
-  //   if (res.status != 200) {
-  //     console.log("res", res);
-  //     resolve(null);
-  //   }
-  //   res = await res.json();
-  //   console.log(res);
-  //   resolve(res);
-  // });
-
-  // dashboard.sensorStations[dashboard.sensorStations.indexOf(sensorStation)] =
-  //   sensorStation;
-
-  // console.log("dashboard", dashboard);
 
   return {
     dashboard,

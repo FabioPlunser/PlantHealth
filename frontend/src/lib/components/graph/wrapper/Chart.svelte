@@ -13,10 +13,11 @@
     datasets: [],
   };
 
-  export let options: any = {
+  export let options = {
     responsive: true,
     maintainAspectRatio: false,
   };
+
   export let plugins: any[] = [];
 
   export let updateMode: any = undefined;
