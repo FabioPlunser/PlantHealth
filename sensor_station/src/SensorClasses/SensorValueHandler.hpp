@@ -30,6 +30,7 @@ class SensorValueHandlerClass {
 			AirSensorClass * airSensor, HydrometerClass * hydrometer,
 			PhototransistorClass * phototransistor
 		) {
+			DEBUG_PRINT_POS(4, "\n");
 			airTemperatureAccumulator = new ValueAccumulatorClass();
 			airHumidityAccumulator	  = new ValueAccumulatorClass();
 			airPressureAccumulator	  = new ValueAccumulatorClass();
@@ -41,6 +42,7 @@ class SensorValueHandlerClass {
 			this->phototransistor	  = phototransistor;
 		}
 		~SensorValueHandlerClass() {
+			DEBUG_PRINT_POS(4, "\n");
 			delete (airTemperatureAccumulator);
 			delete (airHumidityAccumulator);
 			delete (airPressureAccumulator);
@@ -53,6 +55,7 @@ class SensorValueHandlerClass {
 		void setWeightCalculatorFunction(double (*weightFunction
 		)(unsigned long timeNow, unsigned long timeLastUpdate,
 		  unsigned long timeLastReset)) {
+			DEBUG_PRINT_POS(4, "\n");
 			airTemperatureAccumulator->setWeightFunction(weightFunction);
 			airHumidityAccumulator->setWeightFunction(weightFunction);
 			airPressureAccumulator->setWeightFunction(weightFunction);
@@ -65,6 +68,7 @@ class SensorValueHandlerClass {
 			AirSensorClass * airSensor, HydrometerClass * hydrometer,
 			PhototransistorClass * phototransistor
 		) {
+			DEBUG_PRINT_POS(4, "\n");
 			assert(airSensor != NULL);
 			assert(hydrometer != NULL);
 			assert(phototransistor != NULL);
@@ -76,6 +80,7 @@ class SensorValueHandlerClass {
 
 		AirSensorClass::UPDATE_ERROR
 		setSensorValuesFromSensors(sensor_data_t * str) {
+			DEBUG_PRINT_POS(4, "\n");
 			float pressure = 0, temperature = 0, humidity = 0;
 			uint32_t gas_resistance	 = 0;
 			uint16_t earth_humidity	 = hydrometer->getHumidity_16bit();
@@ -105,6 +110,7 @@ class SensorValueHandlerClass {
 		// ---------- Functions ---------- //
 	private:
 		uint16_t convertToGATT_soilHumidity(uint16_t humidity) {
+			DEBUG_PRINT_POS(4, "\n");
 			DEBUG_PRINTF(2, "Soil humidity = %u\n", humidity);
 
 			static uint16_t valueHigh = 300;
@@ -119,43 +125,55 @@ class SensorValueHandlerClass {
 			return uint16_t(calculation * 100);
 		}
 		uint16_t convertToGATT_soilHumidity_notKnown() {
+			DEBUG_PRINT_POS(4, "\n");
 			return (uint16_t) 0xFFFF;
 		}
 
 		uint16_t convertToGATT_airHumidity(float humidity) {
+			DEBUG_PRINT_POS(4, "\n");
 			if (humidity < 0 || humidity > 100) {
 				return convertToGATT_airHumidity_notKnown();
 			}
 			return uint16_t(humidity * 100);
 		}
 		uint16_t convertToGATT_airHumidity_notKnown() {
+			DEBUG_PRINT_POS(4, "\n");
 			return (uint16_t) 0xFFFF;
 		}
 
 		uint32_t convertToGATT_airPressure(float pressure) {
+			DEBUG_PRINT_POS(4, "\n");
 			return uint32_t(pressure * 10);
 		}
 		uint32_t convertToGATT_airPressure_notKnown() {
+			DEBUG_PRINT_POS(4, "\n");
 			return (uint8_t) 0xFFFF'FFFF;
 		}
 
 		uint8_t convertToGATT_airQuality(float gas_resistance) {
+			DEBUG_PRINT_POS(4, "\n");
 			const float calibrationValue = 146000;
 			return (uint8_t) (100 - (gas_resistance / calibrationValue) * 100);
 		}
-		uint8_t convertToGATT_airQuality_notKnown() { return (uint8_t) 0xFF; }
+		uint8_t convertToGATT_airQuality_notKnown() {
+			DEBUG_PRINT_POS(4, "\n");
+			return (uint8_t) 0xFF;
+		}
 
 		uint8_t convertToGATT_airTemperature(float temperature) {
+			DEBUG_PRINT_POS(4, "\n");
 			if (temperature < -64 || temperature > 63) {
 				return convertToGATT_airTemperature_notKnown();
 			}
 			return (uint8_t) (temperature);
 		}
 		uint8_t convertToGATT_airTemperature_notKnown() {
+			DEBUG_PRINT_POS(4, "\n");
 			return (uint8_t) 0x7F;
 		}
 
 		uint16_t convertToGATT_lightIntensity(float lightIntensity) {
+			DEBUG_PRINT_POS(4, "\n");
 			uint16_t luminosity =
 				luminosityFromVoltage((uint16_t) lightIntensity);
 			if (luminosity > 65534) {
@@ -164,10 +182,12 @@ class SensorValueHandlerClass {
 			return luminosity;
 		}
 		uint16_t convertToGATT_lightIntensity_notKnown() {
+			DEBUG_PRINT_POS(4, "\n");
 			return (uint16_t) 0xFFFF;
 		}
 
 		uint16_t luminosityFromVoltage(uint16_t measured) {
+			DEBUG_PRINT_POS(4, "\n");
 			const float R	= 2200;
 			const float Vin = 3.3;
 			float Vout =
@@ -181,6 +201,7 @@ class SensorValueHandlerClass {
 
 	public:
 		void addSensorValuesToAccumulator() {
+			DEBUG_PRINT_POS(4, "\n");
 			float airPressure = 0, airTemperature = 0, airHumidity = 0;
 			uint32_t airGasResistance = 0;
 			uint16_t soilhHumidity	  = hydrometer->getHumidity_16bit();
@@ -209,6 +230,7 @@ class SensorValueHandlerClass {
 		};
 
 		bool setAccumulatedSensorValuesInBle() {
+			DEBUG_PRINT_POS(4, "\n");
 			if (soilHumidityAccumulator->getTotalWeight() == 0) {
 				return false;
 			}

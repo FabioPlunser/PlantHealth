@@ -28,6 +28,7 @@ class LedHandler {
 		bool isEnabled				 = true;
 
 		LedHandler(uint8_t pinRed, uint8_t pinGreen, uint8_t pinBlue) {
+			DEBUG_PRINT_POS(4, "\n");
 			this->pinRed   = pinRed;
 			this->pinGreen = pinGreen;
 			this->pinBlue  = pinBlue;
@@ -38,6 +39,7 @@ class LedHandler {
 		}
 
 		~LedHandler() {
+			DEBUG_PRINT_POS(4, "\n");
 			if (this->durationOn != NULL) {
 				free(this->durationOn);
 				free(this->durationOff);
@@ -50,12 +52,14 @@ class LedHandler {
 
 		static LedHandler *
 		getLedHandler(uint8_t pinRed, uint8_t pinGreen, uint8_t pinBlue) {
+			DEBUG_PRINT_POS(4, "\n");
 			static LedHandler ledHandler(pinRed, pinGreen, pinBlue);
 			return &ledHandler;
 		}
 
 	private:
 		void setLEDStatus(bool on) {
+			DEBUG_PRINT_POS(4, "\n");
 			if (on == this->isOn) {
 				return;
 			}
@@ -72,9 +76,13 @@ class LedHandler {
 			}
 		}
 
-		void toggleLEDStatus() { setLEDStatus(!this->isOn); }
+		void toggleLEDStatus() {
+			DEBUG_PRINT_POS(4, "\n");
+			setLEDStatus(!this->isOn);
+		}
 
 		uint16_t getMsTillNext() {
+			DEBUG_PRINT_POS(4, "\n");
 			if (durationIdx >= durationSize) {
 				DEBUG_PRINT(1, "Overflow\n");
 				return 0;
@@ -94,11 +102,13 @@ class LedHandler {
 
 	public:
 		uint16_t enable() {
+			DEBUG_PRINT_POS(4, "\n");
 			this->isEnabled = true;
 			return updateLEDStatus();
 		}
 
 		void disable() {
+			DEBUG_PRINT_POS(4, "\n");
 			this->isEnabled = false;
 			setLEDStatus(false);
 		}
@@ -107,13 +117,17 @@ class LedHandler {
 		 * This function will disable the led until the next call that will
 		 * modify the led status.
 		 */
-		void silence() { setLEDStatus(false); }
+		void silence() {
+			DEBUG_PRINT_POS(4, "\n");
+			setLEDStatus(false);
+		}
 
 		void setErrorProperties(
 			uint8_t valueRed, uint8_t valueGreen, uint8_t valueBlue,
 			uint16_t * durationOn, uint16_t * durationOff, uint8_t durationSize,
 			bool loopError = false
 		) {
+			DEBUG_PRINT_POS(4, "\n");
 			if (this->durationOn != NULL) {
 				free(this->durationOn);
 				free(this->durationOff);
@@ -133,10 +147,12 @@ class LedHandler {
 			this->loopError	   = loopError;
 			this->isFinished   = false;
 			this->durationIdx  = 0;
+			enable();
 			setLEDStatus(true);
 		}
 
 		uint16_t updateLEDStatus() {
+			DEBUG_PRINT_POS(4, "\n");
 			if (isFinished || !isEnabled) {
 				DEBUG_PRINTF_POS(
 					3, "Wait time was 0. isFinished = %d, isEnabled = %d.\n",

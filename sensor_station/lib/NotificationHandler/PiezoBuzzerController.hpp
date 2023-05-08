@@ -28,7 +28,9 @@ class PiezoBuzzerController {
 		 * parametes.
 		 */
 		void startBuzzer(unsigned int frequency, unsigned int duration = 1000) {
+#if USE_PIEZO_BUZZER
 			tone(this->buzzerPin, frequency, duration);
+#endif
 		}
 		void stopBuzzer() { noTone(this->buzzerPin); }
 };

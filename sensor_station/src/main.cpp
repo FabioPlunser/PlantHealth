@@ -91,9 +91,9 @@ void loop() {
 #if PAIRING_BUTTON_REQUIRED
 	checkPairingButtonAndStatus(inPairingMode);
 	updateNotificationHandler_PairingMode(inPairingMode);
+	enable_pairing_mode();
 #else
 	inPairingMode = true;
-	enable_pairing_mode();
 #endif
 	checkNotificationSilenceButtonPressed();
 	handleCentralDeviceIfPresent(pairedDevice, inPairingMode);
@@ -121,12 +121,13 @@ void loop() {
 			  TIME_IT_TAKES_TO_REACH_MAX_MEASUREMENT
 		  );
 		sensorValueHandler->addSensorValuesToAccumulator();
+		previousSensorMeasurement = millis();
 		// Substract time it took to measur sensor values from remaining sleep
 		// time
-		unsigned long passedTime = millis() - sensorReadStart;
-		remainingSleepTime		 = remainingSleepTime < passedTime
-									   ? 0
-									   : remainingSleepTime - passedTime;
+		unsigned long passedTime  = millis() - sensorReadStart;
+		remainingSleepTime		  = remainingSleepTime < passedTime
+										? 0
+										: remainingSleepTime - passedTime;
 	}
 	delay(remainingSleepTime);
 }
@@ -137,7 +138,8 @@ double sensorValueWeightCalculationFunction(
 	unsigned long timeNow, unsigned long timeLastUpdate,
 	unsigned long timeLastReset
 ) {
-	return (double) timeNow - timeLastUpdate;
+	DEBUG_PRINT_POS(4, "\n");
+	return (double) (timeNow - timeLastUpdate);
 }
 
 unsigned long calculateTimeBetweenMeasures(
@@ -153,6 +155,7 @@ unsigned long calculateTimeBetweenMeasures(
 }
 
 void checkNotificationSilenceButtonPressed() {
+	DEBUG_PRINT_POS(4, "\n");
 	if (digitalRead(PIN_BUTTON_2) == PinStatus::HIGH) {
 		notificationHandler->silenceNotification(
 			TIME_IN_NOTIFICATION_SILENCE_MODE_MS
@@ -161,6 +164,7 @@ void checkNotificationSilenceButtonPressed() {
 }
 
 void checkPairingButtonAndStatus(bool & inPairingMode) {
+	DEBUG_PRINT_POS(4, "\n");
 	static unsigned long pairingTime = 0;
 	DEBUG_PRINTF_POS(
 		3, "Checking pairing button and status. In pairing mode value is %d.\n",
@@ -182,6 +186,7 @@ void checkPairingButtonAndStatus(bool & inPairingMode) {
 }
 
 void setValueInVerifiedCentralDevice(BLEDevice & central) {
+	DEBUG_PRINT_POS(4, "\n");
 	DEBUG_PRINT(1, "Central device is remembered device.\n");
 	if (central.connected()) {
 		DEBUG_PRINT(1, "Connected\n");
@@ -206,6 +211,7 @@ void setValueInVerifiedCentralDevice(BLEDevice & central) {
 void handleCentralDeviceIfPresent(
 	arduino::String & pairedDevice, bool & inPairingMode
 ) {
+	DEBUG_PRINT_POS(4, "\n");
 	BLEDevice central = BLE.central();
 	if (central) {
 		uint8_t dipSwitchId = dipSwitch->getdipSwitchValue();
@@ -226,6 +232,7 @@ void handleCentralDeviceIfPresent(
 		} else {
 			DEBUG_PRINT(1, "Declined connection to ");
 			DEBUG_PRINTLN(1, central.address());
+			DEBUG_PRINTF(1, "Only %s was allowed.\n", pairedDevice.c_str());
 			central.disconnect();
 		}
 		DEBUG_PRINTLN(1, "* Disconnected from central device!");
@@ -242,6 +249,7 @@ void handleCentralDeviceIfPresent(
 }
 
 unsigned long handleNotificationIfPresent(bool notificationPresent) {
+	DEBUG_PRINT_POS(4, "\n");
 	unsigned long startNotificationCheck = millis();
 	if (notificationPresent) {
 		DEBUG_PRINT_POS(1, "Notifcation is present\n");
@@ -267,6 +275,7 @@ unsigned long handleNotificationIfPresent(bool notificationPresent) {
  * @returns True if there is a notification in the queue, else false.
  */
 bool updateNotificationHandler_Errors() {
+	DEBUG_PRINT_POS(4, "\n");
 	notificationHandler->updateAirHumidityValid(get_air_humidity_valid());
 	notificationHandler->updateAirPressureValid(get_air_pressure_valid());
 	notificationHandler->updateAirTemperatureValid(get_temperature_valid());
@@ -283,6 +292,7 @@ bool updateNotificationHandler_PairingMode(bool active) {
 }
 
 void setArduinoPowerStatus() {
+	DEBUG_PRINT_POS(4, "\n");
 	set_battery_level_status(
 		BATTERY_LEVEL_FLAGS_FIELD, BATTERY_POWER_STATE_FIELD, 100
 	);

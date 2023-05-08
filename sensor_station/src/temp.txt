@@ -1,0 +1,949 @@
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+Overflow
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 0
+lib\NotificationHandler/LedController.hpp -> 170 updateLEDStatus: Index overflow.
+lib\NotificationHandler/LedController.hpp -> 80 toggleLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 62 setLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 180 updateLEDStatus: Led got toggled.
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 1.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 3999
+lib\NotificationHandler/LedController.hpp -> 186 updateLEDStatus: Time till next change is 3999.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 3999.
+src\main.cpp -> 167 checkPairingButtonAndStatus: 
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode: 
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty: 
+src\main.cpp -> 252 handleNotificationIfPresent:
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update:
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus: 
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 1063.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 2937
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 2937
+lib\NotificationHandler/LedController.hpp -> 166 updateLEDStatus: Return time.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 2937.
+src\SensorClasses/SensorValueHandler.hpp -> 205 addSensorValuesToAccumulator:
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue: 
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 26.194910. Weight = 3108.000000. Accumulated weighted value is now 986867.313080. 
+Total weight is now 37851.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 26.072424.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 43.439457. Weight = 3111.000000. Accumulated weighted value is now 1669885.475445. Total weight is now 37876.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 44.088221.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction: 
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 95459.000000. Weight = 3103.000000. Accumulated weighted value is now 3617030501.000000. Total weight is now 37891.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 95458.829300.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 198989.000000. Weight = 3106.000000. Accumulated weighted value is now 6354470196.000000. Total weight is now 37901.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 167659.697528.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 884.000000. Weight = 3101.000000. Accumulated weighted value is now 33586928.000000. Total weight is now 37911.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 885.941495.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 18.000000. Weight = 3096.000000. Accumulated weighted value is now 372463.000000. 
+Total weight is now 37918.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 9.822855.
+src\main.cpp -> 167 checkPairingButtonAndStatus:
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode:
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification: 
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 252 handleNotificationIfPresent:
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update:
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 3079.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 921
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 921
+lib\NotificationHandler/LedController.hpp -> 166 updateLEDStatus: Return time.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 921.
+src\main.cpp -> 262 handleNotificationIfPresent: Will wait for 921 ms
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update: 
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 4030.
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 0
+lib\NotificationHandler/LedController.hpp -> 80 toggleLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 62 setLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 180 updateLEDStatus: Led got toggled.
+lib\NotificationHandler/LedController.hpp -> 183 updateLEDStatus: Index got moved.
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+Overflow
+lib\NotificationHandler/LedController.hpp -> 186 updateLEDStatus: Time till next change is 0.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 0.
+src\SensorClasses/SensorValueHandler.hpp -> 205 addSensorValuesToAccumulator: 
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue: 
+src\main.cpp -> 141 sensorValueWeightCalculationFunction: 
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 26.214123. Weight = 2984.000000. Accumulated weighted value is now 1065090.255432. Total weight is now 40835.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 26.082778.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 43.375973. Weight = 2985.000000. Accumulated weighted value is now 1799362.754097. Total weight is now 40861.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 44.036190.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 95459.000000. Weight = 2979.000000. Accumulated weighted value is now 3901402862.000000. Total weight is now 40870.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 95458.841742.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 201932.000000. Weight = 2980.000000. Accumulated weighted value is now 6956227556.000000. Total weight is now 40881.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 170157.959835.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction: 
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 877.000000. Weight = 2969.000000. Accumulated weighted value is now 36190741.000000. Total weight is now 40880.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 885.292099.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 3.000000. Weight = 2972.000000. Accumulated weighted value is now 381379.000000. Total weight is now 40890.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 9.326950.
+src\main.cpp -> 167 checkPairingButtonAndStatus:
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode:
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 252 handleNotificationIfPresent:
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update: 
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext: 
+Overflow
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 0
+lib\NotificationHandler/LedController.hpp -> 170 updateLEDStatus: Index overflow.
+lib\NotificationHandler/LedController.hpp -> 80 toggleLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 62 setLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 180 updateLEDStatus: Led got toggled.
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 1.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 3999
+lib\NotificationHandler/LedController.hpp -> 186 updateLEDStatus: Time till next change is 3999.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 3999.
+src\main.cpp -> 167 checkPairingButtonAndStatus: 
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode:
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 252 handleNotificationIfPresent:
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update:
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 1052.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 2948
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 2948
+lib\NotificationHandler/LedController.hpp -> 166 updateLEDStatus: Return time.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 2948.
+src\SensorClasses/SensorValueHandler.hpp -> 205 addSensorValuesToAccumulator:
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue: 
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 26.214123. Weight = 3074.000000. Accumulated weighted value is now 1145672.468834. Total weight is now 43909.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 26.091974.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 43.351997. Weight = 3080.000000. Accumulated weighted value is now 1932886.906013. Total weight is now 43941.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 43.988232.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 95458.000000. Weight = 3082.000000. Accumulated weighted value is now 4195604418.000000. Total weight is now 43952.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 95458.782718.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 202531.000000. Weight = 3089.000000. Accumulated weighted value is now 7581845815.000000. Total weight is now 43970.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 172432.245053.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 888.000000. Weight = 3092.000000. Accumulated weighted value is now 38936437.000000. Total weight is now 43972.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 885.482512.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 12.000000. Weight = 3091.000000. Accumulated weighted value is now 418471.000000. 
+Total weight is now 43981.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 9.514813.
+src\main.cpp -> 167 checkPairingButtonAndStatus:
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode:
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty: 
+src\main.cpp -> 252 handleNotificationIfPresent:
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update:
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 3085.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 915
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 915
+lib\NotificationHandler/LedController.hpp -> 166 updateLEDStatus: Return time.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 915.
+src\main.cpp -> 262 handleNotificationIfPresent: Will wait for 915 ms
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update: 
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 4020.
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 0
+lib\NotificationHandler/LedController.hpp -> 80 toggleLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 62 setLEDStatus: 
+lib\NotificationHandler/LedController.hpp -> 180 updateLEDStatus: Led got toggled.
+lib\NotificationHandler/LedController.hpp -> 183 updateLEDStatus: Index got moved.
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+Overflow
+lib\NotificationHandler/LedController.hpp -> 186 updateLEDStatus: Time till next change is 0.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 0.
+src\SensorClasses/SensorValueHandler.hpp -> 205 addSensorValuesToAccumulator:
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue: 
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 26.231762. Weight = 2976.000000. Accumulated weighted value is now 1223738.192345. Total weight is now 46885.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 26.100847.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 43.306442. Weight = 2965.000000. Accumulated weighted value is now 2061290.507317. Total weight is now 46906.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 43.945135.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 95459.000000. Weight = 2967.000000. Accumulated weighted value is now 4478831271.000000. Total weight is now 46919.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 95458.796458.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 206202.000000. Weight = 2970.000000. Accumulated weighted value is now 8194265755.000000. Total weight is now 46940.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 174568.933852.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 890.000000. Weight = 2968.000000. Accumulated weighted value is now 41577957.000000. Total weight is now 46940.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 885.768151.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction: 
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 15.000000. Weight = 2967.000000. Accumulated weighted value is now 462976.000000. 
+Total weight is now 46948.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 9.861464.
+src\main.cpp -> 167 checkPairingButtonAndStatus:
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode:
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 252 handleNotificationIfPresent:
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update:
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+Overflow
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 0
+lib\NotificationHandler/LedController.hpp -> 170 updateLEDStatus: Index overflow.
+lib\NotificationHandler/LedController.hpp -> 80 toggleLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 62 setLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 180 updateLEDStatus: Led got toggled.
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 3.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 3997
+lib\NotificationHandler/LedController.hpp -> 186 updateLEDStatus: Time till next change is 3997.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 3997.
+src\main.cpp -> 167 checkPairingButtonAndStatus: 
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode:
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 252 handleNotificationIfPresent: 
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update:
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext: 
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 1087.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 2913
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 2913
+lib\NotificationHandler/LedController.hpp -> 166 updateLEDStatus: Return time.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 2913.
+src\SensorClasses/SensorValueHandler.hpp -> 205 addSensorValuesToAccumulator:
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue: 
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 26.228928. Weight = 3109.000000. Accumulated weighted value is now 1305283.928291. Total weight is now 49994.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 26.108812.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 43.294079. Weight = 3118.000000. Accumulated weighted value is now 2196281.445099. Total weight is now 50024.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 43.904555.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction: 
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 95460.000000. Weight = 3111.000000. Accumulated weighted value is now 4775807331.000000. Total weight is now 50030.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 95458.871297.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 206826.000000. Weight = 3101.000000. Accumulated weighted value is now 8835633181.000000. Total weight is now 50041.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 176567.877960.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 884.000000. Weight = 3103.000000. Accumulated weighted value is now 44321009.000000. Total weight is now 50043.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 885.658514.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 17.000000. Weight = 3105.000000. Accumulated weighted value is now 515761.000000. 
+Total weight is now 50053.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 10.304297.
+src\main.cpp -> 167 checkPairingButtonAndStatus:
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode: 
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 252 handleNotificationIfPresent:
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update:
+lib\NotificationHandler/NotificationHandler.hpp -> 273 update: Buzzer tone.
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 3112.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 888
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 888
+lib\NotificationHandler/LedController.hpp -> 166 updateLEDStatus: Return time.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 888.
+src\main.cpp -> 262 handleNotificationIfPresent: Will wait for 888 ms
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update: 
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 4052.
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 0
+lib\NotificationHandler/LedController.hpp -> 80 toggleLEDStatus: 
+lib\NotificationHandler/LedController.hpp -> 62 setLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 180 updateLEDStatus: Led got toggled.
+lib\NotificationHandler/LedController.hpp -> 183 updateLEDStatus: Index got moved.
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+Overflow
+lib\NotificationHandler/LedController.hpp -> 186 updateLEDStatus: Time till next change is 0.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 0.
+src\SensorClasses/SensorValueHandler.hpp -> 205 addSensorValuesToAccumulator:
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue: 
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 26.246883. Weight = 2979.000000. Accumulated weighted value is now 1383473.393917. Total weight is now 52973.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 26.116576.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 43.260319. Weight = 2967.000000. Accumulated weighted value is now 2324634.810848. Total weight is now 52991.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 43.868484.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 95457.000000. Weight = 2975.000000. Accumulated weighted value is now 5059791906.000000. Total weight is now 53005.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 95458.766267.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 207961.000000. Weight = 2974.000000. Accumulated weighted value is now 9454109195.000000. Total weight is now 53015.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 178328.948317.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 886.000000. Weight = 2979.000000. Accumulated weighted value is now 46960403.000000. Total weight is now 53022.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 885.677700.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 17.000000. Weight = 2975.000000. Accumulated weighted value is now 566336.000000. 
+Total weight is now 53028.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 10.679943.
+src\main.cpp -> 167 checkPairingButtonAndStatus:
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode:
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification: 
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty: 
+src\main.cpp -> 252 handleNotificationIfPresent:
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update:
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+Overflow
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 0
+lib\NotificationHandler/LedController.hpp -> 170 updateLEDStatus: Index overflow.
+lib\NotificationHandler/LedController.hpp -> 80 toggleLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 62 setLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 180 updateLEDStatus: Led got toggled.
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 7.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 3993
+lib\NotificationHandler/LedController.hpp -> 186 updateLEDStatus: Time till next change is 3993.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 3993.
+src\main.cpp -> 167 checkPairingButtonAndStatus: 
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode:
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 252 handleNotificationIfPresent:
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update:
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 1053.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 2947
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 2947
+lib\NotificationHandler/LedController.hpp -> 166 updateLEDStatus: Return time.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 2947.
+src\SensorClasses/SensorValueHandler.hpp -> 205 addSensorValuesToAccumulator:
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue: 
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 26.245625. Weight = 3084.000000. Accumulated weighted value is now 1464414.900005. Total weight is now 56057.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 26.123676.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 43.254211. Weight = 3089.000000. Accumulated weighted value is now 2458247.069942. Total weight is now 56080.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 43.834648.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 95457.000000. Weight = 3090.000000. Accumulated weighted value is now 5354754036.000000. Total weight is now 56095.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 95458.668972.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 210916.000000. Weight = 3089.000000. Accumulated weighted value is now 10105628719.000000. Total weight is now 56104.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 180123.141291.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction: 
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 886.000000. Weight = 3089.000000. Accumulated weighted value is now 49697257.000000. Total weight is now 56111.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 885.695443.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 13.000000. Weight = 3088.000000. Accumulated weighted value is now 606480.000000. 
+Total weight is now 56116.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 10.807613.
+src\main.cpp -> 167 checkPairingButtonAndStatus:
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode:
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 252 handleNotificationIfPresent:
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update:
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext: 
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 3067.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 933
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 933
+lib\NotificationHandler/LedController.hpp -> 166 updateLEDStatus: Return time.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 933.
+src\main.cpp -> 262 handleNotificationIfPresent: Will wait for 933 ms
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update: 
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 4030.
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 0
+lib\NotificationHandler/LedController.hpp -> 80 toggleLEDStatus: 
+lib\NotificationHandler/LedController.hpp -> 62 setLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 180 updateLEDStatus: Led got toggled.
+lib\NotificationHandler/LedController.hpp -> 183 updateLEDStatus: Index got moved.
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+Overflow
+lib\NotificationHandler/LedController.hpp -> 186 updateLEDStatus: Time till next change is 0.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 0.
+src\SensorClasses/SensorValueHandler.hpp -> 205 addSensorValuesToAccumulator:
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue: 
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 26.258854. Weight = 3007.000000. Accumulated weighted value is now 1543375.273720. Total weight is now 59064.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 26.130558.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 43.226032. Weight = 3001.000000. Accumulated weighted value is now 2587968.392746. Total weight is now 59081.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 43.803734.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 95459.000000. Weight = 2999.000000. Accumulated weighted value is now 5641035577.000000. Total weight is now 59094.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 95458.685772.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 213155.000000. Weight = 2996.000000. Accumulated weighted value is now 10744241099.000000. Total weight is now 59100.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 181797.649729.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 890.000000. Weight = 2999.000000. Accumulated weighted value is now 52366367.000000. Total weight is now 59110.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 885.913839.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 10.000000. Weight = 3002.000000. Accumulated weighted value is now 636500.000000. 
+Total weight is now 59118.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 10.766602.
+src\main.cpp -> 167 checkPairingButtonAndStatus:
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode:
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent: 
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 252 handleNotificationIfPresent:
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update:
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+Overflow
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 0
+lib\NotificationHandler/LedController.hpp -> 170 updateLEDStatus: Index overflow.
+lib\NotificationHandler/LedController.hpp -> 80 toggleLEDStatus: 
+lib\NotificationHandler/LedController.hpp -> 62 setLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 180 updateLEDStatus: Led got toggled.
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 1.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 3999
+lib\NotificationHandler/LedController.hpp -> 186 updateLEDStatus: Time till next change is 3999.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 3999.
+src\main.cpp -> 167 checkPairingButtonAndStatus: 
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode: 
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 252 handleNotificationIfPresent:
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update:
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 1070.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 2930
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 2930
+lib\NotificationHandler/LedController.hpp -> 166 updateLEDStatus: Return time.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 2930.
+src\SensorClasses/SensorValueHandler.hpp -> 205 addSensorValuesToAccumulator: 
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue: 
+src\main.cpp -> 141 sensorValueWeightCalculationFunction: 
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 26.254444. Weight = 3121.000000. Accumulated weighted value is now 1625315.393826. Total weight is now 62185.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 26.136776.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 43.207668. Weight = 3130.000000. Accumulated weighted value is now 2723208.394539. Total weight is now 62211.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 43.773744.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 95458.000000. Weight = 3137.000000. Accumulated weighted value is now 5940487323.000000. Total weight is now 62231.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 95458.651203.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 212757.000000. Weight = 3143.000000. Accumulated weighted value is now 11412936350.000000. Total weight is now 62243.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 183360.961875.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 876.000000. Weight = 3153.000000. Accumulated weighted value is now 55128395.000000. Total weight is now 62263.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 885.411802.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 0.000000. Weight = 3147.000000. Accumulated weighted value is now 636500.000000. Total weight is now 62265.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 10.222436.
+src\main.cpp -> 167 checkPairingButtonAndStatus:
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode:
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 252 handleNotificationIfPresent: 
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update:
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus: 
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 3137.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 863
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 863
+lib\NotificationHandler/LedController.hpp -> 166 updateLEDStatus: Return time.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 863.
+src\main.cpp -> 262 handleNotificationIfPresent: Will wait for 863 ms
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update: 
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 4044.
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 0
+lib\NotificationHandler/LedController.hpp -> 80 toggleLEDStatus: 
+lib\NotificationHandler/LedController.hpp -> 62 setLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 180 updateLEDStatus: Led got toggled.
+lib\NotificationHandler/LedController.hpp -> 183 updateLEDStatus: Index got moved.
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+Overflow
+lib\NotificationHandler/LedController.hpp -> 186 updateLEDStatus: Time till next change is 0.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 0.
+src\SensorClasses/SensorValueHandler.hpp -> 205 addSensorValuesToAccumulator:
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue: 
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 26.271454. Weight = 2983.000000. Accumulated weighted value is now 1703683.140682. Total weight is now 65168.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 26.142940.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 43.179115. Weight = 2968.000000. Accumulated weighted value is now 2851364.008736. Total weight is now 65179.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 43.746667.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 95458.000000. Weight = 2971.000000. Accumulated weighted value is now 6224093041.000000. Total weight is now 65202.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 95458.621530.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 215578.000000. Weight = 2967.000000. Accumulated weighted value is now 12052556276.000000. Total weight is now 65210.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 184826.809937.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 869.000000. Weight = 2950.000000. Accumulated weighted value is now 57691945.000000. Total weight is now 65213.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 884.669391.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 14.000000. Weight = 2952.000000. Accumulated weighted value is now 677828.000000. 
+Total weight is now 65217.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 10.393425.
+src\main.cpp -> 167 checkPairingButtonAndStatus: 
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode:
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 252 handleNotificationIfPresent:
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update: 
+lib\NotificationHandler/NotificationHandler.hpp -> 273 update: Buzzer tone.
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext: 
+Overflow
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 0
+lib\NotificationHandler/LedController.hpp -> 170 updateLEDStatus: Index overflow.
+lib\NotificationHandler/LedController.hpp -> 80 toggleLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 62 setLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 180 updateLEDStatus: Led got toggled.
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 14.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 3986
+lib\NotificationHandler/LedController.hpp -> 186 updateLEDStatus: Time till next change is 3986.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 3986.
+src\main.cpp -> 167 checkPairingButtonAndStatus: 
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode: 
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 252 handleNotificationIfPresent:
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update: 
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus: 
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 1073.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 2927
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 2927
+lib\NotificationHandler/LedController.hpp -> 166 updateLEDStatus: Return time.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 2927.
+src\SensorClasses/SensorValueHandler.hpp -> 205 addSensorValuesToAccumulator:
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue: 
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 26.272711. Weight = 3077.000000. Accumulated weighted value is now 1784524.271814. Total weight is now 68245.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 26.148791.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue: 
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 43.173855. Weight = 3086.000000. Accumulated weighted value is now 2984598.524734. Total weight is now 68265.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 43.720772.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 95456.000000. Weight = 3072.000000. Accumulated weighted value is now 6517333873.000000. Total weight is now 68274.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 95458.503574.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 216811.000000. Weight = 3089.000000. Accumulated weighted value is now 12722285455.000000. Total weight is now 68299.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 186273.378161.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 887.000000. Weight = 3100.000000. Accumulated weighted value is now 60441645.000000. Total weight is now 68313.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 884.775153.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 0.000000. Weight = 3108.000000. Accumulated weighted value is now 677828.000000. Total weight is now 68325.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 9.920644.
+src\main.cpp -> 167 checkPairingButtonAndStatus: 
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode:
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 252 handleNotificationIfPresent:
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update:
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 3093.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 907
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 907
+lib\NotificationHandler/LedController.hpp -> 166 updateLEDStatus: Return time.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 907.
+src\main.cpp -> 262 handleNotificationIfPresent: Will wait for 907 ms
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update: 
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 4029.
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 0
+lib\NotificationHandler/LedController.hpp -> 80 toggleLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 62 setLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 180 updateLEDStatus: Led got toggled.
+lib\NotificationHandler/LedController.hpp -> 183 updateLEDStatus: Index got moved.
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+Overflow
+lib\NotificationHandler/LedController.hpp -> 186 updateLEDStatus: Time till next change is 0.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 0.
+src\SensorClasses/SensorValueHandler.hpp -> 205 addSensorValuesToAccumulator:
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue: 
+src\main.cpp -> 141 sensorValueWeightCalculationFunction: 
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 26.290668. Weight = 2972.000000. Accumulated weighted value is now 1862660.138559. Total weight is now 71217.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 26.154712.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 43.140160. Weight = 2978.000000. Accumulated weighted value is now 3113069.920044. Total weight is now 71243.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 43.696502.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 95458.000000. Weight = 2984.000000. Accumulated weighted value is now 6802180545.000000. Total weight is now 71258.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 95458.482486.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 216124.000000. Weight = 2966.000000. Accumulated weighted value is now 13363309239.000000. Total weight is now 71265.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 187515.740391.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 882.000000. Weight = 2968.000000. Accumulated weighted value is now 63059421.000000. Total weight is now 71281.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 884.659601.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 0.000000. Weight = 2965.000000. Accumulated weighted value is now 677828.000000. Total weight is now 71290.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 9.508038.
+src\main.cpp -> 167 checkPairingButtonAndStatus:
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode:
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 252 handleNotificationIfPresent:
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update:
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+Overflow
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 0
+lib\NotificationHandler/LedController.hpp -> 170 updateLEDStatus: Index overflow.
+lib\NotificationHandler/LedController.hpp -> 80 toggleLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 62 setLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 180 updateLEDStatus: Led got toggled.
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 14.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 3986
+lib\NotificationHandler/LedController.hpp -> 186 updateLEDStatus: Time till next change is 3986.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 3986.
+src\main.cpp -> 167 checkPairingButtonAndStatus: 
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode:
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+Station is unlocked: 1
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 252 handleNotificationIfPresent:
+src\main.cpp -> 255 handleNotificationIfPresent: Notifcation is present
+lib\NotificationHandler/NotificationHandler.hpp -> 250 update: 
+lib\NotificationHandler/NotificationHandler.hpp -> 145 setLEDfromSensorError:
+lib\NotificationHandler/NotificationHandler.hpp -> 153 setLEDfromSensorError: Led got updated without changes
+lib\NotificationHandler/LedController.hpp -> 155 updateLEDStatus:
+lib\NotificationHandler/LedController.hpp -> 85 getMsTillNext:
+lib\NotificationHandler/LedController.hpp -> 92 getMsTillNext: Passed time = 1073.
+lib\NotificationHandler/LedController.hpp -> 99 getMsTillNext: Time till next is 2927
+lib\NotificationHandler/LedController.hpp -> 164 updateLEDStatus: Remaining time = 2927
+lib\NotificationHandler/LedController.hpp -> 166 updateLEDStatus: Return time.
+lib\NotificationHandler/NotificationHandler.hpp -> 289 update: Found error with time 2927.
+src\SensorClasses/SensorValueHandler.hpp -> 205 addSensorValuesToAccumulator:
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue: 
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 26.285625. Weight = 3094.000000. Accumulated weighted value is now 1943987.863726. Total weight is now 74311.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 26.160163.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 43.151497. Weight = 3094.000000. Accumulated weighted value is now 3246580.651413. Total weight is now 74337.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 43.673819.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 95457.000000. Weight = 3089.000000. Accumulated weighted value is now 7097047218.000000. Total weight is now 74347.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 95458.420891.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction: 
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 217918.000000. Weight = 3098.000000. Accumulated weighted value is now 14038419203.000000. Total weight is now 74363.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 188782.313825.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue: 
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 869.000000. Weight = 3095.000000. Accumulated weighted value is now 65748976.000000. Total weight is now 74376.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 884.007960.
+src\SensorClasses/ValueAccumulator.hpp -> 61 addValue:
+src\main.cpp -> 141 sensorValueWeightCalculationFunction:
+src\SensorClasses/ValueAccumulator.hpp -> 72 addValue: Value was 8.000000. Weight = 3108.000000. Accumulated weighted value is now 702692.000000. Total weight is now 74398.000000
+src\SensorClasses/ValueAccumulator.hpp -> 76 addValue: Mean would now be 9.445039.
+src\main.cpp -> 167 checkPairingButtonAndStatus:
+src\main.cpp -> 172 checkPairingButtonAndStatus: Checking pairing button and status. In pairing mode value is 0.
+src\main.cpp -> 289 updateNotificationHandler_PairingMode:
+src\main.cpp -> 290 updateNotificationHandler_PairingMode: Update notification with value 0
+lib\NotificationHandler/NotificationHandler.hpp -> 301 updatePairingNotification:
+lib\NotificationHandler/NotificationHandler.hpp -> 307 updatePairingNotification: Is active with same value as previous. Value was 0
+lib\NotificationHandler/NotificationHandler.hpp -> 227 isEmpty:
+src\main.cpp -> 158 checkNotificationSilenceButtonPressed: 
+src\main.cpp -> 214 handleCentralDeviceIfPresent:
+* Connected to central device!
+* Device MAC address: 62:c4:3b:77:fc:e7
+
+src\main.cpp -> 189 setValueInVerifiedCentralDevice: 
+Central device is remembered device.
+Connected
+src\SensorClasses/SensorValueHandler.hpp -> 234 setAccumulatedSensorValuesInBle:
+src\SensorClasses/SensorValueHandler.hpp -> 114 convertToGATT_soilHumidity:
+Soil humidity = 884
+Calculated = 10.153848
+src\SensorClasses/SensorValueHandler.hpp -> 134 convertToGATT_airHumidity:
+src\SensorClasses/SensorValueHandler.hpp -> 146 convertToGATT_airPressure:
+src\SensorClasses/SensorValueHandler.hpp -> 155 convertToGATT_airQuality:
+src\SensorClasses/SensorValueHandler.hpp -> 165 convertToGATT_airTemperature:
+src\SensorClasses/SensorValueHandler.hpp -> 177 convertToGATT_lightIntensity:
+src\SensorClasses/SensorValueHandler.hpp -> 191 luminosityFromVoltage:
+src\SensorClasses/ValueAccumulator.hpp -> 53 reset:
+src\SensorClasses/ValueAccumulator.hpp -> 53 reset:
+src\SensorClasses/ValueAccumulator.hpp -> 53 reset:
+src\SensorClasses/ValueAccumulator.hpp -> 53 reset:
+src\SensorClasses/ValueAccumulator.hpp -> 53 reset:
+src\SensorClasses/ValueAccumulator.hpp -> 53 reset:
+src\main.cpp -> 296 setArduinoPowerStatus:
