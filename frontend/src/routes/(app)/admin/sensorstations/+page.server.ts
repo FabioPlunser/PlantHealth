@@ -31,12 +31,22 @@ export const actions = {
     const formData = await request.formData();
     let sensorStationId = formData.get("sensorStationId");
     let unlocked = formData.get("unlocked");
-    let res = await fetch(
+    await fetch(
       `${BACKEND_URL}/set-unlocked-sensor-station?sensorStationId=${sensorStationId}&unlocked=${unlocked}`,
       {
         method: "POST",
       }
-    );
+    ).then((response) => {
+      let time = new Date().toLocaleString();
+      if (!response.ok) {
+        console.log(`${time} : ${response.message}`);
+        throw error(response.status, response.statusText);
+      } else {
+        console.log(
+          `${time} : unlocked set to "${unlocked}" for sensorStation with id = ${sensorStationId}`
+        );
+      }
+    });
   },
 
   // TODO: add validation and error handling (toast messages)
