@@ -257,7 +257,7 @@
           on:change={setPageSize}
           class="btn"
         >
-          {#each [5, 10, 20] as pageSize}
+          {#each [5, 10, 20, 40, 80] as pageSize}
             <option value={pageSize}>
               Show {pageSize}
             </option>
