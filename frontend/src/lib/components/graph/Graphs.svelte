@@ -2,18 +2,48 @@
   import { fly } from "svelte/transition";
   import Graph from "./Graph.svelte";
   import { sensorsStore } from "$stores/sensorsStore";
-  import { onMount } from "svelte";
   import MediaQuery from "$helper/MediaQuery.svelte";
   import { createGraphData } from "$components/graph/helper";
   import Spinner from "$components/ui/Spinner.svelte";
-
+  import { onMount } from "svelte";
+  // ---------------------------------------------------
+  // ---------------------------------------------------
   export let data: any;
   export let loading = false;
-
+  export let options = {};
+  // ---------------------------------------------------
+  // ---------------------------------------------------
   let sensors = $sensorsStore;
   let currentSensor: any = sensors[0].type;
   let graphData: any = {};
-
+  let width = 0;
+  $: {
+    if (width <= 400) {
+      options = {
+        responsive: true,
+        scales: {
+          x: {
+            ticks: {
+              display: false,
+            },
+          },
+        },
+      };
+    } else {
+      options = {
+        responsive: true,
+        scales: {
+          x: {
+            ticks: {
+              display: true,
+            },
+          },
+        },
+      };
+    }
+  }
+  // ---------------------------------------------------
+  // ---------------------------------------------------
   data
     .then(async (res: any) => {
       console.log;
@@ -22,18 +52,12 @@
     .catch((err: any) => {
       console.log(err);
     });
-
-  export let options = {
-    responsive: true,
-    interaction: {
-      intersect: false,
-      axis: "x",
-    },
-  };
+  // ---------------------------------------------------
+  // ---------------------------------------------------
 </script>
 
 <div>
-  <div class="md:flex items-center">
+  <div class="md:flex items-center" bind:clientWidth={width}>
     <div class="w-full h-full">
       {#if loading}
         <div class="mb-2">

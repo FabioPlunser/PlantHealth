@@ -150,6 +150,7 @@ Usage:
                 >
                 <a
                   data-sveltekit-preload-code
+                  data-sveltekit-reload
                   href="/logout"
                   class="hover:text-gray-600 text-xl">Logout</a
                 >

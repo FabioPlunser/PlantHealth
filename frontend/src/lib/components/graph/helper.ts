@@ -11,10 +11,16 @@ export function createGraphData(data: any) {
     //---------------------------------------------------------------
     let sensorData: any = [];
     let pointBackgroundColor: any = [];
+    let lowerLimit: any = [];
+    let upperLimit: any = [];
+
     for (let data of sensor.values) {
       let label = new Date(data.timestamp).toLocaleTimeString();
       labels.push(label);
       sensorData.push(data.value);
+      lowerLimit.push(data.lowerLimit);
+      upperLimit.push(data.upperLimit);
+
       if (data.aboveLimit) {
         pointBackgroundColor.push("rgba(0,0,255,1)");
       } else if (data.belowLimit) {
@@ -38,30 +44,27 @@ export function createGraphData(data: any) {
     //---------------------------------------------------------------
 
     //create SensorLimitsSet
-    let aboveLimit: any = [];
-    let belowLimit: any = [];
-    for (let data of sensor.values) {
-      aboveLimit.push(data.aboveLimit);
-      belowLimit.push(data.belowLimit);
-    }
-    let aboveLimitSet = {
+
+    let lowerLimitSet = {
       label: "Above Limit",
       fill: true,
       lineTension: 0,
       backgroundColor: "rgba(0,0,255, 1)",
       borderColor: "rgba(0,0,255, 1)",
-      data: aboveLimit,
+      data: lowerLimit,
+      pointRadius: 0,
     };
-    let belowLimitSet = {
+    let upperLimitSet = {
       label: "Below Limit",
       fill: true,
       lineTension: 0,
       backgroundColor: "rgba(255,0,0, 1)",
       borderColor: "rgba(255,0,0, 1)",
-      data: belowLimit,
+      data: upperLimit,
+      pointRadius: 0,
     };
-    datasets.push(aboveLimitSet);
-    datasets.push(belowLimitSet);
+    datasets.push(upperLimitSet);
+    datasets.push(lowerLimitSet);
 
     graphData[sensorType] = {
       labels: labels,

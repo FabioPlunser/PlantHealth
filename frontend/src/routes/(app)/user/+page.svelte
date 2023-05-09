@@ -20,16 +20,14 @@
   let sensorStationModel = false;
   //---------------------------------------------------
   //---------------------------------------------------
-  $: console.log(data);
 </script>
 
 {#if rendered}
   <SensorstationModal
     data={data?.sensorStations}
     bind:showModal={sensorStationModel}
+    on:close={() => (sensorStationModel = false)}
   />
-
-  <!-- <Grid/> -->
 
   <section>
     <div class="flex justify-center">
@@ -42,14 +40,18 @@
     <div class="flex justify-center mt-20">
       <div class="gap-4 grid jusitfy-center w-full">
         {#each data?.dashboard?.sensorStations as sensorStation, i (sensorStation.sensorStationId)}
-          <div
-            in:fly={{ y: -200, duration: 200, delay: 200 * i }}
-            out:fly={{ y: -200, duration: 200 }}
-          >
+          <div in:fly={{ y: -200, duration: 200, delay: 200 * i }}>
             <SensorStation {sensorStation} dates={data.dates} />
           </div>
         {/each}
       </div>
     </div>
+    {#if data?.dashboard?.sensorStations.length === 0}
+      <div class="flex justify-center mt-20">
+        <h1 class="text-2xl font-bold">
+          You have no SensorStations in your Dashboard
+        </h1>
+      </div>
+    {/if}
   </section>
 {/if}

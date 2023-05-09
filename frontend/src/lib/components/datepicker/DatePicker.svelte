@@ -201,7 +201,7 @@
 
 <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 <div
-  class="date-time-picker bg-base-100 rounded-2xl"
+  class="date-time-picker bg-base-100"
   on:focusout
   tabindex="0"
   on:keydown={keydown}
@@ -349,7 +349,6 @@
 
 <style>
   .date-time-picker {
-    display: inline-block;
     user-select: none;
     -webkit-user-select: none;
     padding: 0.5rem;
@@ -360,6 +359,8 @@
     box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.08), 0px 2px 6px rgba(0, 0, 0, 0.11);
     outline: none;
     transition: all 80ms cubic-bezier(0.4, 0, 0.2, 1);
+    position: absolute;
+    z-index: 1000;
   }
   .date-time-picker:focus {
     border-color: var(--date-picker-highlight-border, #0269f7);
