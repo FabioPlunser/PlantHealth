@@ -76,7 +76,7 @@
                       placeholder={accessPoint.roomName}
                       name="roomName"
                       type="text"
-                      class="input input-bordered w-full bg-gray-800 text-white"
+                      class="input dark:input-bordered w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
                     />
                   </label>
                   <FormError field="username" {form} />
@@ -91,7 +91,7 @@
                         placeholder={accessPoint.transferInterval}
                         name="transferInterval"
                         type="number"
-                        class="input input-bordered w-full bg-gray-800 text-white"
+                        class="input dark:input-bordered w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
                         min="30"
                         max="240"
                       />
@@ -100,7 +100,7 @@
 
                   <FormError field="username" {form} />
 
-                  <div class="flex justify-center my-2 gap-4">
+                  <div class="flex justify-center items-center my-2 gap-4">
                     {#if accessPoint.connected}
                       <div class="badge badge-success">Connected</div>
                     {:else}

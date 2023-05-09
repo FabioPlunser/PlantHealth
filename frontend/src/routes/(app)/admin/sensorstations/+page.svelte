@@ -29,10 +29,6 @@
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   let searchTerm = "";
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
-  $: console.log(searchTerm);
-  $: console.log(data);
 </script>
 
 {#if rendered}
@@ -55,7 +51,7 @@
         </div>
         <div
           class="mb-4"
-          in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
+          in:fly|self={{ y: -200, duration: 200, delay: 100 }}
           out:fly|local|self={{ y: 200, duration: 200 }}
         >
           <input
@@ -87,7 +83,7 @@
                     class="card w-full border h-fit bg-base-100 dark:border-none shadow-2xl"
                   >
                     <div class="absolute top-0 right-0 m-4">
-                      <a href="sensorstations/sensorstation">
+                      <a href="/admin/sensorstations/sensorstation">
                         <button
                           on:click={() =>
                             setCookie(sensorStation.sensorStationId)}

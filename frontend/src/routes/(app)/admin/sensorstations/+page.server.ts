@@ -14,7 +14,7 @@ export async function load({ locals, fetch, request, depends, url }) {
 
   let res = await fetch(`${BACKEND_URL}/get-sensor-stations`);
   if (!res.ok) {
-    throw new error(res.status, "Could not get sensor stations");
+    throw error(res.status, "Could not get sensor stations");
   }
   res = await res.json();
 
@@ -74,11 +74,7 @@ export const actions = {
 
       return fail(400, { error: true, errors });
     }
-    console.log(formData);
   },
-
-  // TODO: add validation and error handling (toast messages)
-  scan: async ({ cookies, request, fetch }) => {},
 
   delete: async ({ cookies, request, fetch }) => {
     console.log("delete");
