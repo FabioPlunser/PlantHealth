@@ -77,11 +77,9 @@ function generateQrCodePdfBlob(data: QrCodePdfData): Blob {
 
   let heading = "Plant Health";
   pdf.setFontSize(20);
-  let x1 = pdf.internal.pageSize.width / 2 - pdf.getTextWidth(heading) / 2;
-  pdf.text(heading, x1, 10);
+  pdf.text(heading, center(pdf, pdf.getTextWidth(heading)), 10);
 
-  let x2 = pdf.internal.pageSize.width / 2 - 15;
-  pdf.addImage(data.logoBase64, "PNG", x2, 15, 30, 30);
+  pdf.addImage(data.logoBase64, "PNG", center(pdf, 30), 15, 30, 30);
 
   pdf.setFontSize(10);
   pdf.text(`Room: ${data.roomName}`, 20, 55);
@@ -91,13 +89,11 @@ function generateQrCodePdfBlob(data: QrCodePdfData): Blob {
 
   pdf.line(15, 65, pdf.internal.pageSize.width - 15, 65);
 
-  let x4 = pdf.internal.pageSize.width / 2 - 25;
-  pdf.addImage(data.qrcodeBase64, "PNG", x4, 75, 50, 50);
+  pdf.addImage(data.qrcodeBase64, "PNG", center(pdf, 50), 75, 50, 50);
 
-  pdf.setFontSize(6);
   let idString = `ID = ${data.sensorStationId}`;
-  let x5 = pdf.internal.pageSize.width / 2 - pdf.getTextWidth(idString) / 2;
-  pdf.text(idString, x5, 135);
+  pdf.setFontSize(6);
+  pdf.text(idString, center(pdf, pdf.getTextWidth(idString)), 135);
 
   return pdf.output("blob");
 }
@@ -117,4 +113,8 @@ function createQrCode(url: string): string {
 
   // NOTE: createDataURL writes data:image/gif which we don't want
   return "data:image/;" + base64Image.split(";")[1];
+}
+
+function center(pdf: jsPDF, itemWidth: number) {
+  return pdf.internal.pageSize.width / 2 - itemWidth / 2;
 }

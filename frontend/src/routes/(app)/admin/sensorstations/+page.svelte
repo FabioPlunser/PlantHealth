@@ -139,8 +139,10 @@
                         </div>
                       </div>
                       <div class="flex justify-center my-2 mx-auto gap-4">
-                        <button type="submit" class="btn btn-primary"
-                          >Update</button
+                        <button
+                          type="submit"
+                          action="?/update"
+                          class="btn btn-primary">Update</button
                         >
                         {#if sensorStation.unlocked}
                           <button class="btn btn-info" formaction="?/unlock"
