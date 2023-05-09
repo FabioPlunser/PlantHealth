@@ -74,6 +74,7 @@ export const actions = {
 
       return fail(400, { error: true, errors });
     }
+    console.log(formData);
   },
 
   // TODO: add validation and error handling (toast messages)

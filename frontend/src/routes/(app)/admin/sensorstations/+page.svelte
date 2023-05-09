@@ -103,12 +103,12 @@
                       <Input
                         field="name"
                         label="Name"
-                        placeholder="Sakura"
+                        placeholder="Plant1"
                         type="text"
                         value={sensorStation.name}
                       />
                       <h1>
-                        <span class="font-bold">Room</span><span
+                        <span class="font-bold">Room: </span><span
                           >{sensorStation.roomName}</span
                         >
                       </h1>
@@ -139,10 +139,8 @@
                         </div>
                       </div>
                       <div class="flex justify-center my-2 mx-auto gap-4">
-                        <button
-                          type="submit"
-                          action="?/update"
-                          class="btn btn-primary">Update</button
+                        <button type="submit" class="btn btn-primary"
+                          >Update</button
                         >
                         {#if sensorStation.unlocked}
                           <button class="btn btn-info" formaction="?/unlock"
