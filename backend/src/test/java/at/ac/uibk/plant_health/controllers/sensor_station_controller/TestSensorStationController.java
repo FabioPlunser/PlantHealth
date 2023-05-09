@@ -115,6 +115,11 @@ public class TestSensorStationController {
 		for (int i = 0; i < sensorStationCount; i++) {
 			String bdAddress = StringGenerator.macAddress();
 			SensorStation sensorStation = new SensorStation(bdAddress, 255 - i);
+			sensorStation.setName("SensorStation" + i);
+			sensorStation.setAccessPoint(accessPoint);
+			sensorStation.setDeleted(false);
+			sensorStation.setUnlocked(true);
+			sensorStation.setConnected(true);
 			sensorStationService.save(sensorStation);
 		}
 		List<SensorStation> sensorStations =
@@ -128,7 +133,19 @@ public class TestSensorStationController {
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(
 						status().isOk(), jsonPath("$.sensorStations").exists(),
-						jsonPath("$.sensorStations.length()").value(sensorStations.size())
+						jsonPath("$.sensorStations.length()").value(sensorStations.size()),
+						jsonPath("$.sensorStations[0].sensorStationId").exists(),
+						jsonPath("$.sensorStations[0].bdAddress").exists(),
+						jsonPath("$.sensorStations[0].roomName").exists(),
+						jsonPath("$.sensorStations[0].name").exists(),
+						jsonPath("$.sensorStations[0].dipSwitchId").exists(),
+						jsonPath("$.sensorStations[0].unlocked").exists(),
+						jsonPath("$.sensorStations[0].connected").exists(),
+						jsonPath("$.sensorStations[0].deleted").exists(),
+						jsonPath("$.sensorStations[0].plantPictureIds").exists(),
+						jsonPath("$.sensorStations[0].plantPictureIds").isArray(),
+						jsonPath("$.sensorStations[0].sensorLimits").exists(),
+						jsonPath("$.sensorStations[0].sensorLimits").isArray()
 				);
 	}
 

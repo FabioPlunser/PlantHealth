@@ -31,7 +31,7 @@ public class SensorStation extends Device implements Serializable {
 
 	@Column(name = "plant_name")
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
-	private String name = null;
+	private String name = "SensorStation";
 
 	@JdbcTypeCode(SqlTypes.INTEGER)
 	@Column(name = "dip_switch_id", nullable = false)

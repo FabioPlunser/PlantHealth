@@ -3,6 +3,12 @@ swa:
     expiration-duration: 1d
   api:
     base: /
+  scheduling:
+    rate:
+      in:
+        seconds: 15
+  pictures:
+    path: src/main/resources/static/images/
 
 server:
   port: 8080
@@ -27,7 +33,7 @@ springdoc:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/plant_health?createDatabaseIfNotExist=true
+    url: jdbc:mysql://db:3306/plant_health?createDatabaseIfNotExist=true
     username: spring
     password: password
   h2:
@@ -37,8 +43,13 @@ spring:
     hibernate:
       dialect: org.hibernate.dialect.MySQLDialect
       # Create Model Tables on Startup
-      ddl-auto: none
+      ddl-auto: create
   web:
     resources:
       # Disable static Resource Mapping
       add-mappings: false
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
