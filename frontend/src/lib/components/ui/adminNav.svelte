@@ -36,13 +36,6 @@
       icon: "bi bi-people-fill",
       iconName: "",
     },
-
-    {
-      name: "Settings",
-      path: "/admin/settings",
-      icon: "bi bi-gear",
-      iconName: "",
-    },
   ];
 </script>
 

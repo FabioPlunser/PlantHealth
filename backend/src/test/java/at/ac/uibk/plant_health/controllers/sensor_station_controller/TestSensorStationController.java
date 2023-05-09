@@ -56,7 +56,6 @@ import at.ac.uibk.plant_health.util.StringGenerator;
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class TestSensorStationController {
 	@Autowired
 	private SensorStationService sensorStationService;
@@ -116,6 +115,11 @@ public class TestSensorStationController {
 		for (int i = 0; i < sensorStationCount; i++) {
 			String bdAddress = StringGenerator.macAddress();
 			SensorStation sensorStation = new SensorStation(bdAddress, 255 - i);
+			sensorStation.setName("SensorStation" + i);
+			sensorStation.setAccessPoint(accessPoint);
+			sensorStation.setDeleted(false);
+			sensorStation.setUnlocked(true);
+			sensorStation.setConnected(true);
 			sensorStationService.save(sensorStation);
 		}
 		List<SensorStation> sensorStations =
@@ -129,7 +133,15 @@ public class TestSensorStationController {
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(
 						status().isOk(), jsonPath("$.sensorStations").exists(),
-						jsonPath("$.sensorStations.length()").value(sensorStations.size())
+						jsonPath("$.sensorStations.length()").value(sensorStations.size()),
+						jsonPath("$.sensorStations[0].sensorStationId").exists(),
+						jsonPath("$.sensorStations[0].bdAddress").exists(),
+						jsonPath("$.sensorStations[0].roomName").exists(),
+						jsonPath("$.sensorStations[0].name").exists(),
+						jsonPath("$.sensorStations[0].dipSwitchId").exists(),
+						jsonPath("$.sensorStations[0].unlocked").exists(),
+						jsonPath("$.sensorStations[0].connected").exists(),
+						jsonPath("$.sensorStations[0].deleted").exists()
 				);
 	}
 
@@ -295,7 +307,11 @@ public class TestSensorStationController {
 					sensorMap.keySet().toArray()[i].toString(),
 					sensorMap.values().toArray()[i].toString()
 			);
-			sensorRepository.save(sensor);
+			if (!sensorRepository.findAll().contains(sensor))
+				sensorRepository.save(sensor);
+			else {
+				sensor = sensorRepository.findByType(sensor.getType()).get();
+			}
 			sensors.add(sensor);
 		}
 		List<SensorData> sensorDataList = new ArrayList<>();

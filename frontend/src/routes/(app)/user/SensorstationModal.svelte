@@ -14,14 +14,14 @@
   open={showModal}
   on:close={() => (showModal = false)}
   closeOnBodyClick={false}
-  _class="dark:bg-white/10 backdrop-blur-xl "
+  _class="dark:bg-white/10 backdrop-blur-xl w-fit"
 >
-  <div class="dark:text-white text-black">
+  <div class="dark:text-white text-black w-fit">
     {#if data.length === 0}
       <h1 class="font-bold">No sensor stations available</h1>
     {:else}
       {#key showModal}
-        <div class="grid grid-cols-3 gap-4">
+        <div class="grid grid-rows sm:grid-cols-2 md:grid-cols-3 gap-4 w-fit">
           {#each data as item, i (item.sensorStationId)}
             <div
               in:fly|self={{ x: -200, duration: 300, delay: 200 * i }}

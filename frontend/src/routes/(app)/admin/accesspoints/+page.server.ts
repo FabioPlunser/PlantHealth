@@ -4,7 +4,6 @@ import { BACKEND_URL } from "$env/static/private";
 export async function load({ fetch, depends }) {
   let res = await fetch(`${BACKEND_URL}/get-access-points`);
   res = await res.json();
-  console.log("accessPoints", res.accessPoints);
   depends("app:getAccessPoints");
   return {
     accessPoints: res.accessPoints,
@@ -44,17 +43,13 @@ export const actions = {
   scan: async ({ cookies, request, fetch }) => {
     const formData = await request.formData();
     let accessPointId = formData.get("accessPointId");
-    console.log("scan", accessPointId);
 
     let res = await fetch(
       `${BACKEND_URL}/scan-for-sensor-stations?accessPointId=${accessPointId}`,
       { method: "POST" }
     );
     res = await res.json();
-    console.log("scan", res);
   },
 
-  delete: async ({ cookies, request, fetch }) => {
-    console.log("delete");
-  },
+  delete: async ({ cookies, request, fetch }) => {},
 } satisfies Actions;

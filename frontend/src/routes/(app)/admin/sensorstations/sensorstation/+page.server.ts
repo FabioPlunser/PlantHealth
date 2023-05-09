@@ -40,8 +40,6 @@ export const actions = {
   update: async ({ cookies, request, fetch }) => {},
 
   setLimits: async ({ cookies, request, fetch }) => {
-    console.log("setLimits");
     let formData = await request.formData();
-    console.log("formData", formData);
   },
 };

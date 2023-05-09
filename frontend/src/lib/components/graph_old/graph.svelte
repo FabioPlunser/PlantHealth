@@ -24,9 +24,7 @@
     Soil = "soil",
   }
   $: graph = graphType.Temperature;
-  $: console.log(graph);
   function setGraph(graphType: graphType) {
-    console.log("set graph", graphType);
     graph = graphType;
   }
 

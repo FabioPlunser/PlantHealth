@@ -22,19 +22,9 @@
       name: "AP",
       path: "/admin/accesspoints",
     },
-    // {
-    //   name: "Gardener",
-    //   path: "/admin/gardener",
-    //   icon: Gardener,
-    // },
     {
       name: "Users", // includes gardeners
       path: "/admin/users",
-    },
-
-    {
-      name: "Settings",
-      path: "/admin/settings",
     },
   ];
 </script>
@@ -150,6 +140,7 @@ Usage:
                 >
                 <a
                   data-sveltekit-preload-code
+                  data-sveltekit-reload
                   href="/logout"
                   class="hover:text-gray-600 text-xl">Logout</a
                 >
