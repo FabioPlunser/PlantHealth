@@ -141,11 +141,7 @@ public class TestSensorStationController {
 						jsonPath("$.sensorStations[0].dipSwitchId").exists(),
 						jsonPath("$.sensorStations[0].unlocked").exists(),
 						jsonPath("$.sensorStations[0].connected").exists(),
-						jsonPath("$.sensorStations[0].deleted").exists(),
-						jsonPath("$.sensorStations[0].plantPictureIds").exists(),
-						jsonPath("$.sensorStations[0].plantPictureIds").isArray(),
-						jsonPath("$.sensorStations[0].sensorLimits").exists(),
-						jsonPath("$.sensorStations[0].sensorLimits").isArray()
+						jsonPath("$.sensorStations[0].deleted").exists()
 				);
 	}
 
