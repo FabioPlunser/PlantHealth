@@ -7,6 +7,7 @@
   import Graph from "./Graph.svelte";
   import MediaQuery from "$helper/MediaQuery.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
+  import { onMount } from "svelte";
   // ---------------------------------------------------
   // ---------------------------------------------------
   export let data: any;
@@ -15,7 +16,10 @@
   // ---------------------------------------------------
   // ---------------------------------------------------
   let sensors = $sensorsStore;
-  let currentSensor: any = sensors[0].type;
+  onMount(() => {
+    sensors = $sensorsStore;
+  });
+  let currentSensor: any = sensors[0].sensorType;
   let graphData: any = {};
   let width = 0;
   $: {
@@ -45,14 +49,29 @@
   }
   // ---------------------------------------------------
   // ---------------------------------------------------
+  let sensorData: any[] = [];
+  $: {
+    for (let sensor of sensorData) {
+      if (!$sensorsStore.includes(sensor.type)) {
+        let newSensor = {
+          sensorType: sensor.sensorType,
+          sensorUnit: sensor.sensorUnit,
+          bootstrap: "",
+          google: "sensors",
+        };
+        $sensorsStore = [...$sensorsStore, newSensor];
+      }
+    }
+  }
   data
     .then(async (res: any) => {
-      console.log;
+      sensorData = res.data;
       graphData = createGraphData(res.data);
     })
     .catch((err: any) => {
       console.log(err);
     });
+
   // ---------------------------------------------------
   // ---------------------------------------------------
 </script>
@@ -76,18 +95,20 @@
     </div>
 
     <div
-      class="bg-green-400 mx-auto shadow-2xl rounded-2xl flex justify-center items-ceter gap-4 md:grid md:flex-none md:justify-normal md:gap-2 p-1"
+      class="bg-green-400 mx-auto shadow-2xl rounded-2xl flex justify-center items-ceter gap-4 md:grid md:flex-none md:justify-normal md:gap-2 p-2"
     >
       {#each sensors as sensor, i (i)}
         <div
           in:fly|self={{ y: -50, duration: 50, delay: 100 * i }}
           class="tooltip"
-          data-tip={sensor.type}
+          data-tip={sensor.sensorType}
         >
-          <button on:click={() => (currentSensor = sensor.type)}>
+          <button on:click={() => (currentSensor = sensor.sensorType)}>
             <i
-              class="bi {sensor.icon} transform transition-transform active:scale-110 material-symbols-outlined text-4xl hover:text-white hover:dark:text-black
-              {sensor.type === currentSensor ? 'text-black' : 'text-white'}"
+              class="bi {sensor.bootstrap} transform transition-transform active:scale-110 material-symbols-outlined text-4xl hover:text-white hover:dark:text-black
+              {sensor.sensorType === currentSensor
+                ? 'text-black'
+                : 'text-white'}"
             >
               {sensor?.google}
             </i>

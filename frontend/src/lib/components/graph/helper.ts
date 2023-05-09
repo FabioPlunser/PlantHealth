@@ -6,6 +6,7 @@ export function createGraphData(data: any) {
     let sensorUnit = sensor.sensorUnit;
     let labels = [];
     let datasets = [];
+    console.log(sensor);
 
     // create SensorDataSet
     //---------------------------------------------------------------
