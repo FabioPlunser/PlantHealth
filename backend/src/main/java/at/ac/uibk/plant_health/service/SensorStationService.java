@@ -256,4 +256,10 @@ public class SensorStationService {
 			}
 		}
 	}
+
+	public void isDeleted(SensorStation sensorStation) throws ServiceException {
+		if (sensorStation.isDeleted()) {
+			throw new ServiceException("Sensor station is deleted", 400);
+		}
+	}
 }

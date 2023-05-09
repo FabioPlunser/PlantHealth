@@ -3,34 +3,6 @@ version: "3.9"
 # Docker Reference: https://docs.docker.com/engine/reference/builder/
 
 services:
-  sveltekit:
-    build:
-      context: ./frontend
-      dockerfile: ./Dockerfile
-    depends_on:
-      - spring
-    networks:
-      - api-network
-    ports:
-      - "3000:3000"
-    expose: [3000]
-
-  spring:
-    build:
-      dockerfile: ./Dockerfile
-      context: ./backend
-    depends_on:
-      - db
-    links:
-      - db
-      - db:database
-    ports:
-      - "8443:8080"
-    expose: [8443]
-    networks:
-      - api-network
-      - db-network
-
   db:
     # Docker Hub Reference: https://hub.docker.com/_/mysql/
     image: mysql
@@ -48,7 +20,40 @@ services:
     # (this is just an example, not intended to be a production configuration)
     command: --default-authentication-plugin=mysql_native_password
     expose: [3306]
-
+  # -----------------------------------------------------------------------------
+  # -----------------------------------------------------------------------------
+  spring:
+    build:
+      dockerfile: ./Dockerfile
+      context: ./backend
+    depends_on:
+      - db
+    restart: always
+    links:
+      - db
+      - db:database
+    ports:
+      - "8443:8080"
+    expose: [8443]
+    networks:
+      - api-network
+      - db-network
+  # -----------------------------------------------------------------------------
+  # -----------------------------------------------------------------------------
+  sveltekit:
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+    depends_on:
+      - spring
+    restart: always
+    networks:
+      - api-network
+    ports:
+      - "3000:3000"
+    expose: [3000]
+  # -----------------------------------------------------------------------------
+  # -----------------------------------------------------------------------------
   adminer:
     image: adminer
     restart: always

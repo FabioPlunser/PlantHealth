@@ -54,7 +54,7 @@ public class SensorLimits implements Serializable {
 	@Column(name = "threshold_duration", nullable = false)
 	private int thresholdDuration;
 
-	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	//	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "sensor_type", nullable = false)
 	private Sensor sensor;

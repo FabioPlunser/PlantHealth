@@ -124,6 +124,7 @@ public class SensorStationController {
 			) final LocalDateTime to
 	) {
 		try {
+			sensorStationService.isDeleted(sensorStationService.findById(sensorStationId));
 			return new SensorStationDataResponse(
 						   sensorStationService.findById(sensorStationId), from, to
 			)
