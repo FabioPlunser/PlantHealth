@@ -27,7 +27,7 @@ springdoc:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://db.planthealth.at:3306/plant_health?createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/plant_health?createDatabaseIfNotExist=true
     username: spring
     password: password
   h2:

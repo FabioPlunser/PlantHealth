@@ -56,7 +56,6 @@ import at.ac.uibk.plant_health.util.StringGenerator;
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class TestSensorStationController {
 	@Autowired
 	private SensorStationService sensorStationService;
@@ -295,7 +294,11 @@ public class TestSensorStationController {
 					sensorMap.keySet().toArray()[i].toString(),
 					sensorMap.values().toArray()[i].toString()
 			);
-			sensorRepository.save(sensor);
+			if (!sensorRepository.findAll().contains(sensor))
+				sensorRepository.save(sensor);
+			else {
+				sensor = sensorRepository.findByType(sensor.getType()).get();
+			}
 			sensors.add(sensor);
 		}
 		List<SensorData> sensorDataList = new ArrayList<>();

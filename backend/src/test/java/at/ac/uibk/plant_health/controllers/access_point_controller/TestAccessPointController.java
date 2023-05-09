@@ -48,8 +48,6 @@ import at.ac.uibk.plant_health.util.StringGenerator;
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-@ExtendWith({SetupH2Console.class})
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TestAccessPointController {
 	@Autowired
 	private AccessPointService accessPointService;
