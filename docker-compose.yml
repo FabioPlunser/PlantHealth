@@ -12,8 +12,8 @@ services:
     networks:
       - api-network
     ports:
-      - "8080:3000"
-    expose: [8080]
+      - "3000:3000"
+    expose: [3000]
 
   spring:
     build:
