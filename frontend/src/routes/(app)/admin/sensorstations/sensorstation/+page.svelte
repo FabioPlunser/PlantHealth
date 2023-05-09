@@ -84,7 +84,7 @@
 -->
   <SensorLimitsModal bind:open={sensorLimitsModal} {sensorStation} {sensors} />
   <SensorDataModal bind:open={sensorDataModal} data={data.data} />
-  <section in:fly={{ y: -200, duration: 200 }} class="h-screen">
+  <section in:fly={{ y: -200, duration: 200 }}>
     <div class="flex justify-center mx-auto">
       <form
         in:fly|self={{ y: -200, duration: 200, delay: 100 }}
@@ -250,6 +250,7 @@
               {/if}
             </div>
           </Desktop>
+
           <div class="flex justify-center mx-auto gap-2 mt-6">
             <button formaction="?/update" class="btn btn-primary">Update</button
             >

@@ -67,5 +67,23 @@ export const actions = {
 
   setLimits: async ({ cookies, request, fetch }) => {
     let formData = await request.formData();
+    let sensorStationId = formData.get("sensorStationId");
+    let sensorLimits = formData;
+    await fetch(
+      `${BACKEND_URL}/set-sensor-limits?sensorStationId=${sensorStationId}`,
+      {
+        method: "POST",
+      }
+    ).then((response) => {
+      let time = new Date().toLocaleString();
+      if (!response.ok) {
+        console.log(`${time} : ${response.message}`);
+        throw error(response.status, response.statusText);
+      } else {
+        console.log(
+          `${time} : unlocked set to "${unlocked}" for sensorStation with id = ${sensorStationId}`
+        );
+      }
+    });
   },
 };
