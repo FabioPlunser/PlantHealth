@@ -29,10 +29,8 @@
   const customEnhance: SubmitFunction = () => {
     loading = true;
     return async ({ update }) => {
-      // await setTimeout(async () => {
       await update();
       loading = false;
-      // }, 2000);
     };
   };
 
@@ -47,7 +45,7 @@
           in:fly|self={{ y: -200, duration: 200 }}
           class="card bg-base-100 shadow-2xl rounded-2xl p-4 mx-auto"
         >
-          <div class="absolute top-ß right-0 m-4">
+          <div class="absolute right-0 mr-6">
             <form method="POST" action="?/removeFromDashboard" use:enhance>
               <input
                 type="hidden"
@@ -63,73 +61,84 @@
             <h1>Room: {sensorStation.roomName}</h1>
             <h1>Name: {sensorStation.name}</h1>
           </div>
-          <div class="">
+
+          {#if !sensorStation.unlocked}
+            <h1 class="text-2xl font-bold flex justify-center">
+              SensorStation is locked
+            </h1>
+          {:else if sensorStation.deleted}
+            <h1 class="text-2xl font-bold flex justify-center">
+              SensorStation got deleted
+            </h1>
+          {:else}
             <div class="">
-              {#if loading}
-                <Spinner />
-              {:else}
-                <Graphs data={sensorStation.data} />
-              {/if}
+              <div class="">
+                {#if loading}
+                  <Spinner />
+                {:else}
+                  <Graphs data={sensorStation.data} />
+                {/if}
+              </div>
             </div>
-          </div>
-          <div class="w-full h-full mt-2">
-            <form
-              method="POST"
-              action="?/updateFromTo"
-              use:enhance={customEnhance}
-            >
-              <div
-                class="grid grid-rows xs:flex justify-center items-center gap-2"
+            <div class="w-full h-full mt-2">
+              <form
+                method="POST"
+                action="?/updateFromTo"
+                use:enhance={customEnhance}
               >
-                <div class="flex gap-2">
-                  <label class="my-auto">
-                    From:
-                    <input
-                      type="hidden"
-                      name="from"
-                      bind:value={newDates.from}
-                    />
-                    {#key sensorStation}
-                      <DateInput
-                        format="dd.MM.yyyy"
-                        placeholder={dateNow}
+                <div
+                  class="grid grid-rows sm:flex justify-center items-center gap-2"
+                >
+                  <div class="flex gap-2">
+                    <label class="my-auto">
+                      From:
+                      <input
+                        type="hidden"
+                        name="from"
                         bind:value={newDates.from}
                       />
-                    {/key}
-                  </label>
+                      {#key sensorStation}
+                        <DateInput
+                          format="dd.MM.yyyy"
+                          placeholder={dateNow}
+                          bind:value={newDates.from}
+                        />
+                      {/key}
+                    </label>
+                  </div>
+                  <div class="flex gap-2">
+                    <label class="my-auto">
+                      To:
+                      <input type="hidden" name="to" bind:value={newDates.to} />
+                      {#key sensorStation}
+                        <DateInput
+                          format="dd.MM.yyyy"
+                          placeholder={dateNow}
+                          bind:value={newDates.to}
+                        />
+                      {/key}
+                    </label>
+                  </div>
+                  <div class="my-auto flex items-center mt-6">
+                    <button
+                      class="btn btn-primary flex items-center"
+                      type="submit"
+                    >
+                      Update
+                    </button>
+                  </div>
                 </div>
-                <div class="flex gap-2">
-                  <label class="my-auto">
-                    To:
-                    <input type="hidden" name="to" bind:value={newDates.to} />
-                    {#key sensorStation}
-                      <DateInput
-                        format="dd.MM.yyyy"
-                        placeholder={dateNow}
-                        bind:value={newDates.to}
-                      />
-                    {/key}
-                  </label>
-                </div>
-                <div class="my-auto flex items-center mt-6">
-                  <button
-                    class="btn btn-primary flex items-center"
-                    type="submit"
-                  >
-                    Update
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-          <div class="absolute bottom-0 right-0 mb-6 mr-7">
-            <button
-              on:click={() => (showPictures = !showPictures)}
-              class="hover:text-primary active:scale-125"
-            >
-              <i class="bi bi-image text-3xl" />
-            </button>
-          </div>
+              </form>
+            </div>
+            <div class="absolute right-0 mr-[4.5em] md:bottom-0 md:m-6">
+              <button
+                on:click={() => (showPictures = !showPictures)}
+                class="hover:text-primary active:scale-125"
+              >
+                <i class="bi bi-image text-3xl" />
+              </button>
+            </div>
+          {/if}
         </div>
         {#if showPictures}
           <div

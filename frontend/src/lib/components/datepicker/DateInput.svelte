@@ -128,7 +128,7 @@
   />
   {#if visible && !disabled}
     <div
-      class="picker"
+      class="picker flex justify-center mx-auto rounded-xl"
       class:visible
       transition:fly={{ duration: 80, easing: cubicInOut, y: -5 }}
     >

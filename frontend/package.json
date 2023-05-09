@@ -11,7 +11,6 @@
     "lint": "eslint ."
   },
   "devDependencies": {
-    "@poppanator/sveltekit-svg": "^3.0.0",
     "@sveltejs/adapter-auto": "2.0.0",
     "@sveltejs/adapter-node": "^1.2.3",
     "@sveltejs/kit": "1.15.2",
@@ -40,5 +39,8 @@
     "vite-svg-loader": "^4.0.0",
     "zod": "^3.21.4"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@poppanator/sveltekit-svg": "^3.0.0"
+  }
 }

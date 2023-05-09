@@ -3,7 +3,8 @@
   //---------------------------------------------------
   //---------------------------------------------------
   import SensorstationModal from "./SensorstationModal.svelte";
-  import SensorStation from "$lib/components/ui/SensorStation/SensorStation.svelte";
+  import SensorStation from "$components/ui/SensorStation/SensorStation.svelte";
+  import DatePicker from "$lib/components/datepicker/DatePicker.svelte";
   //---------------------------------------------------
   //---------------------------------------------------
   export let data;
@@ -40,7 +41,10 @@
     <div class="flex justify-center mt-20">
       <div class="gap-4 grid jusitfy-center w-full">
         {#each data?.dashboard?.sensorStations as sensorStation, i (sensorStation.sensorStationId)}
-          <div in:fly={{ y: -200, duration: 200, delay: 200 * i }}>
+          <div
+            in:fly={{ y: -200, duration: 200, delay: 200 * i }}
+            out:fly={{ y: -200, duration: 200 }}
+          >
             <SensorStation {sensorStation} dates={data.dates} />
           </div>
         {/each}

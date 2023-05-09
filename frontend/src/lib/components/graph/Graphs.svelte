@@ -1,11 +1,12 @@
 <script lang="ts">
   import { fly } from "svelte/transition";
-  import Graph from "./Graph.svelte";
   import { sensorsStore } from "$stores/sensorsStore";
-  import MediaQuery from "$helper/MediaQuery.svelte";
   import { createGraphData } from "$components/graph/helper";
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  import Graph from "./Graph.svelte";
+  import MediaQuery from "$helper/MediaQuery.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
-  import { onMount } from "svelte";
   // ---------------------------------------------------
   // ---------------------------------------------------
   export let data: any;
@@ -75,7 +76,7 @@
     </div>
 
     <div
-      class="bg-green-400 mx-auto shadow-2xl rounded-2xl flex justify-center items-ceter gap-4 md:grid md:flex-none md:justify-normal md:gap-2 p-2"
+      class="bg-green-400 mx-auto shadow-2xl rounded-2xl flex justify-center items-ceter gap-4 md:grid md:flex-none md:justify-normal md:gap-2 p-1"
     >
       {#each sensors as sensor, i (i)}
         <div

@@ -2,7 +2,6 @@
   import { getMonthLength, getCalendarDays } from "./date-utils.js";
   import { getInnerLocale } from "./locale.js";
   import { createEventDispatcher } from "svelte";
-  import Modal from "$components/ui/Modal.svelte";
 
   const dispatch = createEventDispatcher();
   function cloneDate(d) {
@@ -201,31 +200,26 @@
 
 <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 <div
-  class="date-time-picker bg-base-100"
+  class="date-time-picker bg-base-100 rounded-2xl"
   on:focusout
   tabindex="0"
   on:keydown={keydown}
 >
-  <div class="tab-container" tabindex="-1">
+  <div class="tab-container rounded-2xl" tabindex="-1">
     <div class="top">
+      <!-- Left Arrow -->
       <button
         type="button"
-        class="page-button"
+        class="flex items-center"
         tabindex="-1"
         on:click={() => setMonth(browseDate.getMonth() - 1)}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          ><path
-            d="M5 3l3.057-3 11.943 12-11.943 12-3.057-3 9-9z"
-            transform="rotate(180, 12, 12)"
-          /></svg
-        >
+        <i
+          class="bi bi-caret-left-fill text-4xl text-black dark:text-white hover:text-gray-700"
+        />
       </button>
-      <div class="dropdown month">
+
+      <div class="dropdown">
         <select
           value={browseMonth}
           on:keydown={monthKeydown}
@@ -246,27 +240,21 @@
             >
           {/each}
         </select>
-        <!--
-          Here we have use `select.dummy-select` for showing just the <select> button. This
-          is to style the <select> button without affecting the menu popup
-          - `option { color: initial }` causes invisible menu in dark mode on Firefox
-          - `option { color: initial; background-color: initial }` causes invisible menu in Chrome
-          - `select { background-color: $bg; color: $text }` causes white scrollbar in dark mode on Firefox
-        -->
-        <select class="dummy-select" tabindex="-1">
+        <select class="dummy-select bg-base-100" tabindex="-1">
           {#each iLocale.months as monthName, i}
             <option value={i} selected={i === browseMonth}>{monthName}</option>
           {/each}
         </select>
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="24"
+          class="fill-black dark:fill-white"
+          width="32"
           height="24"
           viewBox="0 0 24 24"
           ><path d="M6 0l12 12-12 12z" transform="rotate(90, 12, 12)" /></svg
         >
       </div>
-      <div class="dropdown year">
+      <div class="dropdown year bg-base-100">
         <select
           value={browseYear}
           on:input={(e) => setYear(parseInt(e.currentTarget.value))}
@@ -277,7 +265,7 @@
           {/each}
         </select>
         <!-- style <select> button without affecting menu popup -->
-        <select class="dummy-select" tabindex="-1">
+        <select class="dummy-select bg-base-100" tabindex="-1">
           {#each years as v}
             <option value={v} selected={v === browseDate.getFullYear()}
               >{v}</option
@@ -286,25 +274,24 @@
         </select>
         <svg
           xmlns="http://www.w3.org/2000/svg"
+          class="fill-black dark:fill-white"
           width="24"
           height="24"
           viewBox="0 0 24 24"
           ><path d="M6 0l12 12-12 12z" transform="rotate(90, 12, 12)" /></svg
         >
       </div>
+
+      <!-- Right arrow -->
       <button
         type="button"
-        class="page-button"
+        class="flex items-center"
         tabindex="-1"
         on:click={() => setMonth(browseDate.getMonth() + 1)}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          ><path d="M5 3l3.057-3 11.943 12-11.943 12-3.057-3 9-9z" /></svg
-        >
+        <i
+          class="bi bi-caret-right-fill text-3xl text-black dark:text-white hover:text-gray-700"
+        />
       </button>
     </div>
     <div class="header">
@@ -327,7 +314,7 @@
         {#each calendarDays.slice(weekIndex * 7, weekIndex * 7 + 7) as calendarDay}
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
-            class="cell"
+            class="cell hover:bg-gray-200 dark:hover:bg-gray-800"
             on:click={() => selectDay(calendarDay)}
             class:disabled={!dayIsInRange(calendarDay, min, max)}
             class:selected={value &&
@@ -404,13 +391,6 @@
     flex-grow: 1;
   }
 
-  svg {
-    display: block;
-    fill: var(--date-picker-foreground, #000000);
-    opacity: 0.75;
-    outline: none;
-  }
-
   .page-button {
     background-color: transparent;
     width: 1.5rem;
@@ -423,22 +403,12 @@
     align-items: center;
     justify-content: center;
   }
-  .page-button:hover {
-    background-color: rgba(128, 128, 128, 0.08);
-    border: 1px solid rgba(128, 128, 128, 0.08);
-  }
-  .page-button svg {
-    width: 0.68rem;
-    height: 0.68rem;
-  }
 
   select.dummy-select {
     position: absolute;
     width: 100%;
     pointer-events: none;
     outline: none;
-    color: var(--date-picker-foreground, #000000);
-    background-color: var(--date-picker-background, #ffffff);
     border-radius: 3px;
   }
 
@@ -497,14 +467,12 @@
     border: 2px solid transparent;
   }
   .cell:hover {
-    border: 1px solid rgba(128, 128, 128, 0.08);
+    border: 1px solid rgba(128, 128, 128, 0.5);
   }
   .cell.today {
-    font-weight: 600;
-    border: 2px solid var(--date-picker-today-border, rgba(128, 128, 128, 0.3));
-  }
-  .cell:hover {
-    background-color: rgba(128, 128, 128, 0.08);
+    --tw-bg-opacity: 1;
+    background-color: hsl(var(--p) / var(--tw-bg-opacity));
+    border: 1px solid rgba(128, 128, 128, 0.5);
   }
   .cell.disabled {
     visibility: hidden;
@@ -517,8 +485,9 @@
     opacity: 0.4;
   }
   .cell.selected {
+    --tw-bg-opacity: 1;
     color: var(--date-picker-selected-color, inherit);
-    background: var(--date-picker-selected-background, rgba(2, 105, 247, 0.2));
-    border: 2px solid var(--date-picker-highlight-border, #0269f7);
+    /* background: var(--date-picker-selected-background, rgba(2, 105, 247, 0.2)); */
+    border: 2px solid hsl(var(--p) / var(--tw-bg-opacity));
   }
 </style>

@@ -22,19 +22,9 @@
       name: "AP",
       path: "/admin/accesspoints",
     },
-    // {
-    //   name: "Gardener",
-    //   path: "/admin/gardener",
-    //   icon: Gardener,
-    // },
     {
       name: "Users", // includes gardeners
       path: "/admin/users",
-    },
-
-    {
-      name: "Settings",
-      path: "/admin/settings",
     },
   ];
 </script>
