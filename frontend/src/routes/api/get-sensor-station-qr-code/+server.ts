@@ -95,10 +95,9 @@ function generateQrCodePdfBlob(data: QrCodePdfData): Blob {
   pdf.addImage(data.qrcodeBase64, "PNG", x4, 75, 50, 50);
 
   pdf.setFontSize(6);
-  let x5 =
-    pdf.internal.pageSize.width / 2 -
-    pdf.getTextWidth(data.sensorStationId) / 2;
-  pdf.text(`ID = ${data.sensorStationId}`, x5, 135);
+  let idString = `ID = ${data.sensorStationId}`;
+  let x5 = pdf.internal.pageSize.width / 2 - pdf.getTextWidth(idString) / 2;
+  pdf.text(idString, x5, 135);
 
   return pdf.output("blob");
 }
