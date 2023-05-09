@@ -10,6 +10,10 @@
   import SensorLimitsModal from "./SensorLimitsModal.svelte";
   import SensorDataModal from "./SensorDataModal.svelte";
   import { enhance } from "$app/forms";
+  import { string } from "zod";
+  import { flexRender, type ColumnDef } from "@tanstack/svelte-table";
+  import { TextCell } from "$lib/components/table/cellComponents";
+  import Table from "$lib/components/table/Table.svelte";
   // ----------------------------------
   // ----------------------------------
   let rendered = false;
@@ -30,6 +34,48 @@
   let sensorDataModal = false;
   let sensorLimitsModal = false;
   let picturesModal = false;
+  interface SensorData {
+    sensor: { [type: string]: string };
+    value: number;
+    belowLimit: number;
+    aboveLimit: number;
+    alarm: string;
+  }
+
+  let columns: ColumnDef<SensorData>[] = [
+    {
+      id: "sensorType",
+      accessorKey: "sensor.type",
+      header: () => flexRender(TextCell, { text: "Type" }),
+      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+    },
+    {
+      id: "value",
+      accessorKey: "value",
+      header: () => flexRender(TextCell, { text: "Value" }),
+      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+    },
+    {
+      id: "belowLimit",
+      accessorKey: "belowLimit",
+      header: () => flexRender(TextCell, { text: "Above Limit ?" }),
+      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+    },
+    {
+      id: "aboveLimit",
+      accessorKey: "aboveLimit",
+      header: () => flexRender(TextCell, { text: "Below Limit ?" }),
+      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+    },
+    {
+      id: "alarm",
+      accessorKey: "alarm",
+      header: () => flexRender(TextCell, { text: "Alarm" }),
+      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+    },
+  ];
+
+  let mobileColumnVisibility: ColumnVisibility = {};
 </script>
 
 {#if rendered}
@@ -196,30 +242,11 @@
               {#if sensorStation.sensorData.length === 0}
                 <h1>No Data has been sent yet.</h1>
               {:else}
-                <table class="table table-zebra w-full">
-                  <thead>
-                    <tr>
-                      <th>Date/Time</th>
-                      <th>Sensor</th>
-                      <th>Value</th>
-                      <th>belowLimit</th>
-                      <th>aboveLimit</th>
-                      <th>alarm</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {#each sensorStation.sensorData as sensorData}
-                      <tr>
-                        <td>{sensorData.timeStamp}</td>
-                        <td>{sensorData.sensor.type}</td>
-                        <td>{sensorData.value}</td>
-                        <td>{sensorData.belowLimit}</td>
-                        <td>{sensorData.aboveLimit}</td>
-                        <td>{sensorData.alarm}</td>
-                      </tr>
-                    {/each}
-                  </tbody>
-                </table>
+                <Table
+                  data={sensorStation.sensorData}
+                  {columns}
+                  {mobileColumnVisibility}
+                />
               {/if}
             </div>
           </Desktop>
@@ -236,13 +263,6 @@
               >
               <input type="hidden" name="unlocked" value="true" />
             {/if}
-            <!--
-              <button
-                type="button"
-                class="btn btn-info bg-blue-600 text-white border-none"
-                on:click={() => (picturesModal = true)}>Pictures</button
-              >
-            -->
           </div>
         </div>
       </form>
