@@ -47,7 +47,6 @@
 
   $: {
     let color = random_rgba();
-    console.log(data);
     if (data?.datasets) {
       data.datasets[0].backgroundColor = color.background;
       data.datasets[0].borderColor = color.border;

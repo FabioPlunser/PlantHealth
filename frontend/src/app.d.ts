@@ -43,6 +43,10 @@ declare interface User {
   email: string;
 }
 
+declare interface Typed {
+  [key: string]: any;
+}
+
 /**
  * An object representing the visibility of table columns.
  * Each key should be equivalent to the ID of the column.

@@ -11,7 +11,6 @@
     "lint": "eslint ."
   },
   "devDependencies": {
-    "@poppanator/sveltekit-svg": "^3.0.0",
     "@sveltejs/adapter-auto": "2.0.0",
     "@sveltejs/adapter-node": "^1.2.3",
     "@sveltejs/kit": "1.15.2",
@@ -27,6 +26,7 @@
     "postcss": "^8.4.21",
     "qrcode-generator": "^1.4.4",
     "svelte": "^3.58.0",
+    "svelte-chartjs": "^3.1.2",
     "svelte-check": "^3.2.0",
     "svelte-grid": "^5.1.1",
     "svelte-steps": "^2.4.1",
@@ -39,5 +39,8 @@
     "vite-svg-loader": "^4.0.0",
     "zod": "^3.21.4"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@poppanator/sveltekit-svg": "^3.0.0"
+  }
 }
