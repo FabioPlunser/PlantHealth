@@ -88,6 +88,7 @@ class NotificationQueue {
 		 */
 		uint8_t deleteErrorFromQueue(Notification & toDelete) {
 			DEBUG_PRINT_POS(4, "\n");
+			DEBUG_PRINTF_POS(3, "Queue size at beginning = %d\n", queue.size());
 			// List to store the values we don't wand to delete.
 			std::list<const Notification *> list;
 			uint8_t numDeleted = 0;
@@ -133,6 +134,7 @@ class NotificationQueue {
 				queue.push(list.front());
 				list.pop_front();
 			}
+			DEBUG_PRINTF_POS(3, "Queue size at end = %d\n", queue.size());
 			return numDeleted;
 		}
 
@@ -144,6 +146,8 @@ class NotificationQueue {
 		 */
 		uint8_t deleteErrorFromQueue(SensorErrors::Type errorType) {
 			DEBUG_PRINT_POS(4, "\n");
+			DEBUG_PRINTF_POS(3, "Queue size at beginning = %d\n", queue.size());
+			DEBUG_PRINTF_POS(4, "Deleting error type: %d\n", errorType);
 			// List to store the values we don't wand to delete.
 			decltype(queue) newQueue;
 			uint8_t numDeleted = 0;
@@ -155,6 +159,9 @@ class NotificationQueue {
 						static_cast<const SensorError *>(topNotification);
 					if (topError->getErrorType() == errorType) {
 						numDeleted++;
+						DEBUG_PRINTF_POS(
+							4, "Deleted error %d\n", topError->getErrorType()
+						);
 						delete (topError);
 					} else {
 						newQueue.push(topNotification);
@@ -165,6 +172,7 @@ class NotificationQueue {
 				queue.pop();
 			}
 			queue = newQueue;
+			DEBUG_PRINTF_POS(3, "Queue size at beginning = %d\n", queue.size());
 			return numDeleted;
 		}
 };

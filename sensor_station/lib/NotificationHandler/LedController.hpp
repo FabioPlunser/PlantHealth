@@ -84,7 +84,7 @@ class LedHandler {
 		uint16_t getMsTillNext() {
 			DEBUG_PRINT_POS(4, "\n");
 			if (durationIdx >= durationSize) {
-				DEBUG_PRINT(1, "Overflow\n");
+				DEBUG_PRINT_POS(1, "Overflow\n");
 				return 0;
 			}
 			uint16_t * timeArray	 = isOn ? durationOn : durationOff;
@@ -160,12 +160,6 @@ class LedHandler {
 				);
 				return 0;
 			}
-			uint16_t remainingTime = getMsTillNext();
-			DEBUG_PRINTF_POS(3, "Remaining time = %u\n", remainingTime);
-			if (remainingTime > 0) {
-				DEBUG_PRINT_POS(3, "Return time.\n");
-				return remainingTime;
-			}
 			if (durationIdx >= durationSize) {
 				DEBUG_PRINT_POS(3, "Index overflow.\n");
 				if (!loopError) {
@@ -175,6 +169,12 @@ class LedHandler {
 					return 0;
 				}
 				this->durationIdx = 0;
+			}
+			uint16_t remainingTime = getMsTillNext();
+			DEBUG_PRINTF_POS(3, "Remaining time = %u\n", remainingTime);
+			if (remainingTime > 0) {
+				DEBUG_PRINT_POS(3, "Return time.\n");
+				return remainingTime;
 			}
 			toggleLEDStatus();
 			DEBUG_PRINT_POS(3, "Led got toggled.\n");
