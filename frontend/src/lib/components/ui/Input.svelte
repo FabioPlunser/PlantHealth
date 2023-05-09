@@ -4,6 +4,7 @@
   export let placeholder: string = "";
   export let type: string = "";
   export let value: any = null;
+  $: console.log(value);
 </script>
 
 <div>

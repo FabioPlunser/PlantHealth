@@ -4,6 +4,7 @@
   import { invalidate } from "$app/navigation";
   import { apSensorStations } from "$stores/apSensorStations";
   import { onMount } from "svelte";
+  import Input from "$lib/components/ui/Input.svelte";
   // ----------------------------------
   // ----------------------------------
   let rendered = false;
@@ -27,12 +28,10 @@
   }
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  let searchByRoomName = "";
-  let searchByMacAddress = "";
-  let searchByDipSwitchId = "";
+  let searchTerm = "";
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  $: console.log(searchByDipSwitchId);
+  $: console.log(searchTerm);
   $: console.log(data);
 </script>
 
@@ -54,41 +53,25 @@
             <h1 class="text-xl font-bold">All SensorStations</h1>
           {/if}
         </div>
-        <div class="flex justify-center mb-4">
-          <div class="grid grid-rows sm:grid-cols-3 gap-2 justify-center">
-            <label class="justify-center mx-auto">
-              <h1 class="flex justify-center">Search by Room</h1>
-              <input
-                bind:value={searchByRoomName}
-                name="searchRoom"
-                class="input input-border"
-                placeholder="Office-1"
-              />
-            </label>
-            <label class="">
-              <h1 class="flex justify-center">Search by MacAddress</h1>
-              <input
-                bind:value={searchByMacAddress}
-                class="input input-border"
-                placeholder="00-00-00-00-00-00"
-              />
-            </label>
-            <label class="">
-              <h1 class="flex justify-center">Search by DipSwitchId</h1>
-              <input
-                bind:value={searchByDipSwitchId}
-                class="input input-border"
-                placeholder="129"
-              />
-            </label>
-          </div>
+        <div
+          class="mb-4"
+          in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
+          out:fly|local|self={{ y: 200, duration: 200 }}
+        >
+          <input
+            bind:value={searchTerm}
+            type="search"
+            name="searchRoom"
+            placeholder="Global Search"
+            class="input dark:input-bordered w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
+          />
         </div>
         <div class="flex justify-center mx-auto">
           <div class="grid grid-rows md:grid-cols-3 gap-4">
             {#each data.sensorStations as sensorStation, i (sensorStation.sensorStationId)}
-              {#if sensorStation.roomName.includes(searchByRoomName) && sensorStation.bdAddress.includes(searchByMacAddress) && sensorStation.dipSwitchId
+              {#if sensorStation.roomName.includes(searchTerm) || sensorStation.bdAddress.includes(searchTerm) || sensorStation.dipSwitchId
                   .toString()
-                  .includes(searchByDipSwitchId)}
+                  .includes(searchTerm)}
                 <form
                   in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
                   out:fly|local|self={{ y: 200, duration: 200 }}
@@ -117,22 +100,27 @@
                       </a>
                     </div>
                     <div class="card-body">
-                      <label for="name">
-                        <h1 class="label-text font-bold mb-2 ml-2">Name:</h1>
-                        <input
-                          type="text"
-                          name="name"
-                          class="input input-bordered bg-gray-800 w-full text-white"
-                          value={sensorStation.name}
-                          placeholder="Name"
-                        />
-                      </label>
-                      <h1>RoomName: <span>{sensorStation.roomName}</span></h1>
+                      <Input
+                        field="name"
+                        label="Name"
+                        placeholder="Sakura"
+                        type="text"
+                        value={sensorStation.name}
+                      />
                       <h1>
-                        MacAddress: <span>{sensorStation.bdAddress}</span>
+                        <span class="font-bold">Room</span><span
+                          >{sensorStation.roomName}</span
+                        >
                       </h1>
                       <h1>
-                        DipSwitch: <span>{sensorStation.dipSwitchId}</span>
+                        <span class="font-bold">MAC: </span><span
+                          >{sensorStation.bdAddress}</span
+                        >
+                      </h1>
+                      <h1>
+                        <span class="font-bold">DIP: </span><span
+                          >{sensorStation.dipSwitchId}</span
+                        >
                       </h1>
                       <div class="grid grid-rows gap-1">
                         <div class="mx-auto">
