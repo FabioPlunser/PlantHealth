@@ -41,11 +41,13 @@ public class SensorStationController {
 	}
 
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
+	@PrincipalRequired(Person.class)
 	@GetMapping("/get-sensor-station")
-	public RestResponseEntity getSensorStation(@RequestParam("sensorStationId"
-	) final UUID sensorStationId) {
+	public RestResponseEntity getSensorStation(
+			Person person, @RequestParam("sensorStationId") final UUID sensorStationId
+	) {
 		try {
-			return new SensorStationResponse(sensorStationService.findById(sensorStationId))
+			return new SensorStationResponse(sensorStationService.findById(sensorStationId), person)
 					.toEntity();
 		} catch (ServiceException e) {
 			return MessageResponse.builder()
