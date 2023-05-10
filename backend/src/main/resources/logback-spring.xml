@@ -70,14 +70,14 @@
         </filter>
     </appender>
 
-    <springProfile name="!prod">
-        <root level="DEBUG">
-            <appender-ref ref="CONSOLE"/>
-        </root>
-    </springProfile>
+<!--    <springProfile name="!prod">-->
+<!--        <root level="DEBUG">-->
+<!--            <appender-ref ref="CONSOLE"/>-->
+<!--        </root>-->
+<!--    </springProfile>-->
 
-    <root level="DEBUG">
-        <appender-ref ref="INFO_FILE"/>
-        <appender-ref ref="WARNING_FILE"/>
-    </root>
+<!--    <root level="DEBUG">-->
+<!--        <appender-ref ref="INFO_FILE"/>-->
+<!--        <appender-ref ref="WARNING_FILE"/>-->
+<!--    </root>-->
 </configuration>
