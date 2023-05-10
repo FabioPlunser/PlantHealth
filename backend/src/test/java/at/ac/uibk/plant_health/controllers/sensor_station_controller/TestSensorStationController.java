@@ -155,6 +155,30 @@ public class TestSensorStationController {
 		sensorStation = sensorStationService.findByBdAddress(bdAddress);
 		accessPointService.foundNewSensorStation(accessPoint, List.of(sensorStation));
 
+		Map<String, String> sensorMap = new HashMap<>();
+		sensorMap.put("TEMPERATURE", "°C");
+		sensorMap.put("HUMIDITY", "%");
+		sensorMap.put("PRESSURE", "hPa");
+		sensorMap.put("SOILHUMIDITY", "%");
+		sensorMap.put("LIGHTINTENSITY", "lux");
+		sensorMap.put("GASPRESSURE", "ppm");
+
+		for (int i = 0; i < sensorMap.size(); i++) {
+			Sensor sensor = new Sensor(
+					sensorMap.keySet().toArray()[i].toString(),
+					sensorMap.values().toArray()[i].toString()
+			);
+			if (!sensorRepository.findAll().contains(sensor)) {
+				sensorRepository.save(sensor);
+			}
+			sensor = sensorRepository.findByType(sensor.getType()).get();
+			SensorData sensorData =
+					new SensorData(LocalDateTime.now(), 0, 'h', sensor, sensorStation);
+			sensorDataRepository.save(sensorData);
+		}
+		sensorStation.setSensorData(sensorDataRepository.findAll());
+		sensorStationService.save(sensorStation);
+
 		mockMvc.perform(MockMvcRequestBuilders.get("/get-sensor-station")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
@@ -171,14 +195,18 @@ public class TestSensorStationController {
 						jsonPath("$.sensorStation.unlocked").exists(),
 						jsonPath("$.sensorStation.connected").exists(),
 						jsonPath("$.sensorStation.deleted").exists(),
-						jsonPath("$.sensorStation.sensorLimits").exists(),
-						jsonPath("$.sensorStation.sensorLimits").isArray(),
 						jsonPath("$.sensorStation.sensorStationPersonReferences").exists(),
 						jsonPath("$.sensorStation.sensorStationPersonReferences").isArray(),
 						jsonPath("$.sensorStation.sensorStationPictures").exists(),
 						jsonPath("$.sensorStation.sensorStationPictures").isArray(),
-						jsonPath("$.sensorStation.sensors").exists(),
-						jsonPath("$.sensorStation.sensors").isArray()
+						jsonPath("$.sensorStation.sensorLimits").exists(),
+						jsonPath("$.sensorStation.sensorLimits").isArray(),
+						jsonPath("$.sensorStation.sensorLimits[0].timeStamp").exists(),
+						jsonPath("$.sensorStation.sensorLimits[0].upperLimit").exists(),
+						jsonPath("$.sensorStation.sensorLimits[0].lowerLimit").exists(),
+						jsonPath("$.sensorStation.sensorLimits[0].thresholdDuration").exists(),
+						jsonPath("$.sensorStation.sensorLimits[0].sensor").exists(),
+						jsonPath("$.sensorStation.sensorLimits[0].gardener").exists()
 
 				);
 	}
@@ -329,8 +357,8 @@ public class TestSensorStationController {
 		for (int d = 0; d < 14; d++) {
 			for (int i = 0; i < sensorMap.size(); i++) {
 				SensorData sensorData = new SensorData(
-						LocalDateTime.now().minusDays(d), rand.nextFloat(), rand.nextBoolean(),
-						rand.nextBoolean(), 'h', sensors.get(i), sensorStation
+						LocalDateTime.now().minusDays(d), rand.nextFloat(), 'h', sensors.get(i),
+						sensorStation
 
 				);
 				sensorDataRepository.save(sensorData);

@@ -1,5 +1,6 @@
 package at.ac.uibk.plant_health.models.rest_responses;
 
+import java.awt.image.ImageProducer;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -33,10 +34,9 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 		private final boolean unlocked;
 		private final boolean connected;
 		private final boolean deleted;
-		private final List<SensorLimits> sensorLimits;
+		private final List<SensorLimitsResponse> sensorLimits;
 		private final List<SensorStationPersonReference> sensorStationPersonReferences;
 		private final List<SensorStationPicture> sensorStationPictures;
-		private final List<Sensor> sensors;
 
 		public InnerResponse(SensorStation sensorStation, Person person) {
 			this.bdAddress = sensorStation.getBdAddress();
@@ -47,28 +47,50 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 			this.connected = sensorStation.isConnected();
 			this.deleted = sensorStation.isDeleted();
 			if (sensorStation.getSensorLimits().size() > 0) {
-				this.sensorLimits = sensorStation.getSensorLimits();
+				this.sensorLimits =
+						sensorStation.getSensorLimits()
+								.stream()
+								.map(sensorLimit -> new SensorLimitsResponse(sensorLimit, person))
+								.toList();
+
 			} else {
 				this.sensorLimits = sensorStation.getSensorData()
 											.stream()
 											.map(SensorData::getSensor)
 											.distinct()
-											.toList()
-											.stream()
-											.map(sensorData
-												 -> new SensorLimits(
-														 LocalDateTime.now(), 0, 0, 0, sensorData,
-														 person, sensorStation
+											.map(d
+												 -> new SensorLimitsResponse(
+														 new SensorLimits(
+																 LocalDateTime.now(), 0, 0, 0, d,
+																 person, sensorStation
+														 ),
+														 person
 												 ))
 											.toList();
 			}
 			this.sensorStationPersonReferences = sensorStation.getSensorStationPersonReferences();
 			this.sensorStationPictures = sensorStation.getSensorStationPictures();
-			this.sensors = sensorStation.getSensorData()
-								   .stream()
-								   .map(SensorData::getSensor)
-								   .distinct()
-								   .toList();
+		}
+
+		@Getter
+		private static class SensorLimitsResponse {
+			private final LocalDateTime timeStamp;
+			private final float upperLimit;
+			private final float lowerLimit;
+			private final int thresholdDuration;
+			private final Sensor sensor;
+			private final Person gardener;
+			private final boolean deleted;
+
+			public SensorLimitsResponse(SensorLimits sensorLimit, Person person) {
+				this.timeStamp = sensorLimit.getTimeStamp();
+				this.upperLimit = sensorLimit.getUpperLimit();
+				this.lowerLimit = sensorLimit.getLowerLimit();
+				this.thresholdDuration = sensorLimit.getThresholdDuration();
+				this.sensor = sensorLimit.getSensor();
+				this.gardener = sensorLimit.getGardener();
+				this.deleted = sensorLimit.isDeleted();
+			}
 		}
 	}
 }
