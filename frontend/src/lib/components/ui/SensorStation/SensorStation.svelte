@@ -8,6 +8,7 @@
   import Graphs from "$components/graph/Graphs.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
   import DateInput from "$components/datepicker/DateInput.svelte";
+  import PictureModal from "../PictureModal.svelte";
   // ---------------------------------------------------
   // ---------------------------------------------------
   let rendered = false;
@@ -34,8 +35,16 @@
     };
   };
 
-  $: console.log(sensorStation);
+  $: console.table("sensorStation", sensorStation);
+  let openPictureModal = false;
+  let selectedPicture = "";
 </script>
+
+<PictureModal
+  on:close={() => (openPictureModal = false)}
+  imageRef={selectedPicture}
+  open={openPictureModal}
+/>
 
 {#if rendered}
   <section>
@@ -119,9 +128,9 @@
                       {/key}
                     </label>
                   </div>
-                  <div class="my-auto flex items-center mt-6">
+                  <div class="my-auto flex items-center justify-center mt-6">
                     <button
-                      class="btn btn-primary flex items-center"
+                      class="btn btn-primary flex items-center justify-center"
                       type="submit"
                     >
                       Update
@@ -152,15 +161,27 @@
                   {#if sensorStation.pictures}
                     {#each sensorStation?.pictures as picture}
                       {#await picture}
-                        <Spinner />
+                        <Spinner fill="fill-primary" />
                       {:then data}
                         <div class="carousel-item">
-                          <img
-                            src={data.encodedImage}
-                            alt="SensorStationPicture"
-                            class="w-48 h-64 rounded-2xl shadow-xl"
-                          />
+                          <div>
+                            <!-- svelte-ignore a11y-click-events-have-key-events -->
+                            <img
+                              on:click={() => {
+                                selectedPicture = data.imageRef;
+                                openPictureModal = true;
+                              }}
+                              src={data.imageRef}
+                              alt="SensorStationPicture"
+                              class="w-48 h-64 rounded-2xl shadow-xl cursor-pointer"
+                            />
+                            <h1 class="flex justify-center">
+                              {data.creationDate.toLocaleDateString()}
+                            </h1>
+                          </div>
                         </div>
+                      {:catch error}
+                        <h1>Error: {error.message}</h1>
                       {/await}
                     {/each}
                   {:else}

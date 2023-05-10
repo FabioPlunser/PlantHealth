@@ -40,7 +40,7 @@ Usage:
 
 <nav class="navbar">
   <div class="flex justify-center mx-auto">
-    <a href="/" class="absolute left-0 ml-4">
+    <a href="/" data-sveltekit-reload class="absolute left-0 ml-4">
       <!-- <img alt="PlantHealth" src={Logo} class="w-14 h-14" /> -->
       <h1 class="font-bold text-2xl">PlantHealth</h1>
     </a>

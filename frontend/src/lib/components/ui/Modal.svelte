@@ -26,6 +26,29 @@
   }
 </script>
 
+<!-- @component
+This is a Modal component. It is used to display a modal on the screen.
+Usage: 
+```html
+
+<script lang="ts">
+  import Modal from "$components/ui/Modal.svelte";
+  export let open = false;
+<script/>
+
+<Modal {open} on:close={() => (open = false)} closeOnBodyClick={false}>
+  <div>
+    <h1>SensorData</h1>
+  </div>
+  <div class="mx-auto">
+    <button class="btn btn-info" on:click={() => (open = false)}
+      >Close</button
+    >
+  </div>
+</Modal>
+```
+-->
+
 <svelte:window on:keydown={handleKeyDown} />
 
 {#if closeOnBodyClick}
@@ -51,7 +74,7 @@
   >
     <div
       transition:scale={{ duration: 150 }}
-      class="modal-box bg-base-100  {_class} max-w-none"
+      class="modal-box bg-base-100 {_class} max-w-none"
     >
       <slot />
     </div>

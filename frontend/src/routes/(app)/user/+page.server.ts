@@ -31,7 +31,7 @@ export async function load({ locals, fetch, cookies }) {
 
   let sensorStations = res?.sensorStations;
   for (let foundSensorStation of res?.sensorStations) {
-    foundSensorStation.picture = new Promise(async (resolve, reject) => {
+    foundSensorStation.newestPicture = new Promise(async (resolve, reject) => {
       let res = await fetch(
         `${BACKEND_URL}/get-newest-sensor-station-picture?sensorStationId=${foundSensorStation.sensorStationId}`
       );
@@ -56,6 +56,7 @@ export async function load({ locals, fetch, cookies }) {
   dashboard = await dashboard.json();
 
   for (let sensorStation of dashboard.sensorStations) {
+    console.log("sensorStation", sensorStation);
     sensorStation.data = new Promise(async (resolve, reject) => {
       let res = await fetch(
         `${BACKEND_URL}/get-sensor-station-data?sensorStationId=${
@@ -72,6 +73,40 @@ export async function load({ locals, fetch, cookies }) {
       console.log(res);
       resolve(res);
     });
+
+    let res = await fetch(
+      `${BACKEND_URL}/get-sensor-station-pictures?sensorStationId=${sensorStation.sensorStationId}`
+    );
+    res = await res.json();
+
+    sensorStation.pictures = [];
+    for (let possiblePicture of res.pictures) {
+      let picturePromise = new Promise(async (resolve, reject) => {
+        let res = await fetch(
+          `${BACKEND_URL}/get-sensor-station-picture?pictureId=${possiblePicture.pictureId}`
+        );
+        if (!res.ok) {
+          reject(res.statusText);
+          throw new Error(res.statusText);
+        }
+        res = await res.blob();
+        let file = new File([res], "image", { type: res.type });
+        let arrayBuffer = await res.arrayBuffer();
+        let buffer = Buffer.from(arrayBuffer);
+        let encodedImage =
+          "data:image/" + res.type + ";base64," + buffer.toString("base64");
+        let picture: Picture = {
+          imageRef: "",
+          creationDate: new Date(),
+        };
+        picture.imageRef = encodedImage;
+        picture.creationDate = new Date(possiblePicture.timeStamp);
+        picture.pictureId = possiblePicture.pictureId;
+        resolve(picture);
+      });
+
+      sensorStation.pictures.push(picturePromise);
+    }
   }
 
   return {
