@@ -13,6 +13,10 @@ export async function load({ locals, params, url, fetch }) {
       `${BACKEND_URL}/get-sensor-station-pictures?sensorStationId=${sensorStationId}`
     );
     if (!res.ok) {
+      if (res.status === 406) {
+        logger.error("Guest couldn't find sensor station", { res });
+        throw redirect(303, "/guest");
+      }
       error = res.statusText;
       return {
         error,
@@ -23,7 +27,7 @@ export async function load({ locals, params, url, fetch }) {
     roomName = res.roomName;
     plantName = res.plantName;
   } catch (e) {
-    console.log(e);
+    logger.error("Guest couldn't find sensor station", { e });
     error = e.message;
   }
 

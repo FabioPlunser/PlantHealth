@@ -37,6 +37,7 @@
     "typescript": "^5.0.4",
     "vite": "^4.2.1",
     "vite-svg-loader": "^4.0.0",
+    "winston": "^3.8.2",
     "zod": "^3.21.4"
   },
   "type": "module",
