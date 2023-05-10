@@ -217,22 +217,27 @@ void handleCentralDeviceIfPresent(
 		uint8_t dipSwitchId = dipSwitch->getdipSwitchValue();
 		set_dip_switch_id(dipSwitchId);
 		if (inPairingMode) {
+			while (central.connected() && get_sensorstation_locked_status()) {
+				delay(10);
+			}
+			if (!central.connected()) {
+				return;
+			}
 			pairedDevice = central.address();
-			DEBUG_PRINT(1, "In pairing mode\n");
-			DEBUG_PRINT(1, "New device is: ");
-			DEBUG_PRINTLN(1, pairedDevice);
+			DEBUG_PRINTF(
+				1, "In pairing mode. New device is: \"%s\".\n",
+				pairedDevice.c_str()
+			);
 			inPairingMode = false;
 		}
-		DEBUG_PRINTLN(1, "* Connected to central device!");
-		DEBUG_PRINT(1, "* Device MAC address: ");
-		DEBUG_PRINTLN(1, central.address());
-		DEBUG_PRINTLN(1, " ");
+		DEBUG_PRINTF(1, "* Connected to %s.\n", central.address().c_str());
 		if (pairedDevice.compareTo(central.address()) == 0) {
 			setValueInVerifiedCentralDevice(central);
 		} else {
-			DEBUG_PRINT(1, "Declined connection to ");
-			DEBUG_PRINTLN(1, central.address());
-			DEBUG_PRINTF(1, "Only %s was allowed.\n", pairedDevice.c_str());
+			DEBUG_PRINTF(
+				1, "Declined connection to %s. Only %s was allowed.\n",
+				central.address().c_str(), pairedDevice.c_str()
+			);
 			central.disconnect();
 		}
 		DEBUG_PRINTLN(1, "* Disconnected from central device!");
