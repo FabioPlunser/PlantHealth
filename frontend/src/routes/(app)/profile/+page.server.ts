@@ -1,15 +1,29 @@
-import type { Actions, PageServerLoad } from "./$types";
+import type { Actions } from "./$types";
 import { fail, redirect, error } from "@sveltejs/kit";
 import { BACKEND_URL } from "$env/static/private";
 import { z } from "zod";
+import { logger } from "$helper/logger";
 
 let personId: string;
 let source: string | null;
 
-export const load = (async ({ request, url, fetch, locals }) => {
+/**
+ * This function loads user permissions and other information based on the URL and user data.
+ * @param  - - `request`: an object representing the incoming HTTP request
+ * @returns An object with the properties `username`, `permissions`, and `canActiveUserChangeRoles`.
+ * The `username` property is set to the value of the `username` query parameter or the `username`
+ * property of the `locals.user` object if the query parameter is not provided. The `permissions`
+ * property is an object with boolean values for each permission role, based on whether the user has
+ * that
+ */
+export async function load({ request, url, fetch, locals }) {
   personId = url.searchParams.get("personId") ?? locals.user.personId;
   let username = url.searchParams.get("username") ?? locals.user.username;
   source = request.headers.get("referer");
+
+  logger.info("user-profile-page", { personId });
+  logger.info("user-profile-page", { username });
+  logger.info("user-profile-page", { source });
 
   let permissions =
     url.searchParams.get("userPermissions")?.split(",") ??
@@ -21,15 +35,20 @@ export const load = (async ({ request, url, fetch, locals }) => {
 
   let userPermissions: { [role: string]: boolean } = {};
 
+  logger.info("user-profile-page", { permissions });
+
   if (canActiveUserChangeRoles) {
+    logger.info("Change roles");
     await fetch(`${BACKEND_URL}/get-all-permissions`)
       .then((response) => {
         if (!response.ok) {
+          logger.error("user-profile-page", { response });
           throw new error(response.status, response.statusText);
         }
         return response.json();
       })
       .then((data) => {
+        logger.info("user-profile-page", { data });
         data.items.forEach((permission: string) => {
           userPermissions[permission.toLowerCase()] =
             permissions.includes(permission);
@@ -46,7 +65,7 @@ export const load = (async ({ request, url, fetch, locals }) => {
     permissions: userPermissions,
     canActiveUserChangeRoles,
   };
-}) satisfies PageServerLoad;
+}
 
 const schema = z.object({
   username: z
@@ -88,6 +107,9 @@ const schema = z.object({
 const permissionRegex = /\[(.*?)\]/;
 
 export const actions = {
+  /* `updateUser` is an action function that is responsible for updating user information based on the
+  form data submitted by the user. It receives an object with properties `url`, `request`, and
+  `fetch` as its argument. */
   updateUser: async ({ url, request, fetch }) => {
     const formData = await request.formData();
     const zodData = schema.safeParse(Object.fromEntries(formData));
@@ -131,6 +153,17 @@ export const actions = {
     params.set("username", username);
     params.set("permissions", permissions.join(","));
 
+    logger.info(
+      "Update user " +
+        JSON.stringify(username) +
+        ": " +
+        JSON.stringify(permissions) +
+        " " +
+        JSON.stringify(email) +
+        " " +
+        JSON.stringify(password)
+    );
+
     if (email !== "") {
       params.set("email", email);
     }
@@ -146,13 +179,19 @@ export const actions = {
     })
       .then((response) => {
         if (!response.ok) {
+          logger.error("user-profile-page", { response });
           throw new error(response.status, response.statusText);
         }
         return response.json();
       })
       .then((data) => {
         let time = new Date().toLocaleString();
-        console.log(`${time} : ${data.message}`);
+        logger.info(
+          "Updated user: " +
+            JSON.stringify(time) +
+            " " +
+            JSON.stringify(data.message)
+        );
       });
 
     // NOTE: Redirect if the user was redirected to profile from some other page

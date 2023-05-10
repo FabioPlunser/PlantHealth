@@ -40,7 +40,6 @@ export const actions = {
   register: async ({ cookies, request, fetch }) => {
     const formData = await request.formData();
     const zod = schema.safeParse(Object.fromEntries(formData));
-    console.log(formData);
 
     if (formData.get("password") !== formData.get("passwordConfirm")) {
       return fail(400, { error: true, errors: "Passwords do not match" });

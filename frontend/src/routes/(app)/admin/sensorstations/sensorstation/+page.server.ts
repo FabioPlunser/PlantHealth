@@ -1,4 +1,5 @@
 import { BACKEND_URL } from "$env/static/private";
+import { logger } from "$helper/logger";
 
 export async function load({ fetch, depends, url, cookies }) {
   let sensorStationId = cookies.get("sensorStationId");
@@ -6,8 +7,13 @@ export async function load({ fetch, depends, url, cookies }) {
   let res = await fetch(
     `${BACKEND_URL}/get-sensor-station?sensorStationId=${sensorStationId}`
   );
-  res = await res.json();
+  if (!res.ok) {
+    logger.error("Could not get sensor station");
+    throw new error(res.status, "Could not get sensor station");
+  }
 
+  res = await res.json();
+  logger.info("Got sensor station");
   depends("app:getSensorStation");
   return res;
 }

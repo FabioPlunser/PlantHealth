@@ -78,3 +78,9 @@ export const handleFetch = (({ event, request, fetch }) => {
   logger.info("HandleFetch Token is: " + request.headers.get("Authorization"));
   return fetch(request);
 }) satisfies HandleFetch;
+
+export const handleError = (({ event, error }) => {
+  logger.error("HandleError Event: " + JSON.stringify(event));
+  logger.error("HandleError Error: " + JSON.stringify(error));
+  return error;
+}) satisfies HandleServerError;
