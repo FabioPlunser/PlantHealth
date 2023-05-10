@@ -314,7 +314,7 @@ public class TestSensorStationController {
 		}
 		sensorStation = maybeSensorStation.get();
 		List<SensorLimits> sensorLimits = sensorLimitsRepository.findAll();
-		assertEquals(sensorMap.size(), sensorLimits.size());
+		assertEquals(limits.size(), sensorLimits.size());
 		assertEquals(sensorLimits.size(), sensorStation.getSensorLimits().size());
 		assertEquals(sensorLimits, sensorStation.getSensorLimits());
 	}
