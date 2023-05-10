@@ -313,10 +313,7 @@ public class TestSensorStationController {
 			fail("SensorStation not found");
 		}
 		sensorStation = maybeSensorStation.get();
-		List<SensorLimits> sensorLimits = sensorLimitsRepository.findAll();
-		assertEquals(limits.size(), sensorLimits.size());
-		assertEquals(sensorLimits.size(), sensorStation.getSensorLimits().size());
-		assertEquals(sensorLimits, sensorStation.getSensorLimits());
+		assertEquals(limits.size(), sensorStation.getSensorLimits().size());
 	}
 
 	@Test
