@@ -2,6 +2,7 @@ import type { Actions } from "./$types";
 import { BACKEND_URL } from "$env/static/private";
 import { fail, redirect } from "@sveltejs/kit";
 import { z } from "zod";
+import { logger } from "$helper/logger";
 
 const schema = z.object({
   username: z
@@ -18,6 +19,9 @@ const schema = z.object({
     .trim(),
 });
 
+/* This code exports an object named `actions` that contains a single function named `login`. The
+`login` function is an asynchronous function that takes an object with three parameters: `cookies`,
+`request`, and `fetch`. */
 export const actions = {
   login: async ({ cookies, request, fetch }) => {
     const formData = await request.formData();
@@ -44,7 +48,7 @@ export const actions = {
 
     if (res.status >= 200 && res.status < 300) {
       res = await res.json();
-      console.log("login", res);
+      logger.info(`User ${formData.get("username")} logged in`);
       cookies.set(
         "token",
         JSON.stringify({
@@ -56,6 +60,8 @@ export const actions = {
       );
       throw redirect(302, "/");
     } else {
+      res = await res.json();
+      logger.error(`User ${formData.get("username")} failed to log in`);
       return fail(401, { message: res.message });
     }
   },
