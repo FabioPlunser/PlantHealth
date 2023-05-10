@@ -10,7 +10,6 @@
   import SensorLimitsModal from "./SensorLimitsModal.svelte";
   import SensorDataModal from "./SensorDataModal.svelte";
   import { enhance } from "$app/forms";
-  import { string } from "zod";
   import { flexRender, type ColumnDef } from "@tanstack/svelte-table";
   import { TextCell } from "$lib/components/table/cellComponents";
   import Table from "$lib/components/table/Table.svelte";
@@ -28,7 +27,8 @@
   let sensorStation;
   $: sensorStation = data.sensorStation;
   //let sensorStation = data.sensorStation;
-  let sensors = data.sensors;
+  let sensors;
+  $: sensors = data.sensors;
   // ----------------------------------
   // ----------------------------------
   let sensorDataModal = false;
@@ -164,20 +164,20 @@
                 <h1>There is no Information about the sensorstation yet.</h1>
               {/if}
 
-              {#if sensorStation.sensorLimits.length > 0}
+              {#if sensors.length > 0}
                 <div
                   class="mx-auto grid grid-rows md:grid-cols-2 xl:grid-cols-3 gap-4"
                 >
                   {#each sensors as limit}
                     <div class="flex justify-center">
                       <div
-                        class="card dark:bg-slate-800 w-fit bg-base-300 shadow-2xl"
+                        class="card border h-fit bg-base-100 dark:border-none shadow-2xl"
                       >
                         <div class="card-body">
                           <div class="flex">
-                            <h1 class="mx-auto font-bold">
-                              {limit.sensor.type}
-                              <span class="ml-2">[{limit.sensor.unit}]</span>
+                            <h1 class="mx-auto font-semibold">
+                              {limit.type}
+                              <span class="ml-2">[{limit.unit}]</span>
                             </h1>
                           </div>
                           <Input
@@ -208,8 +208,8 @@
                         <div class="card-body">
                           <div class="flex">
                             <h1 class="mx-auto font-bold">
-                              {limit.sensor.type}
-                              <span class="ml-2">[{limit.sensor.unit}]</span>
+                              {limit.type}
+                              <span class="ml-2">[{limit.unit}]</span>
                             </h1>
                           </div>
                           <Input
@@ -240,7 +240,7 @@
                 class="divider mt-2 dark:bg-white bg-black h-[2px] rounded-xl"
               />
               {#if sensorStation.sensorData.length === 0}
-                <h1>No Data has been sent yet.</h1>
+                <h1>No sesor data available yet.</h1>
               {:else}
                 <Table
                   data={sensorStation.sensorData}
