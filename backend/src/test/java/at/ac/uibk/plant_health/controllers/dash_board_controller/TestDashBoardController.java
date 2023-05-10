@@ -124,10 +124,8 @@ public class TestDashBoardController {
 		sensorStationPersonReferenceService.addPlantToDashboard(person, s1);
 
 		Sensor sensor = new Sensor("Test", "°C");
-		SensorData data1 = new SensorData(LocalDateTime.now(), 1, false, false, 'n', sensor, s1);
-		SensorData data2 = new SensorData(
-				data1.getTimeStamp().plusMinutes(5), 2, false, false, 'n', sensor, s1
-		);
+		SensorData data1 = new SensorData(LocalDateTime.now(), 1, 'n', sensor, s1);
+		SensorData data2 = new SensorData(data1.getTimeStamp().plusMinutes(5), 2, 'n', sensor, s1);
 
 		sensorStationService.addSensorData(s1, data1);
 		sensorStationService.addSensorData(s1, data2);

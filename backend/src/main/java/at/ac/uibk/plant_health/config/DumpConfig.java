@@ -161,8 +161,7 @@ public class DumpConfig {
 													char alarm = above ? (below ? 'b' : 'h')
 																	   : (below ? 'l' : 'n');
 													return Stream.of(new SensorData(
-															LocalDateTime.now(), i * 50 + j, above,
-															below, alarm,
+															LocalDateTime.now(), i * 50 + j, alarm,
 															sensors.get(j % sensors.size()), s
 													));
 												})
