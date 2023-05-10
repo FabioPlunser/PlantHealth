@@ -90,6 +90,8 @@ public class SensorStationService {
 			List<SensorLimits> sensorLimits, UUID sensorStationId, Person person
 	) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
+		if (!sensorStation.isUnlocked()) throw new ServiceException("SensorStation is locked", 403);
+		if (sensorStation.isDeleted()) throw new ServiceException("SensorStation is deleted", 403);
 		for (SensorLimits limit : sensorLimits) {
 			Optional<Sensor> sensor = sensorRepository.findByType(limit.getSensor().getType());
 			if (sensor.isEmpty())

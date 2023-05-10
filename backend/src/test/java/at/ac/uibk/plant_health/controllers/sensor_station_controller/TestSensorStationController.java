@@ -225,6 +225,7 @@ public class TestSensorStationController {
 		// precondition accessPoint has found and reported at least one sensor station
 		String bdAddress = StringGenerator.macAddress();
 		SensorStation sensorStation = new SensorStation(bdAddress, 4);
+		sensorStation.setUnlocked(true);
 		sensorStationService.save(sensorStation);
 
 		// precondition sensorStation has at least one sensor
