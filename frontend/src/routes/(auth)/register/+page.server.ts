@@ -60,26 +60,23 @@ export const actions = {
       body: formData,
     };
 
-    let res = await fetch(`${BACKEND_URL}/register`, requestOptions).catch(
-      (error) => console.log("error", error)
-    );
+    let res = await fetch(`${BACKEND_URL}/register`, requestOptions);
 
-    res = await res.json();
-    console.log(res);
-
-    if (res.success) {
+    if (res.status >= 200 && res.status < 300) {
+      res = await res.json();
+      console.log("register", res);
       cookies.set(
         "token",
         JSON.stringify({
           token: res.token,
+          username: formData.get("username"),
           permissions: res.permissions,
           personId: res.personId,
         })
       );
-      throw redirect(302, "/");
+      throw redirect(302, "/user");
     } else {
-      // TODO: add to toast notifications.
-      return fail(400, { error: true, errors: res.message });
+      return fail(401, { message: res.message });
     }
   },
 } satisfies Actions;
