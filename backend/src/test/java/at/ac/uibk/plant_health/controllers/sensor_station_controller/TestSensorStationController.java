@@ -252,7 +252,7 @@ public class TestSensorStationController {
 			sensorJson.put("unit", sensorMap.values().toArray()[i].toString());
 
 			ObjectNode limit = mapper.createObjectNode();
-			limit.putPOJO("sensor", sensorJson);
+			limit.putPOJO("sensor", sensor);
 			limit.put("upperLimit", rand.nextFloat());
 			limit.put("lowerLimit", rand.nextFloat());
 			limit.put("thresholdDuration", rand.nextInt(1000));
@@ -433,8 +433,6 @@ public class TestSensorStationController {
 
 		sensorStation = sensorStationService.findByBdAddress(bdAddress);
 		assertEquals(1, sensorStation.getPlantPictures().size());
-
-		sensorStation.getPlantPictures().forEach(p -> System.out.println(p.getPicturePath()));
 
 		deleteAllPictures(sensorStation);
 		assertEquals(0, sensorStation.getPlantPictures().size());

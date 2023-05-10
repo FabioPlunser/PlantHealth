@@ -110,7 +110,10 @@ public class SensorStationController {
 					.toEntity();
 		}
 
-		return MessageResponse.builder().statusCode(200).toEntity();
+		return MessageResponse.builder()
+				.statusCode(200)
+				.message("Successfully set sensor limits")
+				.toEntity();
 	}
 
 	@AnyPermission({Permission.GARDENER, Permission.ADMIN, Permission.USER})
@@ -148,9 +151,6 @@ public class SensorStationController {
 			@RequestParam("sensorStationId") final UUID sensorStationId,
 			@RequestParam("picture") final MultipartFile picture
 	) {
-		System.out.println(picture.getOriginalFilename());
-		System.out.println(picture.getName());
-		System.out.println(picture.getContentType());
 		try {
 			sensorStationService.findById(sensorStationId);
 			sensorStationService.uploadPicture(picture, sensorStationId);
