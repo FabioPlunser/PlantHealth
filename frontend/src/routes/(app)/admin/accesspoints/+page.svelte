@@ -24,7 +24,6 @@
   // ---------------------------------------------------------
   async function invalidateAccessPoints() {
     await setTimeout(async () => {
-      console.log("invalidate", new Date().toLocaleTimeString());
       await invalidate("app:getAccessPoints");
     }, 1000 * 30);
   }
@@ -44,7 +43,6 @@
   }
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  $: console.log(data);
 </script>
 
 {#if rendered}

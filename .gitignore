@@ -34,3 +34,4 @@ dist-ssr
 .ccls
 
 frontend/build/
+test

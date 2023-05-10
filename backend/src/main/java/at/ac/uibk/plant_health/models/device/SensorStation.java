@@ -19,7 +19,7 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Table(name = "sensor_station")
 // NOTE: This changes the name of the "id"-Column inherited from Device to "sensor_station_id"
@@ -31,7 +31,7 @@ public class SensorStation extends Device implements Serializable {
 
 	@Column(name = "plant_name")
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
-	private String name = null;
+	private String name = "SensorStation";
 
 	@JdbcTypeCode(SqlTypes.INTEGER)
 	@Column(name = "dip_switch_id", nullable = false)

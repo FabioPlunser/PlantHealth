@@ -37,7 +37,6 @@ export async function load({ locals, fetch }) {
 
     if (res.status >= 200 && res.status < 300) {
       res = await res.json();
-      console.log("get-user-permissions", res);
       if (locals.user.permissions.toString() !== res.permissions.toString()) {
         logger.error("User permissions do not match backend permissions");
         throw redirect(302, "/logout");

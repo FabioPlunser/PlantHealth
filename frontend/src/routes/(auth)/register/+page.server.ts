@@ -80,11 +80,12 @@ export const actions = {
         "token",
         JSON.stringify({
           token: res.token,
+          username: formData.get("username"),
           permissions: res.permissions,
           personId: res.personId,
         })
       );
-      throw redirect(302, "/");
+      throw redirect(302, "/user");
     } else {
       return fail(400, { error: true, errors: res.message });
     }

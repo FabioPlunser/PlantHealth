@@ -62,7 +62,6 @@ export const handleFetch = (({ event, request, fetch }) => {
   logger.info("HandleFetch request: " + JSON.stringify(request));
 
   const { cookies } = event;
-  // console.log("event", event)
   let token = cookies.get("token");
   if (token) {
     token = JSON.parse(token);

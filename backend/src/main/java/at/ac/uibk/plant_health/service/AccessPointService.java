@@ -179,6 +179,7 @@ public class AccessPointService {
 			AccessPoint accessPoint, List<SensorStation> sensorStationList
 	) throws ServiceException {
 		sensorStationList.forEach(sensorStation -> {
+			sensorStation.setConnected(true);
 			sensorStation.setAccessPoint(accessPoint);
 			sensorStationService.save(sensorStation);
 		});
@@ -244,6 +245,8 @@ public class AccessPointService {
 			for (SensorStation sensorStation : sensorStations) {
 				SensorStation dbSensorStation =
 						sensorStationService.findByBdAddress(sensorStation.getBdAddress());
+				if (!dbSensorStation.isUnlocked())
+					throw new ServiceException("SensorStation is locked", 401);
 				sensorStationService.addSensorData(dbSensorStation, sensorStation.getSensorData());
 			}
 			setLastConnection(accessPoint);

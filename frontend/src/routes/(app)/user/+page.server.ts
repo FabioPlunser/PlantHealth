@@ -2,18 +2,36 @@ import { BACKEND_URL } from "$env/static/private";
 import type { Actions } from "./$types";
 import { redirect } from "@sveltejs/kit";
 
-let from = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000); // standard fetch of last 14 days;
-let to = new Date();
+interface Dashboard {
+  sensorStations: [
+    {
+      data: Promise;
+      name: string;
+      [key: string]: any;
+    }
+  ];
+}
 
-export async function load({ locals, fetch }) {
+export async function load({ locals, fetch, cookies }) {
+  let from = cookies.get("from");
+  let to = cookies.get("to");
+
+  if (!from || !to) {
+    from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    to = new Date(Date.now());
+    cookies.set("from", from, { path: "/" });
+    cookies.set("to", to, { path: "/" });
+  } else {
+    from = new Date(from);
+    to = new Date(to);
+  }
+
   let res = await fetch(`${BACKEND_URL}/get-sensor-stations`);
   res = await res.json();
 
   let sensorStations = res?.sensorStations;
-
-  /*for (let foundSensorStation of res?.sensorStations) {
-    // console.log("foundSensorStation", foundSensorStation);
-    foundSensorStation.picture = new Promise(async (resolve, reject) => {
+  for (let foundSensorStation of res?.sensorStations) {
+    foundSensorStation.newestPicture = new Promise(async (resolve, reject) => {
       let res = await fetch(
         `${BACKEND_URL}/get-newest-sensor-station-picture?sensorStationId=${foundSensorStation.sensorStationId}`
       );
@@ -33,37 +51,12 @@ export async function load({ locals, fetch }) {
     sensorStations[sensorStations.indexOf(foundSensorStation)] =
       foundSensorStation;
   }
-*/
-  let dashboard = await fetch(`${BACKEND_URL}/get-dashboard`);
-  dashboard = await dashboard.json();
-  /*
-  for (let sensorStation of dashboard?.sensorStations) {
-    console.log("sensorStation", sensorStation);
-    // let pictures = [];
-    // for(let pictureId of sensorStation.pictureIds){
-    //   console.log("pictureId", pictureId);
-    //   let picture = new Promise(async (resolve, reject) => {
-    //     let res = await fetch(`${BACKEND_URL}/get-sensor-station-picture?pictureId=${pictureId}`);
-    //     if(res.status != 200){
-    //       console.log("res", res);
-    //       resolve(null);
-    //     }
-    //     res = await res.blob();
-    //     let file = new File([res], "image", { type: res.type });
-    //     let arrayBuffer = await res.arrayBuffer();
-    //     let buffer = Buffer.from(arrayBuffer);
-    //     let encodedImage =
-    //       "data:image/" + res.type + ";base64," + buffer.toString("base64");
-    //     let picture = {
-    //       encodedImage: encodedImage,
-    //       pictureId: pictureId,
-    //     };
-    //     resolve(picture);
-    //   });
-    //   pictures.push(picture);
-    // }
-    // sensorStation.pictures = pictures;
 
+  let dashboard: Dashboard = await fetch(`${BACKEND_URL}/get-dashboard`);
+  dashboard = await dashboard.json();
+
+  for (let sensorStation of dashboard.sensorStations) {
+    console.log("sensorStation", sensorStation);
     sensorStation.data = new Promise(async (resolve, reject) => {
       let res = await fetch(
         `${BACKEND_URL}/get-sensor-station-data?sensorStationId=${
@@ -73,7 +66,7 @@ export async function load({ locals, fetch }) {
         }`
       );
       if (res.status != 200) {
-        console.log("res", res);
+        console.log(res);
         resolve(null);
       }
       res = await res.json();
@@ -81,14 +74,47 @@ export async function load({ locals, fetch }) {
       resolve(res);
     });
 
-    dashboard.sensorStations[dashboard.sensorStations.indexOf(sensorStation)] =
-      sensorStation;
+    let res = await fetch(
+      `${BACKEND_URL}/get-sensor-station-pictures?sensorStationId=${sensorStation.sensorStationId}`
+    );
+    res = await res.json();
+
+    sensorStation.pictures = [];
+    for (let possiblePicture of res.pictures) {
+      let picturePromise = new Promise(async (resolve, reject) => {
+        let res = await fetch(
+          `${BACKEND_URL}/get-sensor-station-picture?pictureId=${possiblePicture.pictureId}`
+        );
+        if (!res.ok) {
+          reject(res.statusText);
+          throw new Error(res.statusText);
+        }
+        res = await res.blob();
+        let file = new File([res], "image", { type: res.type });
+        let arrayBuffer = await res.arrayBuffer();
+        let buffer = Buffer.from(arrayBuffer);
+        let encodedImage =
+          "data:image/" + res.type + ";base64," + buffer.toString("base64");
+        let picture: Picture = {
+          imageRef: "",
+          creationDate: new Date(),
+        };
+        picture.imageRef = encodedImage;
+        picture.creationDate = new Date(possiblePicture.timeStamp);
+        picture.pictureId = possiblePicture.pictureId;
+        resolve(picture);
+      });
+
+      sensorStation.pictures.push(picturePromise);
+    }
   }
 
-  // console.log("dashboard", dashboard);
-*/
   return {
     dashboard,
+    dates: {
+      from,
+      to,
+    },
     sensorStations: sensorStations,
   };
 }
@@ -116,15 +142,28 @@ export const actions = {
       }
     );
     res = await res.json();
-    console.log("removeFromDashboard", res);
+    // console.log("removeFromDashboard", res);
   },
 
-  updateFromTo: async ({ request, fetch, url }) => {
+  updateFromTo: async ({ request, fetch, url, cookies }) => {
     let formData = await request.formData();
-    from = formData.get("from");
-    to = formData.get("to");
+    let _from = formData.get("from");
+    let _to = formData.get("to");
 
-    console.log("from", from);
-    console.log("to", to);
+    console.log("UpdateFromTo");
+    console.log("from", _from);
+    console.log("to", _to);
+
+    _from = new Date(_from);
+    _to = new Date(_to);
+
+    console.log("from", _from);
+    console.log("to", _to);
+
+    cookies.set("from", _from, { path: "/" });
+    cookies.set("to", _to, { path: "/" });
+
+    console.log("Cookies-from", new Date(cookies.get("from")));
+    console.log("Cookies-to", new Date(cookies.get("to")));
   },
 } satisfies Actions;

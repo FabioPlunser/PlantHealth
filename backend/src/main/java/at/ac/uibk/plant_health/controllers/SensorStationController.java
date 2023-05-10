@@ -37,7 +37,7 @@ public class SensorStationController {
 			|| person.getPermissions().contains(Permission.GARDENER)) {
 			return new SensorStationsResponse(sensorStationService.findAll()).toEntity();
 		}
-		return new UserSensorStationsResponse(sensorStationService.findAll()).toEntity();
+		return new UserSensorStationsResponse(sensorStationService.findAll(), person).toEntity();
 	}
 
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
@@ -124,6 +124,7 @@ public class SensorStationController {
 			) final LocalDateTime to
 	) {
 		try {
+			sensorStationService.isDeleted(sensorStationService.findById(sensorStationId));
 			return new SensorStationDataResponse(
 						   sensorStationService.findById(sensorStationId), from, to
 			)
