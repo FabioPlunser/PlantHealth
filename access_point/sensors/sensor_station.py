@@ -369,6 +369,10 @@ class SensorStation:
                 if sensor.name != sensor_name:
                     continue
                 try:
+                    if alarm == 'l':
+                        log.debug(f'Low threshold alarm for sensor {sensor_name} on sensor station {self.address} active')
+                    if alarm == 'h':
+                        log.debug(f'High threshold alarm for sensor {sensor_name} on sensor station {self.address} active')
                     await sensor.set_alarm(alarm)
                 except WriteError:
                     pass
