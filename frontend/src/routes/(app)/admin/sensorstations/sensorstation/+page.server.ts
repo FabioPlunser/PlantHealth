@@ -9,7 +9,7 @@ export async function load({ fetch, depends, url, cookies }) {
     `${BACKEND_URL}/get-sensor-station?sensorStationId=${sensorStationId}`
   );
   res = await res.json();
-
+  console.log(res);
   depends("app:getSensorStation");
   return res;
 }
@@ -65,14 +65,28 @@ export const actions = {
     }
   },
 
-  setLimits: async ({ cookies, request, fetch }) => {
+  setLimit: async ({ cookies, request, fetch }) => {
     let formData = await request.formData();
     let sensorStationId = formData.get("sensorStationId");
-    let sensorLimits = formData;
+    let sensorId = formData.get("sensorId");
+    let upperLimit = formData.get("upperLimit");
+    let lowerLimit = formData.get("lowerLimit");
+
+    console.log(formData);
+
     await fetch(
       `${BACKEND_URL}/set-sensor-limits?sensorStationId=${sensorStationId}`,
       {
         method: "POST",
+        body: JSON.stringify({
+          limits: [
+            {
+              sensorId,
+              upperLimit,
+              lowerLimit,
+            },
+          ],
+        }),
       }
     ).then((response) => {
       let time = new Date().toLocaleString();
@@ -81,7 +95,7 @@ export const actions = {
         throw error(response.status, response.statusText);
       } else {
         console.log(
-          `${time} : unlocked set to "${unlocked}" for sensorStation with id = ${sensorStationId}`
+          `${time} : set limits for sensorstation = ${sensorStationId} sensor = ${sensorType} to {upperLimit = ${upperLimit}, lowerLimit ${lowerLimit}}`
         );
       }
     });

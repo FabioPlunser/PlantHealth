@@ -27,8 +27,8 @@
   let sensorStation;
   $: sensorStation = data.sensorStation;
   //let sensorStation = data.sensorStation;
-  let sensors;
-  $: sensors = data.sensors;
+  let limits;
+  $: limits = data.sensorStation.sensorLimits;
   // ----------------------------------
   // ----------------------------------
   let sensorDataModal = false;
@@ -82,22 +82,24 @@
   <!--
   <PictureModal bind:open={picturesModal} pictures={data.pictures} />
 -->
-  <SensorLimitsModal bind:open={sensorLimitsModal} {sensorStation} {sensors} />
+  <SensorLimitsModal
+    bind:open={sensorLimitsModal}
+    {sensorStation}
+    sensors={limits}
+  />
   <SensorDataModal bind:open={sensorDataModal} data={data.data} />
   <section in:fly={{ y: -200, duration: 200 }}>
     <div class="flex justify-center mx-auto">
-      <form
+      <div
         in:fly|self={{ y: -200, duration: 200, delay: 100 }}
         out:fly|local|self={{ y: 200, duration: 200 }}
-        method="POST"
-        use:enhance
         class="card p-8 border h-fit bg-base-100 dark:border-none shadow-2xl"
       >
         <div class="text-2xl">
           <input
             type="hidden"
             name="sensorStationId"
-            value={sensorStation?.deviceId}
+            value={sensorStation.sensorStationId}
           />
           <Input
             field="name"
@@ -160,73 +162,59 @@
               <div
                 class="divider mt-2 dark:bg-white bg-black h-[2px] rounded-xl"
               />
-              {#if sensorStation.sensorLimits.length === 0 && sensors.length === 0}
+              {#if limits.length === 0}
                 <h1>There is no Information about the sensorstation yet.</h1>
-              {/if}
-
-              {#if sensors.length > 0}
+              {:else}
                 <div
                   class="mx-auto grid grid-rows md:grid-cols-2 xl:grid-cols-3 gap-4"
                 >
-                  {#each sensors as limit}
+                  {#each limits as limit}
                     <div class="flex justify-center">
                       <div
-                        class="card border h-fit bg-base-100 dark:border-none shadow-2xl"
+                        class="card border h-fit bg-base-100 dark:border-none shadow-2xl w-60"
                       >
                         <div class="card-body">
-                          <div class="flex">
+                          <div class="flex text-center">
                             <h1 class="mx-auto font-semibold">
-                              {limit.type}
-                              <span class="ml-2">[{limit.unit}]</span>
+                              {limit.sensor.type}
+                              <br />
+                              <span class="ml-2 justify-center"
+                                >[{limit.sensor.unit}]</span
+                              >
                             </h1>
                           </div>
-                          <Input
-                            field="LowerLimit"
-                            type="number"
-                            label="LowerLimit: "
-                          />
-                          <Input
-                            field="UpperLimit"
-                            type="number"
-                            label="UpperLimit: "
-                          />
-                          <div class="card-actions mx-auto">
-                            <button class="btn btn-primary">Set Limit</button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  {/each}
-                </div>
-              {:else}
-                <div class="mx-auto grid grid-rows xl:grod-cols-2 gap-4">
-                  {#each sensorStation.sensorLimits as limit}
-                    <div class="flex justify-center">
-                      <div
-                        class="card dark:bg-slate-800 w-fit bg-base-300 shadow-2xl"
-                      >
-                        <div class="card-body">
-                          <div class="flex">
-                            <h1 class="mx-auto font-bold">
-                              {limit.type}
-                              <span class="ml-2">[{limit.unit}]</span>
-                            </h1>
-                          </div>
-                          <Input
-                            field="LowerLimit"
-                            type="number"
-                            label="LowerLimit: "
-                            value={limit.lowerLimit}
-                          />
-                          <Input
-                            field="UpperLimit"
-                            type="number"
-                            label="UpperLimit: "
-                            value={limit.lowerLimit}
-                          />
-                        </div>
-                        <div class="card-actions mx-auto">
-                          <button class="btn btn-primary">Set Limit</button>
+                          <form method="post">
+                            <input
+                              type="hidden"
+                              name="sensorStationId"
+                              value={sensorStation.sensorStationId}
+                            />
+                            <input
+                              type="hidden"
+                              name="sensorId"
+                              value={limit.sensor.sensorId}
+                            />
+                            <Input
+                              field="upperLimit"
+                              type="number"
+                              label="UpperLimit: "
+                              value={limit.upperLimit}
+                            />
+                            <Input
+                              field="lowerLimit"
+                              type="number"
+                              label="LowerLimit: "
+                              value={limit.lowerLimit}
+                            />
+                            <div
+                              class="card-actions mx-auto justify-center mt-4"
+                            >
+                              <button
+                                class="btn btn-primary"
+                                formaction="?/setLimit">Set Limit</button
+                              >
+                            </div>
+                          </form>
                         </div>
                       </div>
                     </div>
@@ -239,34 +227,45 @@
               <div
                 class="divider mt-2 dark:bg-white bg-black h-[2px] rounded-xl"
               />
-              {#if sensorStation.sensorData.length === 0}
-                <h1>No sesor data available yet.</h1>
-              {:else}
-                <Table
-                  data={sensorStation.sensorData}
-                  {columns}
-                  {mobileColumnVisibility}
-                />
-              {/if}
+              <!--
+
+                {#if sensorStation.sensorData.length === 0}
+                  <h1>No sesor data available yet.</h1>
+                {:else}
+                  <Table
+                    data={sensorStation.sensorData}
+                    {columns}
+                    {mobileColumnVisibility}
+                  />
+                {/if}
+              -->
             </div>
           </Desktop>
 
           <div class="flex justify-center mx-auto gap-2 mt-6">
             <button formaction="?/update" class="btn btn-primary">Update</button
             >
-            {#if sensorStation.unlocked}
-              <button class="btn btn-info" formaction="?/unlock"
-                >Unlocked</button
-              >
-              <input type="hidden" name="unlocked" value="false" />
-            {:else}
-              <button class="btn btn-error" formaction="?/unlock">Locked</button
-              >
-              <input type="hidden" name="unlocked" value="true" />
-            {/if}
+            <form method="post">
+              <input
+                type="hidden"
+                name="sensorStationId"
+                value={sensorStation.sensorStationId}
+              />
+              {#if sensorStation.unlocked}
+                <button class="btn btn-info" formaction="?/unlock"
+                  >Unlocked</button
+                >
+                <input type="hidden" name="unlocked" value="false" />
+              {:else}
+                <button class="btn btn-error" formaction="?/unlock"
+                  >Locked</button
+                >
+                <input type="hidden" name="unlocked" value="true" />
+              {/if}
+            </form>
           </div>
         </div>
-      </form>
+      </div>
     </div>
   </section>
 {/if}

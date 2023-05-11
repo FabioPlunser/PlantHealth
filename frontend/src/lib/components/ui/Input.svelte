@@ -15,7 +15,7 @@
       name={field}
       {type}
       {placeholder}
-      class="input input-bordered w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
+      class="input input-bordered w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black caret-red-200"
     />
   </label>
 </div>
