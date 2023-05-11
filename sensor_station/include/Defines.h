@@ -146,50 +146,45 @@
 #define LED_COLOR_ERROR_AIR_QUALITY			   0x4F'00'FF
 #define LED_COLOR_ERROR_AIR_TEMPERATURE		   0x4F'00'00
 #define LED_COLOR_ERROR_AIR_HUMIDITY		   0x4F'99'FF
-<<<<<<< HEAD
-#define LED_COLOR_ERROR_AIR_PRESSURE 0x4F'33'00 // Should be orange
-	== == ==
-	=
-#define LED_COLOR_ERROR_AIR_PRESSURE 0x00'99'FF
-		>>>>>>> 2dea4dd842a7aba77848dc8f6468c112a008aa87
-#define LED_COLOR_ERROR_SOIL_HUMIDITY	0x00'00'FF
-#define LED_COLOR_ERROR_LIGHT_INTENSITY 0x4F'33'00
-#define LED_TIME_ERROR_ON_MS			1000
-#define LED_TIME_ERROR_OFF_MS			4000
-#define LED_TIME_ERROR_BLINK_PAUSE_MS	1000
+#define LED_COLOR_ERROR_AIR_PRESSURE		   0x00'99'FF
+#define LED_COLOR_ERROR_SOIL_HUMIDITY		   0x00'00'FF
+#define LED_COLOR_ERROR_LIGHT_INTENSITY		   0x4F'33'00
+#define LED_TIME_ERROR_ON_MS				   1000
+#define LED_TIME_ERROR_OFF_MS				   4000
+#define LED_TIME_ERROR_BLINK_PAUSE_MS		   1000
 
-#define LED_COLOR_NOTIFICATION_PAIRING	0x00'99'00
-#define LED_TIME_NOTIFICATION_ON_MS		1000
-#define LED_TIME_NOTIFICATION_OFF_MS	4000
+#define LED_COLOR_NOTIFICATION_PAIRING		   0x00'99'00
+#define LED_TIME_NOTIFICATION_ON_MS			   1000
+#define LED_TIME_NOTIFICATION_OFF_MS		   4000
 
-#define PIEZO_BUZZER_TONE_INTERVALL_MS	15'000
-#define PIEZO_BUZZER_TONE_DURATION_MS	100
-#define PIEZO_BUZZER_TONE_FREQUENCY_HZ	3'000
+#define PIEZO_BUZZER_TONE_INTERVALL_MS		   15'000
+#define PIEZO_BUZZER_TONE_DURATION_MS		   100
+#define PIEZO_BUZZER_TONE_FREQUENCY_HZ		   3'000
 
 // ---------------------
 // |    Pin Mapping    |
 // ---------------------
 
-#define PIN_PHOTOTRANSISTOR				A0
-#define PIN_HYDROMETER					A1
-#define PIN_PIEZO_BUZZER				A2
-#define PIN_RGB_RED						A3
-#define PIN_SDA							A4
-#define PIN_SCL							A5
-#define PIN_RGB_BLUE					A6
-#define PIN_RGB_GREEN					A7
+#define PIN_PHOTOTRANSISTOR					   A0
+#define PIN_HYDROMETER						   A1
+#define PIN_PIEZO_BUZZER					   A2
+#define PIN_RGB_RED							   A3
+#define PIN_SDA								   A4
+#define PIN_SCL								   A5
+#define PIN_RGB_BLUE						   A6
+#define PIN_RGB_GREEN						   A7
 
-#define PIN_DIP_8						D12 // Lowest
-#define PIN_DIP_7						D11
-#define PIN_DIP_6						D10
-#define PIN_DIP_5						D9
-#define PIN_DIP_4						D8
-#define PIN_DIP_3						D7
-#define PIN_DIP_2						D6
-#define PIN_DIP_1						D5 // Highest
+#define PIN_DIP_8							   D12 // Lowest
+#define PIN_DIP_7							   D11
+#define PIN_DIP_6							   D10
+#define PIN_DIP_5							   D9
+#define PIN_DIP_4							   D8
+#define PIN_DIP_3							   D7
+#define PIN_DIP_2							   D6
+#define PIN_DIP_1							   D5 // Highest
 
-#define PIN_BUTTON_1					D4 // L
-#define PIN_BUTTON_2					D3 // M
-#define PIN_BUTTON_3					D2 // R
+#define PIN_BUTTON_1						   D4 // L
+#define PIN_BUTTON_2						   D3 // M
+#define PIN_BUTTON_3						   D2 // R
 
 #endif
