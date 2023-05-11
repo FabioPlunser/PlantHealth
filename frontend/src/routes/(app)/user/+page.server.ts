@@ -2,6 +2,7 @@ import { BACKEND_URL } from "$env/static/private";
 import type { Actions } from "./$types";
 import { redirect } from "@sveltejs/kit";
 import { logger } from "$helper/logger";
+import { toasts } from "$stores/toastStore";
 
 interface Dashboard {
   sensorStations: [
@@ -141,7 +142,7 @@ export const actions = {
   of the sensor station to be added. It then sends a POST request to the backend API endpoint
   `/add-to-dashboard` with the sensor station ID as a query parameter. The function is asynchronous,
   as it uses the `await` keyword to wait for the response from the API before continuing. */
-  addToDashboard: async ({ request, fetch, url }) => {
+  addToDashboard: async ({ request, fetch, url, locals }) => {
     let formData = await request.formData();
     let sensorStationId = formData.get("sensorStationId");
 
@@ -153,6 +154,12 @@ export const actions = {
     );
     res = await res.json();
     logger.info("addToDashboard", { res });
+
+    let promise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve("done");
+      }, 2000);
+    });
   },
   /* `removeFromDashboard` is an action function that removes a sensor station from the user's
   dashboard. It receives an HTTP request object, extracts the form data submitted by the user, which
@@ -160,7 +167,7 @@ export const actions = {
   API endpoint `/remove-from-dashboard` with the sensor station ID as a query parameter. The
   function is asynchronous, as it uses the `await` keyword to wait for the response from the API
   before continuing. It also logs the response from the API to the console. */
-  removeFromDashboard: async ({ request, fetch, url }) => {
+  removeFromDashboard: async ({ request, fetch, url, locals }) => {
     let formData = await request.formData();
     let sensorStationId = formData.get("sensorStationId");
 
@@ -171,6 +178,7 @@ export const actions = {
       }
     );
     res = await res.json();
+
     logger.info("removeFromDashboard", { res });
   },
 
@@ -179,7 +187,7 @@ export const actions = {
   includes the new `from` and `to` dates. It then converts these dates to `Date` objects and logs
   them to the console using the `logger` helper function. Finally, it sets the `from` and `to`
   cookies with the new dates, so that they can be used in subsequent requests. */
-  updateFromTo: async ({ request, fetch, url, cookies }) => {
+  updateFromTo: async ({ request, fetch, url, cookies, locals }) => {
     let formData = await request.formData();
     let _from = formData.get("from");
     let _to = formData.get("to");

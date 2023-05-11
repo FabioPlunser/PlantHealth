@@ -86,7 +86,7 @@ Usage example:
     <div class="w-full h-full">
       {#if loading}
         <div class="mb-2">
-          <Spinner />
+          <Spinner fill="fill-primary" />
         </div>
       {:else if Object.keys(graphData).length === 0}
         <h1 class="font-bold text-4xl flex justify-center">No data found</h1>

@@ -8,6 +8,8 @@
 
   export let showModal: boolean;
   export let data: any = [];
+
+  $: console.log(data);
 </script>
 
 <Modal
@@ -27,7 +29,7 @@
               in:fly|self={{ x: -200, duration: 300, delay: 200 * i }}
               class="card w-64 h-92 dark:bg-base-100 bg-base-100 shadow-2xl border-gray-200 border dark:border-none"
             >
-              {#await item?.picture}
+              {#await item?.newestPicture}
                 <div>
                   <Spinner />
                 </div>

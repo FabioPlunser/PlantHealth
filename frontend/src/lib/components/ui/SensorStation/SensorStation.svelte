@@ -83,7 +83,7 @@
             <div class="">
               <div class="">
                 {#if loading}
-                  <Spinner />
+                  <Spinner fill="fill-primary" />
                 {:else}
                   <Graphs data={sensorStation.data} />
                 {/if}
