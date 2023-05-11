@@ -1,4 +1,5 @@
 import { BACKEND_URL } from "$env/static/private";
+import { logger } from "$helper/logger";
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 
@@ -8,7 +9,13 @@ export async function load({ fetch, depends, cookies }) {
   let res = await fetch(
     `${BACKEND_URL}/get-sensor-station?sensorStationId=${sensorStationId}`
   );
+  if (!res.ok) {
+    logger.error("Could not get sensor station");
+    throw error(res.status, "Could not get sensor station");
+  }
+
   res = await res.json();
+  logger.info("Got sensor station");
   depends("app:getSensorStation");
   return res;
 }
@@ -117,6 +124,7 @@ export const actions = {
     let sensorType = formData.get("sensorType");
     let upperLimit = formData.get("upperLimit");
     let lowerLimit = formData.get("lowerLimit");
+    let thresholdDuration = formData.get("thresholdDuration");
 
     // validate name input
     if (!zodData.success) {
@@ -142,9 +150,12 @@ export const actions = {
       body: JSON.stringify({
         limits: [
           {
-            sensorId,
             upperLimit,
             lowerLimit,
+            thresholdDuration,
+            sensor: {
+              type: sensorType,
+            },
           },
         ],
       }),

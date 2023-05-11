@@ -25,6 +25,24 @@ let sensors = [
     bootstrap: "",
     google: "speed",
   },
+  {
+    sensorType: "BATTERYLEVEL",
+    sensorUnit: "%",
+    bootstrap: "bi-battery-half",
+    google: "",
+  },
+  {
+    sensorType: "SOILHUMIDITY",
+    sensorUnit: "%",
+    bootstrap: "bi bi-moisture",
+    google: "",
+  },
+  {
+    sensorType: "AIRQUALITY",
+    sensorUnit: "%",
+    bootstrap: "",
+    google: "air",
+  },
 ];
 
 export const sensorsStore = writable(sensors);

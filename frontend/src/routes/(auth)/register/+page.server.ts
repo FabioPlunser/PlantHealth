@@ -2,6 +2,7 @@ import type { Actions } from "./$types";
 import { BACKEND_URL } from "$env/static/private";
 import { fail, redirect } from "@sveltejs/kit";
 import { z } from "zod";
+import { logger } from "$helper/logger";
 
 const schema = z.object({
   username: z
@@ -32,11 +33,13 @@ const schema = z.object({
     .trim(),
 });
 
+/* This code exports an object named `actions` that contains a single function named `register`. This
+function is an asynchronous function that takes an object with three parameters: `cookies`,
+`request`, and `fetch`. */
 export const actions = {
   register: async ({ cookies, request, fetch }) => {
     const formData = await request.formData();
     const zod = schema.safeParse(Object.fromEntries(formData));
-    console.log(formData);
 
     if (formData.get("password") !== formData.get("passwordConfirm")) {
       return fail(400, { error: true, errors: "Passwords do not match" });
@@ -54,17 +57,24 @@ export const actions = {
       return fail(400, { error: true, errors });
     }
     formData.delete("passwordConfirm");
-    console.log(formData);
+
     var requestOptions = {
       method: "POST",
       body: formData,
     };
 
-    let res = await fetch(`${BACKEND_URL}/register`, requestOptions);
+    let res = await fetch(`${BACKEND_URL}/register`, requestOptions).catch(
+      (error) => {
+        logger.error(`User ${formData.get("username")} failed to register`, {
+          error,
+        });
+      }
+    );
 
-    if (res.status >= 200 && res.status < 300) {
-      res = await res.json();
-      console.log("register", res);
+    res = await res.json();
+    logger.info(`User ${formData.get("username")} registered`);
+
+    if (res.success) {
       cookies.set(
         "token",
         JSON.stringify({
@@ -76,7 +86,7 @@ export const actions = {
       );
       throw redirect(302, "/user");
     } else {
-      return fail(401, { message: res.message });
+      return fail(400, { error: true, errors: res.message });
     }
   },
 } satisfies Actions;

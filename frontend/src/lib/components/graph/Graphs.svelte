@@ -16,9 +16,6 @@
   // ---------------------------------------------------
   // ---------------------------------------------------
   let sensors = $sensorsStore;
-  onMount(() => {
-    sensors = $sensorsStore;
-  });
   let currentSensor: any = sensors[0].sensorType;
   let graphData: any = {};
   let width = 0;
@@ -49,23 +46,22 @@
   }
   // ---------------------------------------------------
   // ---------------------------------------------------
-  let sensorData: any[] = [];
-  $: {
-    for (let sensor of sensorData) {
-      if (!$sensorsStore.includes(sensor.type)) {
+  async function addMissingSensors(dynamicSensors: any) {
+    for (let sensor of dynamicSensors) {
+      if (!sensors.some((s) => s.sensorType === sensor.sensorType)) {
         let newSensor = {
           sensorType: sensor.sensorType,
           sensorUnit: sensor.sensorUnit,
           bootstrap: "",
           google: "sensors",
         };
-        $sensorsStore = [...$sensorsStore, newSensor];
+        sensors = [...sensors, newSensor];
       }
     }
   }
   data
     .then(async (res: any) => {
-      sensorData = res.data;
+      addMissingSensors(res.data);
       graphData = createGraphData(res.data);
     })
     .catch((err: any) => {
@@ -76,12 +72,21 @@
   // ---------------------------------------------------
 </script>
 
+<!-- @component
+This the graphs component 
+it produces a graph with GraphJS and a sidebar to change between the graphs 
+Usage example: 
+```html
+<Graphs data={sensorStation.data} />
+```
+-->
+
 <div>
   <div class="md:flex items-center" bind:clientWidth={width}>
     <div class="w-full h-full">
       {#if loading}
         <div class="mb-2">
-          <Spinner />
+          <Spinner fill="fill-primary" />
         </div>
       {:else if Object.keys(graphData).length === 0}
         <h1 class="font-bold text-4xl flex justify-center">No data found</h1>
@@ -105,7 +110,7 @@
         >
           <button on:click={() => (currentSensor = sensor.sensorType)}>
             <i
-              class="bi {sensor.bootstrap} transform transition-transform active:scale-110 material-symbols-outlined text-4xl hover:text-white hover:dark:text-black
+              class="bi {sensor.bootstrap} transform transition-transform active:scale-110 material-symbols-outlined text-2xl sm:text-3xl md:text-4xl xl:text-5xl hover:text-white hover:dark:text-black
               {sensor.sensorType === currentSensor
                 ? 'text-black'
                 : 'text-white'}"

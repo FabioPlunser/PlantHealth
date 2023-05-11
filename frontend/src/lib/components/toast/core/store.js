@@ -1,9 +1,12 @@
 import { get, writable } from "svelte/store";
 import writableDerived from "svelte-writable-derived";
 const TOAST_LIMIT = 2;
+
 export const toasts = writable([]);
 export const pausedAt = writable(null);
+
 const toastTimeouts = new Map();
+
 const addToRemoveQueue = (toastId) => {
   if (toastTimeouts.has(toastId)) {
     return;
