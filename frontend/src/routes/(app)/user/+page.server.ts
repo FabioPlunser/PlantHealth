@@ -194,10 +194,17 @@ export const actions = {
 
     _from = new Date(_from);
     _to = new Date(_to);
+    _from.setHours(0);
+    _from.setMinutes(0);
+    _from.setSeconds(0);
+
+    _to.setHours(23);
+    _to.setMinutes(59);
+    _to.setSeconds(59);
 
     logger.info("UpdateFromTo");
-    logger.info("from", { _from });
-    logger.info("to", { _to });
+    logger.info("from" + JSON.stringify(_from));
+    logger.info("to" + JSON.stringify(_to));
 
     cookies.set("from", _from, { path: "/" });
     cookies.set("to", _to, { path: "/" });

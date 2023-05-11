@@ -20,14 +20,12 @@
   let graphData: any = {};
   let width = 0;
   $: {
-    if (width <= 400) {
+    if (width <= 700) {
       options = {
         responsive: true,
         scales: {
           x: {
-            ticks: {
-              display: false,
-            },
+            display: false,
           },
         },
       };
@@ -36,14 +34,18 @@
         responsive: true,
         scales: {
           x: {
-            ticks: {
-              display: true,
-            },
+            display: true,
+          },
+          y: {
+            type: "linear",
+            display: true,
+            position: "left",
           },
         },
       };
     }
   }
+  $: console.log(graphData);
   // ---------------------------------------------------
   // ---------------------------------------------------
   async function addMissingSensors(dynamicSensors: any) {
@@ -110,7 +112,7 @@ Usage example:
         >
           <button on:click={() => (currentSensor = sensor.sensorType)}>
             <i
-              class="bi {sensor.bootstrap} transform transition-transform active:scale-110 material-symbols-outlined text-2xl sm:text-3xl md:text-4xl xl:text-5xl hover:text-white hover:dark:text-black
+              class="bi {sensor.bootstrap} transform transition-transform active:scale-110 material-symbols-outlined text-2xl sm:text-3xl md:text-4xl xl:text-5xl hover:text-blue-400 hover:scale-105 hover:dark:text-black
               {sensor.sensorType === currentSensor
                 ? 'text-black'
                 : 'text-white'}"

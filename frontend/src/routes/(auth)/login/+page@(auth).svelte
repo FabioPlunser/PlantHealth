@@ -52,7 +52,7 @@
           </button>
           <button
             disabled={data?.error != null}
-            class="btn btn-primary text-white"
+            class="btn btn-info text-white"
           >
             <a href="/guest" data-sveltekit-preload-code>Guest</a>
           </button>

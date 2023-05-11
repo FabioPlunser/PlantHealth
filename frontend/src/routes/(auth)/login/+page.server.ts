@@ -40,6 +40,7 @@ export const actions = {
       return fail(400, { error: true, errors });
     }
 
+    toasts.addToast();
     var requestOptions = {
       method: "POST",
       body: formData,
