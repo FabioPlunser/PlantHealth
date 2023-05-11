@@ -53,7 +53,7 @@ export async function GET({ url }: RequestEvent) {
   responseHeaders.append("Content-Type", "application/pdf");
   responseHeaders.append(
     "Content-Disposition",
-    `attachment; filename="qr_code_${sensorStationId}"`
+    `attachment; filename="qr_code_${sensorStationId}.pdf"`
   );
 
   let responseOptions = {
