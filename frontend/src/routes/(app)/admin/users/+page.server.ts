@@ -9,7 +9,7 @@ export const load = (async ({ fetch, depends }) => {
   await fetch(`${BACKEND_URL}/get-all-users`)
     .then((response) => {
       if (!response.ok) {
-        throw new error(response.status, response.statusText);
+        throw error(response.status, response.statusText);
       }
       return response.json();
     })
@@ -78,7 +78,7 @@ export const actions = {
     await fetch(`${BACKEND_URL}/create-user`, requestOptions)
       .then((response) => {
         if (!response.ok) {
-          throw new error(response.status, response.statusText);
+          throw error(response.status, response.statusText);
         }
         return response.json();
       })
@@ -104,7 +104,7 @@ export const actions = {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new error(response.status, response.statusText);
+          throw error(response.status, response.statusText);
         }
         return response.json();
       })
