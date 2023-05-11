@@ -61,12 +61,13 @@ declare interface ColumnVisibility {
 
 declare interface Sensor {
   type: string;
+  unit: string;
 }
 
 declare interface SensorLimit {
   upperLimit: number;
   lowerLimit: number;
-  ThresholdDuration: number;
+  thresholdDuration: number;
   sensor: Sensor;
 }
 

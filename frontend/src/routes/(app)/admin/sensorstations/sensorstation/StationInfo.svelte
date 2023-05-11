@@ -1,8 +1,15 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import Input from "$components/ui/Input.svelte";
+  import FormError from "$lib/helper/formError.svelte";
+  import { redirect } from "@sveltejs/kit";
 
   export let sensorStation: SensorStation;
+  export let showDetailLink: boolean = false;
+  export let form;
+  function setCookie(id: any) {
+    document.cookie = `sensorStationId=${id}; path=/;`;
+  }
 </script>
 
 <form method="post" use:enhance>
@@ -12,25 +19,64 @@
       name="sensorStationId"
       value={sensorStation.sensorStationId}
     />
-    <div class=""><i class="bi bi-trash text-3xl hover:text-red-500" /></div>
-    <Input
-      field="name"
-      label="Name"
-      placeholder="Plant1"
-      type="text"
-      value={sensorStation.name}
-    />
-    <h1>
-      <span class="font-bold">Room: </span><span>{sensorStation.roomName}</span>
-    </h1>
-    <h1>
-      <span class="font-bold">MAC: </span><span>{sensorStation.bdAddress}</span>
-    </h1>
-    <h1>
-      <span class="font-bold">DIP: </span><span
-        >{sensorStation.dipSwitchId}</span
+    <div>
+      <button
+        type="submit"
+        on:click={() => {
+          let isDeleteConfirmed = confirm(
+            `You will delete this sensor Station permanently!`
+          );
+          if (isDeleteConfirmed) {
+            throw redirect(307, "/admin/sensorstations");
+          }
+        }}
+        formaction="?/delete"
       >
-    </h1>
+        <i
+          class="absolute top-0 right-0 m-4 bi bi-trash text-4xl hover:text-red-500"
+        />
+      </button>
+    </div>
+    {#if showDetailLink}
+      <div class="absolute top-0.5 right-12 m-4">
+        <a href="/admin/sensorstations/sensorstation">
+          <button
+            on:click={() => setCookie(sensorStation.sensorStationId)}
+            class="transform transition-transform hover:rotate-90 active:scale-125 animate-spin"
+          >
+            <i class="bi bi-gear-fill text-3xl hover:text-primary" />
+          </button>
+        </a>
+      </div>
+    {/if}
+    <div>
+      <Input
+        field="name"
+        label="Name"
+        placeholder="Plant1"
+        type="text"
+        value={sensorStation.name}
+      />
+      <FormError field="name" {form} />
+    </div>
+    <div>
+      <h1>
+        <span class="font-bold">Room: </span>
+        <span>{sensorStation.roomName}</span>
+      </h1>
+    </div>
+    <div>
+      <h1>
+        <span class="font-bold">MAC: </span>
+        <span>{sensorStation.bdAddress}</span>
+      </h1>
+    </div>
+    <div>
+      <h1>
+        <span class="font-bold">DIP: </span>
+        <span>{sensorStation.dipSwitchId}</span>
+      </h1>
+    </div>
     <div class="flex mx-auto justify-center m-4">
       {#if sensorStation.connected}
         <div class="badge badge-success">Connected</div>

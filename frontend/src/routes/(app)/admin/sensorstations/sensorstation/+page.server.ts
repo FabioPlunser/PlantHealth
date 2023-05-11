@@ -1,5 +1,5 @@
 import { BACKEND_URL } from "$env/static/private";
-import { error } from "@sveltejs/kit";
+import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 
 export async function load({ fetch, depends, cookies }) {
@@ -9,7 +9,6 @@ export async function load({ fetch, depends, cookies }) {
     `${BACKEND_URL}/get-sensor-station?sensorStationId=${sensorStationId}`
   );
   res = await res.json();
-  console.log(res);
   depends("app:getSensorStation");
   return res;
 }
@@ -20,8 +19,19 @@ const schema = z.object({
     .min(1, { message: "Name is required" })
     .min(6, { message: "Name must be at least 6 characters" })
     .max(32, { message: "Name must be less than 32 characters" })
-    .trim()
-    .or(z.literal("")),
+    .trim(),
+
+  upperLimit: z
+    .number({ required_error: "Upper Limit is required" })
+    .positive({ message: "Limit has to be positive" }),
+
+  lowerLimit: z
+    .number({ required_error: "Lower Limit is required" })
+    .positive({ message: "Limit has to be positive" }),
+
+  thresholdDuration: z
+    .number({ required_error: "Threshold Duration is required" })
+    .positive({ message: "Duration has to be positive" }),
 });
 
 export const actions = {
@@ -30,8 +40,14 @@ export const actions = {
     const formData = await request.formData();
     let sensorStationId = formData.get("sensorStationId");
     let unlocked = formData.get("unlocked");
+
+    let params = new URLSearchParams();
+    params.set("sensorStationId", sensorStationId?.toString() ?? "");
+    params.set("unlocked", unlocked?.toString() ?? "");
+
+    let parametersString = "?" + params.toString();
     await fetch(
-      `${BACKEND_URL}/set-unlocked-sensor-station?sensorStationId=${sensorStationId}&unlocked=${unlocked}`,
+      `${BACKEND_URL}/set-unlocked-sensor-station${parametersString}`,
       {
         method: "POST",
       }
@@ -51,6 +67,7 @@ export const actions = {
   update: async ({ request, fetch }) => {
     const formData = await request.formData();
     const zodData = schema.safeParse(Object.fromEntries(formData));
+    let sensorStationId = formData.get("sensorStationId");
     let sensorStationName = formData.get("name");
 
     // validate name input
@@ -67,7 +84,7 @@ export const actions = {
     }
 
     await fetch(
-      `${BACKEND_URL}/set-sensor-limits?sensorStationId=${sensorStationId}`,
+      `${BACKEND_URL}/update-sensor-station?sensorStationId=${sensorStationId}`,
       {
         method: "POST",
         body: JSON.stringify({
@@ -87,18 +104,33 @@ export const actions = {
         throw error(response.status, response.statusText);
       } else {
         console.log(
-          `${time} : set limits for sensorstation = ${sensorStationId} sensor = ${sensorType} to {upperLimit = ${upperLimit}, lowerLimit ${lowerLimit}}`
+          `${time} : set updated sensorstation = ${sensorStationId} with name = ${sensorStationName}`
         );
       }
     });
   },
 
   setLimit: async ({ request, fetch }) => {
-    let formData = await request.formData();
+    const formData = await request.formData();
+    const zodData = schema.safeParse(Object.fromEntries(formData));
     let sensorStationId = formData.get("sensorStationId");
-    let sensorId = formData.get("sensorId");
+    let sensorType = formData.get("sensorType");
     let upperLimit = formData.get("upperLimit");
     let lowerLimit = formData.get("lowerLimit");
+
+    // validate name input
+    if (!zodData.success) {
+      console.log("fail");
+      // Loop through the errors array and create a custom errors array
+      const errors = zodData.error.errors.map((error) => {
+        return {
+          field: error.path[0],
+          message: error.message,
+        };
+      });
+
+      return fail(400, { error: true, errors });
+    }
 
     let params = new URLSearchParams();
     params.set("sensorStationnId", sensorStationId?.toString() ?? "");

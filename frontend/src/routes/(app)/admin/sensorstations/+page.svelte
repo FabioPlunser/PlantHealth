@@ -5,6 +5,7 @@
   import { apSensorStations } from "$stores/apSensorStations";
   import { onMount } from "svelte";
   import Input from "$lib/components/ui/Input.svelte";
+  import StationInfo from "./sensorstation/StationInfo.svelte";
   // ----------------------------------
   // ----------------------------------
   let rendered = false;
@@ -23,11 +24,6 @@
   }
   // ----------------------------------
   // ----------------------------------
-  function setCookie(id: any) {
-    document.cookie = `sensorStationId=${id}; path=/;`;
-  }
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
   let searchTerm = "";
 </script>
 
@@ -68,91 +64,15 @@
               {#if sensorStation.roomName.includes(searchTerm) || sensorStation.bdAddress.includes(searchTerm) || sensorStation.dipSwitchId
                   .toString()
                   .includes(searchTerm)}
-                <form
+                <div
+                  class="card w-full border h-fit bg-base-100 dark:border-none shadow-2xl"
                   in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
                   out:fly|local|self={{ y: 200, duration: 200 }}
-                  method="POST"
-                  use:enhance
                 >
-                  <input
-                    type="hidden"
-                    name="sensorStationId"
-                    value={sensorStation?.sensorStationId}
-                  />
-                  <div
-                    class="card w-full border h-fit bg-base-100 dark:border-none shadow-2xl"
-                  >
-                    <div class="absolute top-0 right-0 m-4">
-                      <a href="/admin/sensorstations/sensorstation">
-                        <button
-                          on:click={() =>
-                            setCookie(sensorStation.sensorStationId)}
-                          class="transform transition-transform hover:rotate-90 active:scale-125 animate-spin"
-                        >
-                          <i
-                            class="bi bi-gear-fill text-3xl hover:text-primary"
-                          />
-                        </button>
-                      </a>
-                    </div>
-                    <div class="card-body">
-                      <Input
-                        field="name"
-                        label="Name"
-                        placeholder="Plant1"
-                        type="text"
-                        value={sensorStation.name}
-                      />
-                      <h1>
-                        <span class="font-bold">Room: </span><span
-                          >{sensorStation.roomName}</span
-                        >
-                      </h1>
-                      <h1>
-                        <span class="font-bold">MAC: </span><span
-                          >{sensorStation.bdAddress}</span
-                        >
-                      </h1>
-                      <h1>
-                        <span class="font-bold">DIP: </span><span
-                          >{sensorStation.dipSwitchId}</span
-                        >
-                      </h1>
-                      <div class="grid grid-rows gap-1">
-                        <div class="mx-auto">
-                          {#if sensorStation.connected}
-                            <div class="badge badge-success">Connected</div>
-                          {:else}
-                            <div class="badge badge-error">Disconnected</div>
-                          {/if}
-                        </div>
-                        <div class="mx-auto">
-                          <a
-                            href="http://localhost:3000/api/get-sensor-station-qr-code?sensorStationId=e5dc8654-255e-4fdd-b58e-8160f3a8fd7c&roomName=Office1&plantName=Sakura"
-                          >
-                            <i class="bi bi-qr-code-scan text-4xl" />
-                          </a>
-                        </div>
-                      </div>
-                      <div class="flex justify-center my-2 mx-auto gap-4">
-                        <button type="submit" class="btn btn-primary"
-                          >Update</button
-                        >
-                        {#if sensorStation.unlocked}
-                          <button class="btn btn-info" formaction="?/unlock"
-                            >Unlocked</button
-                          >
-                          <input type="hidden" name="unlocked" value="false" />
-                        {:else}
-                          <button class="btn btn-error" formaction="?/unlock"
-                            >Locked</button
-                          >
-                          <input type="hidden" name="unlocked" value="true" />
-                        {/if}
-                      </div>
-                    </div>
+                  <div class="card-body">
+                    <StationInfo {sensorStation} showDetailLink={true} />
                   </div>
-                </form>
+                </div>
               {/if}
             {/each}
           </div>
