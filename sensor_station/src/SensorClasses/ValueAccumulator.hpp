@@ -1,6 +1,7 @@
 #ifndef SENSOR_MEASUREMENTS_CLASS
 #define SENSOR_MEASUREMENTS_CLASS
 
+#include <CompilerFunctions.hpp>
 #include <cstdlib>
 
 class ValueAccumulatorClass {
@@ -16,10 +17,14 @@ class ValueAccumulatorClass {
 
 		// ---------- Constructors ---------- //
 	public:
-		ValueAccumulatorClass() { this->calculateWheight = NULL; }
+		ValueAccumulatorClass() {
+			this->calculateWheight = NULL;
+			reset();
+		}
 		ValueAccumulatorClass(double (*calculateWheight
 		)(unsigned long timeNow, unsigned long timeLastUpdate,
-		  unsigned long timeLastReset)) {
+		  unsigned long timeLastReset))
+			: ValueAccumulatorClass() {
 			this->calculateWheight = calculateWheight;
 		}
 
@@ -42,6 +47,7 @@ class ValueAccumulatorClass {
 		}
 
 		void reset() {
+			DEBUG_PRINT_POS(4, "\n");
 			accumulatedWeightedValue = 0;
 			totalWeights			 = 0;
 			lastReset				 = millis();
@@ -49,8 +55,10 @@ class ValueAccumulatorClass {
 		}
 
 		void addValue(double value) {
-			lastUpdate				 = millis();
-			double weight			 = getWeightFactor(lastUpdate);
+			DEBUG_PRINT_POS(4, "\n");
+			unsigned long timeStamp	 = millis();
+			double weight			 = getWeightFactor(timeStamp);
+			lastUpdate				 = timeStamp;
 			accumulatedWeightedValue += value * weight;
 			totalWeights			 += weight;
 		}

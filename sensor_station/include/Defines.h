@@ -16,7 +16,7 @@
  * 3 -> Even more notifications. (Not used so far)
  * 4 -> Full call stack of every function call. (Not implemented so far)
  */
-#define DEBUG_PRINT_LEVEL 4
+#define DEBUG_PRINT_LEVEL 2
 
 /* If DO_HARDWARE_TEST is defined the hardware tests will be executet to test
  all the connected devices of the Arduino. Otherwise the main programm will be
@@ -36,7 +36,7 @@
  * If this value is set to true it will output the time it took to read the
  * sensor values to the Serial.
  */
-#define PRINT_TIME_READ_SENSOR				   TRUE
+#define PRINT_TIME_READ_SENSOR				   FALSE
 
 /**
  * If this constant is set to true the sensor station will only connect to the
@@ -56,7 +56,13 @@
  * Useful if a plant is placed where someone wants to sleep, but not recommended
  * since there will be no notification on the device if something is not right.
  */
-#define ALWAYS_IN_SILENT_MODE				   TRUE
+#define ALWAYS_IN_SILENT_MODE				   FALSE
+
+/**
+ * Determins if the pizeo buzzer will output sound if a notification is present.
+ * If ALWAYS_IN_SILEND_MODE is set to TRUE this will have no effect.
+ */
+#define USE_PIEZO_BUZZER					   FALSE
 
 // ---------------------------
 // |    Predefined Values    |
@@ -71,7 +77,7 @@
 #define UPDATE_INTERVAL_BME680_MS_MAX		   1000
 #define DURATION_IN_PAIRING_MODE_MS			   (5 * 60'000)
 #define TIME_CHECK_BLE_CENTRAL_PRESENT_MS	   1000
-#define TIMEOUT_TIME_BLE_CONNECTION_MS		   5000
+#define TIMEOUT_TIME_BLE_CONNECTION_MS		   500'000
 #define TIME_IN_NOTIFICATION_SILENCE_MODE_MS   (30 * 60'000)
 #define TIME_BETWEEN_SENSOR_MEASUREMENTS_MIN_S 30
 #define TIME_BETWEEN_SENSOR_MEASUREMENTS_MAX_S (5 * 60)
@@ -137,17 +143,17 @@
 
 // These are the color codes for the LEDs with time intervall for on and off
 // Colors are in order Red'Green'Blue
-#define LED_COLOR_ERROR_AIR_QUALITY			   0xFF'00'FF
-#define LED_COLOR_ERROR_AIR_TEMPERATURE		   0xFF'00'00
-#define LED_COLOR_ERROR_AIR_HUMIDITY		   0xFF'FF'FF
-#define LED_COLOR_ERROR_AIR_PRESSURE		   0xFF'99'00
+#define LED_COLOR_ERROR_AIR_QUALITY			   0x4F'00'FF
+#define LED_COLOR_ERROR_AIR_TEMPERATURE		   0x4F'00'00
+#define LED_COLOR_ERROR_AIR_HUMIDITY		   0x4F'99'FF
+#define LED_COLOR_ERROR_AIR_PRESSURE		   0x00'99'FF
 #define LED_COLOR_ERROR_SOIL_HUMIDITY		   0x00'00'FF
-#define LED_COLOR_ERROR_LIGHT_INTENSITY		   0xFF'FF'00
+#define LED_COLOR_ERROR_LIGHT_INTENSITY		   0x4F'33'00
 #define LED_TIME_ERROR_ON_MS				   1000
 #define LED_TIME_ERROR_OFF_MS				   4000
 #define LED_TIME_ERROR_BLINK_PAUSE_MS		   1000
 
-#define LED_COLOR_NOTIFICATION_PAIRING		   0x00'FF'00
+#define LED_COLOR_NOTIFICATION_PAIRING		   0x00'99'00
 #define LED_TIME_NOTIFICATION_ON_MS			   1000
 #define LED_TIME_NOTIFICATION_OFF_MS		   4000
 
@@ -168,14 +174,14 @@
 #define PIN_RGB_BLUE						   A6
 #define PIN_RGB_GREEN						   A7
 
-#define PIN_DIP_1							   D12 // Lowest
-#define PIN_DIP_2							   D11
-#define PIN_DIP_3							   D10
-#define PIN_DIP_4							   D9
-#define PIN_DIP_5							   D8
-#define PIN_DIP_6							   D7
-#define PIN_DIP_7							   D6
-#define PIN_DIP_8							   D5 // Highest
+#define PIN_DIP_8							   D12 // Lowest
+#define PIN_DIP_7							   D11
+#define PIN_DIP_6							   D10
+#define PIN_DIP_5							   D9
+#define PIN_DIP_4							   D8
+#define PIN_DIP_3							   D7
+#define PIN_DIP_2							   D6
+#define PIN_DIP_1							   D5 // Highest
 
 #define PIN_BUTTON_1						   D4 // L
 #define PIN_BUTTON_2						   D3 // M

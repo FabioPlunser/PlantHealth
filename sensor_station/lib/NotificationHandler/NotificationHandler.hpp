@@ -53,6 +53,7 @@ class NotificationHandler {
 		static NotificationHandler * getInstance(
 			uint8_t ledPinRed, uint8_t ledPinGreen, uint8_t ledPinBlue
 		) {
+			DEBUG_PRINT_POS(4, "\n");
 			static NotificationHandler notificationHandler(
 				ledPinRed, ledPinGreen, ledPinBlue
 			);
@@ -63,6 +64,7 @@ class NotificationHandler {
 		void addSensorError(
 			SensorErrors::Type errorType, SensorErrors::Status errorStatus
 		) {
+			DEBUG_PRINT_POS(4, "\n");
 			int priority = 0;
 			switch (errorType) {
 				case SensorErrors::Type::AirHumidityError:
@@ -72,18 +74,18 @@ class NotificationHandler {
 					break;
 				case SensorErrors::Type::AirPressureError:
 					priority = errorStatus == SensorErrors::Status::High
-								   ? AIR_TEMPERATURE_TO_HIGH_PRIORITY
-								   : AIR_TEMPERATURE_TO_LOW_PRIORITY;
-					break;
-				case SensorErrors::Type::AirQualityError:
-					priority = errorStatus == SensorErrors::Status::High
 								   ? AIR_PRESSURE_TO_HIGH_PRIORITY
 								   : AIR_PRESSURE_TO_LOW_PRIORITY;
 					break;
-				case SensorErrors::Type::AirTemperatureError:
+				case SensorErrors::Type::AirQualityError:
 					priority = errorStatus == SensorErrors::Status::High
 								   ? AIR_QUALITY_TO_HIGH_PRIORITY
 								   : AIR_QUALITY_TO_LOW_PRIORITY;
+					break;
+				case SensorErrors::Type::AirTemperatureError:
+					priority = errorStatus == SensorErrors::Status::High
+								   ? AIR_TEMPERATURE_TO_HIGH_PRIORITY
+								   : AIR_TEMPERATURE_TO_LOW_PRIORITY;
 					break;
 				case SensorErrors::Type::SoilHumidityError:
 					priority = errorStatus == SensorErrors::Status::High
@@ -92,8 +94,8 @@ class NotificationHandler {
 					break;
 				case SensorErrors::Type::LightIntensityError:
 					priority = errorStatus == SensorErrors::Status::High
-								   ? AIR_HUMIDITY_TO_HIGH_PRIORITY
-								   : AIR_HUMIDITY_TO_LOW_PRIORITY;
+								   ? LUMINOSITY_TO_HIGH_PRIORITY
+								   : LUMINOSITY_TO_LOW_PRIORITY;
 					break;
 				default:
 					break;
@@ -103,10 +105,11 @@ class NotificationHandler {
 		}
 
 		int16_t setLEDfromNotification(const Notification & notification) {
+			DEBUG_PRINT_POS(4, "\n");
 			if (prevErrorNotification != NULL &&
 				*prevErrorNotification == notification) {
 				DEBUG_PRINT_POS(
-					3, "Notification was the same as the previous one."
+					3, "Notification was the same as the previous one.\n"
 				)
 				return ledConstroller->updateLEDStatus();
 			}
@@ -139,6 +142,7 @@ class NotificationHandler {
 		 * update LED.
 		 */
 		int16_t setLEDfromSensorError(const SensorError & sensorError) {
+			DEBUG_PRINT_POS(4, "\n");
 			if (CHECK_IF_CASTABLE_TO_SENSOR_ERROR(prevErrorNotification)) {
 				const SensorError * prevSensorError;
 				CAST_NOTIFICATION_TO_SENSOR_ERROR(
@@ -177,6 +181,10 @@ class NotificationHandler {
 					break;
 			}
 
+			DEBUG_PRINTF_POS(
+				3, "LED will be set with color coude %p\n", (void *) colorCode
+			);
+
 			std::vector<uint16_t> ledOnMs;
 			std::vector<uint16_t> ledOffMs;
 			if (isHigh) {
@@ -187,6 +195,13 @@ class NotificationHandler {
 			} else {
 				ledOnMs.push_back(LED_TIME_ERROR_ON_MS);
 				ledOffMs.push_back(LED_TIME_ERROR_OFF_MS);
+			}
+			DEBUG_PRINT_POS(3, "Times contained in vector:\n");
+			for (unsigned int i = 0; i < ledOnMs.size(); i++) {
+				DEBUG_PRINTF_POS(
+					3, "On %u = %u, Off = %u\n", i, ledOnMs.at(i),
+					ledOffMs.at(i)
+				);
 			}
 			uint8_t colorR = DECOMPOSE_HEX_RGB_R(colorCode);
 			uint8_t colorG = DECOMPOSE_HEX_RGB_G(colorCode);
@@ -203,12 +218,15 @@ class NotificationHandler {
 				delete (prevErrorNotification);
 				prevErrorNotification = NULL;
 			}
-			prevErrorNotification = new Notification(sensorError);
+			prevErrorNotification = new SensorError(sensorError);
 			return ledConstroller->updateLEDStatus();
 		}
 
 	public:
-		bool isEmpty() { return this->notificationQueue->isEmpty(); }
+		bool isEmpty() {
+			DEBUG_PRINT_POS(4, "\n");
+			return this->notificationQueue->isEmpty();
+		}
 
 		/**
 		 * This function silences the led and piezo puzzer for the provided time
@@ -217,6 +235,7 @@ class NotificationHandler {
 		 * silenced for on button press.
 		 */
 		void silenceNotification(unsigned long timeToSilenceMs) {
+			DEBUG_PRINT_POS(4, "\n");
 			this->inSilentMode	   = true;
 			this->timeOfSilenceEnd = millis() + timeToSilenceMs;
 			update();
@@ -228,6 +247,7 @@ class NotificationHandler {
 		 * in ms
 		 */
 		int32_t update() {
+			DEBUG_PRINT_POS(4, "\n");
 			static unsigned long previousTone = 0;
 			if (notificationQueue->isEmpty()) {
 				DEBUG_PRINT_POS(3, "Queue is empty.\n");
@@ -278,6 +298,7 @@ class NotificationHandler {
 		}
 
 		void updatePairingNotification(bool isActive) {
+			DEBUG_PRINT_POS(4, "\n");
 			static bool prevValue = false;
 			if (isActive == prevValue) {
 				DEBUG_PRINTF_POS(
@@ -286,6 +307,7 @@ class NotificationHandler {
 				);
 				return;
 			}
+			this->inSilentMode = false;
 			Notification notification(NOTIFICATION_PAIRING_MODE_PRIORITY);
 			if (isActive) {
 				DEBUG_PRINT_POS(3, "Error gets added to queue.\n");
@@ -293,16 +315,19 @@ class NotificationHandler {
 			} else {
 				DEBUG_PRINT_POS(3, "Error gets removed from queue.\n");
 				notificationQueue->deleteErrorFromQueue(notification);
+				update();
 			}
 			prevValue = isActive;
 		}
 
 		void updateSoilHumidityValid(uint8_t value) {
+			DEBUG_PRINT_POS(4, "\n");
 			static uint8_t prevValue = ERROR_VALUE_NOTHING;
 			CHECK_VALID_VALUE_VALID(value);
 			if (value == prevValue) {
 				return;
 			}
+			this->inSilentMode = false;
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::SoilHumidityError
@@ -310,6 +335,7 @@ class NotificationHandler {
 			}
 			prevValue = value;
 			if (value == ERROR_VALUE_NOTHING) {
+				update();
 				return;
 			}
 			addSensorError(
@@ -320,11 +346,13 @@ class NotificationHandler {
 		}
 
 		void updateAirHumidityValid(uint8_t value) {
+			DEBUG_PRINT_POS(4, "\n");
 			static uint8_t prevValue = ERROR_VALUE_NOTHING;
 			CHECK_VALID_VALUE_VALID(value);
 			if (value == prevValue) {
 				return;
 			}
+			this->inSilentMode = false;
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::AirHumidityError
@@ -332,6 +360,7 @@ class NotificationHandler {
 			}
 			prevValue = value;
 			if (value == ERROR_VALUE_NOTHING) {
+				update();
 				return;
 			}
 			addSensorError(
@@ -342,11 +371,13 @@ class NotificationHandler {
 		}
 
 		void updateAirPressureValid(uint8_t value) {
+			DEBUG_PRINT_POS(4, "\n");
 			static uint8_t prevValue = ERROR_VALUE_NOTHING;
 			CHECK_VALID_VALUE_VALID(value);
 			if (value == prevValue) {
 				return;
 			}
+			this->inSilentMode = false;
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::AirPressureError
@@ -354,6 +385,7 @@ class NotificationHandler {
 			}
 			prevValue = value;
 			if (value == ERROR_VALUE_NOTHING) {
+				update();
 				return;
 			}
 			addSensorError(
@@ -364,11 +396,13 @@ class NotificationHandler {
 		}
 
 		void updateAirTemperatureValid(uint8_t value) {
+			DEBUG_PRINT_POS(4, "\n");
 			static uint8_t prevValue = ERROR_VALUE_NOTHING;
 			CHECK_VALID_VALUE_VALID(value);
 			if (value == prevValue) {
 				return;
 			}
+			this->inSilentMode = false;
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::AirTemperatureError
@@ -376,6 +410,7 @@ class NotificationHandler {
 			}
 			prevValue = value;
 			if (value == ERROR_VALUE_NOTHING) {
+				update();
 				return;
 			}
 			addSensorError(
@@ -386,11 +421,13 @@ class NotificationHandler {
 		}
 
 		void updateAirQualityValid(uint8_t value) {
+			DEBUG_PRINT_POS(4, "\n");
 			static uint8_t prevValue = ERROR_VALUE_NOTHING;
 			CHECK_VALID_VALUE_VALID(value);
 			if (value == prevValue) {
 				return;
 			}
+			this->inSilentMode = false;
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::AirQualityError
@@ -398,6 +435,7 @@ class NotificationHandler {
 			}
 			prevValue = value;
 			if (value == ERROR_VALUE_NOTHING) {
+				update();
 				return;
 			}
 			addSensorError(
@@ -408,11 +446,13 @@ class NotificationHandler {
 		}
 
 		void updateLightIntensityValid(uint8_t value) {
+			DEBUG_PRINT_POS(4, "\n");
 			static uint8_t prevValue = ERROR_VALUE_NOTHING;
 			CHECK_VALID_VALUE_VALID(value);
 			if (value == prevValue) {
 				return;
 			}
+			this->inSilentMode = false;
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::LightIntensityError
@@ -420,6 +460,7 @@ class NotificationHandler {
 			}
 			prevValue = value;
 			if (value == ERROR_VALUE_NOTHING) {
+				update();
 				return;
 			}
 			addSensorError(
