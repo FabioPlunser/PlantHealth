@@ -41,6 +41,7 @@ class SensorValueHandlerClass {
 			this->hydrometer		  = hydrometer;
 			this->phototransistor	  = phototransistor;
 		}
+
 		~SensorValueHandlerClass() {
 			DEBUG_PRINT_POS(4, "\n");
 			delete (airTemperatureAccumulator);
@@ -90,6 +91,7 @@ class SensorValueHandlerClass {
 				airSensor->getMeasuredValues(
 					&pressure, &gas_resistance, &temperature, &humidity
 				);
+
 			if (updateError == AirSensorClass::UPDATE_ERROR::NOTHING) {
 				str->air_humidity = convertToGATT_airHumidity(humidity);
 				str->air_quality  = convertToGATT_airQuality(gas_resistance);
@@ -111,14 +113,14 @@ class SensorValueHandlerClass {
 	private:
 		uint16_t convertToGATT_soilHumidity(uint16_t humidity) {
 			DEBUG_PRINT_POS(4, "\n");
-			DEBUG_PRINTF(2, "Soil humidity = %u\n", humidity);
+			DEBUG_PRINTF_POS(2, "Soil humidity = %u\n", humidity);
 
 			static uint16_t valueHigh = 300;
 			static uint16_t valueLow  = 950;
 			float calculation		  = 100 - ((humidity - valueHigh) /
 									   (float) (valueLow - valueHigh) * 100);
 
-			DEBUG_PRINTF(2, "Calculated = %lf\n", calculation);
+			DEBUG_PRINTF_POS(2, "Calculated = %lf\n", calculation);
 			if (calculation < 0 || calculation > 100) {
 				return convertToGATT_soilHumidity_notKnown();
 			}
@@ -152,7 +154,8 @@ class SensorValueHandlerClass {
 
 		uint8_t convertToGATT_airQuality(float gas_resistance) {
 			DEBUG_PRINT_POS(4, "\n");
-			const float calibrationValue = 146000;
+			DEBUG_PRINTF_POS(2, "Quality is %f\n", gas_resistance);
+			const float calibrationValue = 250'000;
 			return (uint8_t) (100 - (gas_resistance / calibrationValue) * 100);
 		}
 		uint8_t convertToGATT_airQuality_notKnown() {

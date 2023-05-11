@@ -217,25 +217,30 @@ void handleCentralDeviceIfPresent(
 		uint8_t dipSwitchId = dipSwitch->getdipSwitchValue();
 		set_dip_switch_id(dipSwitchId);
 		if (inPairingMode) {
-			while (central.connected() && get_sensorstation_locked_status()) {
+			DEBUG_PRINTF(
+				1,
+				"New central trying to pair. Device is \"%s\" Current locking "
+				"status = %d.\n",
+				central.address().c_str(), get_sensorstation_locked_status()
+			);
+			while (central.connected() && get_sensorstation_locked_status() !=
+											  SENSOR_STATION_UNLOCKED_VALUE) {
 				delay(10);
 			}
 			if (!central.connected()) {
+				DEBUG_PRINT(1, "Did not set unlocked bit.\n");
 				return;
 			}
 			pairedDevice = central.address();
-			DEBUG_PRINTF(
-				1, "In pairing mode. New device is: \"%s\".\n",
-				pairedDevice.c_str()
-			);
+			DEBUG_PRINTF(1, "New device is: \"%s\".\n", pairedDevice.c_str());
 			inPairingMode = false;
 		}
-		DEBUG_PRINTF(1, "* Connected to %s.\n", central.address().c_str());
+		DEBUG_PRINTF(1, "Connected to %s.\n", central.address().c_str());
 		if (pairedDevice.compareTo(central.address()) == 0) {
 			setValueInVerifiedCentralDevice(central);
 		} else {
 			DEBUG_PRINTF(
-				1, "Declined connection to %s. Only %s was allowed.\n",
+				1, "Declined connection to \"%s\". Only \"%s\" was allowed.\n",
 				central.address().c_str(), pairedDevice.c_str()
 			);
 			central.disconnect();
@@ -249,15 +254,16 @@ void handleCentralDeviceIfPresent(
 			);
 		}
 	}
-	DEBUG_PRINT(1, "Station is unlocked: ");
-	DEBUG_PRINTLN(1, get_sensorstation_locked_status());
+	DEBUG_PRINTF_POS(
+		4, "Station is unlocked: %d\n", get_sensorstation_locked_status()
+	);
 }
 
 unsigned long handleNotificationIfPresent(bool notificationPresent) {
 	DEBUG_PRINT_POS(4, "\n");
 	unsigned long startNotificationCheck = millis();
 	if (notificationPresent) {
-		DEBUG_PRINT_POS(1, "Notifcation is present\n");
+		DEBUG_PRINT_POS(3, "Notifcation is present\n");
 		int32_t timeTillNext = notificationHandler->update();
 
 		while (timeTillNext > 0 && (unsigned long) timeTillNext <

@@ -307,6 +307,7 @@ class NotificationHandler {
 				);
 				return;
 			}
+			this->inSilentMode = false;
 			Notification notification(NOTIFICATION_PAIRING_MODE_PRIORITY);
 			if (isActive) {
 				DEBUG_PRINT_POS(3, "Error gets added to queue.\n");
@@ -326,6 +327,7 @@ class NotificationHandler {
 			if (value == prevValue) {
 				return;
 			}
+			this->inSilentMode = false;
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::SoilHumidityError
@@ -350,6 +352,7 @@ class NotificationHandler {
 			if (value == prevValue) {
 				return;
 			}
+			this->inSilentMode = false;
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::AirHumidityError
@@ -374,6 +377,7 @@ class NotificationHandler {
 			if (value == prevValue) {
 				return;
 			}
+			this->inSilentMode = false;
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::AirPressureError
@@ -398,6 +402,7 @@ class NotificationHandler {
 			if (value == prevValue) {
 				return;
 			}
+			this->inSilentMode = false;
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::AirTemperatureError
@@ -422,6 +427,7 @@ class NotificationHandler {
 			if (value == prevValue) {
 				return;
 			}
+			this->inSilentMode = false;
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::AirQualityError
@@ -446,6 +452,7 @@ class NotificationHandler {
 			if (value == prevValue) {
 				return;
 			}
+			this->inSilentMode = false;
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::LightIntensityError
