@@ -8,16 +8,16 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
+import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
 
 public interface PersonRepository extends CrudRepository<Person, UUID> {
 	@Override
 	List<Person> findAll();
+
+	List<Person> findAllByPermissionsIsContaining(Permission permission);
 
 	Optional<Person> findByUsernameAndToken(String username, UUID token);
 
