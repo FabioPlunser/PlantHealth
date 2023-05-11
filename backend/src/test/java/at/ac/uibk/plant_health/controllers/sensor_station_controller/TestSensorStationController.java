@@ -258,6 +258,33 @@ public class TestSensorStationController {
 	}
 
 	@Test
+	void assignGardenerToSensorStation() throws Exception {
+		Person admin = createUserAndLogin(true, false);
+		Person gardener = createUserAndLogin(false, true);
+
+		AccessPoint accessPoint = new AccessPoint(UUID.randomUUID(), "Office1", 50, false);
+		accessPointService.save(accessPoint);
+
+		String bdAddress = StringGenerator.macAddress();
+		SensorStation sensorStation = new SensorStation(bdAddress, 4);
+		sensorStation.setUnlocked(true);
+		sensorStation.setAccessPoint(accessPoint);
+		sensorStationService.save(sensorStation);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/assign-gardener-to-sensor-station")
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(admin))
+								.param("sensorStationId",
+									   String.valueOf(sensorStation.getDeviceId()))
+								.param("gardenerId", String.valueOf(gardener.getPersonId()))
+								.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
+
+		sensorStation = sensorStationService.findByBdAddress(bdAddress);
+		assertEquals(gardener, sensorStation.getGardener());
+	}
+	@Test
 	void setSensorLimitsAdmin() throws Exception {
 		Person person = createUserAndLogin(true, false);
 		// precondition accessPoint has found and reported at least one sensor station

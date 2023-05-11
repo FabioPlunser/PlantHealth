@@ -17,6 +17,7 @@ import at.ac.uibk.plant_health.models.plant.Sensor;
 import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
+import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.repositories.*;
 import jakarta.transaction.Transactional;
@@ -37,6 +38,8 @@ public class SensorStationService {
 	private SensorLimitsRepository sensorLimitsRepository;
 	@Value("${swa.pictures.path}")
 	private String picturesPath;
+	@Autowired
+	private PersonService personService;
 
 	public SensorStation findById(UUID id) throws ServiceException {
 		Optional<SensorStation> maybeSensorStation = this.sensorStationRepository.findById(id);
@@ -124,6 +127,16 @@ public class SensorStationService {
 		save(sensorStation);
 	}
 
+	public void assignGardenerToSensorStation(SensorStation sensorStation, UUID personId)
+			throws ServiceException {
+		Optional<Person> maybePerson = personService.findById(personId);
+		if (maybePerson.isEmpty()) throw new ServiceException("Person does not exist", 404);
+		Person person = maybePerson.get();
+		if (!person.getPermissions().contains(Permission.GARDENER))
+			throw new ServiceException("Person is not a gardener", 403);
+		sensorStation.setGardener(maybePerson.get());
+		save(sensorStation);
+	}
 	/**
 	 * Get pictures of SensorStation
 	 * @param sensorStationId
