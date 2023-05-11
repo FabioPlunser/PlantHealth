@@ -16,7 +16,7 @@
  * 3 -> Even more notifications. (Not used so far)
  * 4 -> Full call stack of every function call. (Not implemented so far)
  */
-#define DEBUG_PRINT_LEVEL 4
+#define DEBUG_PRINT_LEVEL 2
 
 /* If DO_HARDWARE_TEST is defined the hardware tests will be executet to test
  all the connected devices of the Arduino. Otherwise the main programm will be
@@ -146,7 +146,7 @@
 #define LED_COLOR_ERROR_AIR_QUALITY			   0x4F'00'FF
 #define LED_COLOR_ERROR_AIR_TEMPERATURE		   0x4F'00'00
 #define LED_COLOR_ERROR_AIR_HUMIDITY		   0x4F'99'FF
-#define LED_COLOR_ERROR_AIR_PRESSURE		   0x4F'33'00
+#define LED_COLOR_ERROR_AIR_PRESSURE		   0x00'99'FF
 #define LED_COLOR_ERROR_SOIL_HUMIDITY		   0x00'00'FF
 #define LED_COLOR_ERROR_LIGHT_INTENSITY		   0x4F'33'00
 #define LED_TIME_ERROR_ON_MS				   1000

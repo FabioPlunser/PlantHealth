@@ -78,7 +78,10 @@ class AirSensorClass {
 		) {
 			UPDATE_ERROR updateError = tryUpdateValues();
 			if (updateError == UPDATE_ERROR::NOT_INIT) {
-				return updateError;
+				this->initialized = bme680->begin();
+				if (this->initialized == false) {
+					return updateError;
+				}
 			}
 			SET_IF_NOT_NULL(pressure, bme680->readPressure());
 			SET_IF_NOT_NULL(gas_resistance, bme680->readGas());
