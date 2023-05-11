@@ -297,7 +297,7 @@ public class TestSensorStationController {
 			limits.add(limit);
 		}
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/set-sensor-limits")
+		mockMvc.perform(MockMvcRequestBuilders.post("/update-sensor-station")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(person))

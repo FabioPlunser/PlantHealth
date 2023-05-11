@@ -19,6 +19,7 @@ import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
 import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.repositories.*;
+import jakarta.transaction.Transactional;
 
 @Service
 public class SensorStationService {
@@ -82,32 +83,45 @@ public class SensorStationService {
 	/**
 	 * Set sensor limits of sensor station.
 	 * @param sensorLimits
-	 * @param sensorStationId
+	 * @param sensorStation
 	 * @return
 	 */
-	// @Transactional
+	@Transactional
 	public void setSensorLimits(
-			List<SensorLimits> sensorLimits, UUID sensorStationId, Person person
+			List<SensorLimits> sensorLimits, SensorStation sensorStation, Person person
 	) throws ServiceException {
-		SensorStation sensorStation = findById(sensorStationId);
 		if (!sensorStation.isUnlocked()) throw new ServiceException("SensorStation is locked", 403);
 		if (sensorStation.isDeleted()) throw new ServiceException("SensorStation is deleted", 403);
 		for (SensorLimits limit : sensorLimits) {
-			Optional<Sensor> sensor = sensorRepository.findByType(limit.getSensor().getType());
-			if (sensor.isEmpty())
+			Optional<Sensor> maybeSensor = sensorRepository.findByType(limit.getSensor().getType());
+			if (maybeSensor.isEmpty())
 				throw new ServiceException(
 						"Sensor " + limit.getSensor().getType() + " not found", 500
 				);
-			limit.setSensor(sensor.get());
-			limit.setGardener(person);
-			limit.setSensorStation(sensorStation);
-			limit.setTimeStamp(LocalDateTime.now());
+			Sensor sensor = maybeSensor.get();
+			SensorLimits newLimit = new SensorLimits(
+					LocalDateTime.now(), limit.getLowerLimit(), limit.getUpperLimit(),
+					limit.getThresholdDuration(), sensor, person, sensorStation
+			);
 			try {
-				sensorLimitsRepository.save(limit);
+				sensorLimitsRepository.save(newLimit);
 			} catch (Exception e) {
 				throw new ServiceException("Could not save sensor limits", 500);
 			}
 		}
+		//		List<SensorLimits> allLimits = sensorLimitsRepository.findAll();
+		//		sensorStation.setSensorLimits(allLimits);
+		//		save(sensorStation);
+	}
+
+	/**
+	 * Update name of SensorStation
+	 * @param sensorStation
+	 * @param name
+	 */
+	public void updateSensorStation(SensorStation sensorStation, String name) {
+		sensorStation.setName(name);
+		save(sensorStation);
 	}
 
 	/**
