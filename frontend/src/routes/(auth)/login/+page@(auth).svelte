@@ -4,6 +4,7 @@
   import Input from "$components/ui/Input.svelte";
   import Logo from "$assets/Logo.svg?url";
   import toast from "$components/toast";
+  import PasswordInput from "$lib/components/ui/PasswordInput.svelte";
   // export let data: PageData;
   export let form;
   export let data;
@@ -31,14 +32,13 @@
           field="username"
           type="text"
           label="Username"
-          placeholder="Type here"
+          placeholder="Username"
         />
         <FormError field="username" {form} />
-        <Input
+        <PasswordInput
           field="password"
-          type="password"
-          label="Password"
-          placeholder="Type here"
+          label="New Password"
+          placeholder="Password"
         />
         <FormError field="password" {form} />
         <div class="flex justify-center mt-4 gap-4">

@@ -18,7 +18,7 @@ export async function load({ fetch, depends }) {
     .then((response) => {
       if (!response.ok) {
         logger.error("Couldn't get all users", { response });
-        throw new error(response.status, response.statusText);
+        throw error(response.status, response.statusText);
       }
       return response.json();
     })
@@ -96,7 +96,7 @@ export const actions = {
       .then((response) => {
         if (!response.ok) {
           logger.error("Couldn't create user", { response });
-          throw new error(response.status, response.statusText);
+          throw error(response.status, response.statusText);
         }
         return response.json();
       })
@@ -124,7 +124,7 @@ export const actions = {
     let personId = formData.get("personId");
 
     let params = new URLSearchParams();
-    params.set("personId", personId);
+    params.set("personId", personId?.toString() ?? "");
 
     let parametersString = "?" + params.toString();
 
@@ -134,7 +134,7 @@ export const actions = {
       .then((response) => {
         if (!response.ok) {
           logger.error("Couldn't delete user", { response });
-          throw new error(response.status, response.statusText);
+          throw error(response.status, response.statusText);
         }
         return response.json();
       })
