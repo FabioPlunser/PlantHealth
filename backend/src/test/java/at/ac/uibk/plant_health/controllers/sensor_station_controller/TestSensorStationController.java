@@ -615,4 +615,26 @@ public class TestSensorStationController {
 		sensorStation = maybeSensorStation.get();
 		assertEquals(0, sensorStation.getPlantPictures().size());
 	}
+
+	@Test
+	void deleteSensorStation() throws Exception {
+		Person person = createUserAndLogin(true, false);
+		// precondition accessPoint has found and reported at least one sensor station
+		String bdAddress = StringGenerator.macAddress();
+		SensorStation sensorStation = new SensorStation(bdAddress, 4);
+		sensorStationService.save(sensorStation);
+
+		// run request
+		mockMvc.perform(MockMvcRequestBuilders.delete("/delete-sensor-station")
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(person))
+								.param("sensorStationId",
+										String.valueOf(sensorStation.getDeviceId())))
+				.andExpectAll(status().isOk());
+
+		// check if sensor station is removed
+		assertTrue(sensorStationService.findById(sensorStation.getDeviceId()).isDeleted());
+		assertNull(sensorStationService.findById(sensorStation.getDeviceId()).getBdAddress());
+	}
 }
