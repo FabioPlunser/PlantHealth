@@ -25,8 +25,6 @@ export async function load({ locals, fetch, cookies }) {
   let from = cookies.get("from");
   let to = cookies.get("to");
 
-  toasts.addToast(locals.user.personId, "success", "loading user");
-
   // if no dates are set, set them to the last 7 days
   if (!from || !to) {
     from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -156,7 +154,12 @@ export const actions = {
     );
     res = await res.json();
     logger.info("addToDashboard", { res });
-    toasts.addToast(locals.user.personId, "success", "added from dashboard");
+
+    let promise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve("done");
+      }, 2000);
+    });
   },
   /* `removeFromDashboard` is an action function that removes a sensor station from the user's
   dashboard. It receives an HTTP request object, extracts the form data submitted by the user, which
@@ -175,7 +178,6 @@ export const actions = {
       }
     );
     res = await res.json();
-    toasts.addToast(locals.user.personId, "success", "removed from dashboard");
 
     logger.info("removeFromDashboard", { res });
   },
@@ -199,7 +201,5 @@ export const actions = {
 
     cookies.set("from", _from, { path: "/" });
     cookies.set("to", _to, { path: "/" });
-
-    toasts.addToast(locals.user.personId, "success", "update from dashboard");
   },
 } satisfies Actions;

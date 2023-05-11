@@ -16,10 +16,6 @@ export const handle = (async ({ event, resolve, request, locals }) => {
   const { cookies } = event;
   let token = cookies.get("token");
 
-  event.locals.uuid = uuidv4();
-  console.log("uuidv4", event.locals.uuid);
-  logger.info("handle uuidv4: " + JSON.stringify(event.locals.uuid));
-
   if (token) {
     token = JSON.parse(token);
     event.locals.user = token;

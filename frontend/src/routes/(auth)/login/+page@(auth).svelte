@@ -6,6 +6,7 @@
   import toast from "$components/toast";
   // export let data: PageData;
   export let form;
+  export let data;
   $: {
     if (form?.message) {
       toast.error(form?.message);
@@ -41,15 +42,20 @@
         />
         <FormError field="password" {form} />
         <div class="flex justify-center mt-4 gap-4">
-          <button class="btn btn-primary" formaction="?/login">Login</button>
-          <a href="/register" data-sveltekit-preload-code class="btn text-white"
-            >Register</a
+          <button
+            disabled={data?.error != null}
+            class="btn btn-primary"
+            formaction="?/login">Login</button
           >
-          <a
-            href="/guest"
-            data-sveltekit-preload-code
-            class="btn btn-info text-white">Guest</a
+          <button disabled={data?.error != null} class="btn text-white">
+            <a href="/register" data-sveltekit-preload-code>Register</a>
+          </button>
+          <button
+            disabled={data?.error != null}
+            class="btn btn-primary text-white"
           >
+            <a href="/guest" data-sveltekit-preload-code>Guest</a>
+          </button>
         </div>
       </div>
     </form>
