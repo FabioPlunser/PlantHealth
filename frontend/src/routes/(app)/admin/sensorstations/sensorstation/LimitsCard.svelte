@@ -19,7 +19,7 @@
       </div>
       <form method="post" use:enhance>
         <input type="hidden" name="sensorStationId" value={sensorStationId} />
-        <input type="hidden" name="sensorType" value={limit.sensor.type} />
+        <input type="hidden" name="sensor" value={limit.sensor} />
         <Input
           field="upperLimit"
           type="number"
@@ -42,7 +42,7 @@
         />
         <FormError field="thresholdDuration" {form} />
         <div class="card-actions mx-auto justify-center mt-4">
-          <button class="btn btn-primary" formaction="?/setLimit"
+          <button class="btn btn-primary" formaction="?/updateLimit"
             >Set Limit</button
           >
         </div>

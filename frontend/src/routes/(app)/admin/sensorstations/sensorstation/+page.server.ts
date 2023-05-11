@@ -2,6 +2,7 @@ import { BACKEND_URL } from "$env/static/private";
 import { logger } from "$helper/logger";
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
+import { toasts } from "$stores/toastStore";
 
 export async function load({ fetch, depends, cookies }) {
   let sensorStationId = cookies.get("sensorStationId");
@@ -20,14 +21,16 @@ export async function load({ fetch, depends, cookies }) {
   return res;
 }
 
-const schema = z.object({
+const nameSchema = z.object({
   name: z
     .string({ required_error: "Name is required" })
     .min(1, { message: "Name is required" })
     .min(6, { message: "Name must be at least 6 characters" })
     .max(32, { message: "Name must be less than 32 characters" })
     .trim(),
+});
 
+const limitsSchema = z.object({
   upperLimit: z
     .number({ required_error: "Upper Limit is required" })
     .positive({ message: "Limit has to be positive" }),
@@ -61,21 +64,19 @@ export const actions = {
     ).then((response) => {
       let time = new Date().toLocaleString();
       if (!response.ok) {
-        console.log(`${time} : ${response.message}`);
+        logger.error("sensor-station-page", { response });
         throw error(response.status, response.statusText);
       } else {
-        console.log(
-          `${time} : unlocked set to "${unlocked}" for sensorStation with id = ${sensorStationId}`
+        logger.info(
+          `unlocked set to = ${unlocked} for sensor station with id = ${sensorStationId}`
         );
       }
     });
   },
 
-  update: async ({ request, fetch }) => {
+  updateName: async ({ request, fetch, locals }) => {
     const formData = await request.formData();
-    const zodData = schema.safeParse(Object.fromEntries(formData));
-    let sensorStationId = formData.get("sensorStationId");
-    let sensorStationName = formData.get("name");
+    const zodData = nameSchema.safeParse(Object.fromEntries(formData));
 
     // validate name input
     if (!zodData.success) {
@@ -90,62 +91,72 @@ export const actions = {
       return fail(400, { error: true, errors });
     }
 
-    await fetch(
-      `${BACKEND_URL}/update-sensor-station?sensorStationId=${sensorStationId}`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          limits: [
-            {
-              sensorId,
-              upperLimit,
-              lowerLimit,
-            },
-          ],
-        }),
-      }
-    ).then((response) => {
-      let time = new Date().toLocaleString();
-      if (!response.ok) {
-        console.log(`${time} : ${response.message}`);
-        throw error(response.status, response.statusText);
-      } else {
-        console.log(
-          `${time} : set updated sensorstation = ${sensorStationId} with name = ${sensorStationName}`
-        );
-      }
-    });
-  },
-
-  setLimit: async ({ request, fetch }) => {
-    const formData = await request.formData();
-    const zodData = schema.safeParse(Object.fromEntries(formData));
-    let sensorStationId = formData.get("sensorStationId");
-    let sensorType = formData.get("sensorType");
-    let upperLimit = formData.get("upperLimit");
-    let lowerLimit = formData.get("lowerLimit");
-    let thresholdDuration = formData.get("thresholdDuration");
-
-    // validate name input
-    if (!zodData.success) {
-      console.log("fail");
-      // Loop through the errors array and create a custom errors array
-      const errors = zodData.error.errors.map((error) => {
-        return {
-          field: error.path[0],
-          message: error.message,
-        };
-      });
-
-      return fail(400, { error: true, errors });
-    }
+    let sensorStationId: string = String(formData.get("sensorStationId"));
+    let sensorStationName: string = String(formData.get("name"));
 
     let params = new URLSearchParams();
-    params.set("sensorStationnId", sensorStationId?.toString() ?? "");
+    params.set("sensorStationnId", sensorStationId);
+    params.set("sensorStationName", sensorStationName);
 
     let parametersString = "?" + params.toString();
 
-    await fetch(`${BACKEND_URL}/set-sensor-limits${parametersString}`, {
+    await fetch(`${BACKEND_URL}/updata-sensor-station${parametersString}`, {
+      method: "POST",
+      body: JSON.stringify({
+        limits: [],
+      }),
+    }).then((response) => {
+      if (!response.ok) {
+        logger.error("sensor-station-page", { response });
+        toasts.addToast(
+          locals.user.personId,
+          "error",
+          `Failed to update name: ${response.status} ${response.message}`
+        );
+      } else {
+        logger.info(
+          `updated sensor station name for sensor station with id = ${sensorStationId} to name = ${sensorStationName}`
+        );
+        toasts.addToast(
+          locals.user.personId,
+          "success",
+          "Updated sensor station name"
+        );
+      }
+    });
+  },
+
+  updateLimit: async ({ request, fetch, locals }) => {
+    const formData = await request.formData();
+    const zodData = limitsSchema.safeParse(Object.fromEntries(formData));
+
+    // validate limit input
+    if (!zodData.success) {
+      // Loop through the errors array and create a custom errors array
+      const errors = zodData.error.errors.map((error) => {
+        return {
+          field: error.path[0],
+          message: error.message,
+        };
+      });
+
+      return fail(400, { error: true, errors });
+    }
+
+    let sensorStationId: string = String(formData.get("sensorStationId"));
+    let sensor: Sensor | null = formData.get("sensor");
+    let upperLimit: number = parseFloat(String(formData.get("upperLimit")));
+    let lowerLimit: number = parseFloat(String(formData.get("lowerLimit")));
+    let thresholdDuration: number = parseFloat(
+      String(formData.get("thresholdDuration"))
+    );
+
+    let params = new URLSearchParams();
+    params.set("sensorStationnId", sensorStationId);
+
+    let parametersString = "?" + params.toString();
+
+    await fetch(`${BACKEND_URL}/updata-sensor-station${parametersString}`, {
       method: "POST",
       body: JSON.stringify({
         limits: [
@@ -153,21 +164,21 @@ export const actions = {
             upperLimit,
             lowerLimit,
             thresholdDuration,
-            sensor: {
-              type: sensorType,
-            },
+            sensor,
           },
         ],
       }),
     }).then((response) => {
-      let time = new Date().toLocaleString();
       if (!response.ok) {
-        console.log(`${time} : ${response.message}`);
-        throw error(response.status, response.statusText);
-      } else {
-        console.log(
-          `${time} : set limits for sensorstation = ${sensorStationId} sensor = ${sensorType} to {upperLimit = ${upperLimit}, lowerLimit ${lowerLimit}}`
+        logger.error("sensor-station-page", { response });
+        toasts.addToast(
+          locals.user.personId,
+          "error",
+          `Failed to update limits: ${response.status} ${response.message}`
         );
+      } else {
+        logger.info(`Limits updated for ${sensor}`);
+        toasts.addToast(locals.user.personId, "success", "Updated limits");
       }
     });
   },
@@ -182,18 +193,22 @@ export const actions = {
 
     await fetch(`${BACKEND_URL}/delete-sensor-station${parametersString}`, {
       method: "DELETE",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw error(response.status, response.statusText);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        let time = new Date().toLocaleString();
-        console.log(
-          `${time} : Admin with id: ${locals.user.personId} and username: ${locals.user.username} deleted sensor station with id: ${sensorStationId}`
+    }).then((response) => {
+      if (!response.ok) {
+        logger.error("sensor-station-page", { response });
+        toasts.addToast(
+          locals.user.personId,
+          "error",
+          `Failed to delete sensor station: ${response.status} ${response.message}`
         );
-      });
+      } else {
+        logger.info(`Deleted sensor station = ${sensorStationId}`);
+        toasts.addToast(
+          locals.user.personId,
+          "success",
+          "Deleted sensor station"
+        );
+      }
+    });
   },
 };

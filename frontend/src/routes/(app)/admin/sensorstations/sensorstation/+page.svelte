@@ -4,15 +4,12 @@
   // ----------------------------------
   // ----------------------------------
   import PictureModal from "./PictureModal.svelte";
-  import Input from "$components/ui/Input.svelte";
   import Desktop from "$helper/Desktop.svelte";
-  import Mobile from "$helper/Mobile.svelte";
-  import { enhance } from "$app/forms";
   import { flexRender, type ColumnDef } from "@tanstack/svelte-table";
   import { TextCell } from "$lib/components/table/cellComponents";
   import Table from "$lib/components/table/Table.svelte";
   import StationInfo from "./StationInfo.svelte";
-  import FormError from "$lib/helper/formError.svelte";
+
   import LimitsCard from "./LimitsCard.svelte";
   // ----------------------------------
   // ----------------------------------

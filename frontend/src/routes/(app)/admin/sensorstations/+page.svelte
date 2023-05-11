@@ -17,6 +17,7 @@
   // ----------------------------------
   // ----------------------------------
   export let data;
+  export let form;
   $: {
     if (data.fromAccessPoints && $apSensorStations.length > 0) {
       data.sensorStations = $apSensorStations;
@@ -70,7 +71,7 @@
                   out:fly|local|self={{ y: 200, duration: 200 }}
                 >
                   <div class="card-body">
-                    <StationInfo {sensorStation} showDetailLink={true} />
+                    <StationInfo {sensorStation} {form} showDetailLink={true} />
                   </div>
                 </div>
               {/if}

@@ -24,7 +24,7 @@
         type="submit"
         on:click={() => {
           let isDeleteConfirmed = confirm(
-            `You will delete this sensor Station permanently!`
+            `You will delete this sensor station permanently!`
           );
           if (isDeleteConfirmed) {
             throw redirect(307, "/admin/sensorstations");
@@ -97,7 +97,7 @@
     </div>
 
     <div class="flex justify-center mx-auto gap-2 mt-6">
-      <button formaction="?/update" class="btn btn-primary">Update</button>
+      <button formaction="?/updateName" class="btn btn-primary">Update</button>
 
       {#if sensorStation.unlocked}
         <button class="btn btn-info" formaction="?/unlock">Unlocked</button>
