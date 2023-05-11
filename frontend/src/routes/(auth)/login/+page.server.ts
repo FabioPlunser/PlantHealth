@@ -3,6 +3,7 @@ import { BACKEND_URL } from "$env/static/private";
 import { fail, redirect } from "@sveltejs/kit";
 import { z } from "zod";
 import { logger } from "$helper/logger";
+import { toasts } from "$stores/toastStore";
 
 const schema = z.object({
   username: z
@@ -23,7 +24,7 @@ const schema = z.object({
 `login` function is an asynchronous function that takes an object with three parameters: `cookies`,
 `request`, and `fetch`. */
 export const actions = {
-  login: async ({ cookies, request, fetch }) => {
+  login: async ({ cookies, request, fetch, locals }) => {
     const formData = await request.formData();
     const zodData = schema.safeParse(Object.fromEntries(formData));
 
@@ -58,6 +59,12 @@ export const actions = {
           personId: res.personId,
         })
       );
+      locals.user = {
+        token: res.token,
+        username: formData.get("username"),
+        permissions: res.permissions,
+        personId: res.personId,
+      };
       throw redirect(302, "/");
     } else {
       res = await res.json();

@@ -2,6 +2,7 @@ import { BACKEND_URL } from "$env/static/private";
 import type { Actions } from "./$types";
 import { redirect } from "@sveltejs/kit";
 import { logger } from "$helper/logger";
+import { toasts } from "$stores/toastStore";
 
 interface Dashboard {
   sensorStations: [
@@ -23,6 +24,8 @@ export async function load({ locals, fetch, cookies }) {
   // get dates from cookies
   let from = cookies.get("from");
   let to = cookies.get("to");
+
+  toasts.addToast(locals.user.personId, "success", "loading user");
 
   // if no dates are set, set them to the last 7 days
   if (!from || !to) {
@@ -141,7 +144,7 @@ export const actions = {
   of the sensor station to be added. It then sends a POST request to the backend API endpoint
   `/add-to-dashboard` with the sensor station ID as a query parameter. The function is asynchronous,
   as it uses the `await` keyword to wait for the response from the API before continuing. */
-  addToDashboard: async ({ request, fetch, url }) => {
+  addToDashboard: async ({ request, fetch, url, locals }) => {
     let formData = await request.formData();
     let sensorStationId = formData.get("sensorStationId");
 
@@ -153,6 +156,7 @@ export const actions = {
     );
     res = await res.json();
     logger.info("addToDashboard", { res });
+    toasts.addToast(locals.user.personId, "success", "added from dashboard");
   },
   /* `removeFromDashboard` is an action function that removes a sensor station from the user's
   dashboard. It receives an HTTP request object, extracts the form data submitted by the user, which
@@ -160,7 +164,7 @@ export const actions = {
   API endpoint `/remove-from-dashboard` with the sensor station ID as a query parameter. The
   function is asynchronous, as it uses the `await` keyword to wait for the response from the API
   before continuing. It also logs the response from the API to the console. */
-  removeFromDashboard: async ({ request, fetch, url }) => {
+  removeFromDashboard: async ({ request, fetch, url, locals }) => {
     let formData = await request.formData();
     let sensorStationId = formData.get("sensorStationId");
 
@@ -171,6 +175,8 @@ export const actions = {
       }
     );
     res = await res.json();
+    toasts.addToast(locals.user.personId, "success", "removed from dashboard");
+
     logger.info("removeFromDashboard", { res });
   },
 
@@ -179,7 +185,7 @@ export const actions = {
   includes the new `from` and `to` dates. It then converts these dates to `Date` objects and logs
   them to the console using the `logger` helper function. Finally, it sets the `from` and `to`
   cookies with the new dates, so that they can be used in subsequent requests. */
-  updateFromTo: async ({ request, fetch, url, cookies }) => {
+  updateFromTo: async ({ request, fetch, url, cookies, locals }) => {
     let formData = await request.formData();
     let _from = formData.get("from");
     let _to = formData.get("to");
@@ -193,5 +199,7 @@ export const actions = {
 
     cookies.set("from", _from, { path: "/" });
     cookies.set("to", _to, { path: "/" });
+
+    toasts.addToast(locals.user.personId, "success", "update from dashboard");
   },
 } satisfies Actions;
