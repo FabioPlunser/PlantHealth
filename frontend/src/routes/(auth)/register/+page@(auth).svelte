@@ -6,7 +6,6 @@
   import Logo from "$assets/Logo.svg?url";
 
   export let form;
-  $: console.log(form);
 </script>
 
 <section class="flex justify-center items-center h-screen">

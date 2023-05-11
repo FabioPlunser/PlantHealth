@@ -28,7 +28,7 @@
         name={field}
         type={inputType}
         {placeholder}
-        class="w-full appearance-none dark:input-bordered dark:bg-gray-800 bg-gray-200 dark:text-white text-black focus:outline-none"
+        class="w-full dark:input-bordered dark:bg-gray-800 bg-gray-200 dark:text-white text-black focus:outline-none"
       />
     </div>
     <div class="flex-shrink">

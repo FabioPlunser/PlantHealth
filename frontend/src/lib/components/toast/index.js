@@ -9,4 +9,5 @@ export { default as ErrorIcon } from "./components/ErrorIcon.svelte";
 export { default as LoaderIcon } from "./components/LoaderIcon.svelte";
 export { resolveValue } from "./core/types";
 export { toast };
+export { toasts } from "./core/store.js";
 export default toast;

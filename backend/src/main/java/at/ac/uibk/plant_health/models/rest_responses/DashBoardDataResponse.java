@@ -3,12 +3,10 @@ package at.ac.uibk.plant_health.models.rest_responses;
 import static java.util.stream.Collectors.groupingBy;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.SensorStationPersonReference;
 import at.ac.uibk.plant_health.models.device.SensorStation;
-import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
 import at.ac.uibk.plant_health.models.user.Person;
 import lombok.Getter;
@@ -42,7 +40,7 @@ public class DashBoardDataResponse extends RestResponse implements Serializable 
 			if (!sensorStation.isDeleted()) {
 				this.name = sensorStation.getName();
 				this.roomName = sensorStation.getAccessPoint().getRoomName();
-				this.pictureIds = sensorStation.getPlantPictures()
+				this.pictureIds = sensorStation.getSensorStationPictures()
 										  .stream()
 										  .map(SensorStationPicture::getPictureId)
 										  .toList();

@@ -6,7 +6,6 @@
   import Plant from "$assets/icons/potted-plant.svg?component";
   import Gardener from "$assets/icons/gardening-shears.svg?component";
   import User from "$assets/icons/user.svg?component";
-  import Graph from "$lib/components/graph_old/graph.svelte";
 
   let rendered = false;
   onMount(() => {
@@ -48,13 +47,6 @@
               {badges.number}
             </h1>
           </div>
-        </div>
-      {/each}
-    </div>
-    <div class="mt-20">
-      {#each { length: 3 } as _, i}
-        <div class="mt-4">
-          <!-- <Graph data={null} /> -->
         </div>
       {/each}
     </div>
