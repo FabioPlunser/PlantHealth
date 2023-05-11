@@ -95,7 +95,7 @@ export const actions = {
     let personId = formData.get("personId");
 
     let params = new URLSearchParams();
-    params.set("personId", personId);
+    params.set("personId", personId?.toString() ?? "");
 
     let parametersString = "?" + params.toString();
 
