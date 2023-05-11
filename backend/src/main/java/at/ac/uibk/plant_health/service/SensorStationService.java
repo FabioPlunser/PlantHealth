@@ -282,7 +282,9 @@ public class SensorStationService {
 			throw new ServiceException("Sensor station already deleted", 404);
 		}
 		sensorStation.setDeleted(true);
+		sensorStation.setUnlocked(false);
 		sensorStation.setBdAddress(null);
+		sensorStation.setAccessPoint(null);
 		sensorStationRepository.save(sensorStation);
 	}
 }
