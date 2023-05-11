@@ -55,7 +55,7 @@ public class SensorStation extends Device implements Serializable {
 			fetch = FetchType.EAGER, mappedBy = "sensorStation", orphanRemoval = true,
 			cascade = CascadeType.ALL
 	)
-	private List<SensorStationPicture> plantPictures = new ArrayList<>();
+	private List<SensorStationPicture> sensorStationPictures = new ArrayList<>();
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

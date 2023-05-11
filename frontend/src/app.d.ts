@@ -43,6 +43,10 @@ declare interface User {
   email: string;
 }
 
+declare interface Typed {
+  [key: string]: any;
+}
+
 /**
  * An object representing the visibility of table columns.
  * Each key should be equivalent to the ID of the column.
@@ -53,4 +57,29 @@ declare interface User {
  */
 declare interface ColumnVisibility {
   [column: string]: boolean;
+}
+
+declare interface Sensor {
+  type: string;
+  unit: string;
+}
+
+declare interface SensorLimit {
+  upperLimit: number;
+  lowerLimit: number;
+  thresholdDuration: number;
+  sensor: Sensor;
+}
+
+declare interface SensorStation {
+  bdAddress: string;
+  dipSwitchId: number;
+  name: string;
+  roomName: string;
+  sensorStationId: string;
+  connected: boolean;
+  unlocked: boolean;
+  deleted: boolean;
+  sensorLimits: SensorLimit[];
+  sensorStationPictures: string[];
 }

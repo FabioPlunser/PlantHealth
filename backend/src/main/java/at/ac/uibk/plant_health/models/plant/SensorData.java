@@ -61,27 +61,40 @@ public class SensorData implements Serializable {
 	private boolean isDeleted = false;
 
 	public SensorData(
-			LocalDateTime timeStamp, float value, boolean above, boolean below, char alarm,
-			Sensor sensor, SensorStation sensorStation
+			LocalDateTime timeStamp, float value, char alarm, Sensor sensor,
+			SensorStation sensorStation
 	) {
 		this.timeStamp = timeStamp;
 		this.value = value;
-		this.belowLimit = below;
-		this.aboveLimit = above;
 		this.alarm = alarm;
+		switch (alarm) {
+			case 'h' -> {
+				this.aboveLimit = true;
+				this.belowLimit = false;
+			}
+			case 'l' -> {
+				this.aboveLimit = false;
+				this.belowLimit = true;
+			}
+			default -> {
+				this.aboveLimit = false;
+				this.belowLimit = false;
+			}
+		}
+
 		this.sensor = sensor;
 		this.sensorStation = sensorStation;
 	}
 
-	//	@JsonIgnore
-	//	public char getAlarm() {
-	//		if (this.aboveLimit) {
-	//			return 'h';
-	//		} else if (this.belowLimit) {
-	//			return 'l';
-	//		}
-	//		return 'n';
-	//	}
+	@JsonIgnore
+	public char getAlarm() {
+		if (this.aboveLimit) {
+			return 'h';
+		} else if (this.belowLimit) {
+			return 'l';
+		}
+		return 'n';
+	}
 
 	@Override
 	public boolean equals(Object obj) {

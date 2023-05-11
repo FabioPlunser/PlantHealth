@@ -59,7 +59,6 @@
     if (sensorStationIdQr === null) {
       alert("Invalid QR-Code");
     }
-    console.log(sensorStationIdQr);
     await stop();
     form.submit();
   }

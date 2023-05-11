@@ -12,9 +12,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,7 +20,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -35,7 +31,6 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Stream;
 
 import at.ac.uibk.plant_health.models.device.AccessPoint;
 import at.ac.uibk.plant_health.models.device.SensorStation;
@@ -160,6 +155,30 @@ public class TestSensorStationController {
 		sensorStation = sensorStationService.findByBdAddress(bdAddress);
 		accessPointService.foundNewSensorStation(accessPoint, List.of(sensorStation));
 
+		Map<String, String> sensorMap = new HashMap<>();
+		sensorMap.put("TEMPERATURE", "°C");
+		sensorMap.put("HUMIDITY", "%");
+		sensorMap.put("PRESSURE", "hPa");
+		sensorMap.put("SOILHUMIDITY", "%");
+		sensorMap.put("LIGHTINTENSITY", "lux");
+		sensorMap.put("GASPRESSURE", "ppm");
+
+		for (int i = 0; i < sensorMap.size(); i++) {
+			Sensor sensor = new Sensor(
+					sensorMap.keySet().toArray()[i].toString(),
+					sensorMap.values().toArray()[i].toString()
+			);
+			if (!sensorRepository.findAll().contains(sensor)) {
+				sensorRepository.save(sensor);
+			}
+			sensor = sensorRepository.findByType(sensor.getType()).get();
+			SensorData sensorData =
+					new SensorData(LocalDateTime.now(), 0, 'h', sensor, sensorStation);
+			sensorDataRepository.save(sensorData);
+		}
+		sensorStation.setSensorData(sensorDataRepository.findAll());
+		sensorStationService.save(sensorStation);
+
 		mockMvc.perform(MockMvcRequestBuilders.get("/get-sensor-station")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
@@ -169,7 +188,26 @@ public class TestSensorStationController {
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(
 						status().isOk(), jsonPath("$.sensorStation").exists(),
-						jsonPath("$.sensors").exists()
+						jsonPath("$.sensorStation.sensorStationId").exists(),
+						jsonPath("$.sensorStation.bdAddress").exists(),
+						jsonPath("$.sensorStation.dipSwitchId").exists(),
+						jsonPath("$.sensorStation.name").exists(),
+						jsonPath("$.sensorStation.unlocked").exists(),
+						jsonPath("$.sensorStation.connected").exists(),
+						jsonPath("$.sensorStation.deleted").exists(),
+						jsonPath("$.sensorStation.sensorStationPersonReferences").exists(),
+						jsonPath("$.sensorStation.sensorStationPersonReferences").isArray(),
+						jsonPath("$.sensorStation.sensorStationPictures").exists(),
+						jsonPath("$.sensorStation.sensorStationPictures").isArray(),
+						jsonPath("$.sensorStation.sensorLimits").exists(),
+						jsonPath("$.sensorStation.sensorLimits").isArray(),
+						jsonPath("$.sensorStation.sensorLimits[0].timeStamp").exists(),
+						jsonPath("$.sensorStation.sensorLimits[0].upperLimit").exists(),
+						jsonPath("$.sensorStation.sensorLimits[0].lowerLimit").exists(),
+						jsonPath("$.sensorStation.sensorLimits[0].thresholdDuration").exists(),
+						jsonPath("$.sensorStation.sensorLimits[0].sensor").exists(),
+						jsonPath("$.sensorStation.sensorLimits[0].gardener").exists()
+
 				);
 	}
 
@@ -225,8 +263,10 @@ public class TestSensorStationController {
 		// precondition accessPoint has found and reported at least one sensor station
 		String bdAddress = StringGenerator.macAddress();
 		SensorStation sensorStation = new SensorStation(bdAddress, 4);
+		sensorStation.setUnlocked(true);
 		sensorStationService.save(sensorStation);
-		// add other sensor station to check that only limits of the selected sensor station are changed
+		// add other sensor station to check that only limits of the selected sensor station are
+		// changed
 		String otherBdAddress = StringGenerator.macAddress();
 		SensorStation otherSensorStation = new SensorStation(otherBdAddress, 5);
 		sensorStationService.save(otherSensorStation);
@@ -255,7 +295,7 @@ public class TestSensorStationController {
 			sensorJson.put("unit", sensorMap.values().toArray()[i].toString());
 
 			ObjectNode limit = mapper.createObjectNode();
-			limit.putPOJO("sensor", sensorJson);
+			limit.putPOJO("sensor", sensor);
 			limit.put("upperLimit", rand.nextFloat());
 			limit.put("lowerLimit", rand.nextFloat());
 			limit.put("thresholdDuration", rand.nextInt(1000));
@@ -331,13 +371,13 @@ public class TestSensorStationController {
 
 		// run request
 		mockMvc.perform(MockMvcRequestBuilders.post("/set-sensor-limits")
-						.header(HttpHeaders.USER_AGENT, "MockTests")
-						.header(HttpHeaders.AUTHORIZATION,
-								AuthGenerator.generateToken(person))
-						.param("sensorStationId",
-								String.valueOf(sensorStation.getDeviceId()))
-						.content(limits.toString())
-						.contentType(MediaType.APPLICATION_JSON))
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(person))
+								.param("sensorStationId",
+									   String.valueOf(sensorStation.getDeviceId()))
+								.content(limits.toString())
+								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
 		// verify that only single limit got updated
@@ -388,8 +428,8 @@ public class TestSensorStationController {
 		for (int d = 0; d < 14; d++) {
 			for (int i = 0; i < sensorMap.size(); i++) {
 				SensorData sensorData = new SensorData(
-						LocalDateTime.now().minusDays(d), rand.nextFloat(), rand.nextBoolean(),
-						rand.nextBoolean(), 'h', sensors.get(i), sensorStation
+						LocalDateTime.now().minusDays(d), rand.nextFloat(), 'h', sensors.get(i),
+						sensorStation
 
 				);
 				sensorDataRepository.save(sensorData);
@@ -428,7 +468,7 @@ public class TestSensorStationController {
 			Files.createDirectories(path.getParent());
 			Files.write(path, imageByte);
 			plantPictures.add(plantPicture);
-			sensorStation.setPlantPictures(plantPictures);
+			sensorStation.setSensorStationPictures(plantPictures);
 			sensorStationService.save(sensorStation);
 
 		} catch (Exception e) {
@@ -437,13 +477,13 @@ public class TestSensorStationController {
 	}
 
 	private void deleteAllPictures(SensorStation sensorStation) throws Exception {
-		List<SensorStationPicture> pictures = sensorStation.getPlantPictures();
+		List<SensorStationPicture> pictures = sensorStation.getSensorStationPictures();
 		try {
 			for (SensorStationPicture picture1 : pictures) {
 				Path path = Paths.get(picture1.getPicturePath());
 				Files.delete(path);
 			}
-			sensorStation.setPlantPictures(new ArrayList<>());
+			sensorStation.setSensorStationPictures(new ArrayList<>());
 			sensorStationService.save(sensorStation);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -468,10 +508,10 @@ public class TestSensorStationController {
 				.andExpectAll(status().isOk());
 
 		sensorStation = sensorStationService.findByBdAddress(bdAddress);
-		assertEquals(1, sensorStation.getPlantPictures().size());
+		assertEquals(1, sensorStation.getSensorStationPictures().size());
 
 		deleteAllPictures(sensorStation);
-		assertEquals(0, sensorStation.getPlantPictures().size());
+		assertEquals(0, sensorStation.getSensorStationPictures().size());
 	}
 
 	@Test
@@ -501,12 +541,10 @@ public class TestSensorStationController {
 				);
 
 		sensorStation = sensorStationService.findByBdAddress(bdAddress);
-		assertEquals(1, sensorStation.getPlantPictures().size());
-
-		sensorStation.getPlantPictures().forEach(p -> System.out.println(p.getPicturePath()));
+		assertEquals(1, sensorStation.getSensorStationPictures().size());
 
 		deleteAllPictures(sensorStation);
-		assertEquals(0, sensorStation.getPlantPictures().size());
+		assertEquals(0, sensorStation.getSensorStationPictures().size());
 	}
 
 	@Test
@@ -530,7 +568,7 @@ public class TestSensorStationController {
 				.andExpectAll(status().isOk());
 
 		deleteAllPictures(sensorStation);
-		assertEquals(0, sensorStation.getPlantPictures().size());
+		assertEquals(0, sensorStation.getSensorStationPictures().size());
 	}
 
 	@Test
@@ -546,7 +584,7 @@ public class TestSensorStationController {
 		List<SensorStationPicture> pictures = plantPictureRepository.findAll();
 		SensorStationPicture picture1 = pictures.get(0);
 
-		assertEquals(pictures.size(), sensorStation.getPlantPictures().size());
+		assertEquals(pictures.size(), sensorStation.getSensorStationPictures().size());
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/delete-sensor-station-picture")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
@@ -562,7 +600,7 @@ public class TestSensorStationController {
 			fail("SensorStation not found");
 		}
 		sensorStation = maybeSensorStation.get();
-		assertEquals(0, sensorStation.getPlantPictures().size());
+		assertEquals(0, sensorStation.getSensorStationPictures().size());
 	}
 
 	@Test
@@ -592,11 +630,11 @@ public class TestSensorStationController {
 			}
 		}
 
-		sensorStation.setPlantPictures(plantPictures);
+		sensorStation.setSensorStationPictures(plantPictures);
 		sensorStationService.save(sensorStation);
 
 		List<SensorStationPicture> pictures = plantPictureRepository.findAll();
-		assertEquals(pictures.size(), sensorStation.getPlantPictures().size());
+		assertEquals(pictures.size(), sensorStation.getSensorStationPictures().size());
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/delete-all-sensor-station-pictures")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
@@ -613,7 +651,7 @@ public class TestSensorStationController {
 			fail("SensorStation not found");
 		}
 		sensorStation = maybeSensorStation.get();
-		assertEquals(0, sensorStation.getPlantPictures().size());
+		assertEquals(0, sensorStation.getSensorStationPictures().size());
 	}
 
 	@Test

@@ -90,6 +90,8 @@ public class SensorStationService {
 			List<SensorLimits> sensorLimits, UUID sensorStationId, Person person
 	) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
+		if (!sensorStation.isUnlocked()) throw new ServiceException("SensorStation is locked", 403);
+		if (sensorStation.isDeleted()) throw new ServiceException("SensorStation is deleted", 403);
 		for (SensorLimits limit : sensorLimits) {
 			Optional<Sensor> sensor = sensorRepository.findByType(limit.getSensor().getType());
 			if (sensor.isEmpty())
@@ -115,7 +117,7 @@ public class SensorStationService {
 	 */
 	public List<SensorStationPicture> getPictures(UUID sensorStationId) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
-		return sensorStation.getPlantPictures();
+		return sensorStation.getSensorStationPictures();
 	}
 
 	public SensorStationPicture getPicture(UUID pictureId) throws ServiceException {
@@ -158,9 +160,9 @@ public class SensorStationService {
 			throw new ServiceException("Could not save picture", 500);
 		}
 
-		List<SensorStationPicture> sensorStationPictures = sensorStation.getPlantPictures();
+		List<SensorStationPicture> sensorStationPictures = sensorStation.getSensorStationPictures();
 		sensorStationPictures.add(plantPicture);
-		sensorStation.setPlantPictures(sensorStationPictures);
+		sensorStation.setSensorStationPictures(sensorStationPictures);
 		save(sensorStation);
 	}
 
@@ -193,7 +195,7 @@ public class SensorStationService {
 			Path path = Paths.get(picture.getPicturePath());
 			Files.delete(path);
 			plantPictureRepository.delete(picture);
-			sensorStation.getPlantPictures().remove(picture);
+			sensorStation.getSensorStationPictures().remove(picture);
 			save(sensorStation);
 		} catch (Exception e) {
 			throw new ServiceException("Failed to delete pictue of the server", 500);
@@ -207,7 +209,8 @@ public class SensorStationService {
 	 */
 	public void deleteAllPictures(UUID sensorStationId) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
-		List<SensorStationPicture> pictures = new ArrayList<>(sensorStation.getPlantPictures());
+		List<SensorStationPicture> pictures =
+				new ArrayList<>(sensorStation.getSensorStationPictures());
 		try {
 			for (SensorStationPicture picture : pictures) {
 				try {
@@ -219,7 +222,7 @@ public class SensorStationService {
 					throw new ServiceException("Picture already deleted from server", 500);
 				}
 
-				sensorStation.getPlantPictures().remove(picture);
+				sensorStation.getSensorStationPictures().remove(picture);
 			}
 			save(sensorStation);
 		} catch (Exception e) {
