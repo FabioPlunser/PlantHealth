@@ -34,7 +34,7 @@ export async function GET({ url }: RequestEvent) {
     "src/lib/assets/logoBase64.txt", // NOTE: importing it via $assets/logoBase64.txt adds a '/' infront and wont allow for the file to open
     "utf8"
   );
-  const baseURL = "https://www.planthealth.at/guest/plant";
+  const baseURL = `${url.origin}/guest/plant`;
   let URL = `${baseURL}?sensorStationId=${sensorStationId}`;
 
   let qrcodeBase64: string = createQrCode(URL);
