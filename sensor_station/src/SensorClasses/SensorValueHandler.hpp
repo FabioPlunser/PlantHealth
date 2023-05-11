@@ -168,7 +168,7 @@ class SensorValueHandlerClass {
 			if (temperature < -64 || temperature > 63) {
 				return convertToGATT_airTemperature_notKnown();
 			}
-			return (uint8_t) (temperature);
+			return (uint8_t) (temperature * 2);
 		}
 		uint8_t convertToGATT_airTemperature_notKnown() {
 			DEBUG_PRINT_POS(4, "\n");
