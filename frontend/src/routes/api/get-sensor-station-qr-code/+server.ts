@@ -71,7 +71,7 @@ export async function GET({ url }: RequestEvent) {
  * @param {QrCodePdfData} data The QR code PDF data to generate a blob for.
  * @returns {Blob} The generated PDF blob.
  */
-function generateQrCodePdfBlob(data: QrCodePdfData): Blob {
+async function generateQrCodePdfBlob(data: QrCodePdfData): Blob {
   let pdf = new jsPDF("portrait", "mm", "A6");
   pdf.addMetadata("Page Size", "A6");
 
@@ -95,7 +95,14 @@ function generateQrCodePdfBlob(data: QrCodePdfData): Blob {
   pdf.setFontSize(6);
   pdf.text(idString, center(pdf, pdf.getTextWidth(idString)), 135);
 
-  return pdf.output("blob");
+  const pdfBuffer = pdf.output("arraybuffer");
+
+  const response = await fetch(
+    "data:application/pdf;base64," +
+      btoa(String.fromCharCode(...new Uint8Array(pdfBuffer)))
+  );
+  const blob: Blob = await response.blob();
+  return blob;
 }
 
 /**

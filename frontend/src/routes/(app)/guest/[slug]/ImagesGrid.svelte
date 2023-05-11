@@ -3,7 +3,6 @@
   import Spinner from "$components/ui/Spinner.svelte";
   import { onMount } from "svelte";
   import { unknown } from "zod";
-  import { data } from "$lib/components/graph_old/data";
 
   // ----------------------------------------------- //
   let rendered = false;
