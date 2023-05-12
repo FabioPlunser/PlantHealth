@@ -123,4 +123,5 @@ public class SensorData implements Serializable {
 				+ ", belowLimit=" + belowLimit + ", alarm='" + alarm + '\'' + ", sensor=" + sensor
 				+ ", isDeleted=" + isDeleted + '}';
 	}
+
 }

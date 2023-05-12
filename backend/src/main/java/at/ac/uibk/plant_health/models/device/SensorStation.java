@@ -2,6 +2,8 @@ package at.ac.uibk.plant_health.models.device;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,6 +15,7 @@ import at.ac.uibk.plant_health.models.SensorStationPersonReference;
 import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
+import at.ac.uibk.plant_health.models.user.Person;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,6 +39,12 @@ public class SensorStation extends Device implements Serializable {
 	@JdbcTypeCode(SqlTypes.INTEGER)
 	@Column(name = "dip_switch_id", nullable = false)
 	private int dipSwitchId;
+
+	@JsonIgnore
+	@Fetch(FetchMode.SELECT)
+	@OneToOne()
+	//	@JoinColumn(name = "gardener_id")
+	private Person gardener = null;
 
 	@JsonIgnore
 	@ManyToOne
@@ -74,9 +83,9 @@ public class SensorStation extends Device implements Serializable {
 
 	@Override
 	public String toString() {
-		return "SensorStation [bdAddress=" + bdAddress + ", name=" + name + ", dipSwitchId="
-				+ dipSwitchId + ", accessPoint=" + accessPoint + ", sensorStationPersonReferences="
-				+ sensorStationPersonReferences + ", sensorData=" + sensorData + "]";
+		return "SensorStation [bdAddress=" + bdAddress + ", name=" + name
+				+ ", dipSwitchId=" + dipSwitchId + ", accessPoint=" + accessPoint
+				+ ", sensorStationPersonReferences=" + sensorStationPersonReferences + "]";
 	}
 
 	@Override

@@ -18,6 +18,10 @@ public class LogService {
 		return logRepository.findByTimeStampBetween(end, start);
 	}
 
+	public List<Log> findAll() {
+		return logRepository.findAll();
+	}
+
 	public boolean log(Log log) {
 		try {
 			log.setTimeStamp(LocalDateTime.now());

@@ -1,5 +1,6 @@
 package at.ac.uibk.plant_health.controllers;
 
+import org.hibernate.annotations.Any;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
@@ -16,6 +17,7 @@ import java.util.*;
 import at.ac.uibk.plant_health.models.annotations.AnyPermission;
 import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
 import at.ac.uibk.plant_health.models.annotations.PublicEndpoint;
+import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.exceptions.ServiceException;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
@@ -97,14 +99,19 @@ public class SensorStationController {
 
 	@AnyPermission({Permission.GARDENER, Permission.ADMIN})
 	@PrincipalRequired(Person.class)
-	@RequestMapping(value = "/set-sensor-limits", method = {RequestMethod.POST, RequestMethod.PUT})
-	public RestResponseEntity setSensorLimits(
+	@RequestMapping(
+			value = "/update-sensor-station", method = {RequestMethod.POST, RequestMethod.PUT}
+	)
+	public RestResponseEntity
+	setSensorLimits(
 			Person person, @RequestParam("sensorStationId") final UUID sensorStationId,
+			@RequestParam(value = "sensorStationName", required = false) final String name,
 			@RequestBody final List<SensorLimits> sensorLimits
 	) {
 		try {
-			sensorStationService.findById(sensorStationId);
-			sensorStationService.setSensorLimits(sensorLimits, sensorStationId, person);
+			SensorStation sensorStation = sensorStationService.findById(sensorStationId);
+			sensorStationService.updateSensorStation(sensorStation, name);
+			sensorStationService.setSensorLimits(sensorLimits, sensorStation, person);
 		} catch (ServiceException e) {
 			return MessageResponse.builder()
 					.statusCode(e.getStatusCode())
@@ -116,6 +123,28 @@ public class SensorStationController {
 				.statusCode(200)
 				.message("Successfully set sensor limits")
 				.toEntity();
+	}
+
+	@AnyPermission(Permission.ADMIN)
+	@PostMapping("/assign-gardener-to-sensor-station")
+	public RestResponseEntity assignGardenerToSensorStation(
+			@RequestParam("sensorStationId") final UUID sensorStationId,
+			@RequestParam("gardenerId") final UUID gardenerId
+	) {
+		try {
+			sensorStationService.assignGardenerToSensorStation(
+					sensorStationService.findById(sensorStationId), gardenerId
+			);
+			return MessageResponse.builder()
+					.statusCode(200)
+					.message("Successfully assigned gardener to sensor station")
+					.toEntity();
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
 	}
 
 	@AnyPermission({Permission.GARDENER, Permission.ADMIN, Permission.USER})

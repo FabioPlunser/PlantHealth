@@ -17,8 +17,10 @@ import at.ac.uibk.plant_health.models.plant.Sensor;
 import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
+import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.repositories.*;
+import jakarta.transaction.Transactional;
 
 @Service
 public class SensorStationService {
@@ -36,6 +38,8 @@ public class SensorStationService {
 	private SensorLimitsRepository sensorLimitsRepository;
 	@Value("${swa.pictures.path}")
 	private String picturesPath;
+	@Autowired
+	private PersonService personService;
 
 	public SensorStation findById(UUID id) throws ServiceException {
 		Optional<SensorStation> maybeSensorStation = this.sensorStationRepository.findById(id);
@@ -56,6 +60,12 @@ public class SensorStationService {
 			throw new ServiceException("Could not find SensorStation", 404);
 		}
 		return maybeSensorStation.get();
+	}
+
+	public SensorStation sensorStationExists(String bdAddress) {
+		Optional<SensorStation> maybeSensorStation =
+				this.sensorStationRepository.findByBdAddress(bdAddress);
+		return maybeSensorStation.orElse(null);
 	}
 
 	public SensorStation save(SensorStation sensorStation) throws ServiceException {
@@ -82,34 +92,57 @@ public class SensorStationService {
 	/**
 	 * Set sensor limits of sensor station.
 	 * @param sensorLimits
-	 * @param sensorStationId
+	 * @param sensorStation
 	 * @return
 	 */
-	// @Transactional
+	@Transactional
 	public void setSensorLimits(
-			List<SensorLimits> sensorLimits, UUID sensorStationId, Person person
+			List<SensorLimits> sensorLimits, SensorStation sensorStation, Person person
 	) throws ServiceException {
-		SensorStation sensorStation = findById(sensorStationId);
 		if (!sensorStation.isUnlocked()) throw new ServiceException("SensorStation is locked", 403);
 		if (sensorStation.isDeleted()) throw new ServiceException("SensorStation is deleted", 403);
 		for (SensorLimits limit : sensorLimits) {
-			Optional<Sensor> sensor = sensorRepository.findByType(limit.getSensor().getType());
-			if (sensor.isEmpty())
+			Optional<Sensor> maybeSensor = sensorRepository.findByType(limit.getSensor().getType());
+			if (maybeSensor.isEmpty())
 				throw new ServiceException(
 						"Sensor " + limit.getSensor().getType() + " not found", 500
 				);
-			limit.setSensor(sensor.get());
-			limit.setGardener(person);
-			limit.setSensorStation(sensorStation);
-			limit.setTimeStamp(LocalDateTime.now());
+			Sensor sensor = maybeSensor.get();
+			SensorLimits newLimit = new SensorLimits(
+					LocalDateTime.now(), limit.getLowerLimit(), limit.getUpperLimit(),
+					limit.getThresholdDuration(), sensor, person, sensorStation
+			);
 			try {
-				sensorLimitsRepository.save(limit);
+				sensorLimitsRepository.save(newLimit);
 			} catch (Exception e) {
 				throw new ServiceException("Could not save sensor limits", 500);
 			}
 		}
+		//		List<SensorLimits> allLimits = sensorLimitsRepository.findAll();
+		//		sensorStation.setSensorLimits(allLimits);
+		//		save(sensorStation);
 	}
 
+	/**
+	 * Update name of SensorStation
+	 * @param sensorStation
+	 * @param name
+	 */
+	public void updateSensorStation(SensorStation sensorStation, String name) {
+		sensorStation.setName(name);
+		save(sensorStation);
+	}
+
+	public void assignGardenerToSensorStation(SensorStation sensorStation, UUID personId)
+			throws ServiceException {
+		Optional<Person> maybePerson = personService.findById(personId);
+		if (maybePerson.isEmpty()) throw new ServiceException("Person does not exist", 404);
+		Person person = maybePerson.get();
+		if (!person.getPermissions().contains(Permission.GARDENER))
+			throw new ServiceException("Person is not a gardener", 403);
+		sensorStation.setGardener(maybePerson.get());
+		save(sensorStation);
+	}
 	/**
 	 * Get pictures of SensorStation
 	 * @param sensorStationId

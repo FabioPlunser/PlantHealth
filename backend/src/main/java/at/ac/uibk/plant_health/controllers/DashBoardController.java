@@ -9,7 +9,9 @@ import java.util.UUID;
 import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
 import at.ac.uibk.plant_health.models.exceptions.ServiceException;
 import at.ac.uibk.plant_health.models.rest_responses.*;
+import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
+import at.ac.uibk.plant_health.service.AccessPointService;
 import at.ac.uibk.plant_health.service.PersonService;
 import at.ac.uibk.plant_health.service.SensorStationPersonReferenceService;
 import at.ac.uibk.plant_health.service.SensorStationService;
@@ -22,6 +24,8 @@ public class DashBoardController {
 	private SensorStationService sensorStationService;
 	@Autowired
 	private SensorStationPersonReferenceService sensorStationPersonReferenceService;
+	@Autowired
+	private AccessPointService accessPointService;
 
 	@PrincipalRequired(Person.class)
 	@GetMapping("/get-dashboard-data")
@@ -32,6 +36,13 @@ public class DashBoardController {
 	@PrincipalRequired(Person.class)
 	@GetMapping("/get-dashboard")
 	public RestResponseEntity getDashboard(Person person) {
+		if (person.getPermissions().contains(Permission.ADMIN))
+			return new AdminDashBoardResponse(
+						   sensorStationService.findAll(), accessPointService.findAllAccessPoints(),
+						   personService.getPersons()
+			)
+					.toEntity();
+
 		return new DashBoardDataResponse(person).toEntity();
 	}
 

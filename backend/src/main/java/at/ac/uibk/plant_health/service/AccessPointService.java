@@ -178,11 +178,20 @@ public class AccessPointService {
 	public void foundNewSensorStation(
 			AccessPoint accessPoint, List<SensorStation> sensorStationList
 	) throws ServiceException {
-		sensorStationList.forEach(sensorStation -> {
+		for (SensorStation sensorStation : sensorStationList) {
+			if (sensorStationService.sensorStationExists(sensorStation.getBdAddress()) != null) {
+				SensorStation dbSensorStation =
+						sensorStationService.findByBdAddress(sensorStation.getBdAddress());
+				dbSensorStation.setDipSwitchId(sensorStation.getDipSwitchId());
+				dbSensorStation.setAccessPoint(accessPoint);
+				dbSensorStation.setConnected(true);
+				sensorStationService.save(dbSensorStation);
+				continue;
+			}
 			sensorStation.setConnected(true);
 			sensorStation.setAccessPoint(accessPoint);
 			sensorStationService.save(sensorStation);
-		});
+		}
 		accessPoint.setSensorStations(sensorStationList);
 		accessPoint.setScanActive(false);
 		setLastConnection(accessPoint);
