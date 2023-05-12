@@ -6,19 +6,16 @@ import { toasts } from "$stores/toastStore";
 import { apSensorStations } from "../../../../../lib/stores/apSensorStations";
 
 export async function load({ fetch, depends, cookies }) {
-  let from = cookies.get("from");
-  let to = cookies.get("to");
+  let cookieFrom = cookies.get("from") || "";
+  let cookieTo = cookies.get("to") || "";
 
-  // if no dates are set, set them to the last 7 days
-  if (!from || !to) {
-    from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    to = new Date(Date.now());
-    cookies.set("from", from, { path: "/" });
-    cookies.set("to", to, { path: "/" });
-    logger.info("No dates set, setting to last 7 days", { from, to });
-  } else {
-    from = new Date(from);
-    to = new Date(to);
+  let from: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  let to: Date = new Date(Date.now());
+
+  // if cookies are set overwrite the dates
+  if (cookieFrom !== "" || cookieTo !== "") {
+    from = new Date(cookieFrom);
+    to = new Date(cookieTo);
   }
   //-------------------------------------------------------------------------------------------------------------------------
   //-------------------------------------------------------------------------------------------------------------------------
@@ -63,18 +60,16 @@ export async function load({ fetch, depends, cookies }) {
         reject(res.statusText);
         throw new Error(res.statusText);
       }
-      res = await res.blob();
-      let file = new File([res], "image", { type: res.type });
+      let blob: BlobPart = await res.blob();
+      let file = new File([blob], "image", { type: res.type });
       let arrayBuffer = await res.arrayBuffer();
       let buffer = Buffer.from(arrayBuffer);
       let encodedImage =
         "data:image/" + res.type + ";base64," + buffer.toString("base64");
-      let picture: Picture = {
-        imageRef: "",
-        creationDate: new Date(),
+      let picture: Typed = {
+        imageRef: encodedImage,
+        creationDate: new Date(possiblePicture.timeStamp),
       };
-      picture.imageRef = encodedImage;
-      picture.creationDate = new Date(possiblePicture.timeStamp);
       picture.pictureId = possiblePicture.pictureId;
       resolve(picture);
       sensorStation.pictures.push(picture);
@@ -82,12 +77,13 @@ export async function load({ fetch, depends, cookies }) {
   }
   //-------------------------------------------------------------------------------------------------------------------------
   //-------------------------------------------------------------------------------------------------------------------------
-  let gardener = await fetch(`${BACKEND_URL}/get-all-gardener`);
-  if (!gardener.ok) {
+  let gardener = null;
+  res = await fetch(`${BACKEND_URL}/get-all-gardener`);
+  if (!res.ok) {
     logger.error("Could not get gardener");
-    throw error(gardener.status, "Could not get gardener");
+    throw error(res.status, "Could not get gardener");
   } else {
-    gardener = await gardener.json();
+    gardener = await res.json();
     gardener = gardener.items;
   }
 
@@ -158,7 +154,7 @@ export const actions = {
     });
   },
 
-  updateName: async ({ request, fetch, locals }) => {
+  update: async ({ request, fetch, locals }) => {
     const formData = await request.formData();
     const zodData = nameSchema.safeParse(Object.fromEntries(formData));
 

@@ -73,7 +73,7 @@ export const actions = {
       {
         method: "POST",
       }
-    ).then((response) => {
+    ).then((response: any) => {
       let time = new Date().toLocaleString();
       if (!response.ok) {
         logger.error("sensor-station-page", { response });
@@ -85,7 +85,6 @@ export const actions = {
       }
     });
   },
-
   update: async ({ request, fetch, locals }) => {
     const formData = await request.formData();
     const zodData = nameSchema.safeParse(Object.fromEntries(formData));

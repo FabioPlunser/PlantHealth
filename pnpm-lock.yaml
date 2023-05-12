@@ -3,27 +3,27 @@ lockfileVersion: "6.0"
 dependencies:
   "@tanstack/svelte-table":
     specifier: ^8.9.1
-    version: 8.9.1(svelte@3.58.0)
+    version: 8.9.1(svelte@3.59.1)
   svelte:
-    specifier: ^3.58.0
-    version: 3.58.0
+    specifier: ^3.59.1
+    version: 3.59.1
   vite:
-    specifier: ^4.3.4
-    version: 4.3.4
+    specifier: ^4.3.5
+    version: 4.3.5
 
 devDependencies:
   "@poppanator/sveltekit-svg":
     specifier: ^3.0.0
-    version: 3.0.0(svelte@3.58.0)(vite@4.3.4)
+    version: 3.0.0(svelte@3.59.1)(vite@4.3.5)
   date-picker-svelte:
     specifier: ^2.4.3
-    version: 2.4.3(svelte@3.58.0)
+    version: 2.4.3(svelte@3.59.1)
   html5-qrcode:
     specifier: ^2.3.8
     version: 2.3.8
   svelte-chartjs:
     specifier: ^3.1.2
-    version: 3.1.2(svelte@3.58.0)
+    version: 3.1.2(chart.js@4.3.0)(svelte@3.59.1)
   zod:
     specifier: ^3.21.4
     version: 3.21.4
@@ -271,7 +271,14 @@ packages:
     requiresBuild: true
     optional: true
 
-  /@poppanator/sveltekit-svg@3.0.0(svelte@3.58.0)(vite@4.3.4):
+  /@kurkle/color@0.3.2:
+    resolution:
+      {
+        integrity: sha512-fuscdXJ9G1qb7W8VdHi+IwRqij3lBkosAm4ydQtEmbY58OzHXqQhvlxqEkoz0yssNVn38bcpRWgA9PP+OGoisw==,
+      }
+    dev: true
+
+  /@poppanator/sveltekit-svg@3.0.0(svelte@3.59.1)(vite@4.3.5):
     resolution:
       {
         integrity: sha512-ZWY65A79R52EYTMAQpTwsS05gvS3nOqtqrEGKfkY7PTQErFBjvHbgmfbEX9hofVrw1SwOhR5gG80VyYdOZjDRQ==,
@@ -280,12 +287,12 @@ packages:
       svelte: 3.x
       vite: ">=3.x"
     dependencies:
-      svelte: 3.58.0
+      svelte: 3.59.1
       svgo: 3.0.2
-      vite: 4.3.4
+      vite: 4.3.5
     dev: true
 
-  /@tanstack/svelte-table@8.9.1(svelte@3.58.0):
+  /@tanstack/svelte-table@8.9.1(svelte@3.59.1):
     resolution:
       {
         integrity: sha512-c84SBP2rRbloBcA3/WFsfm0a4vJCeztbRxox4MHAPCwfLW955tmCYbIF6ihcDUZg5fsDvu992qdDEhKKLLxmEg==,
@@ -295,7 +302,7 @@ packages:
       svelte: ^3.49.0
     dependencies:
       "@tanstack/table-core": 8.9.1
-      svelte: 3.58.0
+      svelte: 3.59.1
     dev: false
 
   /@tanstack/table-core@8.9.1:
@@ -319,6 +326,16 @@ packages:
       {
         integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==,
       }
+    dev: true
+
+  /chart.js@4.3.0:
+    resolution:
+      {
+        integrity: sha512-ynG0E79xGfMaV2xAHdbhwiPLczxnNNnasrmPEXriXsPJGjmhOBYzFVEsB65w2qMDz+CaBJJuJD0inE/ab/h36g==,
+      }
+    engines: { pnpm: ">=7" }
+    dependencies:
+      "@kurkle/color": 0.3.2
     dev: true
 
   /commander@7.2.0:
@@ -382,7 +399,7 @@ packages:
       css-tree: 2.2.1
     dev: true
 
-  /date-picker-svelte@2.4.3(svelte@3.58.0):
+  /date-picker-svelte@2.4.3(svelte@3.59.1):
     resolution:
       {
         integrity: sha512-aYQzLNc7MfMWYc5InrCQv26geewkTeLg0x4R5Rr3H4YJS1i1VucQxOIvObjaJ64ylCBwVnEpQeO5iBq3semn1A==,
@@ -390,7 +407,7 @@ packages:
     peerDependencies:
       svelte: ^3.24.0
     dependencies:
-      svelte: 3.58.0
+      svelte: 3.59.1
     dev: true
 
   /dom-serializer@2.0.0:
@@ -554,7 +571,7 @@ packages:
       }
     engines: { node: ">=0.10.0" }
 
-  /svelte-chartjs@3.1.2(svelte@3.58.0):
+  /svelte-chartjs@3.1.2(chart.js@4.3.0)(svelte@3.59.1):
     resolution:
       {
         integrity: sha512-3+6gY2IJ9Ua8R9pk3iS1ypa7Z9OoXCJb9oPwIfTp7caJM+X+RrWnH2CTkGAq7FeSxc2nnmW08tYN88Q8Y+5M+w==,
@@ -563,13 +580,14 @@ packages:
       chart.js: ^3.5.0 || ^4.0.0
       svelte: ^3.45.0
     dependencies:
-      svelte: 3.58.0
+      chart.js: 4.3.0
+      svelte: 3.59.1
     dev: true
 
-  /svelte@3.58.0:
+  /svelte@3.59.1:
     resolution:
       {
-        integrity: sha512-brIBNNB76mXFmU/Kerm4wFnkskBbluBDCjx/8TcpYRb298Yh2dztS2kQ6bhtjMcvUhd5ynClfwpz5h2gnzdQ1A==,
+        integrity: sha512-pKj8fEBmqf6mq3/NfrB9SLtcJcUvjYSWyePlfCqN9gujLB25RitWK8PvFzlwim6hD/We35KbPlRteuA6rnPGcQ==,
       }
     engines: { node: ">= 8" }
 
@@ -589,10 +607,10 @@ packages:
       picocolors: 1.0.0
     dev: true
 
-  /vite@4.3.4:
+  /vite@4.3.5:
     resolution:
       {
-        integrity: sha512-f90aqGBoxSFxWph2b39ae2uHAxm5jFBBdnfueNxZAT1FTpM13ccFQExCaKbR2xFW5atowjleRniQ7onjJ22QEg==,
+        integrity: sha512-0gEnL9wiRFxgz40o/i/eTBwm+NEbpUeTWhzKrZDSdKm6nplj+z4lKz8ANDgildxHm47Vg8EUia0aicKbawUVVA==,
       }
     engines: { node: ^14.18.0 || >=16.0.0 }
     hasBin: true
