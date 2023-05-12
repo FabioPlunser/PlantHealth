@@ -62,6 +62,12 @@ public class SensorStationService {
 		return maybeSensorStation.get();
 	}
 
+	public SensorStation sensorStationExists(String bdAddress) {
+		Optional<SensorStation> maybeSensorStation =
+				this.sensorStationRepository.findByBdAddress(bdAddress);
+		return maybeSensorStation.orElse(null);
+	}
+
 	public SensorStation save(SensorStation sensorStation) throws ServiceException {
 		try {
 			return sensorStationRepository.save(sensorStation);
