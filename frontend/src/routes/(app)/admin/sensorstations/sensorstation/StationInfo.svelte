@@ -15,7 +15,7 @@
 <form method="post" use:enhance>
   <div class="float margin-right text-2xl">
     <input
-      type="hidden"
+      type="text"
       name="sensorStationId"
       value={sensorStation.sensorStationId}
     />
@@ -88,7 +88,7 @@
       <div class="flex">
         <div class="mx-auto">
           <a
-            href="http://localhost:3000/api/get-sensor-station-qr-code?sensorStationId=e5dc8654-255e-4fdd-b58e-8160f3a8fd7c&roomName=Office1&plantName=Sakura"
+            href={`http://localhost:3000/api/get-sensor-station-qr-code?sensorStationId=${sensorStation.sensorStationId}&roomName=${sensorStation.roomName}&plantName=${sensorStation.name}`}
           >
             <i class="bi bi-qr-code-scan text-4xl" />
           </a>
