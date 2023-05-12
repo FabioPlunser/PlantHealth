@@ -67,7 +67,12 @@
                   out:fly|local|self={{ y: 200, duration: 200 }}
                 >
                   <div class="card-body">
-                    <StationInfo {sensorStation} {form} showDetailLink={true} />
+                    <StationInfo
+                      {sensorStation}
+                      {form}
+                      showDetailLink={true}
+                      gardener={data.gardener}
+                    />
                   </div>
                 </div>
               {/if}

@@ -3,7 +3,6 @@ import { toasts } from "$stores/toastStore";
 import { logger } from "$helper/logger";
 
 export async function load({ depends, locals }) {
-  console.log("layout", locals.user);
   let error = false;
 
   if (locals.user) {
@@ -23,7 +22,6 @@ export async function load({ depends, locals }) {
   let res;
   try {
     res = await fetch(`${BACKEND_URL}/get-user-permissions`);
-    console.log(res);
   } catch (err) {
     logger.error("layout: get-user-permissions " + JSON.stringify(err));
     if (err.cause.code === "ECONNREFUSED") {

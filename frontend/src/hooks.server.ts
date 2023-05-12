@@ -19,7 +19,7 @@ export const handle = (async ({ event, resolve, request, locals }) => {
   if (token) {
     token = JSON.parse(token);
     event.locals.user = token;
-    console.log(event.locals.user);
+    logger.info("Token found: " + JSON.stringify(token));
   } else {
     logger.error("No token found");
     event.locals.user = null;

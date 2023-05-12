@@ -25,7 +25,6 @@ export async function load({ fetch, locals }) {
     lines.forEach((line) => {
       if (line) {
         // skip empty lines
-        // console.log(line)
         const logRegex =
           /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) \[(\w+)\]: (.*)$/;
         const [, timeStamp, severity, message] = line.match(logRegex);
@@ -39,14 +38,6 @@ export async function load({ fetch, locals }) {
     });
     resolve(logs);
   });
-
-  // const filePath = resolve("./logs/all.log")
-  // const fileExtension = filePath.split(".").pop();
-  // var file = fs.readFileSync(filePath);
-  // console.log(process.cwd());
-  // console.log(file)
-  // let buffer = new ArrayBuffer(file);
-  // console.log(buffer)
   return {
     numbers,
     backend: backendLogs,

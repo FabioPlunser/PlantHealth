@@ -82,12 +82,22 @@ export async function load({ fetch, depends, cookies }) {
   }
   //-------------------------------------------------------------------------------------------------------------------------
   //-------------------------------------------------------------------------------------------------------------------------
+  let gardener = await fetch(`${BACKEND_URL}/get-all-gardener`);
+  if (!gardener.ok) {
+    logger.error("Could not get gardener");
+    throw error(gardener.status, "Could not get gardener");
+  } else {
+    gardener = await gardener.json();
+    gardener = gardener.items;
+  }
 
-  // res = await res.json();
+  //-------------------------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------------------------------------
   logger.info("Got sensor station");
   depends("app:getSensorStation");
   return {
     sensorStation,
+    gardener,
     dates: {
       from,
       to,

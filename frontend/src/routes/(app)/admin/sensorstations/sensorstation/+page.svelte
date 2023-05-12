@@ -41,7 +41,6 @@
     });
   }
 
-  $: console.log("sensorStationData", sensorStationData);
   let limits: SensorLimit[];
   $: limits = data.sensorStation.sensorLimits;
 
@@ -126,7 +125,7 @@
         out:fly|local|self={{ y: 200, duration: 200 }}
         class="flex card p-8 border h-fit w-full bg-base-100 dark:border-none shadow-2xl md:max-w-9/12"
       >
-        <StationInfo {sensorStation} {form} />
+        <StationInfo {sensorStation} {form} gardener={data.gardener} />
 
         <div in:slide={{ duration: 200 }}>
           <br />

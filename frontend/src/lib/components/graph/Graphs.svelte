@@ -45,7 +45,6 @@
       };
     }
   }
-  $: console.log(graphData);
   // ---------------------------------------------------
   // ---------------------------------------------------
   async function addMissingSensors(dynamicSensors: any) {

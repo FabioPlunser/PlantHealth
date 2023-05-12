@@ -6,12 +6,11 @@
 
   export let sensorStation: SensorStation;
   export let showDetailLink: boolean = false;
+  export let gardener: any;
   export let form;
   function setCookie(id: any) {
     document.cookie = `sensorStationId=${id}; path=/;`;
   }
-
-  $: console.log(sensorStation);
 </script>
 
 <form
@@ -69,52 +68,72 @@
       <FormError field="name" {form} />
     </div>
     <div>
-      <h1>
-        <span class="font-bold">Room: </span>
-        <span>{sensorStation.roomName}</span>
-      </h1>
+      <span class="font-bold">Room: </span>
+      <span>{sensorStation.roomName}</span>
     </div>
     <div>
-      <h1>
-        <span class="font-bold">MAC: </span>
-        <span>{sensorStation.bdAddress}</span>
-      </h1>
+      <span class="font-bold">MAC: </span>
+      <span>{sensorStation.bdAddress}</span>
     </div>
     <div>
-      <h1>
-        <span class="font-bold">DIP: </span>
-        <span>{sensorStation.dipSwitchId}</span>
-      </h1>
+      <span class="font-bold">DIP: </span>
+      <span>{sensorStation.dipSwitchId}</span>
     </div>
-    <div class="flex mx-auto justify-center m-4">
-      {#if sensorStation.connected}
-        <div class="badge badge-success">Connected</div>
-      {:else}
-        <div class="badge badge-error">Disconnected</div>
-      {/if}
-    </div>
-    <div class="flex justify-center">
-      <div class="flex">
-        <div class="mx-auto">
-          <a
-            href="http://localhost:3000/api/get-sensor-station-qr-code?sensorStationId=e5dc8654-255e-4fdd-b58e-8160f3a8fd7c&roomName=Office1&plantName=Sakura"
-          >
-            <i class="bi bi-qr-code-scan text-4xl" />
-          </a>
-        </div>
+    <div class="xl:flex gap-4">
+      <span class="font-bold flex items-center">Gardener: </span>
+      <div>
+        <select
+          name="gardener"
+          class="flex items-center justify-center text-sm select dark:bg-gray-700 bg-base-100 w-fit h-2 max-w-xs border-2 border-base-200 dark:border-none"
+        >
+          {#each gardener as person, i}
+            {#if sensorStation.gardener?.username === person.username}
+              <!-- <option hidden class="hidden">{person.personId}</option> -->
+              <option selected value={person.personId}>{person.username}</option
+              >
+            {:else}
+              {#if i == 0}
+                <option>No gardener assigned</option>
+              {/if}
+              <!-- <option hidden class="hidden">{person.personId}</option> -->
+              <option value={person.personId}>{person.username}</option>
+            {/if}
+          {/each}
+        </select>
       </div>
     </div>
 
-    <div class="flex justify-center mx-auto gap-2 mt-6">
-      <button formaction="?/updateName" class="btn btn-primary">Update</button>
+    <div class="">
+      <div class="flex mx-auto justify-center m-4">
+        {#if sensorStation.connected}
+          <div class="badge badge-success">Connected</div>
+        {:else}
+          <div class="badge badge-error">Disconnected</div>
+        {/if}
+      </div>
+      <div class="flex justify-center">
+        <div class="flex">
+          <div class="mx-auto">
+            <a
+              href="http://localhost:3000/api/get-sensor-station-qr-code?sensorStationId=e5dc8654-255e-4fdd-b58e-8160f3a8fd7c&roomName=Office1&plantName=Sakura"
+            >
+              <i class="bi bi-qr-code-scan text-4xl" />
+            </a>
+          </div>
+        </div>
+      </div>
 
-      {#if sensorStation.unlocked}
-        <button class="btn btn-info" formaction="?/unlock">Unlocked</button>
-        <input type="hidden" name="unlocked" value="false" />
-      {:else}
-        <button class="btn btn-error" formaction="?/unlock">Locked</button>
-        <input type="hidden" name="unlocked" value="true" />
-      {/if}
+      <div class="flex justify-center mx-auto gap-2 mt-6">
+        <button formaction="?/update" class="btn btn-primary">Update</button>
+
+        {#if sensorStation.unlocked}
+          <button class="btn btn-info" formaction="?/unlock">Unlocked</button>
+          <input type="hidden" name="unlocked" value="false" />
+        {:else}
+          <button class="btn btn-error" formaction="?/unlock">Locked</button>
+          <input type="hidden" name="unlocked" value="true" />
+        {/if}
+      </div>
     </div>
   </div>
 </form>
