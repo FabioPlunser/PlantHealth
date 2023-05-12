@@ -4,8 +4,6 @@ import { toasts } from "$stores/toastStore";
 
 // TODO: add validation and error handling (toast messages)
 export async function load({ fetch, depends, locals }) {
-  toasts.addToast(locals.user.personId, "success", "loading accessPoints");
-
   let res = await fetch(`${BACKEND_URL}/get-access-points`);
   if (!res.ok) {
     logger.error("Could not get access points");

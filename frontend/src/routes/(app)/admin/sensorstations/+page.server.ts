@@ -3,6 +3,7 @@ import { error, fail } from "@sveltejs/kit";
 import { logger } from "$helper/logger";
 import { z } from "zod";
 import { toasts } from "$lib/stores/toastStore";
+import { addToast } from "../../../../lib/components/toast_old/addToToastStore";
 
 // TODO: add validation and error handling (toast messages)
 /**
@@ -31,9 +32,19 @@ export async function load({ locals, fetch, request, depends, url }) {
   res = await res.json();
   logger.info("Got sensor stations");
 
+  let gardener = await fetch(`${BACKEND_URL}/get-all-gardener`);
+  if (!gardener.ok) {
+    logger.error("Could not get gardener");
+    throw error(gardener.status, "Could not get gardener");
+  } else {
+    gardener = await gardener.json();
+    gardener = gardener.items;
+  }
+
   depends("app:getSensorStations");
   return {
     fromAccessPoints,
+    gardener,
     sensorStations: res.sensorStations,
   };
 }
@@ -76,7 +87,7 @@ export const actions = {
     });
   },
 
-  updateName: async ({ request, fetch, locals }) => {
+  update: async ({ request, fetch, locals }) => {
     const formData = await request.formData();
     const zodData = nameSchema.safeParse(Object.fromEntries(formData));
 
@@ -95,14 +106,14 @@ export const actions = {
 
     let sensorStationId: string = String(formData.get("sensorStationId"));
     let sensorStationName: string = String(formData.get("name"));
-
     let params = new URLSearchParams();
-    params.set("sensorStationnId", sensorStationId);
+
+    params.set("sensorStationId", sensorStationId);
     params.set("sensorStationName", sensorStationName);
 
     let parametersString = "?" + params.toString();
 
-    await fetch(`${BACKEND_URL}/updata-sensor-station${parametersString}`, {
+    await fetch(`${BACKEND_URL}/update-sensor-station${parametersString}`, {
       method: "POST",
       body: JSON.stringify({
         limits: [],
@@ -126,8 +137,29 @@ export const actions = {
         );
       }
     });
-  },
 
+    let gardenerId = formData.get("gardener");
+    params = new URLSearchParams();
+    params.set("sensorStationId", sensorStationId);
+    params.set("gardenerId", gardenerId);
+    let res = await fetch(
+      `${BACKEND_URL}/assign-gardener-to-sensor-station?${params.toString()}`,
+      {
+        method: "POST",
+      }
+    );
+    if (!res.ok) {
+      logger.error("Could not assign gardener to sensor station");
+      throw error(res.status, "Could not assign gardener to sensor station");
+    } else {
+      logger.info("Assigned gardener to sensor station");
+      toasts.addToast(
+        locals.user.personId,
+        "success",
+        "Assigned gardener to sensor station"
+      );
+    }
+  },
   delete: async ({ request, fetch, locals }) => {
     let formData = await request.formData();
     let sensorStationId = formData.get("sensorStationId");

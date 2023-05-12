@@ -5,7 +5,6 @@
   export let data;
   $: {
     data?.streamed?.notifications.then((notification) => {
-      console.log(notification);
       let position = "top-right";
       let toastId = "";
       if (notification) {
@@ -20,7 +19,6 @@
       }
     });
   }
-  $: console.log(data?.error);
 </script>
 
 {#if data?.error}

@@ -7,6 +7,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "checkHuman": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --output human > check.log",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "eslint ."
   },

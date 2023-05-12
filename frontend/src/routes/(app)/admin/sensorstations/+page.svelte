@@ -46,17 +46,13 @@
             <h1 class="text-xl font-bold">All SensorStations</h1>
           {/if}
         </div>
-        <div
-          class="mb-4"
-          in:fly|self={{ y: -200, duration: 200, delay: 100 }}
-          out:fly|local|self={{ y: 200, duration: 200 }}
-        >
+        <div class="mb-4 flex justify-ceter">
           <input
             bind:value={searchTerm}
             type="search"
             name="searchRoom"
             placeholder="Global Search"
-            class="input dark:input-bordered w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
+            class="input dark:input-bordered w-fit min-w-64 mx-auto dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
           />
         </div>
         <div class="flex justify-center mx-auto">
@@ -71,7 +67,12 @@
                   out:fly|local|self={{ y: 200, duration: 200 }}
                 >
                   <div class="card-body">
-                    <StationInfo {sensorStation} {form} showDetailLink={true} />
+                    <StationInfo
+                      {sensorStation}
+                      {form}
+                      showDetailLink={true}
+                      gardener={data.gardener}
+                    />
                   </div>
                 </div>
               {/if}

@@ -18,7 +18,7 @@ export const handle = (async ({ event, resolve, request, locals }) => {
   if (token) {
     token = JSON.parse(token);
     event.locals.user = token;
-    console.log(event.locals.user);
+    logger.info("Token found: " + JSON.stringify(token));
   } else {
     logger.error("No token found");
     event.locals.user = null;
@@ -80,8 +80,8 @@ export const handleFetch = (({ event, request, fetch }) => {
   return fetch(request);
 }) satisfies HandleFetch;
 
-export const handleError = (({ event, error }) => {
-  //logger.error("HandleError Event: " + JSON.stringify(event));
-  logger.error("HandleError Error: " + JSON.stringify(error));
-  return error;
-}) satisfies HandleServerError;
+// export const handleError = (({ event, error }) => {
+//   logger.error("HandleError Event: " + JSON.stringify(event));
+//   logger.error("HandleError Error: " + JSON.stringify(error));
+
+// }) satisfies HandleServerError;

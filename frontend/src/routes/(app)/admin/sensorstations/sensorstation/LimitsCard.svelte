@@ -8,7 +8,9 @@
 </script>
 
 <div class="flex justify-center">
-  <div class="card border h-fit bg-base-100 dark:border-none shadow-2xl w-60">
+  <div
+    class="card border h-fit dark:bg-gray-700 bg-base-100 dark:border-none shadow-2xl w-60"
+  >
     <div class="card-body">
       <div class="flex text-center">
         <h1 class="mx-auto font-semibold">

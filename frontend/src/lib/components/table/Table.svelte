@@ -52,11 +52,11 @@
   /**
    * Array\<T\> where T is the datatype of the object to be displayed
    */
-  export let data;
+  export let data: any;
   /**
    * Array\<ColumnDef\<T\>\> where T is the datatype of the object to be displayed
    */
-  export let columns;
+  export let columns: ColumnDef<any>[];
   /**
    * column visibility if media is not mobile
    * @default {}
@@ -68,6 +68,11 @@
    * @type {ColumnVisibility}
    */
   export let mobileColumnVisibility: ColumnVisibility;
+
+  /**
+   * Array\<number\> where each number is a page size option
+   */
+  export let pageSizeOptions: number[] = [5, 10, 20];
 
   $: columnVisibility = isMediaNotMobile
     ? defaultColumnVisibility
