@@ -10,9 +10,18 @@
   function setCookie(id: any) {
     document.cookie = `sensorStationId=${id}; path=/;`;
   }
+
+  $: console.log(sensorStation);
 </script>
 
-<form method="post" use:enhance>
+<form
+  method="post"
+  use:enhance={() => {
+    return async ({ update }) => {
+      await update({ reset: false });
+    };
+  }}
+>
   <div class="float margin-right text-2xl">
     <input
       type="hidden"

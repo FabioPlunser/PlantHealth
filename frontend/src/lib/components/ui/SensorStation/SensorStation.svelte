@@ -8,7 +8,7 @@
   import Graphs from "$components/graph/Graphs.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
   import DateInput from "$components/datepicker/DateInput.svelte";
-  import PictureModal from "../PictureModal.svelte";
+  import PictureModal from "../BigPictureModal.svelte";
   // ---------------------------------------------------
   // ---------------------------------------------------
   let rendered = false;
@@ -173,7 +173,7 @@
                               }}
                               src={data.imageRef}
                               alt="SensorStationPicture"
-                              class="w-48 h-64 rounded-2xl shadow-xl cursor-pointer"
+                              class="rounded-2xl shadow-xl cursor-pointer"
                             />
                             <h1 class="flex justify-center">
                               {data.creationDate.toLocaleDateString()}

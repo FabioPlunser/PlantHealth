@@ -3,8 +3,26 @@ import { logger } from "$helper/logger";
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 import { toasts } from "$stores/toastStore";
+import { apSensorStations } from "../../../../../lib/stores/apSensorStations";
 
 export async function load({ fetch, depends, cookies }) {
+  let from = cookies.get("from");
+  let to = cookies.get("to");
+
+  // if no dates are set, set them to the last 7 days
+  if (!from || !to) {
+    from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    to = new Date(Date.now());
+    cookies.set("from", from, { path: "/" });
+    cookies.set("to", to, { path: "/" });
+    logger.info("No dates set, setting to last 7 days", { from, to });
+  } else {
+    from = new Date(from);
+    to = new Date(to);
+  }
+  //-------------------------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------------------------------------
+
   let sensorStationId = cookies.get("sensorStationId");
 
   let res = await fetch(
@@ -15,10 +33,66 @@ export async function load({ fetch, depends, cookies }) {
     throw error(res.status, "Could not get sensor station");
   }
 
-  res = await res.json();
+  let sensorStation = await res.json();
+  sensorStation = sensorStation.sensorStation;
+  //-------------------------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------------------------------------
+  sensorStation.data = new Promise(async (resolve, reject) => {
+    let res = await fetch(
+      `${BACKEND_URL}/get-sensor-station-data?sensorStationId=${
+        sensorStation.sensorStationId
+      }&from=${from.toISOString().split(".")[0]}&to=${
+        to.toISOString().split(".")[0]
+      }`
+    );
+    if (res.status != 200) {
+      resolve(null);
+    }
+    res = await res.json();
+    resolve(res);
+  });
+  //-------------------------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------------------------------------
+  sensorStation.pictures = [];
+  for (let possiblePicture of sensorStation.sensorStationPictures) {
+    let picturePromise = new Promise(async (resolve, reject) => {
+      let res = await fetch(
+        `${BACKEND_URL}/get-sensor-station-picture?pictureId=${possiblePicture.pictureId}`
+      );
+      if (!res.ok) {
+        reject(res.statusText);
+        throw new Error(res.statusText);
+      }
+      res = await res.blob();
+      let file = new File([res], "image", { type: res.type });
+      let arrayBuffer = await res.arrayBuffer();
+      let buffer = Buffer.from(arrayBuffer);
+      let encodedImage =
+        "data:image/" + res.type + ";base64," + buffer.toString("base64");
+      let picture: Picture = {
+        imageRef: "",
+        creationDate: new Date(),
+      };
+      picture.imageRef = encodedImage;
+      picture.creationDate = new Date(possiblePicture.timeStamp);
+      picture.pictureId = possiblePicture.pictureId;
+      resolve(picture);
+      sensorStation.pictures.push(picture);
+    });
+  }
+  //-------------------------------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------------------------------------
+
+  // res = await res.json();
   logger.info("Got sensor station");
   depends("app:getSensorStation");
-  return res;
+  return {
+    sensorStation,
+    dates: {
+      from,
+      to,
+    },
+  };
 }
 
 const nameSchema = z.object({
@@ -210,5 +284,27 @@ export const actions = {
         );
       }
     });
+  },
+  updateFromTo: async ({ request, fetch, url, cookies, locals }) => {
+    let formData = await request.formData();
+    let _from = formData.get("from");
+    let _to = formData.get("to");
+
+    _from = new Date(_from);
+    _to = new Date(_to);
+    _from.setHours(0);
+    _from.setMinutes(0);
+    _from.setSeconds(0);
+
+    _to.setHours(23);
+    _to.setMinutes(59);
+    _to.setSeconds(59);
+
+    logger.info("UpdateFromTo");
+    logger.info("from" + JSON.stringify(_from));
+    logger.info("to" + JSON.stringify(_to));
+
+    cookies.set("from", _from, { path: "/" });
+    cookies.set("to", _to, { path: "/" });
   },
 };

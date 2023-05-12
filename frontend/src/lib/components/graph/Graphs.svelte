@@ -61,14 +61,19 @@
       }
     }
   }
-  data
-    .then(async (res: any) => {
-      addMissingSensors(res.data);
-      graphData = createGraphData(res.data);
-    })
-    .catch((err: any) => {
-      console.log(err);
-    });
+  if (data instanceof Promise) {
+    data
+      .then(async (res: any) => {
+        addMissingSensors(res.data);
+        graphData = createGraphData(res.data);
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+  } else {
+    addMissingSensors(data);
+    graphData = createGraphData(data);
+  }
 
   // ---------------------------------------------------
   // ---------------------------------------------------
