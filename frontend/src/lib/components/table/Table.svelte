@@ -219,6 +219,7 @@
     <div class=" justify-center flex align-items-center btn-group mt-3">
       <button
         class="btn"
+        type="button"
         on:click={() => setCurrentPage(0)}
         class:is-disabled={!$table.getCanPreviousPage()}
         disabled={!$table.getCanPreviousPage()}
@@ -227,6 +228,7 @@
       </button>
       <button
         class="btn"
+        type="button"
         on:click={() =>
           setCurrentPage($table.getState().pagination.pageIndex - 1)}
         class:is-disabled={!$table.getCanPreviousPage()}
@@ -241,6 +243,7 @@
       </span>
       <button
         class="btn"
+        type="button"
         on:click={() =>
           setCurrentPage($table.getState().pagination.pageIndex + 1)}
         class:is-disabled={!$table.getCanNextPage()}
@@ -250,6 +253,7 @@
       </button>
       <button
         class="btn"
+        type="button"
         on:click={() => setCurrentPage($table.getPageCount() - 1)}
         class:is-disabled={!$table.getCanNextPage()}
         disabled={!$table.getCanNextPage()}
@@ -262,7 +266,7 @@
           on:change={setPageSize}
           class="btn"
         >
-          {#each pageSizeOptions as pageSize}
+          {#each [5, 10, 20, 40, 80] as pageSize}
             <option value={pageSize}>
               Show {pageSize}
             </option>

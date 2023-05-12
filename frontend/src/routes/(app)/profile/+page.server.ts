@@ -180,7 +180,7 @@ export const actions = {
       .then((response) => {
         if (!response.ok) {
           logger.error("user-profile-page", { response });
-          throw new error(response.status, response.statusText);
+          throw error(response.status, response.statusText);
         }
         return response.json();
       })

@@ -4,6 +4,7 @@
   export let placeholder: string = "";
   export let type: string = "";
   export let value: any = null;
+  $: console.log(value);
 </script>
 
 <div>
@@ -14,7 +15,7 @@
       name={field}
       {type}
       {placeholder}
-      class="input input-bordered w-full bg-gray-800 text-white"
+      class="input input-bordered w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black caret-red-200"
     />
   </label>
 </div>
