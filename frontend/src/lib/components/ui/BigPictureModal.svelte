@@ -18,11 +18,11 @@
 <svelte:window on:keydown={handleKeyDown} />
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="modal cursor-pointer" class:modal-open={open} on:click={close}>
-  <div transition:scale={{ duration: 150 }} class="w-11/12 rounded-2xl">
+  <div transition:scale={{ duration: 150 }} class="w-8/12 rounded-2xl">
     <img
       src={imageRef}
       alt="SensorStationImageBit"
-      class="w-full h-full object-contain rounded-2xl"
+      class="object-contain rounded-2xl"
     />
   </div>
 </div>

@@ -19,7 +19,7 @@
     <!-- Appenders -->
     <appender name="CONSOLE" class="ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>WARN</level>
+            <level>TRACE</level>
         </filter>
         <encoder class="PatternLayoutEncoder">
             <pattern>%d{yyyy-MM-dd HH:mm:ss} %-4relative [%thread] %-5level %logger{35} -%kvp- %msg %n</pattern>
@@ -70,7 +70,7 @@
         </filter>
     </appender>
 
-    <springProfile name="!prod">
+    <springProfile name="prod">
         <root level="DEBUG">
             <appender-ref ref="CONSOLE"/>
         </root>

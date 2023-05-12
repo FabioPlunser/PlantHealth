@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { toast } from "$components/toast";
   import { fly, slide, fade } from "svelte/transition";
   import { onMount } from "svelte";
   import { enhance } from "$app/forms";
@@ -36,8 +37,9 @@
 
   let sensorStationData: any = null;
   $: {
-    sensorStation?.data.then((res) => {
-      sensorStationData = res?.data;
+    sensorStation.data.then((res: any) => {
+      console.log(res);
+      sensorStationData = res.data;
     });
   }
 
@@ -122,7 +124,6 @@
     <div class="flex justify-center mx-auto">
       <div
         in:fly|self={{ y: -200, duration: 200, delay: 100 }}
-        out:fly|local|self={{ y: 200, duration: 200 }}
         class="flex card p-8 border h-fit w-full bg-base-100 dark:border-none shadow-2xl md:max-w-9/12"
       >
         <StationInfo {sensorStation} {form} gardener={data.gardener} />
@@ -380,27 +381,31 @@
                 <div
                   class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
                 >
-                  {#each sensorStation.pictures as picturePromise, i (i)}
-                    {#await picturePromise}
-                      <Spinner />
-                    {:then picture}
-                      <div>
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <img
-                          on:click={() => {
-                            selectedPicture = picture.imageRef;
-                            pictureModal = true;
-                          }}
-                          src={picture.imageRef}
-                          alt="SensorStation {i}"
-                          class="rounded-2xl shadow-xl cursor-pointer"
-                        />
-                        <h1 class="flex justify-center">
-                          {picture.creationDate.toDateString()}
-                        </h1>
-                      </div>
-                    {/await}
-                  {/each}
+                  {#if sensorStation.pictures}
+                    {#each sensorStation?.pictures as picturePromise}
+                      {#await picturePromise}
+                        <Spinner fill="fill-primary" />
+                      {:then picture}
+                        <div>
+                          <!-- svelte-ignore a11y-click-events-have-key-events -->
+                          <img
+                            on:click={() => {
+                              selectedPicture = picture.imageRef;
+                              pictureModal = true;
+                            }}
+                            src={picture.imageRef}
+                            alt="SensorStation"
+                            class="rounded-2xl shadow-xl cursor-pointer"
+                          />
+                          <h1 class="flex justify-center">
+                            {picture.creationDate.toDateString()}
+                          </h1>
+                        </div>
+                      {:catch error}
+                        <h1>Error: {error.message}</h1>
+                      {/await}
+                    {/each}
+                  {/if}
                 </div>
               {:else}
                 <h1>No pictures available yet.</h1>

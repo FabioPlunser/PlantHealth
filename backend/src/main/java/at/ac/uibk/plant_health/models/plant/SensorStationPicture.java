@@ -23,7 +23,6 @@ public class SensorStationPicture {
 	@Id
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@JsonIgnore
 	@Column(name = "picture_id", nullable = false)
 	private UUID pictureId;
 

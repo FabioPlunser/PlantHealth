@@ -99,26 +99,24 @@ export async function load({ locals, fetch, cookies }) {
     for (let possiblePicture of res.pictures) {
       logger.info("get-sensor-station-picture", { possiblePicture });
       let picturePromise = new Promise(async (resolve, reject) => {
-        let res = await fetch(
+        let pictureResponse = await fetch(
           `${BACKEND_URL}/get-sensor-station-picture?pictureId=${possiblePicture.pictureId}`
         );
-        if (!res.ok) {
-          reject(res.statusText);
-          throw new Error(res.statusText);
+
+        if (!pictureResponse.ok) {
+          reject(pictureResponse.statusText);
         }
-        res = await res.blob();
-        let file = new File([res], "image", { type: res.type });
-        let arrayBuffer = await res.arrayBuffer();
+        let blob = await pictureResponse.blob();
+        let arrayBuffer = await blob.arrayBuffer();
         let buffer = Buffer.from(arrayBuffer);
         let encodedImage =
           "data:image/" + res.type + ";base64," + buffer.toString("base64");
         let picture: Picture = {
-          imageRef: "",
-          creationDate: new Date(),
+          imageRef: encodedImage,
+          creationDate: new Date(possiblePicture.timeStamp),
+          pictureId: possiblePicture.pictureId,
         };
-        picture.imageRef = encodedImage;
-        picture.creationDate = new Date(possiblePicture.timeStamp);
-        picture.pictureId = possiblePicture.pictureId;
+
         resolve(picture);
       });
 

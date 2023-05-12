@@ -3,7 +3,12 @@ import { logger } from "$helper/logger";
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 import { toasts } from "$stores/toastStore";
-import { apSensorStations } from "../../../../../lib/stores/apSensorStations";
+
+interface _SensorStation extends SensorStation {
+  data: Promise<any>;
+  pictures: Promise<any>[];
+  [key: string]: any;
+}
 
 export async function load({ fetch, depends, cookies }) {
   let cookieFrom = cookies.get("from") || "";
@@ -11,7 +16,6 @@ export async function load({ fetch, depends, cookies }) {
 
   let from: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   let to: Date = new Date(Date.now());
-
   // if cookies are set overwrite the dates
   if (cookieFrom !== "" || cookieTo !== "") {
     from = new Date(cookieFrom);
@@ -30,8 +34,8 @@ export async function load({ fetch, depends, cookies }) {
     throw error(res.status, "Could not get sensor station");
   }
 
-  let sensorStation = await res.json();
-  sensorStation = sensorStation.sensorStation;
+  let data = await res.json();
+  let sensorStation: _SensorStation = data.sensorStation;
   //-------------------------------------------------------------------------------------------------------------------------
   //-------------------------------------------------------------------------------------------------------------------------
   sensorStation.data = new Promise(async (resolve, reject) => {
@@ -42,7 +46,15 @@ export async function load({ fetch, depends, cookies }) {
         to.toISOString().split(".")[0]
       }`
     );
-    if (res.status != 200) {
+    console.log(res);
+    logger.info(
+      "Get sensor-station-data " +
+        "from: " +
+        JSON.stringify(from) +
+        " to: " +
+        JSON.stringify(to)
+    );
+    if (!res.ok) {
       resolve(null);
     }
     res = await res.json();
@@ -50,30 +62,31 @@ export async function load({ fetch, depends, cookies }) {
   });
   //-------------------------------------------------------------------------------------------------------------------------
   //-------------------------------------------------------------------------------------------------------------------------
+
   sensorStation.pictures = [];
   for (let possiblePicture of sensorStation.sensorStationPictures) {
-    let picturePromise = new Promise(async (resolve, reject) => {
-      let res = await fetch(
+    let picturePromise = new Promise<any>(async (resolve, reject) => {
+      let pictureResponse = await fetch(
         `${BACKEND_URL}/get-sensor-station-picture?pictureId=${possiblePicture.pictureId}`
       );
-      if (!res.ok) {
-        reject(res.statusText);
-        throw new Error(res.statusText);
+
+      if (!pictureResponse.ok) {
+        reject(pictureResponse.statusText);
       }
-      let blob: BlobPart = await res.blob();
-      let file = new File([blob], "image", { type: res.type });
-      let arrayBuffer = await res.arrayBuffer();
+
+      let blob = await pictureResponse.blob();
+      let arrayBuffer = await blob.arrayBuffer();
       let buffer = Buffer.from(arrayBuffer);
       let encodedImage =
         "data:image/" + res.type + ";base64," + buffer.toString("base64");
-      let picture: Typed = {
+      let picture: Picture = {
+        pictureId: possiblePicture.pictureId,
         imageRef: encodedImage,
         creationDate: new Date(possiblePicture.timeStamp),
       };
-      picture.pictureId = possiblePicture.pictureId;
       resolve(picture);
-      sensorStation.pictures.push(picture);
     });
+    sensorStation.pictures.push(picturePromise);
   }
   //-------------------------------------------------------------------------------------------------------------------------
   //-------------------------------------------------------------------------------------------------------------------------
@@ -296,21 +309,24 @@ export const actions = {
     let _from = formData.get("from");
     let _to = formData.get("to");
 
-    _from = new Date(_from);
-    _to = new Date(_to);
-    _from.setHours(0);
-    _from.setMinutes(0);
-    _from.setSeconds(0);
+    if (_from == null || _to == null) {
+      return;
+    }
+    let newFrom = new Date(_from.toString());
+    let newTo = new Date(_to.toString());
+    newFrom.setHours(0);
+    newFrom.setMinutes(0);
+    newFrom.setSeconds(0);
 
-    _to.setHours(23);
-    _to.setMinutes(59);
-    _to.setSeconds(59);
+    newTo.setHours(23);
+    newTo.setMinutes(59);
+    newTo.setSeconds(59);
 
     logger.info("UpdateFromTo");
     logger.info("from" + JSON.stringify(_from));
     logger.info("to" + JSON.stringify(_to));
 
-    cookies.set("from", _from, { path: "/" });
-    cookies.set("to", _to, { path: "/" });
+    cookies.set("from", JSON.stringify(newFrom), { path: "/" });
+    cookies.set("to", JSON.stringify(newTo), { path: "/" });
   },
 };

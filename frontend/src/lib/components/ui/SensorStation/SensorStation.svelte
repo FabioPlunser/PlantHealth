@@ -8,7 +8,7 @@
   import Graphs from "$components/graph/Graphs.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
   import DateInput from "$components/datepicker/DateInput.svelte";
-  import PictureModal from "../BigPictureModal.svelte";
+  import BigPictureModal from "$components/ui/BigPictureModal.svelte";
   // ---------------------------------------------------
   // ---------------------------------------------------
   let rendered = false;
@@ -40,7 +40,7 @@
   let selectedPicture = "";
 </script>
 
-<PictureModal
+<BigPictureModal
   on:close={() => (openPictureModal = false)}
   imageRef={selectedPicture}
   open={openPictureModal}
@@ -173,7 +173,7 @@
                               }}
                               src={data.imageRef}
                               alt="SensorStationPicture"
-                              class="rounded-2xl shadow-xl cursor-pointer"
+                              class="rounded-2xl shadow-xl cursor-pointer w-64"
                             />
                             <h1 class="flex justify-center">
                               {data.creationDate.toLocaleDateString()}
