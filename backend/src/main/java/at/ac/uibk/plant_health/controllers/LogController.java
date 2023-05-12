@@ -17,11 +17,17 @@ public class LogController {
 	private LogService logService;
 
 	@AnyPermission(Permission.ADMIN)
-	@GetMapping("/get-logs")
+	@GetMapping("/get-logs-between")
 	public RestResponseEntity getLogs(
 			@RequestParam("start") final LocalDateTime start,
 			@RequestParam("end") final LocalDateTime end
 	) {
 		return new LogResponse(logService.findBetween(start, end)).toEntity();
+	}
+
+	@AnyPermission(Permission.ADMIN)
+	@GetMapping("/get-logs")
+	public RestResponseEntity getLogs() {
+		return new LogResponse(logService.findAll()).toEntity();
 	}
 }
