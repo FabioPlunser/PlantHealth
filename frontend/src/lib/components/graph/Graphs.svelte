@@ -4,7 +4,7 @@
   import { createGraphData } from "$components/graph/helper";
   // ---------------------------------------------------
   // ---------------------------------------------------
-  import { Graph, Graphs } from "$lib/components/graph";
+  import Line from "./Line.svelte";
   import MediaQuery from "$helper/MediaQuery.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
   // ---------------------------------------------------
@@ -97,7 +97,7 @@ Usage example:
       {:else}
         <MediaQuery query="(width <= 640px)" let:matches>
           {#key matches}
-            <Graph data={graphData?.[currentSensor]} {options} />
+            <Line data={graphData?.[currentSensor]} {options} />
           {/key}
         </MediaQuery>
       {/if}
