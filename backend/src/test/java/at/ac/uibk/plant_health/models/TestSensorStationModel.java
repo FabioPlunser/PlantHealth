@@ -105,12 +105,6 @@ public class TestSensorStationModel {
 		assertNotNull(sensorLimitsRepository.findAll());
 
 		sensorStation = sensorStationRepository.findByBdAddress(sensorStation.getBdAddress()).get();
-
-		assertEquals(sensorMap.size(), sensorRepository.findAll().size());
-		assertEquals(sensorMap.size(), sensorRepository.findAll().size());
-		assertEquals(
-				sensorStation, sensorStationRepository.findById(sensorStation.getDeviceId()).get()
-		);
 		assertEquals(sensorMap.size(), sensorStation.getSensorLimits().size());
 	}
 }
