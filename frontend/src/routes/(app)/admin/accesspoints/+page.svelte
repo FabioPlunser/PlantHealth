@@ -46,9 +46,9 @@
 </script>
 
 {#if rendered}
-  <section class="mt-14">
-    {#if accessPoints}
-      <div class="flex justify-center mx-auto">
+  <section class="h-full">
+    {#if accessPoints.length > 0}
+      <div class="flex justify-center mx-auto h-full">
         <div class="grid grid-rows md:grid-cols-2 gap-4 xl:grid-cols-3">
           {#each accessPoints as accessPoint, i (accessPoint.accessPointId)}
             <form
@@ -173,7 +173,7 @@
         </div>
       </div>
     {:else}
-      <div class="flex justify-center">
+      <div class="flex justify-center h-screen">
         <h1 class="text-2xl font-bold">No Access Points found</h1>
       </div>
     {/if}

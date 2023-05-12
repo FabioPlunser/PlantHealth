@@ -1,7 +1,7 @@
 import type { Handle, HandleFetch, HandleServerError } from "@sveltejs/kit";
 import { redirect, error } from "@sveltejs/kit";
 import { logger } from "$helper/logger";
-import { v4 as uuidv4 } from "uuid";
+
 /**
  * @type {Handle}
  * Check if user is logged in and has the correct permissions
@@ -81,8 +81,8 @@ export const handleFetch = (({ event, request, fetch }) => {
   return fetch(request);
 }) satisfies HandleFetch;
 
-export const handleError = (({ event, error }) => {
-  logger.error("HandleError Event: " + JSON.stringify(event));
-  logger.error("HandleError Error: " + JSON.stringify(error));
-  return error;
-}) satisfies HandleServerError;
+// export const handleError = (({ event, error }) => {
+//   logger.error("HandleError Event: " + JSON.stringify(event));
+//   logger.error("HandleError Error: " + JSON.stringify(error));
+
+// }) satisfies HandleServerError;

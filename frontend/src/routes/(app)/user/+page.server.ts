@@ -68,9 +68,9 @@ export async function load({ locals, fetch, cookies }) {
   }
 
   // fetch dashboard data
-  let dashboard: Dashboard = await fetch(`${BACKEND_URL}/get-dashboard`);
+  let dashboard: Dashboard = await fetch(`${BACKEND_URL}/get-dashboard-data`);
   dashboard = await dashboard.json();
-  logger.info("get-dashboard", { dashboard });
+  logger.info("get-dashboard-data", { dashboard });
 
   for (let sensorStation of dashboard.sensorStations) {
     logger.info("get-sensor-station-data", { sensorStation });
