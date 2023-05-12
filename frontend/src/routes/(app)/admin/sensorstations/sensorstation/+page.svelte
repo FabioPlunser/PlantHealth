@@ -183,8 +183,55 @@
               <form
                 method="POST"
                 action="?/updateFromTo"
-                use:enhance={customEnhance}
-              />
+                use:enhance={() => {
+                  return async ({ update }) => {
+                    await update({ reset: false });
+                  };
+                }}
+              >
+                <div
+                  class="justify-start grid grid-rows sm:flex items-center gap-2"
+                >
+                  <div class="flex gap-2">
+                    <label class="my-auto">
+                      From:
+                      <input
+                        type="hidden"
+                        name="from"
+                        bind:value={newDates.from}
+                      />
+                      {#key sensorStation}
+                        <DateInput
+                          format="dd.MM.yyyy"
+                          placeholder={dateNow}
+                          bind:value={newDates.from}
+                        />
+                      {/key}
+                    </label>
+                  </div>
+                  <div class="flex gap-2">
+                    <label class="my-auto">
+                      To:
+                      <input type="hidden" name="to" bind:value={newDates.to} />
+                      {#key sensorStation}
+                        <DateInput
+                          format="dd.MM.yyyy"
+                          placeholder={dateNow}
+                          bind:value={newDates.to}
+                        />
+                      {/key}
+                    </label>
+                  </div>
+                  <div class="my-auto flex items-center justify-center mt-6">
+                    <button
+                      class="btn btn-primary flex items-center justify-center"
+                      type="submit"
+                    >
+                      Update
+                    </button>
+                  </div>
+                </div>
+              </form>
             </div>
           {/if}
 
@@ -214,44 +261,6 @@
               </div>
             </div>
 
-            <div
-              class="justify-start grid grid-rows sm:flex items-center gap-2"
-            >
-              <div class="flex gap-2">
-                <label class="my-auto">
-                  From:
-                  <input type="hidden" name="from" bind:value={newDates.from} />
-                  {#key sensorStation}
-                    <DateInput
-                      format="dd.MM.yyyy"
-                      placeholder={dateNow}
-                      bind:value={newDates.from}
-                    />
-                  {/key}
-                </label>
-              </div>
-              <div class="flex gap-2">
-                <label class="my-auto">
-                  To:
-                  <input type="hidden" name="to" bind:value={newDates.to} />
-                  {#key sensorStation}
-                    <DateInput
-                      format="dd.MM.yyyy"
-                      placeholder={dateNow}
-                      bind:value={newDates.to}
-                    />
-                  {/key}
-                </label>
-              </div>
-              <div class="my-auto flex items-center justify-center mt-6">
-                <button
-                  class="btn btn-primary flex items-center justify-center"
-                  type="submit"
-                >
-                  Update
-                </button>
-              </div>
-            </div>
             <div
               class="divider mt-2 dark:bg-white bg-black h-[2px] rounded-xl"
             />

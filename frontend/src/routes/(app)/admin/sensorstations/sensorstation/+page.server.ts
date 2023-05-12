@@ -17,6 +17,8 @@ export async function load({ fetch, depends, cookies }) {
   let from: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   let to: Date = new Date(Date.now());
   // if cookies are set overwrite the dates
+  console.log("cookieFrom: ", cookieFrom);
+  console.log("cookieTo: ", cookieTo);
   if (cookieFrom !== "" || cookieTo !== "") {
     from = new Date(cookieFrom);
     to = new Date(cookieTo);
@@ -46,7 +48,6 @@ export async function load({ fetch, depends, cookies }) {
         to.toISOString().split(".")[0]
       }`
     );
-    console.log(res);
     logger.info(
       "Get sensor-station-data " +
         "from: " +
@@ -314,19 +315,19 @@ export const actions = {
     }
     let newFrom = new Date(_from.toString());
     let newTo = new Date(_to.toString());
+    console.log(newTo);
+
     newFrom.setHours(0);
     newFrom.setMinutes(0);
     newFrom.setSeconds(0);
 
-    newTo.setHours(23);
-    newTo.setMinutes(59);
-    newTo.setSeconds(59);
+    newTo.setDate(newTo.getDate() + 1);
 
     logger.info("UpdateFromTo");
     logger.info("from" + JSON.stringify(_from));
     logger.info("to" + JSON.stringify(_to));
 
-    cookies.set("from", JSON.stringify(newFrom), { path: "/" });
-    cookies.set("to", JSON.stringify(newTo), { path: "/" });
+    cookies.set("from", newFrom.toISOString(), { path: "/" });
+    cookies.set("to", newTo.toISOString(), { path: "/" });
   },
 };
