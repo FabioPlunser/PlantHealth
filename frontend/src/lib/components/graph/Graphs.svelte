@@ -4,10 +4,9 @@
   import { createGraphData } from "$components/graph/helper";
   // ---------------------------------------------------
   // ---------------------------------------------------
-  import Graph from "./graph.svelte";
+  import Graph from "$components/graph/Graph.svelte";
   import MediaQuery from "$helper/MediaQuery.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
-  import { onMount } from "svelte";
   // ---------------------------------------------------
   // ---------------------------------------------------
   export let data: any;
@@ -73,7 +72,6 @@
     addMissingSensors(data);
     graphData = createGraphData(data);
   }
-
   // ---------------------------------------------------
   // ---------------------------------------------------
 </script>

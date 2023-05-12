@@ -9,9 +9,11 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "checkHuman": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --output human > check.log",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "docker": "BACKEND_URL=http://spring:8080 vite preview --host 0.0.0.0 --port 3000",
     "lint": "eslint ."
   },
   "devDependencies": {
+    "@poppanator/sveltekit-svg": "^3.0.0",
     "@sveltejs/adapter-auto": "2.0.0",
     "@sveltejs/adapter-node": "^1.2.3",
     "@sveltejs/kit": "1.15.2",
@@ -43,6 +45,5 @@
   },
   "type": "module",
   "dependencies": {
-    "@poppanator/sveltekit-svg": "^3.0.0"
   }
 }

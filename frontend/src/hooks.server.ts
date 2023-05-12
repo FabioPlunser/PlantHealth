@@ -8,9 +8,9 @@ import { logger } from "$helper/logger";
  * Redirect to home if logged in but does not have the correct permissions
  * Add user to event.locals
  */
-export const handle = (async ({ event, resolve, request, locals }) => {
+export const handle = (async ({ event, resolve }) => {
   //logger.info("Handle Event: " + JSON.stringify(event));
-  logger.info("Handle request: " + JSON.stringify(request));
+  logger.info("Handle request: " + JSON.stringify(event.request));
 
   const { cookies } = event;
   let token = cookies.get("token");

@@ -3,7 +3,6 @@ import { error, fail } from "@sveltejs/kit";
 import { logger } from "$helper/logger";
 import { z } from "zod";
 import { toasts } from "$lib/stores/toastStore";
-import { addToast } from "../../../../lib/components/toast_old/addToToastStore";
 
 // TODO: add validation and error handling (toast messages)
 /**
@@ -15,7 +14,7 @@ import { addToast } from "../../../../lib/components/toast_old/addToToastStore";
  * "/admin/accesspoints" page. The "sensorStations" property is an array of sensor station objects
  * obtained from a fetch request to the backend API.
  */
-export async function load({ locals, fetch, request, depends, url }) {
+export async function load({ fetch, request, depends, url }) {
   let referer = request.headers.get("referer");
   let origin = url.origin;
   let fromAccessPoints = false;
