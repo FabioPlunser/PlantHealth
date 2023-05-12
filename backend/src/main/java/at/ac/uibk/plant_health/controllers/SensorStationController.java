@@ -278,4 +278,23 @@ public class SensorStationController {
 				.message("Delete all pictures of SensorStation " + sensorStationId)
 				.toEntity();
 	}
+
+	@AnyPermission({Permission.ADMIN})
+	@WriteOperation
+	@DeleteMapping("/delete-sensor-station")
+	public RestResponseEntity deleteSensorStation(@RequestParam("sensorStationId") final UUID sensorStationId) {
+		try {
+			sensorStationService.deleteSensorStation(sensorStationId);
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
+
+		return MessageResponse.builder()
+				.statusCode(200)
+				.message("Deleted SensorStation " + sensorStationId)
+				.toEntity();
+	}
 }

@@ -24,7 +24,7 @@ type QrCodePdfData = {
  * Generates a QR code PDF for the given request event.
  *
  * @param {RequestEvent} event The request event containing query parameters.
- * @returns {Promise<Response>} A response with the generated PDF blob as content.
+ * @returns {Promise<Response>} A response with the generated PDF buffer as content.
  */
 export async function GET({ url }: RequestEvent) {
   const sensorStationId = url.searchParams.get("sensorStationId") ?? "";
@@ -47,10 +47,11 @@ export async function GET({ url }: RequestEvent) {
     url: URL,
   };
 
-  let pdfBlob = generateQrCodePdfBlob(data);
+  let pdfBuffer = await generateQrCodePdfBuffer(data);
 
   let responseHeaders = new Headers();
   responseHeaders.append("Content-Type", "application/pdf");
+  responseHeaders.append("Content-Length", pdfBuffer.length.toString());
   responseHeaders.append(
     "Content-Disposition",
     `attachment; filename="qr_code_${sensorStationId}.pdf"`
@@ -62,16 +63,16 @@ export async function GET({ url }: RequestEvent) {
     headers: responseHeaders,
   };
 
-  return new Response(pdfBlob, responseOptions);
+  return new Response(pdfBuffer, responseOptions);
 }
 
 /**
  * Generates a QR code PDF blob for the given QR code PDF data.
  *
  * @param {QrCodePdfData} data The QR code PDF data to generate a blob for.
- * @returns {Blob} The generated PDF blob.
+ * @returns {Buffer} The generated PDF buffer.
  */
-function generateQrCodePdfBlob(data: QrCodePdfData): Blob {
+async function generateQrCodePdfBuffer(data: QrCodePdfData): Promise<Buffer> {
   let pdf = new jsPDF("portrait", "mm", "A6");
   pdf.addMetadata("Page Size", "A6");
 
@@ -95,7 +96,7 @@ function generateQrCodePdfBlob(data: QrCodePdfData): Blob {
   pdf.setFontSize(6);
   pdf.text(idString, center(pdf, pdf.getTextWidth(idString)), 135);
 
-  return pdf.output("blob");
+  return Buffer.from(pdf.output("arraybuffer"));
 }
 
 /**

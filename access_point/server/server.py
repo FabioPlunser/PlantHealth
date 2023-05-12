@@ -118,7 +118,7 @@ class Server:
         # check status code
         if response.status_code in self._LOCKED_STATUS_CODES:
             self.token = None
-        elif not response.ok:
+        elif not response.status_code == 200:
             raise ConnectionError(describe_not_ok_response(response))
         else:    
             # get content
@@ -167,7 +167,7 @@ class Server:
         # check status code
         if response.status_code in self._LOCKED_STATUS_CODES:
             self.token = None
-        elif not response.ok:
+        elif not response.status_code == 200:
             raise ConnectionError(describe_not_ok_response(response))
         
         # get content
@@ -197,7 +197,7 @@ class Server:
                     sensor['sensor_name'] = raw_sensor['sensorName']
                     sensor['lower_limit'] = raw_sensor['limits']['lowerLimit']
                     sensor['upper_limit'] = raw_sensor['limits']['upperLimit']
-                    sensor['alarm_tripping_time'] = raw_sensor['thresholdTime']
+                    sensor['alarm_tripping_time'] = raw_sensor['alarmThresholdTime']
                     sensor_station['sensors'].append(sensor)
                 sensor_stations.append(sensor_station)
             except (ValueError, KeyError, TypeError):
@@ -262,7 +262,7 @@ class Server:
         
         if response.status_code in self._LOCKED_STATUS_CODES:
             self.token = None
-        elif not response.ok:
+        elif not response.status_code == 200:
             raise ConnectionError(describe_not_ok_response(response))
 
     def report_found_sensor_station(self, sensor_stations: list[dict[str, Union[str, int]]]) -> None:
@@ -292,5 +292,5 @@ class Server:
         # check status code
         if response.status_code in self._LOCKED_STATUS_CODES:
             self.token = None
-        elif not response.ok:
+        elif not response.status_code == 200:
             raise ConnectionError(describe_not_ok_response(response))

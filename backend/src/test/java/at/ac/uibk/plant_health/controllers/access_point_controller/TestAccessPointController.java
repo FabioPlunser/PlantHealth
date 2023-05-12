@@ -362,4 +362,36 @@ public class TestAccessPointController {
 		assertEquals(sensorMap.size() * sensorStationsCount, sensorDataRepository.findAll().size());
 		assertEquals(sensorMap.size(), sensorRepository.findAll().size());
 	}
+
+	@Test
+	void deleteAccessPoint() throws Exception {
+		Person person = createUserAndLogin(true);
+		// access point registers
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
+
+		// one sensor station assigned
+		String bdAddress = StringGenerator.macAddress();
+		SensorStation sensorStation = new SensorStation(bdAddress, 4);
+		sensorStation.setAccessPoint(accessPoint);
+		sensorStationService.save(sensorStation);
+
+		// run request
+		mockMvc.perform(MockMvcRequestBuilders.delete("/delete-access-point")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("accessPointId", String.valueOf(accessPoint.getDeviceId()))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
+
+		// check if access point is removed
+		assertTrue(accessPointService.findById(accessPoint.getDeviceId()).isDeleted());
+		assertNull(accessPointService.findById(accessPoint.getDeviceId()).getSelfAssignedId());
+
+		// check if assigned sensor station is also deleted
+		assertTrue(sensorStationService.findById(sensorStation.getDeviceId()).isDeleted());
+	}
 }

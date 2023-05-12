@@ -265,6 +265,11 @@ public class TestSensorStationController {
 		SensorStation sensorStation = new SensorStation(bdAddress, 4);
 		sensorStation.setUnlocked(true);
 		sensorStationService.save(sensorStation);
+		// add other sensor station to check that only limits of the selected sensor station are
+		// changed
+		String otherBdAddress = StringGenerator.macAddress();
+		SensorStation otherSensorStation = new SensorStation(otherBdAddress, 5);
+		sensorStationService.save(otherSensorStation);
 
 		// precondition sensorStation has at least one sensor
 		Map<String, String> sensorMap = new HashMap<>();
@@ -313,7 +318,76 @@ public class TestSensorStationController {
 			fail("SensorStation not found");
 		}
 		sensorStation = maybeSensorStation.get();
-		assertEquals(limits.size(), sensorStation.getSensorLimits().size());
+		assertEquals(sensorMap.size(), sensorStation.getSensorLimits().size());
+
+		// check other sensor station
+		maybeSensorStation = sensorStationRepository.findById(otherSensorStation.getDeviceId());
+		if (maybeSensorStation.isEmpty()) {
+			fail("Other SensorStation not found");
+		}
+		otherSensorStation = maybeSensorStation.get();
+		assertEquals(0, otherSensorStation.getSensorLimits().size());
+	}
+
+	@Test
+	void setSingleSensorLimitAdmin() throws Exception {
+		Person person = createUserAndLogin(true, false);
+		// precondition accessPoint has found and reported at least one sensor station
+		String bdAddress = StringGenerator.macAddress();
+		SensorStation sensorStation = new SensorStation(bdAddress, 4);
+		sensorStationService.save(sensorStation);
+
+		// precondition sensorStation has at least one sensor
+		Map<String, String> sensorMap = new HashMap<>();
+		sensorMap.put("TEMPERATURE", "°C");
+		sensorMap.put("HUMIDITY", "%");
+		sensorMap.put("PRESSURE", "hPa");
+		sensorMap.put("SOILHUMIDITY", "%");
+		sensorMap.put("LIGHTINTENSITY", "lux");
+		sensorMap.put("GASPRESSURE", "ppm");
+
+		for (int i = 0; i < sensorMap.size(); i++) {
+			Sensor sensor = new Sensor(
+					sensorMap.keySet().toArray()[i].toString(),
+					sensorMap.values().toArray()[i].toString()
+			);
+			if (!sensorRepository.findAll().contains(sensor)) {
+				sensorRepository.save(sensor);
+			}
+		}
+
+		// create single limit for test request
+		ArrayNode limits = mapper.createArrayNode();
+		ObjectNode sensorJson = mapper.createObjectNode();
+		sensorJson.put("type", sensorMap.keySet().toArray()[0].toString());
+		sensorJson.put("unit", sensorMap.values().toArray()[0].toString());
+
+		ObjectNode limit = mapper.createObjectNode();
+		limit.putPOJO("sensor", sensorJson);
+		limit.put("upperLimit", rand.nextFloat());
+		limit.put("lowerLimit", rand.nextFloat());
+		limit.put("thresholdDuration", rand.nextInt(1000));
+		limits.add(limit);
+
+		// run request
+		mockMvc.perform(MockMvcRequestBuilders.post("/set-sensor-limits")
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(person))
+								.param("sensorStationId",
+									   String.valueOf(sensorStation.getDeviceId()))
+								.content(limits.toString())
+								.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
+
+		// verify that only single limit got updated
+		Optional<SensorStation> maybeSensorStation =
+				sensorStationRepository.findById(sensorStation.getDeviceId());
+		if (maybeSensorStation.isEmpty()) {
+			fail("SensorStation not found");
+		}
+		sensorStation = maybeSensorStation.get();
+		assertEquals(1, sensorStation.getSensorLimits().size());
 	}
 
 	@Test
@@ -578,5 +652,27 @@ public class TestSensorStationController {
 		}
 		sensorStation = maybeSensorStation.get();
 		assertEquals(0, sensorStation.getSensorStationPictures().size());
+	}
+
+	@Test
+	void deleteSensorStation() throws Exception {
+		Person person = createUserAndLogin(true, false);
+		// precondition accessPoint has found and reported at least one sensor station
+		String bdAddress = StringGenerator.macAddress();
+		SensorStation sensorStation = new SensorStation(bdAddress, 4);
+		sensorStationService.save(sensorStation);
+
+		// run request
+		mockMvc.perform(MockMvcRequestBuilders.delete("/delete-sensor-station")
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(person))
+								.param("sensorStationId",
+										String.valueOf(sensorStation.getDeviceId())))
+				.andExpectAll(status().isOk());
+
+		// check if sensor station is removed
+		assertTrue(sensorStationService.findById(sensorStation.getDeviceId()).isDeleted());
+		assertNull(sensorStationService.findById(sensorStation.getDeviceId()).getBdAddress());
 	}
 }
