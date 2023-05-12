@@ -17,12 +17,12 @@ export const logger = createLogger({
       filename: "logs/error.log",
       level: "error",
       maxsize: 5242880,
-      maxFiles: 5,
+      maxFiles: 1,
     }),
     new transports.File({
       filename: "logs/all.log",
       maxsize: 5242880,
-      maxFiles: 5,
+      maxFiles: 1,
     }),
   ],
 });
