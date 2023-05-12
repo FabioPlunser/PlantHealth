@@ -115,7 +115,7 @@
         <div class="flex">
           <div class="mx-auto">
             <a
-              href={`http://localhost:3000/api/get-sensor-station-qr-code?sensorStationId=${sensorStation.sensorStationId}&roomName=${sensorStation.roomName}&plantName=${sensorStation.name}`}
+              href={`/api/get-sensor-station-qr-code?sensorStationId=${sensorStation.sensorStationId}&roomName=${sensorStation.roomName}&plantName=${sensorStation.name}`}
             >
               <i class="bi bi-qr-code-scan text-4xl" />
             </a>

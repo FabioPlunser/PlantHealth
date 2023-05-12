@@ -4,7 +4,7 @@
   import { createGraphData } from "$components/graph/helper";
   // ---------------------------------------------------
   // ---------------------------------------------------
-  import Graph from "$components/graph/Graph.svelte";
+  import Graph from "$components/graph/graph.svelte";
   import MediaQuery from "$helper/MediaQuery.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
   // ---------------------------------------------------

@@ -98,7 +98,7 @@
   on:keydown={keydown}
 >
   <input
-    class="input bg-gray-700 input-bordered max-w-sm text-white"
+    class="input input-bordered w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black caret-red-200"
     class:invalid={!valid}
     type="text"
     value={text}
