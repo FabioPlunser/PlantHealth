@@ -53,6 +53,20 @@ If the Profile `test` is specified, then an `Adminer`-Instance is started that c
 
 - Sensorstation
     The Sensorstation is an Arduino 33 BLE that is programmed using [Platform IO](https://platformio.org/).
+	
+## Setup instructions for acceptance test
+
+### Frontend + Backend
+
+TODO
+
+### Accesspoint
+
+TODO
+
+### Sensorstation
+
+TODO
 
 ## License
 
