@@ -27,7 +27,7 @@ class Config(object):
     ATTRIBUTES_NO_FILESAVE = [
                     'filename',
                     'scan_active',
-                    'last_collect_data'
+                    'last_data_collect'
                 ]
 
     def __init__(self, filename: str) -> None:

@@ -27,7 +27,7 @@ SERVICES =[MockGATTService('dea07cc4-d084-11ed-a760-325096b39f47',  # sensor sta
                            [MockGATTCharacteristic('2a6f', int(200).to_bytes(2, BYTEORDER)),
                             MockGATTCharacteristic('2a9a', int(1).to_bytes(1, BYTEORDER))]),
            MockGATTService('dea07cc4-d084-11ed-a760-325096b39f4b',  # air pressure
-                           [MockGATTCharacteristic('2a6d', int(30).to_bytes(4, BYTEORDER)),
+                           [MockGATTCharacteristic('2a6d', int(3000).to_bytes(4, BYTEORDER)),
                             MockGATTCharacteristic('2a9a', int(1).to_bytes(1, BYTEORDER))]),
            MockGATTService('dea07cc4-d084-11ed-a760-325096b39f4c',  # temperature
                            [MockGATTCharacteristic('2b0d', int(8).to_bytes(1, BYTEORDER, signed=True)),
