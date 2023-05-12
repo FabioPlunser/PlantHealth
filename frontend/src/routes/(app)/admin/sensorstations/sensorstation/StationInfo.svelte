@@ -15,7 +15,7 @@
 <form method="post" use:enhance>
   <div class="float margin-right text-2xl">
     <input
-      type="text"
+      type="hidden"
       name="sensorStationId"
       value={sensorStation.sensorStationId}
     />
