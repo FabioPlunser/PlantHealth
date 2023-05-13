@@ -408,20 +408,40 @@
                       {#await picturePromise}
                         <Spinner fill="fill-primary" />
                       {:then picture}
-                        <div>
-                          <!-- svelte-ignore a11y-click-events-have-key-events -->
-                          <img
-                            on:click={() => {
-                              selectedPicture = picture.imageRef;
-                              pictureModal = true;
-                            }}
-                            src={picture.imageRef}
-                            alt="SensorStation"
-                            class="rounded-2xl shadow-xl cursor-pointer"
-                          />
-                          <h1 class="flex justify-center">
-                            {picture.creationDate.toDateString()}
-                          </h1>
+                        <div class="relative">
+                          <div class="absolute top-0 right-0 m-4">
+                            <form method="post">
+                              <input type="hidden" value={picture.}>
+                              <button
+                                type="submit"
+                                on:click={() => {
+                                  confirm(
+                                    `You will delete this image permanently!`
+                                  );
+                                }}
+                                formaction="?/delete-picture"
+                              >
+                                <i
+                                  class="bi bi-trash text-4xl text-gray-400 hover:text-red-500"
+                                />
+                              </button>
+                            </form>
+                          </div>
+                          <div class="justify-center">
+                            <!-- svelte-ignore a11y-click-events-have-key-events -->
+                            <img
+                              on:click={() => {
+                                selectedPicture = picture.imageRef;
+                                pictureModal = true;
+                              }}
+                              src={picture.imageRef}
+                              alt="SensorStation"
+                              class="rounded-2xl shadow-xl cursor-pointer"
+                            />
+                            <h1 class="flex justify-center">
+                              {picture.creationDate.toDateString()}
+                            </h1>
+                          </div>
                         </div>
                       {:catch error}
                         <h1>Error: {error.message}</h1>
