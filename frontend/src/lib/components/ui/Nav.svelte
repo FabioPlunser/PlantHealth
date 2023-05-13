@@ -121,12 +121,12 @@ Usage:
           >
             <!-- <a> -->
             <div class="cursor-pointer">
-              <div class="avatar flex-items-center mt-5">
+              <div class="avatar flex items-center justify-center mt-5">
                 <div class="w-12 rounded-full bg-base-300 p-2">
                   <img alt="Avatar" src={Logo} />
                 </div>
               </div>
-              <h1 class="-mt-2 flex justify-center">{user}</h1>
+              <h1 class=" flex justify-center">{user}</h1>
             </div>
             <!-- </a> -->
             {#if profile && user != "GUEST"}

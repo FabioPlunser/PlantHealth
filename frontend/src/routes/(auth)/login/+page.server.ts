@@ -24,8 +24,8 @@ const schema = z.object({
 `login` function is an asynchronous function that takes an object with three parameters: `cookies`,
 `request`, and `fetch`. */
 export const actions = {
-  login: async ({ cookies, request, fetch, locals }) => {
-    const formData = await request.formData();
+  login: async (event) => {
+    const formData = await event.request.formData();
     const zodData = schema.safeParse(Object.fromEntries(formData));
 
     if (!zodData.success) {
@@ -45,31 +45,33 @@ export const actions = {
       body: formData,
     };
 
-    let res = await fetch(`${BACKEND_URL}/login`, requestOptions);
+    let res = await event.fetch(`${BACKEND_URL}/login`, requestOptions);
 
-    if (res.status >= 200 && res.status < 300) {
-      res = await res.json();
-      logger.info(`User ${formData.get("username")} logged in`);
-      cookies.set(
-        "token",
-        JSON.stringify({
-          token: res.token,
-          username: formData.get("username"),
-          permissions: res.permissions,
-          personId: res.personId,
-        })
-      );
-      locals.user = {
-        token: res.token,
-        username: formData.get("username"),
-        permissions: res.permissions,
-        personId: res.personId,
-      };
-      throw redirect(302, "/");
-    } else {
-      res = await res.json();
-      logger.error(`User ${formData.get("username")} failed to log in`);
-      return fail(401, { message: res.message });
+    if (!res.ok) {
+      console.log(res);
+      logger.error(`Error while logging in: ${res.status} ${res.statusText}`);
+      return fail(500, { message: "Error while logging in" });
     }
+
+    let data = await res.json();
+
+    let username = formData.get("username") || "";
+    let newUser: User = {
+      personId: data.personId,
+      username: username.toString(),
+      permissions: data.permissions,
+      token: data.token,
+    };
+
+    event.locals.user = newUser;
+    toasts.addToast(
+      event.locals.user.personId,
+      "sueccess",
+      `User ${username.toString()} logged in`
+    );
+    event.cookies.set("token", JSON.stringify(event.locals.user));
+    console.log("Login", event.cookies.get("token"));
+    logger.info(`User: ${JSON.stringify(newUser)} loggedIn redirect`);
+    throw redirect(307, "/");
   },
 } satisfies Actions;

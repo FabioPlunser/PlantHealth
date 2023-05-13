@@ -2,7 +2,9 @@
 // for information about these interfaces
 // and what to do when importing types
 declare namespace App {
-  // interface Locals {}
+  interface Locals {
+    user?: User;
+  }
   // interface PageData {}
   // interface Platform {}
   // interface PrivateEnv {}
@@ -40,7 +42,7 @@ declare interface User {
   username: string;
   token: string;
   permissions: string[];
-  email: string;
+  [key: string]: any;
 }
 
 declare interface Typed {
