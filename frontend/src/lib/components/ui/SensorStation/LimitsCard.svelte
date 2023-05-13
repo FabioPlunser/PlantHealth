@@ -1,10 +1,10 @@
 <script lang="ts">
   import Input from "$components/ui/Input.svelte";
   import { enhance } from "$app/forms";
-  import FormError from "$lib/helper/formError.svelte";
+  import FormError from "$components/ui/formError.svelte";
   export let sensorStationId: string;
   export let limit: SensorLimit;
-  export let form;
+  export let form: any;
 </script>
 
 <div class="flex justify-center">
@@ -21,28 +21,28 @@
       </div>
       <form method="post" use:enhance>
         <input type="hidden" name="sensorStationId" value={sensorStationId} />
-        <input type="hidden" name="sensor" value={limit.sensor} />
+        <input type="hidden" name="sensor" value={limit.sensor.type} />
         <Input
           field="upperLimit"
           type="number"
           label="UpperLimit: "
           value={limit.upperLimit}
         />
-        <FormError field="upperLimit" {form} />
+        <FormError field="upperLimit" {form} id={limit.sensor.type} />
         <Input
           field="lowerLimit"
           type="number"
           label="LowerLimit: "
           value={limit.lowerLimit}
         />
-        <FormError field="lowerLimit" {form} />
+        <FormError field="lowerLimit" {form} id={limit.sensor.type} />
         <Input
           field="thresholdDuration"
           type="number"
           label="Threshold [s]:"
           value={limit.thresholdDuration}
         />
-        <FormError field="thresholdDuration" {form} />
+        <FormError field="thresholdDuration" {form} id={limit.sensor.type} />
         <div class="card-actions mx-auto justify-center mt-4">
           <button class="btn btn-primary" formaction="?/updateLimit"
             >Set Limit</button

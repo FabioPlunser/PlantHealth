@@ -155,12 +155,6 @@ export const actions = {
     );
     res = await res.json();
     logger.info("addToDashboard", { res });
-
-    let promise = new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve("done");
-      }, 2000);
-    });
   },
   /* `removeFromDashboard` is an action function that removes a sensor station from the user's
   dashboard. It receives an HTTP request object, extracts the form data submitted by the user, which

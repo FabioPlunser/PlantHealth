@@ -5,6 +5,9 @@ import { z } from "zod";
 import { logger } from "$helper/logger";
 import { toasts } from "$stores/toastStore";
 
+import { getSensorStationData } from "./getData";
+import { getSensorStationPictures } from "./getPictures";
+
 interface Dashboard {
   sensorStations: SensorStation[];
 }
@@ -23,6 +26,84 @@ export async function load(event) {
     to = new Date(cookieTo);
   }
   //---------------------------------------------------------------------
+  // get all sensor stations available to add to dashboard
+  //---------------------------------------------------------------------
+  let allSensorStations = new Promise(async (resolve, reject) => {
+    await fetch(`${BACKEND_URL}/get-sensor-stations`)
+      .then(async (res) => {
+        if (!res.ok) {
+          logger.error(
+            `Error while fetching sensor stations: ${res.status} ${res.statusText}`
+          );
+          toasts.addToast(
+            event.locals.user?.personId,
+            "error",
+            "Error while fetching sensor stations"
+          );
+          reject(null);
+        }
+        let data = await res.json();
+        let sensorStations = data.sensorStations;
+        //---------------------------------------------------------------------
+        // get newest picture for possible sensor stations
+        //---------------------------------------------------------------------
+        for (let foundSensorStation of sensorStations) {
+          foundSensorStation.newestPicture = new Promise(
+            async (resolve, reject) => {
+              await fetch(
+                `${BACKEND_URL}/get-newest-sensor-station-picture?sensorStationId=${foundSensorStation.sensorStationId}`
+              )
+                .then(async (pictureResponse) => {
+                  if (!pictureResponse.ok) {
+                    logger.error(
+                      `Error while fetching sensor station picture: ${pictureResponse.status} ${pictureResponse.statusText}`
+                    );
+                    toasts.addToast(
+                      event.locals.user?.personId,
+                      "error",
+                      "Error while fetching sensor station picture"
+                    );
+                    resolve(null);
+                  }
+                  let blob = await pictureResponse.blob();
+                  let file = new File([blob], "image", { type: blob.type });
+                  let arrayBuffer = await blob.arrayBuffer();
+                  let buffer = Buffer.from(arrayBuffer);
+                  let encodedImage =
+                    "data:image/" +
+                    blob.type +
+                    ";base64," +
+                    buffer.toString("base64");
+                  resolve(encodedImage);
+                })
+                .catch((e) => {
+                  logger.error("Error while fetching sensor station picture", {
+                    e,
+                  });
+                  toasts.addToast(
+                    event.locals.user?.personId,
+                    "error",
+                    "Error while fetching sensor station picture"
+                  );
+                  reject(null);
+                });
+            }
+          );
+        }
+        resolve(sensorStations);
+      })
+      .catch((e) => {
+        logger.error("Error while fetching sensor stations", { e });
+        toasts.addToast(
+          event.locals.user?.personId,
+          "error",
+          "Error while fetching sensor stations"
+        );
+        reject(null);
+      });
+  });
+  //---------------------------------------------------------------------
+  // get all sensor stations in dashboard or assigned to gardener
   //---------------------------------------------------------------------
   let res = await fetch(`${BACKEND_URL}/get-dashboard`);
   if (!res.ok) {
@@ -32,13 +113,17 @@ export async function load(event) {
     throw error(res.status, "Error while fetching dashboard data");
   }
   let dashboard = await res.json();
-
   //---------------------------------------------------------------------
-  // Iterate through all sensor stations and get alle pictures and data as a promise
+  //
   //---------------------------------------------------------------------
-  console.log(dashboard);
-  for (let sensorStation of dashboard.sensorStations) {
-    console.log("sensorStation", sensorStation);
+  for (let sensorStation of dashboard.addedSensorStations) {
+    getSensorStationData(event, fetch, sensorStation, from, to);
+    getSensorStationPictures(event, fetch, sensorStation);
+  }
+  //---------------------------------------------------------------------
+  // Iterate through all assigned sensor stations and get alle pictures and data as a promise
+  //---------------------------------------------------------------------
+  for (let sensorStation of dashboard.assignedSensorStations) {
     //---------------------------------------------------------------------
     // Get sensor station data
     //---------------------------------------------------------------------
@@ -51,9 +136,7 @@ export async function load(event) {
         }`
       )
         .then(async (res) => {
-          console.log("Get-sensor-station-data", res);
           let data = await res.json();
-          console.log("Get-sensor-station-data", data);
           resolve(data);
         })
         .catch((e) => {
@@ -73,9 +156,7 @@ export async function load(event) {
         `${BACKEND_URL}/get-sensor-station?sensorStationId=${sensorStation.sensorStationId}`
       )
         .then(async (res) => {
-          console.log("Get-sensor-station", res);
           let data = await res.json();
-          console.log("Get-sensor-station", data);
           resolve(data.sensorStation.sensorLimits);
         })
         .catch((e) => {
@@ -106,7 +187,6 @@ export async function load(event) {
           possiblePictures = [];
         }
         let data = await res.json();
-        console.log("SensorStationPicture", data);
         possiblePictures = data.pictureIds;
       })
       .catch((e) => {
@@ -128,7 +208,6 @@ export async function load(event) {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     for (let picture of possiblePictures) {
-      console.log("Picture", picture);
       let picturePromise = new Promise(async (resolve, reject) => {
         await fetch(`${BACKEND_URL}/get-picture?pictureId=${picture.picutreId}`)
           .then(async (res) => {
@@ -155,7 +234,6 @@ export async function load(event) {
               imageRef: encodedImage,
               creationDate: new Date(picture.creationDate),
             };
-            console.log(newPicture);
             resolve(newPicture);
           })
           .catch((e) => {
@@ -170,12 +248,14 @@ export async function load(event) {
       });
       sensorStation.pictures.push(picturePromise);
     }
-    console.log("hure");
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
   }
 
   return {
+    streamed: {
+      sensorStations: allSensorStations,
+    },
     dashboard,
     dates: {
       from,
@@ -218,7 +298,6 @@ export const actions = {
   updateSensorStation: async (event) => {
     const { request, fetch } = event;
     const formData = await request.formData();
-    console.log(formData);
     const zodData = update.safeParse({
       name: formData.get("name"),
       transferInterval: Number(formData.get("transferInterval")),
@@ -259,10 +338,8 @@ export const actions = {
       requestOptions
     )
       .then(async (res) => {
-        console.log(res);
         if (!res.ok) {
           res = await res.json();
-          console.log(res);
           logger.error("Error while updating sensor station" + String(res));
           toasts.addToast(
             event.locals.user?.personId,
@@ -289,5 +366,159 @@ export const actions = {
       });
   },
 
-  deletePicture: async (e) => {},
+  deletePicture: async (event) => {},
+
+  updateLimit: async (event) => {
+    const { request, fetch } = event;
+    const formData = await request.formData();
+    const zodData = limitsSchema.safeParse({
+      upperLimit: Number(formData.get("upperLimit")),
+      lowerLimit: Number(formData.get("lowerLimit")),
+      thresholdDuration: Number(formData.get("thresholdDuration")),
+    });
+
+    let sensorStationId: string = String(formData.get("sensorStationId"));
+    let sensor: string = String(formData.get("sensor"));
+
+    if (!zodData.success) {
+      // Loop through the errors array and create a custom errors array
+      const errors = zodData.error.errors.map((error) => {
+        return {
+          field: error.path[0],
+          message: error.message,
+        };
+      });
+
+      return fail(400, { id: sensor, error: true, errors });
+    }
+
+    let upperLimit: number = Number(formData.get("upperLimit"));
+    let lowerLimit: number = Number(formData.get("lowerLimit"));
+    let thresholdDuration: number = Number(formData.get("thresholdDuration"));
+
+    let params = new URLSearchParams();
+    params.set("sensorStationId", sensorStationId);
+
+    let requestOptions = {
+      method: "POST",
+      body: JSON.stringify([
+        {
+          upperLimit,
+          lowerLimit,
+          thresholdDuration,
+          sensor: {
+            type: sensor,
+          },
+        },
+      ]),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    await fetch(
+      `${BACKEND_URL}/update-sensor-station?${params.toString()}`,
+      requestOptions
+    )
+      .then(async (res) => {
+        if (!res.ok) {
+          res = await res.json();
+          logger.error("Error while updating limit" + String(res));
+          toasts.addToast(
+            event.locals.user?.personId,
+            "error",
+            "Error while updating limit"
+          );
+          throw error(500, "Error while updating limit");
+        }
+        let data = await res.json();
+        toasts.addToast(
+          event.locals.user?.personId,
+          "success",
+          "Limit updated"
+        );
+      })
+      .catch((e) => {
+        logger.error("Error while updating limit", { e });
+        toasts.addToast(
+          event.locals.user?.personId,
+          "error",
+          "Error while updating limit"
+        );
+        throw error(500, "Error while updating limit");
+      });
+  },
+
+  updateFromTo: async (event) => {
+    let fromData = await event.request.formData();
+    let _from = String(fromData.get("from"));
+    let _to = String(fromData.get("to"));
+
+    let from = new Date(_from);
+    let to = new Date(_to);
+
+    from.setHours(0, 0, 0, 0);
+    to.setHours(23, 59, 59, 999);
+
+    logger.info("Update from to" + JSON.stringify({ from, to }));
+
+    event.cookies.set("from", from.toISOString(), { path: "/" });
+    event.cookies.set("to", to.toISOString(), { path: "/" });
+  },
+
+  addToDashboard: async (event) => {
+    const { request, fetch } = event;
+    let formdData = await request.formData();
+    let sensorStationId: string = String(formdData.get("sensorStationId"));
+
+    await fetch(
+      `${BACKEND_URL}/add-to-dashboard?sensorStationId=${sensorStationId}`,
+      { method: "POST" }
+    ).then(async (res) => {
+      if (!res.ok) {
+        res = await res.json();
+        logger.error("Error while adding to dashboard" + String(res));
+        toasts.addToast(
+          event.locals.user?.personId,
+          "error",
+          "Error while adding to dashboard"
+        );
+        throw error(500, "Error while adding to dashboard");
+      }
+      let data = await res.json();
+      toasts.addToast(
+        event.locals.user?.personId,
+        "success",
+        "Added to dashboard"
+      );
+    });
+  },
+
+  removeFromDashboard: async (event) => {
+    const { request, fetch } = event;
+    let formdData = await request.formData();
+    let sensorStationId: string = String(formdData.get("sensorStationId"));
+
+    await fetch(
+      `${BACKEND_URL}/remove-from-dashboard?sensorStationId=${sensorStationId}`,
+      { method: "POST" }
+    ).then(async (res) => {
+      if (!res.ok) {
+        res = await res.json();
+        logger.error("Error while removing from dashboard" + String(res));
+        toasts.addToast(
+          event.locals.user?.personId,
+          "error",
+          "Error while removing from dashboard"
+        );
+        throw error(500, "Error while removing from dashboard");
+      }
+      let data = await res.json();
+      toasts.addToast(
+        event.locals.user?.personId,
+        "success",
+        "Removed from dashboard"
+      );
+    });
+  },
 };
