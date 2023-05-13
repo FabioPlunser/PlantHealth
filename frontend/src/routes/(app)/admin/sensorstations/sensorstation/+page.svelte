@@ -399,6 +399,31 @@
             />
 
             {#if showPictures}
+              <div>
+                <form method="post" use:enhance>
+                  <input
+                    type="hidden"
+                    name="sensorStationId"
+                    value={sensorStation.sensorStationId}
+                  />
+                  <button
+                    type="submit"
+                    on:click={(event) => {
+                      if (
+                        !window.confirm(
+                          "Are you sure you want to delete all images?"
+                        )
+                      ) {
+                        event.preventDefault(); // Prevent the form from submitting
+                      }
+                    }}
+                    formaction="?/deleteAllPictures"
+                    class="btn btn-error mb-4"
+                  >
+                    DELETE ALL
+                  </button>
+                </form>
+              </div>
               {#if sensorStation.pictures.length > 0}
                 <div
                   class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
@@ -410,8 +435,12 @@
                       {:then picture}
                         <div class="relative">
                           <div class="absolute top-0 right-0 m-4">
-                            <form method="post">
-                              <input type="hidden" value={picture.}>
+                            <form method="post" use:enhance>
+                              <input
+                                type="hidden"
+                                name="pictureId"
+                                value={picture.pictureId}
+                              />
                               <button
                                 type="submit"
                                 on:click={() => {
@@ -419,7 +448,7 @@
                                     `You will delete this image permanently!`
                                   );
                                 }}
-                                formaction="?/delete-picture"
+                                formaction="?/deletePicture"
                               >
                                 <i
                                   class="bi bi-trash text-4xl text-gray-400 hover:text-red-500"
