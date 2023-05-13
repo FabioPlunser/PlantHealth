@@ -143,7 +143,6 @@
     bind:open={pictureModal}
     imageRef={selectedPicture}
   />
-  <!-- <PictureModal bind:open={picturesModal} pictures={data.pictures} /> -->
 
   <section in:fly={{ y: -200, duration: 200 }}>
     <div class="flex justify-center mx-auto">
