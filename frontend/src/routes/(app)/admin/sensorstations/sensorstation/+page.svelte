@@ -6,19 +6,30 @@
   import type { SubmitFunction } from "$app/forms";
   // ----------------------------------
   // ----------------------------------
-  import PictureModal from "./PictureModal.svelte";
   import BigPictureModal from "$components/ui/BigPictureModal.svelte";
   import { flexRender, type ColumnDef } from "@tanstack/svelte-table";
-  import { TextCell } from "$lib/components/table/cellComponents";
   import Table from "$lib/components/table/Table.svelte";
   import StationInfo from "./StationInfo.svelte";
   import LimitsCard from "./LimitsCard.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
-  import SensorLimitsModal from "./SensorLimitsModal.svelte";
   import Graphs from "$components/graph/Graphs.svelte";
   import DateInput from "$components/datepicker/DateInput.svelte";
-  import type { ColumnVisibility, ResponseSensorValue, ResponseSensorValues, Sensor, SensorLimit, SensorStation, SensorValue } from "../../../../../app";
-  import LocaleDateCell from "$lib/components/table/cellComponents/LocaleDateCell.svelte";
+  import type {
+    ColumnVisibility,
+    ResponseSensorValue,
+    ResponseSensorValues,
+    Sensor,
+    SensorLimit,
+    SensorStation,
+    SensorValue,
+  } from "../../../../../app";
+  import {
+    TextCell,
+    SensorTypeBadgeCell,
+    SensorValueCell,
+    LocaleDateCell,
+  } from "$components/table/cellComponents";
+
   // ----------------------------------
   // ----------------------------------
   let rendered = false;
@@ -44,18 +55,17 @@
     });
   }
 
-  
   let limits: SensorLimit[];
   $: limits = data.sensorStation.sensorLimits;
-  
+
   let newDates = data.dates;
   let dateNow = new Date(Date.now()).toLocaleDateString();
-  
+
   let showLimits = false;
   let showDataTable = false;
   let showGraphs = false;
   let showPictures = false;
-  
+
   let pictureModal = false;
   let selectedPicture = "";
   // ----------------------------------
@@ -79,14 +89,14 @@
           unit: sensorValues.sensorUnit,
         };
         sensorValues.values.forEach((responseValue: ResponseSensorValue) => {
-          let newSensorValue : SensorValue = {
+          let newSensorValue: SensorValue = {
             sensor,
             timeStamp: new Date(responseValue.timeStamp),
             value: responseValue.value,
             isAboveLimit: responseValue.aboveLimit,
             isBelowLimit: responseValue.belowLimit,
             alarm: responseValue.alarm,
-          }
+          };
           tableData.push(newSensorValue);
         });
       });
@@ -98,24 +108,29 @@
       id: "sensorType",
       accessorKey: "sensor.type",
       header: () => flexRender(TextCell, { text: "Type" }),
-      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+      cell: (info) =>
+        flexRender(SensorTypeBadgeCell, { type: info.getValue() }),
     },
     {
       id: "value",
       accessorKey: "value",
       header: () => flexRender(TextCell, { text: "Value" }),
+      cell: ({ row }) =>
+        flexRender(SensorValueCell, {
+          value: row.original.value,
+          unit: row.original.sensor.unit,
+        }),
+    },
+    {
+      id: "isAboveLimit",
+      accessorKey: "isAboveLimit",
+      header: () => flexRender(TextCell, { text: "Below Limit ?" }),
       cell: (info) => flexRender(TextCell, { text: info.getValue() }),
     },
     {
       id: "isBelowLimit",
       accessorKey: "isBelowLimit",
       header: () => flexRender(TextCell, { text: "Above Limit ?" }),
-      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
-    },
-    {
-      id: "aboveLimit",
-      accessorKey: "isAboveLimit",
-      header: () => flexRender(TextCell, { text: "Below Limit ?" }),
       cell: (info) => flexRender(TextCell, { text: info.getValue() }),
     },
     {
@@ -128,11 +143,17 @@
       id: "timestamp",
       accessorKey: "timestamp",
       header: () => flexRender(TextCell, { text: "Time" }),
-      cell: ({row}) => flexRender(LocaleDateCell, { date: row.original.timeStamp}),
+      cell: ({ row }) =>
+        flexRender(LocaleDateCell, { date: row.original.timeStamp }),
     },
   ];
 
-  let mobileColumnVisibility: ColumnVisibility = {};
+  let mobileColumnVisibility: ColumnVisibility = {
+    isAboveLimit: false,
+    isBelowLimit: false,
+    alarm: false,
+    timestamp: false,
+  };
   // ----------------------------------
   // ----------------------------------
 </script>
@@ -300,7 +321,7 @@
                 <h1>No sensor station data available yet.</h1>
               {:else}
                 <div class="overflow-auto">
-                 <Table data={tableData} {columns} {mobileColumnVisibility}/>
+                  <Table data={tableData} {columns} {mobileColumnVisibility} />
                 </div>
               {/if}
             {/if}
