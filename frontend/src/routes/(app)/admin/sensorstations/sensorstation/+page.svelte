@@ -6,18 +6,30 @@
   import type { SubmitFunction } from "$app/forms";
   // ----------------------------------
   // ----------------------------------
-  import PictureModal from "./PictureModal.svelte";
-  import Desktop from "$helper/Desktop.svelte";
   import BigPictureModal from "$components/ui/BigPictureModal.svelte";
   import { flexRender, type ColumnDef } from "@tanstack/svelte-table";
-  import { TextCell } from "$lib/components/table/cellComponents";
   import Table from "$lib/components/table/Table.svelte";
   import StationInfo from "./StationInfo.svelte";
   import LimitsCard from "./LimitsCard.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
-  import SensorLimitsModal from "./SensorLimitsModal.svelte";
   import Graphs from "$components/graph/Graphs.svelte";
   import DateInput from "$components/datepicker/DateInput.svelte";
+  import type {
+    ColumnVisibility,
+    ResponseSensorValue,
+    ResponseSensorValues,
+    Sensor,
+    SensorLimit,
+    SensorStation,
+    SensorValue,
+  } from "../../../../../app";
+  import {
+    TextCell,
+    SensorTypeBadgeCell,
+    SensorValueCell,
+    LocaleDateCell,
+  } from "$components/table/cellComponents";
+
   // ----------------------------------
   // ----------------------------------
   let rendered = false;
@@ -35,11 +47,11 @@
   let sensorStation: SensorStation;
   $: sensorStation = data.sensorStation;
 
-  let sensorStationData: any = null;
+  let sensorStationData: ResponseSensorValues[] | null = null;
   $: {
-    sensorStation.data.then((res: any) => {
+    sensorStation.data.then((res: ResponseSensorValues[]) => {
       console.log(res);
-      sensorStationData = res.data;
+      sensorStationData = res;
     });
   }
 
@@ -66,37 +78,59 @@
   };
   // ----------------------------------
   // ----------------------------------
-  interface SensorData {
-    sensor: { [type: string]: string };
-    value: number;
-    belowLimit: number;
-    aboveLimit: number;
-    alarm: string;
+  let tableData: SensorValue[] = [];
+
+  $: {
+    if (sensorStationData) {
+      // map sensor type to each sensor value to make table generation easier
+      sensorStationData.forEach((sensorValues: ResponseSensorValues) => {
+        const sensor: Sensor = {
+          type: sensorValues.sensorType,
+          unit: sensorValues.sensorUnit,
+        };
+        sensorValues.values.forEach((responseValue: ResponseSensorValue) => {
+          let newSensorValue: SensorValue = {
+            sensor,
+            timeStamp: new Date(responseValue.timeStamp),
+            value: responseValue.value,
+            isAboveLimit: responseValue.aboveLimit,
+            isBelowLimit: responseValue.belowLimit,
+            alarm: responseValue.alarm,
+          };
+          tableData.push(newSensorValue);
+        });
+      });
+    }
   }
 
-  let columns: ColumnDef<SensorData>[] = [
+  let columns: ColumnDef<SensorValue>[] = [
     {
       id: "sensorType",
-      accessorKey: "sensorType",
+      accessorKey: "sensor.type",
       header: () => flexRender(TextCell, { text: "Type" }),
-      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+      cell: (info) =>
+        flexRender(SensorTypeBadgeCell, { type: info.getValue() }),
     },
     {
       id: "value",
-      accessorKey: "sensor.values",
+      accessorKey: "value",
       header: () => flexRender(TextCell, { text: "Value" }),
-      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+      cell: ({ row }) =>
+        flexRender(SensorValueCell, {
+          value: row.original.value,
+          unit: row.original.sensor.unit,
+        }),
     },
     {
-      id: "belowLimit",
-      accessorKey: "belowLimit",
-      header: () => flexRender(TextCell, { text: "Above Limit ?" }),
-      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
-    },
-    {
-      id: "aboveLimit",
-      accessorKey: "aboveLimit",
+      id: "isAboveLimit",
+      accessorKey: "isAboveLimit",
       header: () => flexRender(TextCell, { text: "Below Limit ?" }),
+      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+    },
+    {
+      id: "isBelowLimit",
+      accessorKey: "isBelowLimit",
+      header: () => flexRender(TextCell, { text: "Above Limit ?" }),
       cell: (info) => flexRender(TextCell, { text: info.getValue() }),
     },
     {
@@ -105,9 +139,21 @@
       header: () => flexRender(TextCell, { text: "Alarm" }),
       cell: (info) => flexRender(TextCell, { text: info.getValue() }),
     },
+    {
+      id: "timestamp",
+      accessorKey: "timestamp",
+      header: () => flexRender(TextCell, { text: "Time" }),
+      cell: ({ row }) =>
+        flexRender(LocaleDateCell, { date: row.original.timeStamp }),
+    },
   ];
 
-  let mobileColumnVisibility: ColumnVisibility = {};
+  let mobileColumnVisibility: ColumnVisibility = {
+    isAboveLimit: false,
+    isBelowLimit: false,
+    alarm: false,
+    timestamp: false,
+  };
   // ----------------------------------
   // ----------------------------------
 </script>
@@ -118,7 +164,6 @@
     bind:open={pictureModal}
     imageRef={selectedPicture}
   />
-  <!-- <PictureModal bind:open={picturesModal} pictures={data.pictures} /> -->
 
   <section in:fly={{ y: -200, duration: 200 }}>
     <div class="flex justify-center mx-auto">
@@ -276,34 +321,7 @@
                 <h1>No sensor station data available yet.</h1>
               {:else}
                 <div class="overflow-auto">
-                  <table class="table table-zebra w-full">
-                    <thead>
-                      <tr>
-                        <th>SensorType</th>
-                        <th>TimeStamp</th>
-                        <th>Value</th>
-                        <th>Below Limit ?</th>
-                        <th>Above Limit ?</th>
-                        <th>Alarm</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {#each sensorStationData as sensor}
-                        {#each sensor.values as value}
-                          <tr>
-                            <th>{sensor.sensorType}</th>
-                            <td>{new Date(value.timeStamp).toLocaleString()}</td
-                            >
-                            <td>{value.value}</td>
-                            <td>{value.belowLimit}</td>
-                            <td>{value.aboveLimit}</td>
-                            <td>{value.alarm}</td>
-                          </tr>
-                        {/each}
-                      {/each}
-                    </tbody>
-                    <!-- <Table data={sensorStationData} {columns} {mobileColumnVisibility} /> -->
-                  </table>
+                  <Table data={tableData} {columns} {mobileColumnVisibility} />
                 </div>
               {/if}
             {/if}

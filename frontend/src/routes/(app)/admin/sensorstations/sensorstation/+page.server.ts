@@ -3,6 +3,8 @@ import { logger } from "$helper/logger";
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 import { toasts } from "$stores/toastStore";
+import type { ResponseSensorValue, ResponseSensorValues, Sensor, SensorValue } from "../../../../../app.js";
+import SensorDataModal from "./SensorDataModal.svelte";
 
 interface _SensorStation extends SensorStation {
   data: Promise<any>;
@@ -41,25 +43,28 @@ export async function load({ fetch, depends, cookies }) {
   //-------------------------------------------------------------------------------------------------------------------------
   //-------------------------------------------------------------------------------------------------------------------------
   sensorStation.data = new Promise(async (resolve, reject) => {
-    let res = await fetch(
+    await fetch(
       `${BACKEND_URL}/get-sensor-station-data?sensorStationId=${
         sensorStation.sensorStationId
       }&from=${from.toISOString().split(".")[0]}&to=${
         to.toISOString().split(".")[0]
       }`
-    );
-    logger.info(
-      "Get sensor-station-data " +
-        "from: " +
-        JSON.stringify(from) +
-        " to: " +
-        JSON.stringify(to)
-    );
-    if (!res.ok) {
-      resolve(null);
-    }
-    res = await res.json();
-    resolve(res);
+    ).then((response) => {
+      logger.info(
+        "Get sensor-station-data " +
+          "from: " +
+          JSON.stringify(from) +
+          " to: " +
+          JSON.stringify(to)
+      );
+      if (!response.ok) {
+        resolve(null);
+      }
+      return response.json();
+    }).then((data) => {
+      let responseValues: ResponseSensorValues[] = data.data;
+      resolve(responseValues);
+    });
   });
   //-------------------------------------------------------------------------------------------------------------------------
   //-------------------------------------------------------------------------------------------------------------------------
