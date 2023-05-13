@@ -85,32 +85,18 @@ export async function handleFetch({ request, fetch, event }) {
   };
 
   request.headers.set("Authorization", JSON.stringify(token));
-  console.log(request.headers);
+  // console.log(request.headers);
 
   return fetch(request);
 }
-// export const handleFetch = (async ({ event }) => {
-//logger.info("HandleFetch Event: " + JSON.stringify(event));
-// logger.info("HandleFetch request: " + JSON.stringify(event.request));
 
-// // console.log(event.request.url);
-// if(event.request.url.includes("/login") || event.request.url.includes("/register")){
-//   logger.info("Login fetch");
-//   return event.fetch(event.request);
-// }
-
-// console.log("HandleFetch", event.locals.user);
-
-// let cookieToken = event.cookies.get("token") || "";
-// console.log("HanldeFetch", cookieToken);
-// let token = JSON.parse(cookieToken);
-// console.log(token);
-
-// event.request.headers.set("Authorization", JSON.stringify(token));
-// logger.info("HandleFetch Token is: " + event.request.headers.get("Authorization"));
-//   return event.fetch(event.request);
-// }) satisfies HandleFetch;
-
+export async function handleError({ error, event }) {
+  logger.error("HandleError Event: " + JSON.stringify(error.message));
+  return {
+    message: error.message,
+    errorId: error.errorId,
+  };
+}
 // export const handleError = (({ event, error }) => {
 //   logger.error("HandleError Event: " + JSON.stringify(event));
 //   logger.error("HandleError Error: " + JSON.stringify(error));

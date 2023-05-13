@@ -5,6 +5,9 @@ declare namespace App {
   interface Locals {
     user?: User;
   }
+  interface Error {
+    [key: string]: any;
+  }
   // interface PageData {}
   // interface Platform {}
   // interface PrivateEnv {}

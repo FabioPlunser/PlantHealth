@@ -14,7 +14,7 @@ export async function load(event) {
   let res = await event.fetch(`${BACKEND_URL}/logout`, {
     method: "POST",
   });
-  logger.info(`User ${event.locals.user.username} logged out`);
+  logger.info(`User ${event.locals.user?.username} logged out`);
   event.cookies.getAll().forEach((cookie) => {
     event.cookies.set(cookie.name, "", { maxAge: 0 });
   });
