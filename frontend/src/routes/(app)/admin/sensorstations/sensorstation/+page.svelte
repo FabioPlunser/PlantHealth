@@ -414,7 +414,7 @@
                           "Are you sure you want to delete all images?"
                         )
                       ) {
-                        event.preventDefault(); // Prevent the form from submitting
+                        event.preventDefault();
                       }
                     }}
                     formaction="?/deleteAllPictures"
@@ -443,10 +443,14 @@
                               />
                               <button
                                 type="submit"
-                                on:click={() => {
-                                  confirm(
-                                    `You will delete this image permanently!`
-                                  );
+                                on:click={(event) => {
+                                  if (
+                                    !window.confirm(
+                                      "You will delete this picture permanently!"
+                                    )
+                                  ) {
+                                    event.preventDefault();
+                                  }
                                 }}
                                 formaction="?/deletePicture"
                               >
