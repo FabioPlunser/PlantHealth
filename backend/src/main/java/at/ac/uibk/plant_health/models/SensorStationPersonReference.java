@@ -1,5 +1,7 @@
 package at.ac.uibk.plant_health.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -25,6 +27,7 @@ public class SensorStationPersonReference implements Serializable {
 	private UUID id;
 
 	@ManyToOne
+	@JsonIgnore
 	@JoinColumn(name = "sensor_station_id")
 	private SensorStation sensorStation;
 
@@ -41,6 +44,7 @@ public class SensorStationPersonReference implements Serializable {
 	private boolean isDeleted = false;
 
 	@ManyToOne(optional = false)
+	@JsonIgnore
 	@JoinColumn(name = "person_id", nullable = false)
 	private Person person;
 

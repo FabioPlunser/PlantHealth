@@ -10,4 +10,5 @@ import at.ac.uibk.plant_health.models.Log;
 
 public interface LogRepository extends CrudRepository<Log, UUID> {
 	List<Log> findByTimeStampBetween(LocalDateTime timeStampStart, LocalDateTime timeStampEnd);
+	List<Log> findAll();
 }

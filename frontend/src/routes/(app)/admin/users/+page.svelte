@@ -82,7 +82,7 @@
   <AddUserModal bind:showModal={addUserModal} {form} />
 {/if}
 {#if isRendered}
-  <section class="h-screen">
+  <section>
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <btn
       class="btn btn-primary flex justify-center w-fit mx-auto m-4"

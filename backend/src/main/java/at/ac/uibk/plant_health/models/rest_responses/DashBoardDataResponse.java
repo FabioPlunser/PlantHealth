@@ -3,12 +3,10 @@ package at.ac.uibk.plant_health.models.rest_responses;
 import static java.util.stream.Collectors.groupingBy;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.SensorStationPersonReference;
 import at.ac.uibk.plant_health.models.device.SensorStation;
-import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
 import at.ac.uibk.plant_health.models.user.Person;
 import lombok.Getter;
@@ -29,55 +27,36 @@ public class DashBoardDataResponse extends RestResponse implements Serializable 
 	}
 
 	@Getter
-	private class DashboardSensorStation implements Serializable {
+	private static class DashboardSensorStation implements Serializable {
 		private final String name;
 		private final String roomName;
 		private final UUID sensorStationId;
 		private final List<UUID> pictureIds;
-
-		private final List<TimeStampedSensorData> values;
+		private final boolean connected;
+		private final boolean unlocked;
+		private final boolean deleted;
 
 		public DashboardSensorStation(SensorStation sensorStation) {
-			this.name = sensorStation.getName();
-			this.values = sensorStation.getSensorData()
-								  .stream()
-								  .collect(groupingBy(SensorData::getTimeStamp))
-								  .entrySet()
-								  .stream()
-								  .map(TimeStampedSensorData::new)
-								  .sorted(Comparator.comparing(o -> o.timestamp))
-								  .toList();
-			this.roomName = sensorStation.getAccessPoint().getRoomName();
-			this.pictureIds = sensorStation.getPlantPictures()
-									  .stream()
-									  .map(SensorStationPicture::getPictureId)
-									  .toList();
-			this.sensorStationId = sensorStation.getDeviceId();
-		}
-	}
-
-	@Getter
-	private class TimeStampedSensorData implements Serializable {
-		private final LocalDateTime timestamp;
-		private final List<InnerSensorData> sensors;
-		public TimeStampedSensorData(Map.Entry<LocalDateTime, List<SensorData>> e) {
-			this.timestamp = e.getKey();
-			this.sensors = e.getValue().stream().map(InnerSensorData::new).toList();
-		}
-	}
-
-	@Getter
-	private class InnerSensorData implements Serializable {
-		private final String sensor;
-		private final double value;
-		private final String unit;
-		private final char alarm;
-
-		public InnerSensorData(SensorData sensorData) {
-			this.sensor = sensorData.getSensor().getType();
-			this.value = sensorData.getValue();
-			this.unit = sensorData.getSensor().getUnit();
-			this.alarm = sensorData.getAlarm();
+			if (!sensorStation.isDeleted()) {
+				this.name = sensorStation.getName();
+				this.roomName = sensorStation.getAccessPoint().getRoomName();
+				this.pictureIds = sensorStation.getSensorStationPictures()
+										  .stream()
+										  .map(SensorStationPicture::getPictureId)
+										  .toList();
+				this.sensorStationId = sensorStation.getDeviceId();
+				this.connected = sensorStation.isConnected();
+				this.unlocked = sensorStation.isUnlocked();
+				this.deleted = false;
+			} else {
+				this.name = null;
+				this.roomName = null;
+				this.pictureIds = null;
+				this.sensorStationId = null;
+				this.connected = false;
+				this.unlocked = false;
+				this.deleted = true;
+			}
 		}
 	}
 }

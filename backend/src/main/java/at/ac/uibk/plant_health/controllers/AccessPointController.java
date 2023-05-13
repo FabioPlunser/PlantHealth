@@ -210,4 +210,23 @@ public class AccessPointController {
 				.message("Successfully transfered data")
 				.toEntity();
 	}
+
+	@AnyPermission({Permission.ADMIN})
+	@DeleteMapping("/delete-access-point")
+	@WriteOperation
+	public RestResponseEntity deleteAccessPoint(@RequestParam("accessPointId") final UUID accessPointId) {
+		try {
+			accessPointService.deleteAccessPoint(accessPointId);
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
+
+		return MessageResponse.builder()
+				.statusCode(200)
+				.message("Deleted AccessPoint")
+				.toEntity();
+	}
 }

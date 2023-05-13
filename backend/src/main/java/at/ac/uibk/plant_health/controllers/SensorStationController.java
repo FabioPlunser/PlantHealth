@@ -1,5 +1,6 @@
 package at.ac.uibk.plant_health.controllers;
 
+import org.hibernate.annotations.Any;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
@@ -16,6 +17,7 @@ import java.util.*;
 import at.ac.uibk.plant_health.models.annotations.AnyPermission;
 import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
 import at.ac.uibk.plant_health.models.annotations.PublicEndpoint;
+import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.exceptions.ServiceException;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
@@ -37,15 +39,17 @@ public class SensorStationController {
 			|| person.getPermissions().contains(Permission.GARDENER)) {
 			return new SensorStationsResponse(sensorStationService.findAll()).toEntity();
 		}
-		return new UserSensorStationsResponse(sensorStationService.findAll()).toEntity();
+		return new UserSensorStationsResponse(sensorStationService.findAll(), person).toEntity();
 	}
 
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
+	@PrincipalRequired(Person.class)
 	@GetMapping("/get-sensor-station")
-	public RestResponseEntity getSensorStation(@RequestParam("sensorStationId"
-	) final UUID sensorStationId) {
+	public RestResponseEntity getSensorStation(
+			Person person, @RequestParam("sensorStationId") final UUID sensorStationId
+	) {
 		try {
-			return new SensorStationResponse(sensorStationService.findById(sensorStationId))
+			return new SensorStationResponse(sensorStationService.findById(sensorStationId), person)
 					.toEntity();
 		} catch (ServiceException e) {
 			return MessageResponse.builder()
@@ -95,14 +99,19 @@ public class SensorStationController {
 
 	@AnyPermission({Permission.GARDENER, Permission.ADMIN})
 	@PrincipalRequired(Person.class)
-	@RequestMapping(value = "/set-sensor-limits", method = {RequestMethod.POST, RequestMethod.PUT})
-	public RestResponseEntity setSensorLimits(
+	@RequestMapping(
+			value = "/update-sensor-station", method = {RequestMethod.POST, RequestMethod.PUT}
+	)
+	public RestResponseEntity
+	setSensorLimits(
 			Person person, @RequestParam("sensorStationId") final UUID sensorStationId,
+			@RequestParam(value = "sensorStationName", required = false) final String name,
 			@RequestBody final List<SensorLimits> sensorLimits
 	) {
 		try {
-			sensorStationService.findById(sensorStationId);
-			sensorStationService.setSensorLimits(sensorLimits, sensorStationId, person);
+			SensorStation sensorStation = sensorStationService.findById(sensorStationId);
+			sensorStationService.updateSensorStation(sensorStation, name);
+			sensorStationService.setSensorLimits(sensorLimits, sensorStation, person);
 		} catch (ServiceException e) {
 			return MessageResponse.builder()
 					.statusCode(e.getStatusCode())
@@ -110,7 +119,32 @@ public class SensorStationController {
 					.toEntity();
 		}
 
-		return MessageResponse.builder().statusCode(200).toEntity();
+		return MessageResponse.builder()
+				.statusCode(200)
+				.message("Successfully set sensor limits")
+				.toEntity();
+	}
+
+	@AnyPermission(Permission.ADMIN)
+	@PostMapping("/assign-gardener-to-sensor-station")
+	public RestResponseEntity assignGardenerToSensorStation(
+			@RequestParam("sensorStationId") final UUID sensorStationId,
+			@RequestParam("gardenerId") final UUID gardenerId
+	) {
+		try {
+			sensorStationService.assignGardenerToSensorStation(
+					sensorStationService.findById(sensorStationId), gardenerId
+			);
+			return MessageResponse.builder()
+					.statusCode(200)
+					.message("Successfully assigned gardener to sensor station")
+					.toEntity();
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
 	}
 
 	@AnyPermission({Permission.GARDENER, Permission.ADMIN, Permission.USER})
@@ -124,6 +158,7 @@ public class SensorStationController {
 			) final LocalDateTime to
 	) {
 		try {
+			sensorStationService.isDeleted(sensorStationService.findById(sensorStationId));
 			return new SensorStationDataResponse(
 						   sensorStationService.findById(sensorStationId), from, to
 			)
@@ -147,9 +182,6 @@ public class SensorStationController {
 			@RequestParam("sensorStationId") final UUID sensorStationId,
 			@RequestParam("picture") final MultipartFile picture
 	) {
-		System.out.println(picture.getOriginalFilename());
-		System.out.println(picture.getName());
-		System.out.println(picture.getContentType());
 		try {
 			sensorStationService.findById(sensorStationId);
 			sensorStationService.uploadPicture(picture, sensorStationId);
@@ -273,6 +305,25 @@ public class SensorStationController {
 		return MessageResponse.builder()
 				.statusCode(200)
 				.message("Delete all pictures of SensorStation " + sensorStationId)
+				.toEntity();
+	}
+
+	@AnyPermission({Permission.ADMIN})
+	@WriteOperation
+	@DeleteMapping("/delete-sensor-station")
+	public RestResponseEntity deleteSensorStation(@RequestParam("sensorStationId") final UUID sensorStationId) {
+		try {
+			sensorStationService.deleteSensorStation(sensorStationId);
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
+
+		return MessageResponse.builder()
+				.statusCode(200)
+				.message("Deleted SensorStation " + sensorStationId)
 				.toEntity();
 	}
 }

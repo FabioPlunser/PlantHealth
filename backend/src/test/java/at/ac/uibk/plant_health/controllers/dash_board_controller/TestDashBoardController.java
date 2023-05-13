@@ -113,21 +113,23 @@ public class TestDashBoardController {
 				);
 	}
 
-	@Disabled
 	@Test
 	public void getDataFromDashboard() throws Exception {
 		Person person = createUserAndLogin(false);
 		SensorStation s1 = new SensorStation(StringGenerator.macAddress(), 1);
 
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+
 		s1.setName("SensorStation 1");
+		s1.setAccessPoint(accessPoint);
 		sensorStationService.save(s1);
 		sensorStationPersonReferenceService.addPlantToDashboard(person, s1);
 
 		Sensor sensor = new Sensor("Test", "°C");
-		SensorData data1 = new SensorData(LocalDateTime.now(), 1, false, false, 'n', sensor, s1);
-		SensorData data2 = new SensorData(
-				data1.getTimeStamp().plusMinutes(5), 2, false, false, 'n', sensor, s1
-		);
+		SensorData data1 = new SensorData(LocalDateTime.now(), 1, 'n', sensor, s1);
+		SensorData data2 = new SensorData(data1.getTimeStamp().plusMinutes(5), 2, 'n', sensor, s1);
 
 		sensorStationService.addSensorData(s1, data1);
 		sensorStationService.addSensorData(s1, data2);
@@ -137,51 +139,7 @@ public class TestDashBoardController {
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(person))
 								.contentType(MediaType.APPLICATION_JSON))
-				.andExpectAll(
-						status().isOk(), jsonPath("$.plants").isArray(),
-
-						jsonPath("$.plants[0]").exists(), jsonPath("$.plants[1]").doesNotExist(),
-
-						jsonPath("$.plants[0].plant-name").value(Matchers.equalTo(s1.getName())),
-
-						jsonPath("$.plants[0].values").isArray(),
-						jsonPath("$.plants[0].values[0]").exists(),
-						jsonPath("$.plants[0].values[1]").exists(),
-						jsonPath("$.plants[0].values[2]").doesNotExist(),
-
-						jsonPath("$.plants[0].values[0].timestamp")
-								.value(LocalDateTimeJsonParser.equalsWithTolerance(
-										data1.getTimeStamp(), Duration.ofSeconds(TIME_TOLERANCE)
-								)),
-						jsonPath("$.plants[0].values[1].timestamp")
-								.value(LocalDateTimeJsonParser.equalsWithTolerance(
-										data2.getTimeStamp(), Duration.ofSeconds(TIME_TOLERANCE)
-								)),
-
-						jsonPath("$.plants[0].values[0].sensors").isArray(),
-						jsonPath("$.plants[0].values[0].sensors[0]").exists(),
-						jsonPath("$.plants[0].values[0].sensors[1]").doesNotExist(),
-						jsonPath("$.plants[0].values[1].sensors[0]").exists(),
-						jsonPath("$.plants[0].values[1].sensors[1]").doesNotExist(),
-
-						jsonPath("$.plants[0].values[0].sensors[0].sensor")
-								.value(Matchers.equalTo(sensor.getType())),
-						jsonPath("$.plants[0].values[0].sensors[0].value")
-								.value(Matchers.equalTo(data1.getValue())),
-						// TODO: Units aren't being sent
-						// jsonPath("$.plants[0].values[0].sensors[0].unit").value(Matchers.equalTo(sensor.getUnit())),
-						jsonPath("$.plants[0].values[0].sensors[0].alarm")
-								.value(Matchers.equalTo(Character.toString(data1.getAlarm()))),
-
-						jsonPath("$.plants[0].values[1].sensors[0].sensor")
-								.value(Matchers.equalTo(sensor.getType())),
-						jsonPath("$.plants[0].values[1].sensors[0].value")
-								.value(Matchers.equalTo(data2.getValue())),
-						// TODO: Units aren't being sent
-						// jsonPath("$.plants[0].values[1].sensors[0].unit").value(Matchers.equalTo(sensor.getUnit())),
-						jsonPath("$.plants[0].values[1].sensors[0].alarm")
-								.value(Matchers.equalTo(Character.toString(data1.getAlarm())))
-				);
+				.andExpectAll(status().isOk(), jsonPath("$.sensorStations").isArray());
 	}
 
 	@Test

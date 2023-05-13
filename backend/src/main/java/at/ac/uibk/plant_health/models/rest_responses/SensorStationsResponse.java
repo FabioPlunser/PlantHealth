@@ -5,6 +5,9 @@ import java.util.*;
 import java.util.List;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
+import at.ac.uibk.plant_health.models.plant.Sensor;
+import at.ac.uibk.plant_health.models.plant.SensorLimits;
+import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -30,10 +33,6 @@ public class SensorStationsResponse extends RestResponse implements Serializable
 		private final boolean unlocked;
 		private final boolean connected;
 		private final boolean deleted;
-		//		private final List<UUID> plantPictureIds;
-		//		private final List<SensorLimits> sensorLimits;
-		//		private final List<SensorData> sensorData;
-
 		public InnerResponse(SensorStation sensorstation) {
 			this.sensorStationId = sensorstation.getDeviceId();
 			this.bdAddress = sensorstation.getBdAddress();
@@ -43,10 +42,6 @@ public class SensorStationsResponse extends RestResponse implements Serializable
 			this.unlocked = sensorstation.isUnlocked();
 			this.connected = sensorstation.isConnected();
 			this.deleted = sensorstation.isDeleted();
-			//			this.plantPictureIds =
-			// sensorstation.getPlantPictures().stream().map(PlantPicture::getPictureId).toList();
-			//			this.sensorLimits = sensorstation.getSensorLimits();
-			//			this.sensorData = sensorstation.getSensorData();
 		}
 	}
 }

@@ -1,14 +1,23 @@
 <script lang="ts">
-  import { fly, slide } from "svelte/transition";
+  import { toast } from "$components/toast";
+  import { fly, slide, fade } from "svelte/transition";
   import { onMount } from "svelte";
+  import { enhance } from "$app/forms";
+  import type { SubmitFunction } from "$app/forms";
   // ----------------------------------
   // ----------------------------------
-  import PictureModel from "./PictureModel.svelte";
-  import Input from "$components/ui/Input.svelte";
+  import PictureModal from "./PictureModal.svelte";
   import Desktop from "$helper/Desktop.svelte";
-  import Mobile from "$helper/Mobile.svelte";
+  import BigPictureModal from "$components/ui/BigPictureModal.svelte";
+  import { flexRender, type ColumnDef } from "@tanstack/svelte-table";
+  import { TextCell } from "$lib/components/table/cellComponents";
+  import Table from "$lib/components/table/Table.svelte";
+  import StationInfo from "./StationInfo.svelte";
+  import LimitsCard from "./LimitsCard.svelte";
+  import Spinner from "$components/ui/Spinner.svelte";
   import SensorLimitsModal from "./SensorLimitsModal.svelte";
-  import SensorDataModal from "./SensorDataModal.svelte";
+  import Graphs from "$components/graph/Graphs.svelte";
+  import DateInput from "$components/datepicker/DateInput.svelte";
   // ----------------------------------
   // ----------------------------------
   let rendered = false;
@@ -20,208 +29,395 @@
   // ----------------------------------
   // ----------------------------------
   export let data;
-  let sensorStation = data.sensorStation;
-  let sensors = data.sensors;
-  $: console.log(data);
+  export let form;
   // ----------------------------------
   // ----------------------------------
-  let sensorDataModal = false;
-  let sensorLimitsModal = false;
-  let picturesModal = false;
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
-  $: console.log(data);
+  let sensorStation: SensorStation;
+  $: sensorStation = data.sensorStation;
+
+  let sensorStationData: any = null;
+  $: {
+    sensorStation.data.then((res: any) => {
+      console.log(res);
+      sensorStationData = res.data;
+    });
+  }
+
+  let limits: SensorLimit[];
+  $: limits = data.sensorStation.sensorLimits;
+
+  let newDates = data.dates;
+  let dateNow = new Date(Date.now()).toLocaleDateString();
+
+  let showLimits = false;
+  let showDataTable = false;
+  let showGraphs = false;
+  let showPictures = false;
+
+  let pictureModal = false;
+  let selectedPicture = "";
+  // ----------------------------------
+  // ----------------------------------
+  const customEnhance: SubmitFunction = () => {
+    sensorStationData = null;
+    return async ({ update }) => {
+      await update();
+    };
+  };
+  // ----------------------------------
+  // ----------------------------------
+  interface SensorData {
+    sensor: { [type: string]: string };
+    value: number;
+    belowLimit: number;
+    aboveLimit: number;
+    alarm: string;
+  }
+
+  let columns: ColumnDef<SensorData>[] = [
+    {
+      id: "sensorType",
+      accessorKey: "sensorType",
+      header: () => flexRender(TextCell, { text: "Type" }),
+      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+    },
+    {
+      id: "value",
+      accessorKey: "sensor.values",
+      header: () => flexRender(TextCell, { text: "Value" }),
+      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+    },
+    {
+      id: "belowLimit",
+      accessorKey: "belowLimit",
+      header: () => flexRender(TextCell, { text: "Above Limit ?" }),
+      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+    },
+    {
+      id: "aboveLimit",
+      accessorKey: "aboveLimit",
+      header: () => flexRender(TextCell, { text: "Below Limit ?" }),
+      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+    },
+    {
+      id: "alarm",
+      accessorKey: "alarm",
+      header: () => flexRender(TextCell, { text: "Alarm" }),
+      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+    },
+  ];
+
+  let mobileColumnVisibility: ColumnVisibility = {};
+  // ----------------------------------
+  // ----------------------------------
 </script>
 
 {#if rendered}
-  <PictureModel bind:open={picturesModal} pictures={data.pictures} />
-  <SensorLimitsModal bind:open={sensorLimitsModal} {sensorStation} {sensors} />
-  <SensorDataModal bind:open={sensorDataModal} data={data.data} />
-  <section in:fly={{ y: -200, duration: 200 }} class="h-screen">
-    <button
-      on:click={() => history.back()}
-      class="transform transition-transform active:scale-110 mb-2"
-    >
-      <i class="bi bi-arrow-left-circle text-3xl" />
-    </button>
-    <div class="flex justify-center mx-auto">
-      <div class="">
-        <div class="text-2xl">
-          <Input field="name" label="Name:" value={sensorStation.name} />
-          <!-- <label for="name" class="">
-            <h1 class="font-bold">Name:</h1>
-            <input
-              value={sensorStation.name}
-              type="text"
-              name="name"
-              class="input input-bordered bg-gray-800 text-white h- ml-4"
-              placeholder="Office"
-            />
-          </label> -->
-          <h1 class="font-bold">MacAddress: {sensorStation.bdAddress}</h1>
-          <h1 class="font-bold">DipSwitchId: {sensorStation.dipSwitchId}</h1>
-          <h1 class="font-bold">Connected: {sensorStation.connected}</h1>
+  <BigPictureModal
+    on:close={() => (pictureModal = false)}
+    bind:open={pictureModal}
+    imageRef={selectedPicture}
+  />
+  <!-- <PictureModal bind:open={picturesModal} pictures={data.pictures} /> -->
 
-          <Mobile>
-            <div class="grid grid-rows gap-2" in:slide>
-              <button
-                class="btn btn-warning text-white"
-                on:click={() => (sensorLimitsModal = true)}
-                >Sensor Limits</button
-              >
-              <button class="btn" on:click={() => (sensorDataModal = true)}
-                >Sensor Data</button
-              >
-            </div>
-            <div class="flex justify-center m-2">
-              <div class="flex">
-                <div class="tooltip" data-tip="Create QR-Code">
-                  <button
-                    disabled
-                    class="transform transition-transform active:scale-110 transf"
-                  >
-                    <i class="bi bi-qr-code-scan text-4xl" />
-                  </button>
-                </div>
+  <section in:fly={{ y: -200, duration: 200 }}>
+    <div class="flex justify-center mx-auto">
+      <div
+        in:fly|self={{ y: -200, duration: 200, delay: 100 }}
+        class="flex card p-8 border h-fit w-full bg-base-100 dark:border-none shadow-2xl md:max-w-9/12"
+      >
+        <StationInfo {sensorStation} {form} gardener={data.gardener} />
+
+        <div in:slide={{ duration: 200 }}>
+          <br />
+          <div>
+            <div class="">
+              <div class="flex gap-4">
+                <h1 class="text-2xl font-bold">SensorLimits</h1>
+                <button
+                  class="my-auto flex items-center hover:text-primary hover:scale-110 transition-all"
+                  on:click={() => (showLimits = !showLimits)}
+                >
+                  {#if showLimits}
+                    <i
+                      class="material-symbols-outlined my-auto flex items-center"
+                    >
+                      visibility
+                    </i>
+                  {:else}
+                    <i
+                      class="material-symbols-outlined my-auto flex items-center"
+                    >
+                      visibility_off
+                    </i>
+                  {/if}
+                </button>
               </div>
             </div>
-          </Mobile>
 
-          <Desktop>
-            <div in:slide={{ duration: 200 }}>
-              <br />
-              <h1 class="text-2xl mx-auto font-bold">SensorLimits</h1>
+            <div
+              class="divider mt-2 dark:bg-white bg-black h-[2px] rounded-xl"
+            />
+
+            {#if limits.length === 0}
+              <h1>There is no Information about the sensorstation yet.</h1>
+            {:else if showLimits}
               <div
-                class="divider -mt-2 dark:bg-white bg-black h-[2px] rounded-xl"
-              />
-              {#if sensorStation.sensorLimits.length === 0 && sensors.length === 0}
-                <h1>Their is no Information about the sensorstation yet</h1>
-              {/if}
-
-              {#if sensorStation.sensorLimits.length == 0}
-                <div
-                  class="mx-auto grid grid-rows md:grid-cols-2 xl:grid-cols-3 gap-4"
-                >
-                  {#each sensors as limit}
-                    <div class="flex justify-center">
-                      <div
-                        class="card dark:bg-slate-800 w-fit bg-base-300 shadow-2xl"
-                      >
-                        <div class="card-body">
-                          <div class="flex">
-                            <h1 class="mx-auto font-bold">
-                              {limit.type}
-                              <span class="ml-2">[{limit.unit}]</span>
-                            </h1>
-                          </div>
-                          <Input
-                            field="LowerLimit"
-                            type="number"
-                            label="LowerLimit: "
-                          />
-                          <Input
-                            field="UpperLimit"
-                            type="number"
-                            label="UpperLimit: "
-                          />
-                          <div class="card-actions mx-auto">
-                            <button class="btn btn-primary">Set Limit</button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  {/each}
-                </div>
-              {:else}
-                <div class="mx-auto grid grid-rows xl:grod-cols-2 gap-4">
-                  {#each sensorStation.sensorLimits as limit}
-                    <div class="flex justify-center">
-                      <div
-                        class="card dark:bg-slate-800 w-fit bg-base-300 shadow-2xl"
-                      >
-                        <div class="card-body">
-                          <div class="flex">
-                            <h1 class="mx-auto font-bold">
-                              {limit.type}
-                              <span class="ml-2">[{limit.unit}]</span>
-                            </h1>
-                          </div>
-                          <Input
-                            field="LowerLimit"
-                            type="number"
-                            label="LowerLimit: "
-                            value={limit.lowerLimit}
-                          />
-                          <Input
-                            field="UpperLimit"
-                            type="number"
-                            label="UpperLimit: "
-                            value={limit.lowerLimit}
-                          />
-                        </div>
-                        <div class="card-actions mx-auto">
-                          <button class="btn btn-primary">Set Limit</button>
-                        </div>
-                      </div>
-                    </div>
-                  {/each}
-                </div>
-              {/if}
-
-              <br />
-              <h1 class="text-2xl mx-auto font-bold">SensorData</h1>
-              <div
-                class="divider -mt-2 dark:bg-white bg-black h-[2px] rounded-xl"
-              />
-              {#if sensorStation.sensorData.length === 0}
-                <h1>No Data has been send yet</h1>
-              {:else}
-                <table class="table table-zebra w-full">
-                  <thead>
-                    <tr>
-                      <th>Date/Time</th>
-                      <th>Sensor</th>
-                      <th>Value</th>
-                      <th>belowLimit</th>
-                      <th>aboveLimit</th>
-                      <th>alarm</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {#each sensorStation.sensorData as sensorData}
-                      <tr>
-                        <td>{sensorData.timeStamp}</td>
-                        <td>{sensorData.sensor.type}</td>
-                        <td>{sensorData.value}</td>
-                        <td>{sensorData.belowLimit}</td>
-                        <td>{sensorData.aboveLimit}</td>
-                        <td>{sensorData.alarm}</td>
-                      </tr>
-                    {/each}
-                  </tbody>
-                </table>
-              {/if}
-            </div>
-          </Desktop>
-          <div class="flex justify-center mx-auto gap-2 mt-6">
-            <button class="btn btn-primary">Update</button>
-            {#if sensorStation.unlocked}
-              <button class="btn btn-info text-white">Unlocked</button>
-            {:else}
-              <button class="btn btn-error text-white">Locked</button>
+                class="mx-auto grid grid-rows md:grid-cols-2 xl:grid-cols-4 gap-4"
+              >
+                {#each limits as limit}
+                  <LimitsCard
+                    {limit}
+                    sensorStationId={sensorStation.sensorStationId}
+                    {form}
+                  />
+                {/each}
+              </div>
             {/if}
-            <button
-              class="btn btn-info bg-blue-600 text-white border-none"
-              on:click={() => (picturesModal = true)}>Pictures</button
-            >
+          </div>
+
+          <br />
+
+          {#if sensorStationData}
+            <div>
+              <form
+                method="POST"
+                action="?/updateFromTo"
+                use:enhance={() => {
+                  return async ({ update }) => {
+                    await update({ reset: false });
+                  };
+                }}
+              >
+                <div
+                  class="justify-start grid grid-rows sm:flex items-center gap-2"
+                >
+                  <div class="flex gap-2">
+                    <label class="my-auto">
+                      From:
+                      <input
+                        type="hidden"
+                        name="from"
+                        bind:value={newDates.from}
+                      />
+                      {#key sensorStation}
+                        <DateInput
+                          format="dd.MM.yyyy"
+                          placeholder={dateNow}
+                          bind:value={newDates.from}
+                        />
+                      {/key}
+                    </label>
+                  </div>
+                  <div class="flex gap-2">
+                    <label class="my-auto">
+                      To:
+                      <input type="hidden" name="to" bind:value={newDates.to} />
+                      {#key sensorStation}
+                        <DateInput
+                          format="dd.MM.yyyy"
+                          placeholder={dateNow}
+                          bind:value={newDates.to}
+                        />
+                      {/key}
+                    </label>
+                  </div>
+                  <div class="my-auto flex items-center justify-center mt-6">
+                    <button
+                      class="btn btn-primary flex items-center justify-center"
+                      type="submit"
+                    >
+                      Update
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          {/if}
+
+          <br />
+          <div>
+            <div class="">
+              <div class="flex gap-4">
+                <h1 class="text-2xl font-bold">SensorData</h1>
+                <button
+                  class="my-auto flex items-center hover:text-primary hover:scale-110 transition-all"
+                  on:click={() => (showDataTable = !showDataTable)}
+                >
+                  {#if showDataTable}
+                    <i
+                      class="material-symbols-outlined my-auto flex items-center"
+                    >
+                      visibility
+                    </i>
+                  {:else}
+                    <i
+                      class="material-symbols-outlined my-auto flex items-center"
+                    >
+                      visibility_off
+                    </i>
+                  {/if}
+                </button>
+              </div>
+            </div>
+
+            <div
+              class="divider mt-2 dark:bg-white bg-black h-[2px] rounded-xl"
+            />
+            {#if showDataTable}
+              {#if !sensorStationData}
+                <div>
+                  <Spinner
+                    fill="fill-primary"
+                    background="text-base-300 dark:text-white"
+                  />
+                </div>
+              {:else if sensorStationData.length === 0}
+                <h1>No sensor station data available yet.</h1>
+              {:else}
+                <div class="overflow-auto">
+                  <table class="table table-zebra w-full">
+                    <thead>
+                      <tr>
+                        <th>SensorType</th>
+                        <th>TimeStamp</th>
+                        <th>Value</th>
+                        <th>Below Limit ?</th>
+                        <th>Above Limit ?</th>
+                        <th>Alarm</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {#each sensorStationData as sensor}
+                        {#each sensor.values as value}
+                          <tr>
+                            <th>{sensor.sensorType}</th>
+                            <td>{new Date(value.timeStamp).toLocaleString()}</td
+                            >
+                            <td>{value.value}</td>
+                            <td>{value.belowLimit}</td>
+                            <td>{value.aboveLimit}</td>
+                            <td>{value.alarm}</td>
+                          </tr>
+                        {/each}
+                      {/each}
+                    </tbody>
+                    <!-- <Table data={sensorStationData} {columns} {mobileColumnVisibility} /> -->
+                  </table>
+                </div>
+              {/if}
+            {/if}
+          </div>
+
+          <br />
+          <div>
+            <div class="">
+              <div class="flex gap-4">
+                <h1 class="text-2xl font-bold">Graphs</h1>
+                <button
+                  class="my-auto flex items-center hover:text-primary hover:scale-110 transition-all"
+                  on:click={() => (showGraphs = !showGraphs)}
+                >
+                  {#if showGraphs}
+                    <i
+                      class="material-symbols-outlined my-auto flex items-center"
+                    >
+                      visibility
+                    </i>
+                  {:else}
+                    <i
+                      class="material-symbols-outlined my-auto flex items-center"
+                    >
+                      visibility_off
+                    </i>
+                  {/if}
+                </button>
+              </div>
+            </div>
+            <div
+              class="divider mt-2 dark:bg-white bg-black h-[2px] rounded-xl"
+            />
+            {#if showGraphs}
+              {#if !sensorStationData}
+                <Spinner
+                  fill="fill-primary"
+                  background="text-base-300 dark:text-white"
+                />
+              {:else if sensorStationData.length == 0}
+                <h1>No sensor station data available yet.</h1>
+              {:else}
+                <Graphs data={sensorStationData} />
+              {/if}
+            {/if}
+          </div>
+
+          <br />
+          <div>
+            <div class="">
+              <div class="flex gap-4">
+                <h1 class="text-2xl font-bold">Pictures</h1>
+                <button
+                  class="my-auto flex items-center hover:text-primary hover:scale-110 transition-all"
+                  on:click={() => (showPictures = !showPictures)}
+                >
+                  {#if showPictures}
+                    <i
+                      class="material-symbols-outlined my-auto flex items-center"
+                    >
+                      visibility
+                    </i>
+                  {:else}
+                    <i
+                      class="material-symbols-outlined my-auto flex items-center"
+                    >
+                      visibility_off
+                    </i>
+                  {/if}
+                </button>
+              </div>
+            </div>
+            <div
+              class="divider mt-2 dark:bg-white bg-black h-[2px] rounded-xl"
+            />
+
+            {#if showPictures}
+              {#if sensorStation.pictures.length > 0}
+                <div
+                  class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
+                >
+                  {#if sensorStation.pictures}
+                    {#each sensorStation?.pictures as picturePromise}
+                      {#await picturePromise}
+                        <Spinner fill="fill-primary" />
+                      {:then picture}
+                        <div>
+                          <!-- svelte-ignore a11y-click-events-have-key-events -->
+                          <img
+                            on:click={() => {
+                              selectedPicture = picture.imageRef;
+                              pictureModal = true;
+                            }}
+                            src={picture.imageRef}
+                            alt="SensorStation"
+                            class="rounded-2xl shadow-xl cursor-pointer"
+                          />
+                          <h1 class="flex justify-center">
+                            {picture.creationDate.toDateString()}
+                          </h1>
+                        </div>
+                      {:catch error}
+                        <h1>Error: {error.message}</h1>
+                      {/await}
+                    {/each}
+                  {/if}
+                </div>
+              {:else}
+                <h1>No pictures available yet.</h1>
+              {/if}
+            {/if}
           </div>
         </div>
       </div>
     </div>
-    <!-- {#each data.sensorStation as s, i (s.sensorStationId)}
-      <div>
-       
-      </div>
-    {/each} -->
   </section>
 {/if}

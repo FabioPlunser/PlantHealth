@@ -103,7 +103,7 @@ public class TestLogController {
 
 						jsonPath("$.logs[0].severity")
 								.value(Matchers.equalTo(log.getSeverity().toString())),
-						jsonPath("$.logs[0].timestamp")
+						jsonPath("$.logs[0].timeStamp")
 								.value(new LocalDateTimeJsonParser(
 										log.getTimeStamp(), Duration.ofSeconds(TIME_TOLERANCE)
 								)),
@@ -134,7 +134,7 @@ public class TestLogController {
 
 						jsonPath("$.logs[0].severity")
 								.value(Matchers.equalTo(log.getSeverity().toString())),
-						jsonPath("$.logs[0].timestamp")
+						jsonPath("$.logs[0].timeStamp")
 								.value(new LocalDateTimeJsonParser(
 										log.getTimeStamp(), Duration.ofSeconds(TIME_TOLERANCE)
 								)),
