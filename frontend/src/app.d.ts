@@ -72,14 +72,12 @@ declare interface SensorLimit {
 }
 
 declare interface SensorStation {
-  bdAddress: string;
-  dipSwitchId: number;
-  name: string;
-  roomName: string;
   sensorStationId: string;
-  connected: boolean;
-  unlocked: boolean;
-  deleted: boolean;
-  sensorLimits: SensorLimit[];
-  sensorStationPictures: string[];
+  [key: string]: any;
+}
+
+declare interface Picture {
+  pictureId: string;
+  imageRef: string;
+  creationDate: Date;
 }

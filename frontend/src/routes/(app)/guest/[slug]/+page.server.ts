@@ -1,18 +1,24 @@
 import { BACKEND_URL } from "$env/static/private";
+import { logger } from "$lib/helper/logger";
+import { redirect } from "@sveltejs/kit";
 import type { Actions } from "./$types";
 
 export async function load({ locals, params, url, fetch }) {
   let error = "";
-
+  console.log("LOAD GUEST PLANT");
   let roomName = "";
   let plantName = "";
   let possiblePictures = [];
   try {
     let sensorStationId = url.searchParams.get("sensorStationId");
+    console.log("LOAD GUEST PLANT 2");
     let res = await fetch(
       `${BACKEND_URL}/get-sensor-station-pictures?sensorStationId=${sensorStationId}`
     );
+    console.log("LOAD GUEST PLANT 3");
     if (!res.ok) {
+      console.log("LOAD GUEST PLANT 4");
+      console.log(await res.json());
       if (res.status === 406) {
         logger.error("Guest couldn't find sensor station", { res });
         throw redirect(303, "/guest");
@@ -22,6 +28,7 @@ export async function load({ locals, params, url, fetch }) {
         error,
       };
     }
+    console.log("LOAD GUEST PLANT 5");
     res = await res.json();
     possiblePictures = res?.pictures;
     roomName = res.roomName;
@@ -45,9 +52,10 @@ export async function load({ locals, params, url, fetch }) {
         let buffer = Buffer.from(arrayBuffer);
         let encodedImage =
           "data:image/" + res.type + ";base64," + buffer.toString("base64");
-        let picture: Picture = {
+        let picture = {
           imageRef: "",
           creationDate: new Date(),
+          pictureId: "",
         };
 
         picture.imageRef = encodedImage;

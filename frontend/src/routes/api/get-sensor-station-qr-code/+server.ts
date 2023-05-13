@@ -1,5 +1,5 @@
 import type { RequestEvent } from "./$types";
-import jsPDF from "jspdf";
+import { jsPDF } from "jspdf";
 import qrcode from "qrcode-generator";
 import fs from "fs";
 

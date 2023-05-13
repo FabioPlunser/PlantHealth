@@ -45,50 +45,42 @@ public class SensorStationDataResponse extends RestResponse implements Serializa
 		private final String sensorType;
 		private final String sensorUnit;
 		private final List<TimeStampedSensorData> values;
+		private final List<SensorLimits> sensorLimits;
 		public InnerSensors(
 				Map.Entry<Sensor, List<SensorData>> sensorData, SensorStation sensorStation
 		) {
 			this.sensorType = sensorData.getKey().getType();
 			this.sensorUnit = sensorData.getKey().getUnit();
 
-			SensorLimits sensorLimit =
+			this.sensorLimits =
 					sensorStation.getSensorLimits()
 							.stream()
 							.filter(limit -> limit.getSensor().equals(sensorData.getKey()))
-							.findFirst()
-							.orElse(null);
-
-			this.values =
-					sensorData.getValue()
-							.stream()
-							.map(sensorDate -> new TimeStampedSensorData(sensorDate, sensorLimit))
+							.sorted(Comparator.comparing(SensorLimits::getTimeStamp))
 							.toList();
+
+			this.values = sensorData.getValue()
+								  .stream()
+								  .sorted(Comparator.comparing(SensorData::getTimeStamp))
+								  .map(TimeStampedSensorData::new)
+								  .toList();
 		}
 	}
 
 	@Getter
 	private static class TimeStampedSensorData implements Serializable {
-		private final LocalDateTime timestamp;
+		private final LocalDateTime timeStamp;
 		private final double value;
 		private final boolean isAboveLimit;
 		private final boolean isBelowLimit;
 		private final char alarm;
-		private final float upperLimit;
-		private final float lowerLimit;
 
-		public TimeStampedSensorData(SensorData sensorData, SensorLimits sensorLimit) {
-			this.timestamp = sensorData.getTimeStamp();
+		public TimeStampedSensorData(SensorData sensorData) {
+			this.timeStamp = sensorData.getTimeStamp();
 			this.value = sensorData.getValue();
 			this.isAboveLimit = sensorData.isAboveLimit();
 			this.isBelowLimit = sensorData.isBelowLimit();
 			this.alarm = sensorData.getAlarm();
-			if (sensorLimit != null) {
-				this.upperLimit = sensorLimit.getUpperLimit();
-				this.lowerLimit = sensorLimit.getLowerLimit();
-			} else {
-				this.upperLimit = 0;
-				this.lowerLimit = 0;
-			}
 		}
 	}
 }

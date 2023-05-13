@@ -30,6 +30,7 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 		private final String bdAddress;
 		private final int dipSwitchId;
 		private final String name;
+		private final String roomName;
 		private final UUID sensorStationId;
 		private final boolean unlocked;
 		private final boolean connected;
@@ -42,6 +43,7 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 			this.bdAddress = sensorStation.getBdAddress();
 			this.dipSwitchId = sensorStation.getDipSwitchId();
 			this.name = sensorStation.getName();
+			this.roomName = sensorStation.getAccessPoint().getRoomName();
 			this.sensorStationId = sensorStation.getDeviceId();
 			this.unlocked = sensorStation.isUnlocked();
 			this.connected = sensorStation.isConnected();

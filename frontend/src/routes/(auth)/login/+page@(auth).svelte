@@ -43,14 +43,20 @@
         <FormError field="password" {form} />
         <div class="flex justify-center mt-4 gap-4">
           <button
+            type="submit"
             disabled={data?.error != null}
             class="btn btn-primary"
             formaction="?/login">Login</button
           >
-          <button disabled={data?.error != null} class="btn text-white">
+          <button
+            type="button"
+            disabled={data?.error != null}
+            class="btn text-white"
+          >
             <a href="/register" data-sveltekit-preload-code>Register</a>
           </button>
           <button
+            type="button"
             disabled={data?.error != null}
             class="btn btn-info text-white"
           >

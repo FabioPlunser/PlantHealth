@@ -4,10 +4,9 @@
   import { createGraphData } from "$components/graph/helper";
   // ---------------------------------------------------
   // ---------------------------------------------------
-  import Graph from "./graph.svelte";
+  import Line from "./Line.svelte";
   import MediaQuery from "$helper/MediaQuery.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
-  import { onMount } from "svelte";
   // ---------------------------------------------------
   // ---------------------------------------------------
   export let data: any;
@@ -73,7 +72,6 @@
     addMissingSensors(data);
     graphData = createGraphData(data);
   }
-
   // ---------------------------------------------------
   // ---------------------------------------------------
 </script>
@@ -99,7 +97,7 @@ Usage example:
       {:else}
         <MediaQuery query="(width <= 640px)" let:matches>
           {#key matches}
-            <Graph data={graphData?.[currentSensor]} {options} />
+            <Line data={graphData?.[currentSensor]} {options} />
           {/key}
         </MediaQuery>
       {/if}

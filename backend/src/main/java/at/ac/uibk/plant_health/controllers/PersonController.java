@@ -208,6 +208,12 @@ public class PersonController {
 		return new ListResponse<>(personService.getPersons());
 	}
 
+	@ReadOperation
+	@AnyPermission(Permission.ADMIN)
+	@GetMapping("/get-all-gardener")
+	public RestResponse getAllGardener() {
+		return new ListResponse<>(personService.getGardener());
+	}
 	/**
 	 * Endpoint for Admins to get all possible Permission so that they don't
 	 * need to be changed manually on frontend.

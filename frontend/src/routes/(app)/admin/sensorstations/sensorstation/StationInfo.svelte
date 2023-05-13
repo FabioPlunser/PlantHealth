@@ -3,14 +3,32 @@
   import Input from "$components/ui/Input.svelte";
   import FormError from "$lib/helper/formError.svelte";
   import { redirect } from "@sveltejs/kit";
-
+  //---------------------------------------------------------------
+  //---------------------------------------------------------------
   export let sensorStation: SensorStation;
   export let showDetailLink: boolean = false;
   export let gardener: any;
-  export let form;
+  export let form: any;
   function setCookie(id: any) {
     document.cookie = `sensorStationId=${id}; path=/;`;
   }
+  //---------------------------------------------------------------
+  //---------------------------------------------------------------
+  async function downloadQRCode() {
+    let response = await fetch(
+      `/api/get-sensor-station-qr-code?sensorStationId=${sensorStation.sensorStationId}&roomName=${sensorStation.roomName}&plantName=${sensorStation.name}`
+    );
+    let data = await response.blob();
+    let url = URL.createObjectURL(data);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = sensorStation.sensorStationId;
+    document.body.appendChild(link);
+    link.click();
+  }
+  //---------------------------------------------------------------
+  //---------------------------------------------------------------
 </script>
 
 <form
@@ -49,6 +67,7 @@
       <div class="absolute top-0.5 right-12 m-4">
         <a href="/admin/sensorstations/sensorstation">
           <button
+            type="button"
             on:click={() => setCookie(sensorStation.sensorStationId)}
             class="transform transition-transform hover:rotate-90 active:scale-125 animate-spin"
           >
@@ -114,11 +133,9 @@
       <div class="flex justify-center">
         <div class="flex">
           <div class="mx-auto">
-            <a
-              href="http://localhost:3000/api/get-sensor-station-qr-code?sensorStationId=e5dc8654-255e-4fdd-b58e-8160f3a8fd7c&roomName=Office1&plantName=Sakura"
-            >
+            <button type="button" on:click={downloadQRCode}>
               <i class="bi bi-qr-code-scan text-4xl" />
-            </a>
+            </button>
           </div>
         </div>
       </div>

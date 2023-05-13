@@ -2,13 +2,11 @@ package at.ac.uibk.plant_health.service;
 
 import at.ac.uibk.plant_health.repositories.SensorStationPersonReferenceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import at.ac.uibk.plant_health.config.jwt_authentication.AuthContext;
 import at.ac.uibk.plant_health.config.jwt_authentication.authentication_types.UserAuthentication;
@@ -38,6 +36,11 @@ public class PersonService {
 	 */
 	public List<Person> getPersons() {
 		return personRepository.findAll();
+	}
+
+	public List<Person> getGardener() {
+		//		return personRepository.findAll();
+		return personRepository.findAllByPermissionsIsContaining(Permission.GARDENER);
 	}
 
 	// region Login/Logout
@@ -158,7 +161,8 @@ public class PersonService {
 	 *     otherwise.
 	 */
 	public boolean update(
-			Person person, String username, String email, String password, Set<Permission> permissions
+			Person person, String username, String email, String password,
+			Set<Permission> permissions
 	) {
 		if (person != null && person.getPersonId() != null) {
 			if (username != null) person.setUsername(username);
@@ -186,7 +190,8 @@ public class PersonService {
 	 * @return true if user was successfully update, false otherwise
 	 */
 	public boolean update(
-			UUID personId, String username, String email, Set<Permission> permissions, String password
+			UUID personId, String username, String email, Set<Permission> permissions,
+			String password
 	) {
 		Optional<Person> maybePerson = findById(personId);
 		return maybePerson.filter(person -> update(person, username, email, password, permissions))

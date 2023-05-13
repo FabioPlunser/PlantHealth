@@ -3,6 +3,7 @@ import { BACKEND_URL } from "$env/static/private";
 import { fail, redirect } from "@sveltejs/kit";
 import { z } from "zod";
 import { logger } from "$helper/logger";
+import { toasts } from "$stores/toastStore";
 
 const schema = z.object({
   username: z
@@ -63,7 +64,7 @@ export const actions = {
       body: formData,
     };
 
-    let res = await fetch(`${BACKEND_URL}/register`, requestOptions).catch(
+    let res: any = await fetch(`${BACKEND_URL}/register`, requestOptions).catch(
       (error) => {
         logger.error(`User ${formData.get("username")} failed to register`, {
           error,
@@ -71,10 +72,9 @@ export const actions = {
       }
     );
 
-    res = await res.json();
-    logger.info(`User ${formData.get("username")} registered`);
-
-    if (res.success) {
+    if (res.ok) {
+      res = await res.json();
+      logger.info(`User ${formData.get("username")} registered`);
       cookies.set(
         "token",
         JSON.stringify({
