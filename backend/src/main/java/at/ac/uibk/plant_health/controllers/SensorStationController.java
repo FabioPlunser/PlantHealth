@@ -138,11 +138,12 @@ public class SensorStationController {
 	@PostMapping("/assign-gardener-to-sensor-station")
 	public RestResponseEntity assignGardenerToSensorStation(
 			@RequestParam("sensorStationId") final UUID sensorStationId,
-			@RequestParam("gardenerId") final UUID gardenerId
+			@RequestParam("gardenerId") final UUID gardenerId,
+			@RequestParam(value = "delete", required = false) final boolean delete
 	) {
 		try {
 			sensorStationService.assignGardenerToSensorStation(
-					sensorStationService.findById(sensorStationId), gardenerId
+					sensorStationService.findById(sensorStationId), gardenerId, delete
 			);
 			return MessageResponse.builder()
 					.statusCode(200)
@@ -320,7 +321,8 @@ public class SensorStationController {
 	@AnyPermission({Permission.ADMIN})
 	@WriteOperation
 	@DeleteMapping("/delete-sensor-station")
-	public RestResponseEntity deleteSensorStation(@RequestParam("sensorStationId") final UUID sensorStationId) {
+	public RestResponseEntity deleteSensorStation(@RequestParam("sensorStationId"
+	) final UUID sensorStationId) {
 		try {
 			sensorStationService.deleteSensorStation(sensorStationId);
 		} catch (ServiceException e) {
