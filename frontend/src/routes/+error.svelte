@@ -17,7 +17,7 @@
     </p>
     <br />
     <p class="text-4xl flex justify-center">
-      Oops! Page {$page.error?.message}
+      Oops... Something went wrong!
     </p>
     <div class="flex justify-center mt-9 ">
       <ul>

@@ -1,6 +1,6 @@
 import { BACKEND_URL } from "$env/static/private";
 import type { Actions } from "./$types";
-import { redirect } from "@sveltejs/kit";
+import { redirect, error } from "@sveltejs/kit";
 import { logger } from "$helper/logger";
 import { toasts } from "$stores/toastStore";
 
@@ -38,8 +38,14 @@ export async function load({ locals, fetch, cookies }) {
   }
 
   // get all possible sensor stations from backend
-  let res = await fetch(`${BACKEND_URL}/get-sensor-stations`);
-  res = await res.json();
+  let res = await fetch(`${BACKEND_URL}/get-sensor-stations`)
+				.then((response) => {
+						if (!response.ok) {
+							logger.error("get-sensor-stations", { response });
+							throw new error(response.status);
+						}
+						return response.json();
+					});
   logger.info("get-sensor-stations", res);
 
   // get newest picture for each sensor station
@@ -68,11 +74,17 @@ export async function load({ locals, fetch, cookies }) {
   }
 
   // fetch dashboard data
-  let dashboard: Dashboard = await fetch(`${BACKEND_URL}/get-dashboard-data`);
-  dashboard = await dashboard.json();
+  let dashboard: Dashboard = await fetch(`${BACKEND_URL}/get-dashboard-data`)
+								.then((response) => {
+									if (!response.ok) {
+										logger.error("get-dashboard-data", { response });
+										throw new error(response.status);
+									}
+									return response.json();
+								});
   logger.info("get-dashboard-data", { dashboard });
 
-  for (let sensorStation of dashboard.sensorStations) {
+  for (let sensorStation of dashboard?.sensorStations) {
     logger.info("get-sensor-station-data", { sensorStation });
     sensorStation.data = new Promise(async (resolve, reject) => {
       let res = await fetch(
