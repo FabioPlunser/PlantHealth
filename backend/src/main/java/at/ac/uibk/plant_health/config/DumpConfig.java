@@ -55,7 +55,7 @@ public class DumpConfig {
 							.mapToObj(
 									i
 									-> new Person(
-											"Admin_" + i, "admin" + i + "@planthealh.org",
+											"Admin_" + i, "admin" + i + "@planthealth.at",
 											"password", Set.of(Permission.ADMIN)
 									)
 							)
@@ -65,7 +65,7 @@ public class DumpConfig {
 							.mapToObj(
 									i
 									-> new Person(
-											"Gardener_" + i, "gardener" + i + "@planthealh.org",
+											"Gardener_" + i, "gardener" + i + "@planthealth.at",
 											"password", Set.of(Permission.GARDENER)
 									)
 							)
@@ -75,7 +75,7 @@ public class DumpConfig {
 							.mapToObj(
 									i
 									-> new Person(
-											"User_" + i, "user" + i + "@planthealh.org", "password",
+											"User_" + i, "user" + i + "@planthealth.at", "password",
 											Set.of(Permission.USER)
 									)
 							)
