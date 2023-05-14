@@ -1,5 +1,8 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
+
+import type { StringifyOptions } from "querystring";
+
 // and what to do when importing types
 declare namespace App {
   // interface Locals {}
@@ -74,6 +77,28 @@ declare interface SensorLimit {
 declare interface SensorStation {
   sensorStationId: string;
   [key: string]: any;
+}
+
+declare interface ResponseSensorValues {
+  sensorType: string;
+  sensorUnit: string;
+  values: ResponseSensorValue[];
+}
+
+declare interface ResponseSensorValue {
+  timeStamp: Date;
+  value: number;
+  belowLimit: boolean;
+  aboveLimit: boolean;
+  alarm: string;
+}
+declare interface SensorValue {
+  sensor: Sensor;
+  timeStamp: Date;
+  value: number;
+  isAboveLimit: boolean;
+  isBelowLimit: boolean;
+  alarm: string;
 }
 
 declare interface Picture {

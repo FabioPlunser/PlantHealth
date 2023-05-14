@@ -38,11 +38,15 @@
         bind:checked={ispasswordHidden}
         class="hidden"
       />
-      <label for={label} class="label text-gray-400 hover:underline">
+      <label for={label} class="label text-gray-400 hover:text-gray-600">
         {#if ispasswordHidden}
-          show
+          <i class="material-symbols-outlined my-auto flex items-center">
+            visibility
+          </i>
         {:else}
-          hide
+          <i class="material-symbols-outlined my-auto flex items-center">
+            visibility_off
+          </i>
         {/if}
       </label>
     </div>

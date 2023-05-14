@@ -12,8 +12,12 @@
     <input type="hidden" bind:value={formActionValue} name="personId" />
     <button
       type="submit"
-      on:click={() => {
-        return confirm(confirmMessage);
+      on:click={(event) => {
+        let isConfirmed = confirm(confirmMessage);
+        if (!isConfirmed) {
+          event.preventDefault();
+          return;
+        }
       }}
     >
       <i class={iconClass} />
