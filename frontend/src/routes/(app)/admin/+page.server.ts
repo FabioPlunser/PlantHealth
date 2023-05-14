@@ -6,34 +6,40 @@ import { toasts } from "$stores/toastStore";
 import fs from "fs";
 import path from "path";
 
-export async function load({ fetch, locals }) {
-  let numbers = await fetch(`${BACKEND_URL}/get-dashboard`);
-  numbers = await numbers.json();
+/**
+ * Load function to fetch admint dashboard
+ * @param event
+ * @returns
+ */
+export async function load({ fetch }) {
+  let res = await fetch(`${BACKEND_URL}/get-dashboard`);
+  let numbers = await res.json();
 
-  let backendLogs = await fetch(`${BACKEND_URL}/get-logs`);
-  backendLogs = await backendLogs.json();
+  res = await fetch(`${BACKEND_URL}/get-logs`);
+  let backendLogs = await res.json();
   backendLogs = backendLogs.logs;
-  backendLogs.forEach((element) => {
-    element.timestamp = new Date(element.timestamp).toLocaleString("de-DE");
-  });
+  console.log(backendLogs);
 
   let allLog = new Promise(async (resolve, reject) => {
     const filePath = path.resolve("./logs/all.log");
     var logFile = await fs.readFileSync(filePath, { encoding: "utf-8" });
     const lines = logFile.split("\n");
-    const logs = [];
+    const logs: any[] = [];
     lines.forEach((line) => {
       if (line) {
         // skip empty lines
         const logRegex =
           /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) \[(\w+)\]: (.*)$/;
-        const [, timeStamp, severity, message] = line.match(logRegex);
-        const logObject = { timeStamp, severity, message };
-        logObject.timeStamp = new Date(logObject.timeStamp).toLocaleString(
-          "de-DE"
-        );
-        logObject.message = logObject.message.slice(0, 100);
-        logs.push(logObject);
+        const match = line.match(logRegex);
+        if (match) {
+          const [timeStamp, severity, message] = match;
+          const logObject = { timeStamp, severity, message };
+          logObject.timeStamp = new Date(logObject.timeStamp).toLocaleString(
+            "de-DE"
+          );
+          logObject.message = logObject.message.slice(0, 100);
+          logs.push(logObject);
+        }
       }
     });
     resolve(logs);

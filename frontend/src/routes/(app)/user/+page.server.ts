@@ -107,10 +107,13 @@ export async function load({ locals, fetch, cookies }) {
           reject(pictureResponse.statusText);
         }
         let blob = await pictureResponse.blob();
+        let file = new File([blob], possiblePicture.pictureId, {
+          type: blob.type,
+        });
         let arrayBuffer = await blob.arrayBuffer();
         let buffer = Buffer.from(arrayBuffer);
         let encodedImage =
-          "data:image/" + res.type + ";base64," + buffer.toString("base64");
+          "data:image/" + file.type + ";base64," + buffer.toString("base64");
         let picture: Picture = {
           imageRef: encodedImage,
           creationDate: new Date(possiblePicture.timeStamp),
@@ -152,12 +155,6 @@ export const actions = {
     );
     res = await res.json();
     logger.info("addToDashboard", { res });
-
-    let promise = new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve("done");
-      }, 2000);
-    });
   },
   /* `removeFromDashboard` is an action function that removes a sensor station from the user's
   dashboard. It receives an HTTP request object, extracts the form data submitted by the user, which

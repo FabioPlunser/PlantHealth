@@ -48,13 +48,15 @@
     <div>
       <button
         type="submit"
-        on:click={() => {
+        on:click={(event) => {
           let isDeleteConfirmed = confirm(
             `You will delete this sensor station permanently!`
           );
-          if (isDeleteConfirmed) {
-            throw redirect(307, "/admin/sensorstations");
+          if (!isDeleteConfirmed) {
+            event.preventDefault();
+            return;
           }
+          throw redirect(307, "/admin/sensorstations");
         }}
         formaction="?/delete"
       >
@@ -110,6 +112,8 @@
               <!-- <option hidden class="hidden">{person.personId}</option> -->
               <option selected value={person.personId}>{person.username}</option
               >
+              <input type="hidden" name="delete" value="true" />
+              <option value={person.personId}>Unassign</option>
             {:else}
               {#if i == 0}
                 <option>No gardener assigned</option>
