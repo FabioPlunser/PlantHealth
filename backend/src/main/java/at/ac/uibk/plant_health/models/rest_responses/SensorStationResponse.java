@@ -43,7 +43,8 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 			this.bdAddress = sensorStation.getBdAddress();
 			this.dipSwitchId = sensorStation.getDipSwitchId();
 			this.name = sensorStation.getName();
-			this.roomName = sensorStation.getAccessPoint().getRoomName();
+			var access_point = sensorStation.getAccessPoint();
+			if (access_point != null) this.roomName = access_point.getRoomName(); else this.roomName = null;
 			this.sensorStationId = sensorStation.getDeviceId();
 			this.unlocked = sensorStation.isUnlocked();
 			this.connected = sensorStation.isConnected();
