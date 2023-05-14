@@ -25,14 +25,28 @@ The System is built from 5 different Components:
 
 ![Component Diagram](https://git.uibk.ac.at/informatik/qe/swess23/group1/g1t1/-/raw/media/Diagrams/component-diagram.drawio.png)
 
-## Usage
+## Setup instructions for acceptance test
 
-### Docker Compose
+### Frontend + Backend
+
 The Backend, Frontend and Database can be deployed using `docker compose up`.  
 See the `docker-compose.yml` to see the exposed ports.  
 If the Profile `test` is specified, then an `Adminer`-Instance is started that can be used to manually edit the database.
 
-### Development
+### Accesspoint
+
+1. Setup the Rasperry, configure it so that it has access to the network in which also frontend and backend are available and enable SSH
+2. Copy the whole directory `access_point` to the Rasperry
+3. SSH into the Rasperrry
+4. CD into the previously copied `access_point` directory
+5. Run `./configure`. The script will guide you through the access point initialization and provide all necessary pre-requisites. Use `http://<IP address of the machine running the backend>:8080` as your backend URL/IP. Confirm all other except the last dialogue with just pressing ENTER to keep default values. In the end, the script will ask you if you prefer to automatically start the access point. Enter `y` and the the main routine will automatically start (and even restart after reboots) after max. 1 minute. You can check the file `main.log` for log output. This file will only be created once the main routine is started. A command like `clear && tail -50 main.log` has proven helpful to analyze the log file.
+6. Once you don't need a running access point anymore, execute `./reset`. Main routine execution will be stopped and default state will be restored. Be aware that the database file, configuration file and all logfiles will be removed. Create copies before running `./reset` if you need backups of these files. You will have to re-execute step 5 to restart the access point.
+
+### Sensorstation
+
+TODO
+
+## Development
 - Pre-commit hooks:
     This project makes use of [pre-commit](https://pre-commit.com) to ensure a uniform coding style.
 
@@ -54,24 +68,6 @@ If the Profile `test` is specified, then an `Adminer`-Instance is started that c
 - Sensorstation
     The Sensorstation is an Arduino 33 BLE that is programmed using [Platform IO](https://platformio.org/).
 	
-## Setup instructions for acceptance test
-
-### Frontend + Backend
-
-TODO
-
-### Accesspoint
-
-1. Setup the Rasperry, configure it so that it has access to the network in which also frontend and backend are available and enable SSH
-2. Copy the whole directory `access_point` to the Rasperry
-3. SSH into the Rasperrry
-4. CD into the previously copied `access_point` directory
-5. Run `./configure`. The script will guide you through the access point initialization and provide all necessary pre-requisites. Use `http://<IP address of the machine running the backend>:8080` as your backend URL/IP. Confirm all other except the last dialogue with just pressing ENTER to keep default values. In the end, the script will ask you if you prefer to automatically start the access point. Enter `y` and the the main routine will automatically start (and even restart after reboots) after max. 1 minute. You can check the file `main.log` for log output. This file will only be created once the main routine is started. A command like `clear && tail -50 main.log` has proven helpful to analyze the log file.
-6. Once you don't need a running access point anymore, execute `./reset`. Main routine execution will be stopped and default state will be restored. Be aware that the database file, configuration file and all logfiles will be removed. Create copies before running `./reset` if you need backups of these files. You will have to re-execute step 5 to restart the access point.
-
-### Sensorstation
-
-TODO
 
 ## License
 
