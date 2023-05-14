@@ -1,16 +1,11 @@
 package at.ac.uibk.plant_health.models.rest_responses;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.device.AccessPoint;
-import at.ac.uibk.plant_health.models.device.SensorStation;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Getter
@@ -31,7 +26,7 @@ public class AccessPointListResponse extends RestResponse {
 		private final boolean scanActive;
 		private final boolean connected;
 		private final int transferInterval;
-		private final SensorStationsResponse sensorStations;
+		private final AdminSensorStationsResponse sensorStations;
 
 		public InnerAccessPoint(AccessPoint accessPoint) {
 			this.accessPointId = accessPoint.getDeviceId();
@@ -41,7 +36,7 @@ public class AccessPointListResponse extends RestResponse {
 			this.scanActive = accessPoint.getScanActive();
 			this.connected = accessPoint.isConnected();
 			this.transferInterval = accessPoint.getTransferInterval();
-			this.sensorStations = new SensorStationsResponse(accessPoint.getSensorStations());
+			this.sensorStations = new AdminSensorStationsResponse(accessPoint.getSensorStations());
 		}
 	}
 }

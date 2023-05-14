@@ -128,13 +128,26 @@ public class SensorStationService {
 	 * @param sensorStation
 	 * @param name
 	 */
-	public void updateSensorStation(SensorStation sensorStation, String name) {
-		sensorStation.setName(name);
+	public void updateSensorStation(
+			SensorStation sensorStation, String name, Integer transferInterval
+	) {
+		if (!Objects.isNull(name)) {
+			sensorStation.setName(name);
+		}
+		if (!Objects.isNull(transferInterval) && !Objects.isNull(sensorStation.getAccessPoint())) {
+			sensorStation.getAccessPoint().setTransferInterval(transferInterval);
+		}
 		save(sensorStation);
 	}
 
-	public void assignGardenerToSensorStation(SensorStation sensorStation, UUID personId)
-			throws ServiceException {
+	public void assignGardenerToSensorStation(
+			SensorStation sensorStation, UUID personId, boolean delete
+	) throws ServiceException {
+		if (delete) {
+			sensorStation.setGardener(null);
+			save(sensorStation);
+			return;
+		}
 		Optional<Person> maybePerson = personService.findById(personId);
 		if (maybePerson.isEmpty()) throw new ServiceException("Person does not exist", 404);
 		Person person = maybePerson.get();
@@ -306,7 +319,8 @@ public class SensorStationService {
 	 * @throws ServiceException
 	 */
 	public void deleteSensorStation(UUID sensorStationId) throws ServiceException {
-		Optional<SensorStation> maybeSensorStation = sensorStationRepository.findById(sensorStationId);
+		Optional<SensorStation> maybeSensorStation =
+				sensorStationRepository.findById(sensorStationId);
 		if (maybeSensorStation.isEmpty()) {
 			throw new ServiceException("Sensor station not found", 404);
 		}

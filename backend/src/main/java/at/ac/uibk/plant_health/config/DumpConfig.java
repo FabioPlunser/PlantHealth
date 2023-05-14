@@ -108,7 +108,7 @@ public class DumpConfig {
 			var sensors = sensorKeyValues.stream()
 								  .map(p -> new Sensor(p.getFirst(), p.getSecond()))
 								  .toList();
-			sensors.forEach(sensorRepository::save);
+			sensorRepository.saveAll(sensors);
 
 			var sensorStations =
 					IntStream.range(0, num_sensor_stations)
@@ -161,7 +161,7 @@ public class DumpConfig {
 													char alarm = above ? (below ? 'b' : 'h')
 																	   : (below ? 'l' : 'n');
 													return Stream.of(new SensorData(
-															LocalDateTime.now(), i * 50 + j, alarm,
+															LocalDateTime.now(), (float)i * 50 + j, alarm,
 															sensors.get(j % sensors.size()), s
 													));
 												})
@@ -180,13 +180,11 @@ public class DumpConfig {
 							.toList();
 
 			sensorStations.forEach(sensorStationService::save);
-			sensorStations.forEach(s -> s.getSensorLimits().forEach(sensorLimitsRepository::save));
-			sensorStations.forEach(s -> s.getSensorData().forEach(sensorDataRepository::save));
+			sensorStations.forEach(s -> sensorLimitsRepository.saveAll(s.getSensorLimits()));
+			sensorStations.forEach(s -> sensorDataRepository.saveAll(s.getSensorData()));
 			sensorStations.forEach(
 					s
-					-> s.getSensorStationPersonReferences().forEach(
-							sensorStationPersonReferenceRepository::save
-					)
+					-> sensorStationPersonReferenceRepository.saveAll(s.getSensorStationPersonReferences())
 			);
 		} catch (Exception e) {
 		}

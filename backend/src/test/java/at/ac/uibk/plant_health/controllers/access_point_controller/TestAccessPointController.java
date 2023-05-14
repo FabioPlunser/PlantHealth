@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import at.ac.uibk.plant_health.models.plant.SensorData;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -320,14 +321,15 @@ public class TestAccessPointController {
 		sensorMap.put("LIGHTINTENSITY", "lux");
 		sensorMap.put("GASPRESSURE", "ppm");
 
+		List<String> bdAddresses = new ArrayList<>();
 		for (int i = 0; i < sensorStationsCount; i++) {
-			String BdAddress = StringGenerator.macAddress();
-			SensorStation sS = new SensorStation(BdAddress, 255 - i);
+			bdAddresses.add(StringGenerator.macAddress());
+			SensorStation sS = new SensorStation(bdAddresses.get(i), 255 - i);
 			sS.setUnlocked(true);
 			sensorStationService.save(sS);
 
 			ObjectNode sensorStation = mapper.createObjectNode();
-			sensorStation.put("bdAddress", BdAddress);
+			sensorStation.put("bdAddress", bdAddresses.get(i));
 			sensorStation.put("dipSwitchId", 255 - i);
 			sensorStation.put("connectionAlive", rand.nextBoolean());
 
@@ -359,8 +361,10 @@ public class TestAccessPointController {
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
-		assertEquals(sensorMap.size() * sensorStationsCount, sensorDataRepository.findAll().size());
-		assertEquals(sensorMap.size(), sensorRepository.findAll().size());
+		List<SensorData> availableData = sensorDataRepository.findAll().stream()
+				.filter(d -> bdAddresses.contains(d.getSensorStation().getBdAddress()))
+				.toList();
+		assertEquals(sensorMap.size() * sensorStationsCount, availableData.size());
 	}
 
 	@Test
