@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+import at.ac.uibk.plant_health.models.annotations.AnyPermission;
 import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
 import at.ac.uibk.plant_health.models.exceptions.ServiceException;
 import at.ac.uibk.plant_health.models.rest_responses.*;
@@ -36,14 +37,26 @@ public class DashBoardController {
 	@PrincipalRequired(Person.class)
 	@GetMapping("/get-dashboard")
 	public RestResponseEntity getDashboard(Person person) {
-		if (person.getPermissions().contains(Permission.ADMIN))
-			return new AdminDashBoardResponse(
-						   sensorStationService.findAll(), accessPointService.findAllAccessPoints(),
-						   personService.getPersons()
-			)
-					.toEntity();
+		System.out.println(person);
+		try {
+			if (person.getPermissions().contains(Permission.ADMIN))
+				return new AdminDashBoardResponse(
+							   sensorStationService.findAll(),
+							   accessPointService.findAllAccessPoints(), personService.getPersons()
+				)
+						.toEntity();
+			if (person.getPermissions().contains(Permission.GARDENER)) {
+				return new GardenerDashBoardResponse(sensorStationService.findAll(), person)
+						.toEntity();
+			}
 
-		return new DashBoardDataResponse(person).toEntity();
+			return new DashBoardDataResponse(person).toEntity();
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
 	}
 
 	@PrincipalRequired(Person.class)

@@ -1,6 +1,5 @@
 package at.ac.uibk.plant_health.controllers;
 
-import org.hibernate.annotations.Any;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
@@ -35,10 +34,17 @@ public class SensorStationController {
 	@PrincipalRequired(Person.class)
 	@GetMapping("/get-sensor-stations")
 	public RestResponseEntity getSensorStations(Person person) {
-		if (person.getPermissions().contains(Permission.ADMIN)
-			|| person.getPermissions().contains(Permission.GARDENER)) {
-			return new SensorStationsResponse(sensorStationService.findAll()).toEntity();
+		try {
+			if (person.getPermissions().contains(Permission.ADMIN)) {
+				return new AdminSensorStationsResponse(sensorStationService.findAll()).toEntity();
+			}
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
 		}
+
 		return new UserSensorStationsResponse(sensorStationService.findAll(), person).toEntity();
 	}
 
@@ -52,8 +58,9 @@ public class SensorStationController {
 			return new SensorStationResponse(sensorStationService.findById(sensorStationId), person)
 					.toEntity();
 		} catch (ServiceException e) {
-			return MessageResponse.builder()
-					.statusCode(e.getStatusCode())
+			return MessageResponse
+					.builder()
+
 					.message(e.getMessage())
 					.toEntity();
 		}
@@ -106,11 +113,13 @@ public class SensorStationController {
 	setSensorLimits(
 			Person person, @RequestParam("sensorStationId") final UUID sensorStationId,
 			@RequestParam(value = "sensorStationName", required = false) final String name,
-			@RequestBody final List<SensorLimits> sensorLimits
+			@RequestParam(value = "transferInterval", required = false)
+			final Integer transferInterval, @RequestBody final List<SensorLimits> sensorLimits
 	) {
+		System.out.println("update sensor station");
 		try {
 			SensorStation sensorStation = sensorStationService.findById(sensorStationId);
-			if (name != null) sensorStationService.updateSensorStation(sensorStation, name);
+			sensorStationService.updateSensorStation(sensorStation, name, transferInterval);
 			sensorStationService.setSensorLimits(sensorLimits, sensorStation, person);
 		} catch (ServiceException e) {
 			return MessageResponse.builder()
@@ -129,11 +138,12 @@ public class SensorStationController {
 	@PostMapping("/assign-gardener-to-sensor-station")
 	public RestResponseEntity assignGardenerToSensorStation(
 			@RequestParam("sensorStationId") final UUID sensorStationId,
-			@RequestParam("gardenerId") final UUID gardenerId
+			@RequestParam("gardenerId") final UUID gardenerId,
+			@RequestParam(value = "delete", required = false) final boolean delete
 	) {
 		try {
 			sensorStationService.assignGardenerToSensorStation(
-					sensorStationService.findById(sensorStationId), gardenerId
+					sensorStationService.findById(sensorStationId), gardenerId, delete
 			);
 			return MessageResponse.builder()
 					.statusCode(200)
@@ -311,7 +321,8 @@ public class SensorStationController {
 	@AnyPermission({Permission.ADMIN})
 	@WriteOperation
 	@DeleteMapping("/delete-sensor-station")
-	public RestResponseEntity deleteSensorStation(@RequestParam("sensorStationId") final UUID sensorStationId) {
+	public RestResponseEntity deleteSensorStation(@RequestParam("sensorStationId"
+	) final UUID sensorStationId) {
 		try {
 			sensorStationService.deleteSensorStation(sensorStationId);
 		} catch (ServiceException e) {
