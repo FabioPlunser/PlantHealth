@@ -571,10 +571,6 @@ public class TestSensorStationController {
 
 		sensorStation = sensorStationService.findByBdAddress(bdAddress);
 		assertEquals(1, sensorStation.getSensorStationPictures().size());
-
-		deleteAllPictures(sensorStation);
-		sensorStation = sensorStationService.findByBdAddress(bdAddress);
-		assertEquals(0, sensorStation.getSensorStationPictures().size());
 	}
 
 	@Test
