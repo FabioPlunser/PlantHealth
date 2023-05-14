@@ -269,4 +269,28 @@ public class AccessPointService {
 		accesspoint.setConnected(true);
 		save(accesspoint);
 	}
+
+	/**
+	 * Deletes an AccessPoint
+	 * @param accessPointId
+	 * @throws ServiceException
+	 */
+	public void deleteAccessPoint(UUID accessPointId) throws ServiceException{
+		Optional<AccessPoint> maybeAccessPoint = accessPointRepository.findById(accessPointId);
+		if (maybeAccessPoint.isEmpty()) {
+			throw new ServiceException("AccessPoint not found", 404);
+		}
+		AccessPoint accessPoint = maybeAccessPoint.get();
+		if (accessPoint.isDeleted()) {
+			throw new ServiceException("AccessPoint already deleted", 404);
+		}
+		accessPoint.setDeleted(true);
+		accessPoint.setUnlocked(false);
+		accessPoint.setSelfAssignedId(null);
+		accessPoint.setAccessToken(null);
+		for (SensorStation sensorStation : accessPoint.getSensorStations()) {
+			sensorStationService.deleteSensorStation(sensorStation.getDeviceId());
+		}
+		accessPointRepository.save(accessPoint);
+	}
 }

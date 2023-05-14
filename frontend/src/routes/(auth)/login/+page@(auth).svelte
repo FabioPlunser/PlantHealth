@@ -4,8 +4,10 @@
   import Input from "$components/ui/Input.svelte";
   import Logo from "$assets/Logo.svg?url";
   import toast from "$components/toast";
+  import PasswordInput from "$lib/components/ui/PasswordInput.svelte";
   // export let data: PageData;
   export let form;
+  export let data;
   $: {
     if (form?.message) {
       toast.error(form?.message);
@@ -30,26 +32,36 @@
           field="username"
           type="text"
           label="Username"
-          placeholder="Type here"
+          placeholder="Username"
         />
         <FormError field="username" {form} />
-        <Input
+        <PasswordInput
           field="password"
-          type="password"
-          label="Password"
-          placeholder="Type here"
+          label="New Password"
+          placeholder="Password"
         />
         <FormError field="password" {form} />
         <div class="flex justify-center mt-4 gap-4">
-          <button class="btn btn-primary" formaction="?/login">Login</button>
-          <a href="/register" data-sveltekit-preload-code class="btn text-white"
-            >Register</a
+          <button
+            type="submit"
+            disabled={data?.error != null}
+            class="btn btn-primary"
+            formaction="?/login">Login</button
           >
-          <a
-            href="/guest"
-            data-sveltekit-preload-code
-            class="btn btn-info text-white">Guest</a
+          <button
+            type="button"
+            disabled={data?.error != null}
+            class="btn text-white"
           >
+            <a href="/register" data-sveltekit-preload-code>Register</a>
+          </button>
+          <button
+            type="button"
+            disabled={data?.error != null}
+            class="btn btn-info text-white"
+          >
+            <a href="/guest" data-sveltekit-preload-code>Guest</a>
+          </button>
         </div>
       </div>
     </form>

@@ -1,18 +1,14 @@
-# https://github.com/JustinyAhin/trigyte
-
-FROM node:16-alpine
+FROM node:lts-slim
  
 RUN npm install -g pnpm
 
-WORKDIR /app
-COPY package.json ./
-RUN pnpm install 
-
 COPY . ./
 ENV BACKEND_URL=http://spring:8080
-RUN pnpm build
 
-EXPOSE 3000
-ENV BACKEND_URL=http://spring:8080
-ENV ORIGIN=http://localhost:3000
-CMD ["node", "build/index.js"]
+RUN rm -rf node_modules
+RUN rm -rf build
+
+RUN pnpm install
+RUN pnpm run build
+
+ENTRYPOINT ["pnpm", "run", "docker"]

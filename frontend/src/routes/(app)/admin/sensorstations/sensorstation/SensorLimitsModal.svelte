@@ -21,8 +21,6 @@
   export let sensors: any;
   export let open = false;
 
-  $: console.log("SensorLimitsModal-SensorStation", sensorStation);
-  $: console.log("SensorLimitsModal-Sensors", sensors);
   // ----------------------------------
   // ----------------------------------
 </script>

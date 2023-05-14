@@ -1,5 +1,5 @@
 import type { RequestEvent } from "./$types";
-import jsPDF from "jspdf";
+import { jsPDF } from "jspdf";
 import qrcode from "qrcode-generator";
 import fs from "fs";
 
@@ -16,6 +16,7 @@ type QrCodePdfData = {
   plantName: string;
   logoBase64: string;
   qrcodeBase64: string;
+  sensorStationId: string;
   url: string;
 };
 
@@ -23,7 +24,7 @@ type QrCodePdfData = {
  * Generates a QR code PDF for the given request event.
  *
  * @param {RequestEvent} event The request event containing query parameters.
- * @returns {Promise<Response>} A response with the generated PDF blob as content.
+ * @returns {Promise<Response>} A response with the generated PDF buffer as content.
  */
 export async function GET({ url }: RequestEvent) {
   const sensorStationId = url.searchParams.get("sensorStationId") ?? "";
@@ -33,7 +34,7 @@ export async function GET({ url }: RequestEvent) {
     "src/lib/assets/logoBase64.txt", // NOTE: importing it via $assets/logoBase64.txt adds a '/' infront and wont allow for the file to open
     "utf8"
   );
-  const baseURL = "https://www.planthealth.at/guest/plant";
+  const baseURL = `${url.origin}/guest/plant`;
   let URL = `${baseURL}?sensorStationId=${sensorStationId}`;
 
   let qrcodeBase64: string = createQrCode(URL);
@@ -42,16 +43,18 @@ export async function GET({ url }: RequestEvent) {
     plantName,
     logoBase64,
     qrcodeBase64,
+    sensorStationId,
     url: URL,
   };
 
-  let pdfBlob = generateQrCodePdfBlob(data);
+  let pdfBuffer = await generateQrCodePdfBuffer(data);
 
   let responseHeaders = new Headers();
   responseHeaders.append("Content-Type", "application/pdf");
+  responseHeaders.append("Content-Length", pdfBuffer.length.toString());
   responseHeaders.append(
     "Content-Disposition",
-    `attachment; filename="qr_code_${sensorStationId}"`
+    `attachment; filename="qr_code_${sensorStationId}.pdf"`
   );
 
   let responseOptions = {
@@ -60,26 +63,24 @@ export async function GET({ url }: RequestEvent) {
     headers: responseHeaders,
   };
 
-  return new Response(pdfBlob, responseOptions);
+  return new Response(pdfBuffer, responseOptions);
 }
 
 /**
  * Generates a QR code PDF blob for the given QR code PDF data.
  *
  * @param {QrCodePdfData} data The QR code PDF data to generate a blob for.
- * @returns {Blob} The generated PDF blob.
+ * @returns {Buffer} The generated PDF buffer.
  */
-function generateQrCodePdfBlob(data: QrCodePdfData): Blob {
+async function generateQrCodePdfBuffer(data: QrCodePdfData): Promise<Buffer> {
   let pdf = new jsPDF("portrait", "mm", "A6");
   pdf.addMetadata("Page Size", "A6");
 
   let heading = "Plant Health";
   pdf.setFontSize(20);
-  let x1 = pdf.internal.pageSize.width / 2 - pdf.getTextWidth(heading) / 2;
-  pdf.text(heading, x1, 10);
+  pdf.text(heading, center(pdf, pdf.getTextWidth(heading)), 10);
 
-  let x2 = pdf.internal.pageSize.width / 2 - 15;
-  pdf.addImage(data.logoBase64, "PNG", x2, 15, 30, 30);
+  pdf.addImage(data.logoBase64, "PNG", center(pdf, 30), 15, 30, 30);
 
   pdf.setFontSize(10);
   pdf.text(`Room: ${data.roomName}`, 20, 55);
@@ -89,14 +90,13 @@ function generateQrCodePdfBlob(data: QrCodePdfData): Blob {
 
   pdf.line(15, 65, pdf.internal.pageSize.width - 15, 65);
 
-  let x4 = pdf.internal.pageSize.width / 2 - 25;
-  pdf.addImage(data.qrcodeBase64, "PNG", x4, 75, 50, 50);
+  pdf.addImage(data.qrcodeBase64, "PNG", center(pdf, 50), 75, 50, 50);
 
+  let idString = `ID = ${data.sensorStationId}`;
   pdf.setFontSize(6);
-  let x5 = pdf.internal.pageSize.width / 2 - pdf.getTextWidth(data.url) / 2;
-  pdf.text(data.url, x5, 135);
+  pdf.text(idString, center(pdf, pdf.getTextWidth(idString)), 135);
 
-  return pdf.output("blob");
+  return Buffer.from(pdf.output("arraybuffer"));
 }
 
 /**
@@ -114,4 +114,8 @@ function createQrCode(url: string): string {
 
   // NOTE: createDataURL writes data:image/gif which we don't want
   return "data:image/;" + base64Image.split(";")[1];
+}
+
+function center(pdf: jsPDF, itemWidth: number) {
+  return pdf.internal.pageSize.width / 2 - itemWidth / 2;
 }

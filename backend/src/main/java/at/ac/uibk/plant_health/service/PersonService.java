@@ -1,5 +1,6 @@
 package at.ac.uibk.plant_health.service;
 
+import at.ac.uibk.plant_health.repositories.SensorStationPersonReferenceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 public class PersonService {
 	@Autowired
 	private PersonRepository personRepository;
+
+	@Autowired
+	private SensorStationPersonReferenceRepository sensorStationPersonReferenceRepository;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -210,6 +214,12 @@ public class PersonService {
 	 */
 	public boolean delete(UUID personId) {
 		try {
+			Optional<Person> maybePerson = personRepository.findById(personId);
+			if (maybePerson.isEmpty()) {
+				return false;
+			}
+			Person person = maybePerson.get();
+			sensorStationPersonReferenceRepository.deleteAll(person.getSensorStationPersonReferences());
 			this.personRepository.deleteById(personId);
 			return true;
 		} catch (Exception e) {

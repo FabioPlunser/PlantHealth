@@ -52,11 +52,11 @@
   /**
    * Array\<T\> where T is the datatype of the object to be displayed
    */
-  export let data;
+  export let data: any;
   /**
    * Array\<ColumnDef\<T\>\> where T is the datatype of the object to be displayed
    */
-  export let columns;
+  export let columns: ColumnDef<any>[];
   /**
    * column visibility if media is not mobile
    * @default {}
@@ -68,6 +68,11 @@
    * @type {ColumnVisibility}
    */
   export let mobileColumnVisibility: ColumnVisibility;
+
+  /**
+   * Array\<number\> where each number is a page size option
+   */
+  export let pageSizeOptions: number[] = [5, 10, 20];
 
   $: columnVisibility = isMediaNotMobile
     ? defaultColumnVisibility
@@ -214,6 +219,7 @@
     <div class=" justify-center flex align-items-center btn-group mt-3">
       <button
         class="btn"
+        type="button"
         on:click={() => setCurrentPage(0)}
         class:is-disabled={!$table.getCanPreviousPage()}
         disabled={!$table.getCanPreviousPage()}
@@ -222,6 +228,7 @@
       </button>
       <button
         class="btn"
+        type="button"
         on:click={() =>
           setCurrentPage($table.getState().pagination.pageIndex - 1)}
         class:is-disabled={!$table.getCanPreviousPage()}
@@ -236,6 +243,7 @@
       </span>
       <button
         class="btn"
+        type="button"
         on:click={() =>
           setCurrentPage($table.getState().pagination.pageIndex + 1)}
         class:is-disabled={!$table.getCanNextPage()}
@@ -245,6 +253,7 @@
       </button>
       <button
         class="btn"
+        type="button"
         on:click={() => setCurrentPage($table.getPageCount() - 1)}
         class:is-disabled={!$table.getCanNextPage()}
         disabled={!$table.getCanNextPage()}
@@ -257,7 +266,7 @@
           on:change={setPageSize}
           class="btn"
         >
-          {#each [5, 10, 20] as pageSize}
+          {#each [5, 10, 20, 40, 80] as pageSize}
             <option value={pageSize}>
               Show {pageSize}
             </option>

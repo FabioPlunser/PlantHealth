@@ -303,4 +303,26 @@ public class SensorStationService {
 			throw new ServiceException("Sensor station is deleted", 400);
 		}
 	}
+
+	/**
+	 * Deletes a sensor station
+	 *
+	 * @param sensorStationId
+	 * @throws ServiceException
+	 */
+	public void deleteSensorStation(UUID sensorStationId) throws ServiceException {
+		Optional<SensorStation> maybeSensorStation = sensorStationRepository.findById(sensorStationId);
+		if (maybeSensorStation.isEmpty()) {
+			throw new ServiceException("Sensor station not found", 404);
+		}
+		SensorStation sensorStation = maybeSensorStation.get();
+		if (sensorStation.isDeleted()) {
+			throw new ServiceException("Sensor station already deleted", 404);
+		}
+		sensorStation.setDeleted(true);
+		sensorStation.setUnlocked(false);
+		sensorStation.setBdAddress(null);
+		sensorStation.setAccessPoint(null);
+		sensorStationRepository.save(sensorStation);
+	}
 }
