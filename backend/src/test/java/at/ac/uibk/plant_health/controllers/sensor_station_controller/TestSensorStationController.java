@@ -593,8 +593,8 @@ public class TestSensorStationController {
 								.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_OCTET_STREAM))
 				.andExpectAll(status().isOk());
 
-		deleteAllPictures(sensorStation);
-		assertEquals(0, sensorStation.getSensorStationPictures().size());
+		sensorStation = sensorStationService.findByBdAddress(bdAddress);
+		assertEquals(1, sensorStation.getSensorStationPictures().size());
 	}
 
 	@Test
