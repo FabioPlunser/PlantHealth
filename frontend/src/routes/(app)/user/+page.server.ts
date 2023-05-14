@@ -40,7 +40,7 @@ export async function load({ locals, fetch, cookies }) {
   // get all possible sensor stations from backend
   let res = await fetch(`${BACKEND_URL}/get-sensor-stations`);
   res = await res.json();
-  logger.info("get-sensor-stations", { res });
+  logger.info("get-sensor-stations", res);
 
   // get newest picture for each sensor station
   let sensorStations = res?.sensorStations;
@@ -96,7 +96,7 @@ export async function load({ locals, fetch, cookies }) {
     logger.info("get-sensor-station-pictures", { res });
 
     sensorStation.pictures = [];
-    for (let possiblePicture of res.pictures) {
+    for (let possiblePicture of res?.pictures ?? []) {
       logger.info("get-sensor-station-picture", { possiblePicture });
       let picturePromise = new Promise(async (resolve, reject) => {
         let pictureResponse = await fetch(
