@@ -110,7 +110,7 @@ public class SensorStationController {
 	) {
 		try {
 			SensorStation sensorStation = sensorStationService.findById(sensorStationId);
-			sensorStationService.updateSensorStation(sensorStation, name);
+			if (name != null) sensorStationService.updateSensorStation(sensorStation, name);
 			sensorStationService.setSensorLimits(sensorLimits, sensorStation, person);
 		} catch (ServiceException e) {
 			return MessageResponse.builder()
