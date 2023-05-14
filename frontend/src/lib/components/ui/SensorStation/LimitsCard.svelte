@@ -1,7 +1,7 @@
 <script lang="ts">
   import Input from "$components/ui/Input.svelte";
   import { enhance } from "$app/forms";
-  import FormError from "$components/ui/formError.svelte";
+  import FormError from "$components/ui/FormError.svelte";
   export let sensorStationId: string;
   export let limit: SensorLimit;
   export let form: any;
