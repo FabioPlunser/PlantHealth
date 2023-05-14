@@ -17,7 +17,14 @@ let source: string | null;
  * that
  */
 export async function load({ request, url, fetch, locals }) {
-  personId = url.searchParams.get("personId") ?? locals.user.personId;
+  // check if required variables are available
+  if (	(!url.searchParams.get("personId") && !locals?.user?.personId) ||
+		(!url.searchParams.get("username") && !locals?.user?.username) ||
+		(!url.searchParams.get("userPermissions") && !locals?.user?.permissions)) {
+			throw new error(403);
+		}
+  
+  personId = url.searchParams.get("personId") ?? locals?.user?.personId;
   let username = url.searchParams.get("username") ?? locals.user.username;
   source = request.headers.get("referer");
 
