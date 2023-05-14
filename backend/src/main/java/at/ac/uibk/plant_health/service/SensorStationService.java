@@ -128,8 +128,13 @@ public class SensorStationService {
 	 * @param sensorStation
 	 * @param name
 	 */
-	public void updateSensorStation(SensorStation sensorStation, String name) {
+	public void updateSensorStation(
+			SensorStation sensorStation, String name, Integer transferInterval
+	) {
+		if (name == null) return;
+		if (transferInterval == null) return;
 		sensorStation.setName(name);
+		sensorStation.getAccessPoint().setTransferInterval(transferInterval);
 		save(sensorStation);
 	}
 

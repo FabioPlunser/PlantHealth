@@ -151,6 +151,7 @@ public class TestSensorStationController {
 
 		String bdAddress = StringGenerator.macAddress();
 		SensorStation sensorStation = new SensorStation(bdAddress, 255);
+		sensorStation.setAccessPoint(accessPoint);
 		sensorStationService.save(sensorStation);
 		sensorStation = sensorStationService.findByBdAddress(bdAddress);
 		accessPointService.foundNewSensorStation(accessPoint, List.of(sensorStation));
