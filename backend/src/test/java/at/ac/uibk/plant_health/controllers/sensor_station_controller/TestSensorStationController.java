@@ -360,9 +360,10 @@ public class TestSensorStationController {
 	@Test
 	void setSingleSensorLimitAdmin() throws Exception {
 		Person person = createUserAndLogin(true, false);
-		// precondition accessPoint has found and reported at least one sensor station
+		// precondition accessPoint has found and reported at least one sensor station that is unlocked
 		String bdAddress = StringGenerator.macAddress();
 		SensorStation sensorStation = new SensorStation(bdAddress, 4);
+		sensorStation.setUnlocked(true);
 		sensorStationService.save(sensorStation);
 
 		// precondition sensorStation has at least one sensor
@@ -398,7 +399,7 @@ public class TestSensorStationController {
 		limits.add(limit);
 
 		// run request
-		mockMvc.perform(MockMvcRequestBuilders.post("/set-sensor-limits")
+		mockMvc.perform(MockMvcRequestBuilders.post("/update-sensor-station")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(person))
