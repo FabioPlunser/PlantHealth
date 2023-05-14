@@ -119,7 +119,7 @@ public class SensorStationController {
 		System.out.println("update sensor station");
 		try {
 			SensorStation sensorStation = sensorStationService.findById(sensorStationId);
-			if (name != null) sensorStationService.updateSensorStation(sensorStation, name, transferInterval);
+			sensorStationService.updateSensorStation(sensorStation, name, transferInterval);
 			sensorStationService.setSensorLimits(sensorLimits, sensorStation, person);
 		} catch (ServiceException e) {
 			return MessageResponse.builder()
