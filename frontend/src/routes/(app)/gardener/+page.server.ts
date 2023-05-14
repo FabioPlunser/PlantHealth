@@ -209,7 +209,6 @@ export async function load(event) {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     for (let picture of possiblePictures) {
-      console.log(picture);
       let picturePromise = new Promise(async (resolve, reject) => {
         await fetch(
           `${BACKEND_URL}/get-sensor-station-picture?pictureId=${picture.pictureId}`
@@ -253,7 +252,11 @@ export async function load(event) {
             reject(null);
           });
       });
-      sensorStation.pictures.push(picturePromise);
+      let sensorStationPicture: any = {
+        pictureId: picture.pictureId,
+        promise: picturePromise,
+      };
+      sensorStation.pictures.push(sensorStationPicture);
     }
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -373,7 +376,50 @@ export const actions = {
       });
   },
 
-  deletePicture: async (event) => {},
+  deletePicture: async (event) => {
+    const { request, fetch } = event;
+    let formData = await request.formData();
+    let pictureId = String(formData.get("pictureId"));
+    let params = new URLSearchParams();
+    params.set("pictureId", pictureId);
+
+    let requestOptions = {
+      method: "POST",
+    };
+
+    await fetch(
+      `${BACKEND_URL}/delete-sensor-station-picture?${params.toString()}`,
+      requestOptions
+    )
+      .then(async (res) => {
+        if (!res.ok) {
+          res = await res.json();
+          console.log("delete picture error", res);
+          logger.error("Error while deleting picture" + String(res));
+          toasts.addToast(
+            event.locals.user?.personId,
+            "error",
+            "Error while deleting picture"
+          );
+          throw error(500, "Error while deleting picture");
+        }
+        let data = await res.json();
+        toasts.addToast(
+          event.locals.user?.personId,
+          "success",
+          "Picture deleted"
+        );
+      })
+      .catch((e) => {
+        logger.error("Error while deleting picture", { e });
+        toasts.addToast(
+          event.locals.user?.personId,
+          "error",
+          "Error while deleting picture"
+        );
+        throw error(500, "Error while deleting picture");
+      });
+  },
 
   uploadPicture: async (event) => {
     const { request, fetch } = event;

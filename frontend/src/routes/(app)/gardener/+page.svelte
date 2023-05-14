@@ -427,17 +427,75 @@
                             sensorStationId={sensorStation.sensorStationId}
                           />
                         {:else}
-                          <UploadPicture
-                            sensorStationId={sensorStation.sensorStationId}
-                          />
+                          <div class="flex gap-2">
+                            <UploadPicture
+                              sensorStationId={sensorStation.sensorStationId}
+                            />
+                            <form
+                              method="POST"
+                              action="?/deleteAllPictures"
+                              use:enhance
+                            >
+                              <input
+                                type="hidden"
+                                name="sensorStationId"
+                                value={sensorStation.sensorStationId}
+                              />
+                              <button
+                                type="submit"
+                                on:click={(event) => {
+                                  if (
+                                    !window.confirm(
+                                      "Are you sure you want to delete all images?"
+                                    )
+                                  ) {
+                                    event.preventDefault();
+                                  }
+                                }}
+                                formaction="?/deleteAllPictures"
+                                class="btn btn-error mb-4"
+                              >
+                                DELETE ALL
+                              </button>
+                            </form>
+                          </div>
                           <div
                             class="grid grid-rows sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
                           >
-                            {#each sensorStation.pictures as picture, i (i)}
-                              {#await picture}
+                            {#each sensorStation.pictures as picture, i (picture.pictureId)}
+                              {#await picture.promise}
                                 <Spinner />
                               {:then data}
-                                <div>
+                                <div class="relative">
+                                  <div class="absolute top-0 right-0 m-2">
+                                    <form
+                                      method="POST"
+                                      action="?/deletePicture"
+                                      use:enhance
+                                    >
+                                      <input
+                                        type="hidden"
+                                        name="pictureId"
+                                        value={data.pictureId}
+                                      />
+                                      <button
+                                        class=""
+                                        type="submit"
+                                        on:click={() => {
+                                          if (
+                                            !window.confirm(
+                                              "You will delete this picture permanently"
+                                            )
+                                          )
+                                            event?.preventDefault();
+                                        }}
+                                      >
+                                        <i
+                                          class="bi bi-trash text-2xl text-black hover:text-red-500 hover:scale-105"
+                                        />
+                                      </button>
+                                    </form>
+                                  </div>
                                   <!-- svelte-ignore a11y-click-events-have-key-events -->
                                   <img
                                     src={data.imageRef}
