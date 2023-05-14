@@ -19,12 +19,12 @@ public class UserSensorStationsResponse extends RestResponse implements Serializ
 			this.sensorStations =
 					sensorStations.stream()
 							.filter(s -> !s.isDeleted() && s.isUnlocked())
-							.filter(s -> {
-								if (s.getGardener() != null)
-									return s.getGardener().equals(person);
-								else
-									return false;
-							})
+							//							.filter(s -> {
+							//								if (s.getGardener() != null)
+							//									return
+							//! s.getGardener().equals(person); 								else
+							//! return false;
+							//							})
 							.filter(s
 									-> person.getSensorStationPersonReferences().stream().noneMatch(
 											r -> r.getSensorStation().equals(s)
