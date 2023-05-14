@@ -1,4 +1,3 @@
-import type { Handle, HandleFetch, HandleServerError } from "@sveltejs/kit";
 import { redirect, error } from "@sveltejs/kit";
 import { logger } from "$helper/logger";
 /**
@@ -8,43 +7,60 @@ import { logger } from "$helper/logger";
  * Redirect to home if logged in but does not have the correct permissions
  * Add user to event.locals
  */
-export const handle = (async ({ event, resolve }) => {
-  //logger.info("Handle Event: " + JSON.stringify(event));
+export async function handle({ event, resolve }) {
   logger.info("Handle request: " + JSON.stringify(event.request));
 
-  const { cookies } = event;
-  let token = cookies.get("token");
+  let cookieToken = event.cookies.get("token") || "";
 
-  if (token) {
-    token = JSON.parse(token);
-    event.locals.user = token;
-    logger.info("Token found: " + JSON.stringify(token));
+  if (!event.locals.user) {
+    event.locals.user = {
+      personId: "",
+      username: "",
+      permissions: [],
+      token: "",
+    };
+  }
+
+  if (cookieToken !== "") {
+    event.locals.user = JSON.parse(cookieToken);
+    logger.info("Token found: " + JSON.stringify(event.locals.user));
   } else {
     logger.error("No token found");
-    event.locals.user = null;
+    event.locals.user.token = "";
+    event.locals.user = undefined;
     const response = await resolve(event);
     return response;
   }
+  // console.log("CurrentUser: ")
+  // console.table(event.locals.user);
+  logger.info("User: " + JSON.stringify(event.locals.user));
 
   if (event.url.pathname.startsWith("/login")) {
     if (event.locals.user) {
-      throw redirect(307, "/");
+      throw redirect(302, "/");
     }
   }
 
   if (event.url.pathname.startsWith("/admin")) {
+    if (!event.locals.user) {
+      throw redirect(307, "/logout");
+    }
     if (!event.locals.user.permissions.includes("ADMIN")) {
       throw redirect(307, "/");
     }
   }
-
   if (event.url.pathname.startsWith("/gardener")) {
+    if (!event.locals.user) {
+      throw redirect(307, "/logout");
+    }
     if (!event.locals.user.permissions.includes("GARDENER")) {
       throw redirect(307, "/");
     }
   }
-
   if (event.url.pathname.startsWith("/user")) {
+    if (!event.locals.user) {
+      throw redirect(307, "/logout");
+    }
     if (!event.locals.user.permissions.includes("USER")) {
       throw redirect(307, "/");
     }
@@ -52,34 +68,35 @@ export const handle = (async ({ event, resolve }) => {
 
   const response = await resolve(event);
   return response;
-}) satisfies Handle;
+}
 
 /**
  * @type {HandleFetch}
  * Add token to all backend fetches
  */
-export const handleFetch = (({ event, request, fetch }) => {
-  //logger.info("HandleFetch Event: " + JSON.stringify(event));
-  logger.info("HandleFetch request: " + JSON.stringify(request));
-
-  const { cookies } = event;
-  let token = cookies.get("token");
-  if (token) {
-    token = JSON.parse(token);
-  } else {
+export async function handleFetch({ request, fetch, event }) {
+  if (!event.locals.user) {
     return fetch(request);
   }
 
-  let value = {
-    token: token.token,
-    username: token.username,
+  let token = {
+    token: event.locals.user.token,
+    username: event.locals.user.username,
   };
 
-  request.headers.set("Authorization", JSON.stringify(value));
-  logger.info("HandleFetch Token is: " + request.headers.get("Authorization"));
-  return fetch(request);
-}) satisfies HandleFetch;
+  request.headers.set("Authorization", JSON.stringify(token));
+  // console.log(request.headers);
 
+  return fetch(request);
+}
+
+export async function handleError({ error, event }) {
+  logger.error("HandleError Event: " + JSON.stringify(error.message));
+  return {
+    message: error.message,
+    errorId: error.errorId,
+  };
+}
 // export const handleError = (({ event, error }) => {
 //   logger.error("HandleError Event: " + JSON.stringify(event));
 //   logger.error("HandleError Error: " + JSON.stringify(error));

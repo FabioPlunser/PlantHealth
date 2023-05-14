@@ -5,7 +5,12 @@ import type { StringifyOptions } from "querystring";
 
 // and what to do when importing types
 declare namespace App {
-  // interface Locals {}
+  interface Locals {
+    user?: User;
+  }
+  interface Error {
+    [key: string]: any;
+  }
   // interface PageData {}
   // interface Platform {}
   // interface PrivateEnv {}
@@ -43,7 +48,7 @@ declare interface User {
   username: string;
   token: string;
   permissions: string[];
-  email: string;
+  [key: string]: any;
 }
 
 declare interface Typed {

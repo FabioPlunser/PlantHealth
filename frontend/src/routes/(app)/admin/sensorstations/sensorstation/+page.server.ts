@@ -3,7 +3,11 @@ import { logger } from "$helper/logger";
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 import { toasts } from "$stores/toastStore";
-import type { ResponseSensorValues, Sensor, SensorStation } from "../../../../../app.js";
+import type {
+  ResponseSensorValues,
+  Sensor,
+  SensorStation,
+} from "../../../../../app.js";
 
 interface _SensorStation extends SensorStation {
   data: Promise<any>;
@@ -48,22 +52,24 @@ export async function load({ fetch, depends, cookies }) {
       }&from=${from.toISOString().split(".")[0]}&to=${
         to.toISOString().split(".")[0]
       }`
-    ).then((response) => {
-      logger.info(
-        "Get sensor-station-data " +
-          "from: " +
-          JSON.stringify(from) +
-          " to: " +
-          JSON.stringify(to)
-      );
-      if (!response.ok) {
-        resolve(null);
-      }
-      return response.json();
-    }).then((data) => {
-      let responseValues: ResponseSensorValues[] = data.data;
-      resolve(responseValues);
-    });
+    )
+      .then((response) => {
+        logger.info(
+          "Get sensor-station-data " +
+            "from: " +
+            JSON.stringify(from) +
+            " to: " +
+            JSON.stringify(to)
+        );
+        if (!response.ok) {
+          resolve(null);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        let responseValues: ResponseSensorValues[] = data.data;
+        resolve(responseValues);
+      });
   });
   //-------------------------------------------------------------------------------------------------------------------------
   //-------------------------------------------------------------------------------------------------------------------------
@@ -123,7 +129,6 @@ const nameSchema = z.object({
   name: z
     .string({ required_error: "Name is required" })
     .min(1, { message: "Name is required" })
-    .min(6, { message: "Name must be at least 6 characters" })
     .max(32, { message: "Name must be less than 32 characters" })
     .trim(),
 });
@@ -341,7 +346,11 @@ export const actions = {
 
     if (pictureId === null) {
       logger.error("deletePicture: pictureId null");
-      toasts.addToast(locals.user.personId, "error", "Failed to delete picture no pictureId");
+      toasts.addToast(
+        locals.user.personId,
+        "error",
+        "Failed to delete picture no pictureId"
+      );
       return;
     }
 
@@ -349,10 +358,12 @@ export const actions = {
     params.set("pictureId", pictureId.toString());
 
     let parametersString = "?" + params.toString();
-    await fetch(`${BACKEND_URL}/delete-sensor-station-picture${parametersString}`, {
-      method: "POST",
-    })
-    .then((response) => {
+    await fetch(
+      `${BACKEND_URL}/delete-sensor-station-picture${parametersString}`,
+      {
+        method: "POST",
+      }
+    ).then((response) => {
       if (!response.ok) {
         logger.error("sensor-station-page", { response });
         toasts.addToast(
@@ -362,22 +373,22 @@ export const actions = {
         );
       } else {
         logger.info(`Deleted picture = ${pictureId}`);
-        toasts.addToast(
-          locals.user.personId,
-          "success",
-          "Deleted picture"
-        );
+        toasts.addToast(locals.user.personId, "success", "Deleted picture");
       }
-    })
+    });
   },
-  
+
   deleteAllPictures: async ({ request, fetch, locals }) => {
     let formData = await request.formData();
     let sensorStationId = formData.get("sensorStationId");
 
     if (sensorStationId === null) {
       logger.error("deletePicture: pictureId null");
-      toasts.addToast(locals.user.personId, "error", "Failed to delete all pictures no sensorStationId");
+      toasts.addToast(
+        locals.user.personId,
+        "error",
+        "Failed to delete all pictures no sensorStationId"
+      );
       return;
     }
 
@@ -385,10 +396,12 @@ export const actions = {
     params.set("sensorStationId", sensorStationId.toString());
 
     let parametersString = "?" + params.toString();
-    await fetch(`${BACKEND_URL}/delete-all-sensor-station-pictures${parametersString}`, {
-      method: "POST",
-    })
-    .then((response) => {
+    await fetch(
+      `${BACKEND_URL}/delete-all-sensor-station-pictures${parametersString}`,
+      {
+        method: "POST",
+      }
+    ).then((response) => {
       if (!response.ok) {
         logger.error("sensor-station-page", { response });
         toasts.addToast(
@@ -404,6 +417,6 @@ export const actions = {
           "Deleted all pictures"
         );
       }
-    })
+    });
   },
 };
