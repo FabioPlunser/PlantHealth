@@ -362,6 +362,7 @@ public class TestSensorStationController {
 		// precondition accessPoint has found and reported at least one sensor station
 		String bdAddress = StringGenerator.macAddress();
 		SensorStation sensorStation = new SensorStation(bdAddress, 4);
+		sensorStation.setUnlocked(true);
 		sensorStationService.save(sensorStation);
 
 		// precondition sensorStation has at least one sensor
@@ -397,7 +398,7 @@ public class TestSensorStationController {
 		limits.add(limit);
 
 		// run request
-		mockMvc.perform(MockMvcRequestBuilders.post("/set-sensor-limits")
+		mockMvc.perform(MockMvcRequestBuilders.post("/update-sensor-station")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(person))
