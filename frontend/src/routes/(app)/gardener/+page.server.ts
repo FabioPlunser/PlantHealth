@@ -7,6 +7,7 @@ import { toasts } from "$stores/toastStore";
 
 import { getSensorStationData } from "./getData";
 import { getSensorStationPictures } from "./getPictures";
+import { format } from "path";
 
 interface Dashboard {
   sensorStations: SensorStation[];
@@ -187,7 +188,7 @@ export async function load(event) {
           possiblePictures = [];
         }
         let data = await res.json();
-        possiblePictures = data.pictureIds;
+        possiblePictures = data.pictures;
       })
       .catch((e) => {
         logger.error("Error while fetching sensor station pictures", { e });
@@ -208,17 +209,22 @@ export async function load(event) {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     for (let picture of possiblePictures) {
+      console.log(picture);
       let picturePromise = new Promise(async (resolve, reject) => {
-        await fetch(`${BACKEND_URL}/get-picture?pictureId=${picture.picutreId}`)
+        await fetch(
+          `${BACKEND_URL}/get-sensor-station-picture?pictureId=${picture.pictureId}`
+        )
           .then(async (res) => {
             if (!res.ok) {
+              res = await res.json();
+              console.log("res", res);
               logger.error("Error while fetching picture", { res });
               toasts.addToast(
                 event.locals.user?.personId,
                 "error",
                 "Error while fetching picture"
               );
-              reject(null);
+              resolve(null);
             }
             let blob = await res.blob();
             let file = new File([blob], picture.pictureId, { type: blob.type });
@@ -232,8 +238,9 @@ export async function load(event) {
             let newPicture: Picture = {
               pictureId: picture.pictureId,
               imageRef: encodedImage,
-              creationDate: new Date(picture.creationDate),
+              creationDate: new Date(picture.timeStamp),
             };
+            console.log("newPicture", newPicture);
             resolve(newPicture);
           })
           .catch((e) => {
@@ -367,6 +374,52 @@ export const actions = {
   },
 
   deletePicture: async (event) => {},
+
+  uploadPicture: async (event) => {
+    const { request, fetch } = event;
+    let formData = await request.formData();
+    let sensorStationId: string = String(formData.get("sensorStationId"));
+    formData.delete("sensorStationId");
+
+    let requestOptions = {
+      method: "POST",
+      body: formData,
+    };
+    await fetch(
+      `${BACKEND_URL}/upload-sensor-station-picture?sensorStationId=${sensorStationId}`,
+      requestOptions
+    )
+      .then(async (res) => {
+        if (!res.ok) {
+          res = await res.json();
+          console.log(res);
+          logger.error("Error while uploading picture" + String(res));
+          toasts.addToast(
+            event.locals.user?.personId,
+            "error",
+            "Error while uploading picture"
+          );
+          throw error(500, "Error while uploading picture");
+        }
+        let data = await res.json();
+        console.log(res);
+        toasts.addToast(
+          event.locals.user?.personId,
+          "success",
+          "Picture uploaded"
+        );
+      })
+      .catch((e) => {
+        console.log(e);
+        logger.error("Error while uploading picture", { e });
+        toasts.addToast(
+          event.locals.user?.personId,
+          "error",
+          "Error while uploading picture"
+        );
+        throw error(500, "Error while uploading picture");
+      });
+  },
 
   updateLimit: async (event) => {
     const { request, fetch } = event;

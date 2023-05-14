@@ -20,6 +20,7 @@
   // ---------------------------------------------------
   import { onMount } from "svelte";
   import { add } from "$lib/components/toast/core/store";
+  import UploadPicture from "./uploadPicture.svelte";
   let rendered = false;
   onMount(() => {
     rendered = true;
@@ -41,6 +42,7 @@
   let loading = false;
   let assignedAdded = true;
   let showPicture = false;
+  let selectedPicture: any = null;
   let newDates = data.dates;
   let dateNow = new Date(Date.now()).toLocaleDateString();
   let state = "graph";
@@ -113,6 +115,11 @@
 </script>
 
 {#if rendered}
+  <BigPictureModal
+    bind:imageRef={selectedPicture}
+    bind:open={showPicture}
+    on:close={() => (showPicture = false)}
+  />
   <SensorStationsModal
     data={sensorStations}
     bind:showModal={sensorStationsModal}
@@ -416,25 +423,40 @@
                           <h1 class="flex justify-center text-3xl font-bold">
                             No Pictures
                           </h1>
+                          <UploadPicture
+                            sensorStationId={sensorStation.sensorStationId}
+                          />
                         {:else}
-                          {#each sensorStation.pictures as picture, i (picture.pictureId)}
-                            {#await picture}
-                              <Spinner />
-                            {:then data}
-                              <div>
-                                <img
-                                  src={data.imageRef}
-                                  alt="SensorStationPicture: {i}"
-                                  class="rounded-2xl shadow-xl cursor-pointer"
-                                />
-                                <h1 class="flex justify-center">
-                                  {data.creationDate.toLocaleDateString()}
-                                </h1>
-                              </div>
-                            {:catch error}
-                              <p class="text-red-500">{error.message}</p>
-                            {/await}
-                          {/each}
+                          <UploadPicture
+                            sensorStationId={sensorStation.sensorStationId}
+                          />
+                          <div
+                            class="grid grid-rows sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
+                          >
+                            {#each sensorStation.pictures as picture, i (i)}
+                              {#await picture}
+                                <Spinner />
+                              {:then data}
+                                <div>
+                                  <!-- svelte-ignore a11y-click-events-have-key-events -->
+                                  <img
+                                    src={data.imageRef}
+                                    alt="SensorStationPicture: {i}"
+                                    class="rounded-2xl shadow-xl cursor-pointer"
+                                    on:click={() => {
+                                      showPicture = true;
+                                      selectedPicture = data.imageRef;
+                                    }}
+                                  />
+                                  <h1 class="flex justify-center">
+                                    {data.creationDate.toLocaleDateString()}
+                                  </h1>
+                                </div>
+                              {:catch error}
+                                <p class="text-red-500">{error.message}</p>
+                              {/await}
+                            {/each}
+                          </div>
                         {/if}
                       </div>
                     {/if}
