@@ -637,8 +637,8 @@ public class TestSensorStationController {
 		Person person = createUserAndLogin(true, false);
 		// precondition accessPoint has found and reported at least one sensor station
 		String bdAddress = StringGenerator.macAddress();
-		SensorStation sensorStation = new SensorStation(bdAddress, 4);
-		sensorStationService.save(sensorStation);
+		SensorStation testSensorStation = new SensorStation(bdAddress, 4);
+		sensorStationService.save(testSensorStation);
 
 		int pictureCount = 10;
 
@@ -649,7 +649,7 @@ public class TestSensorStationController {
 				String picturePath = picturesPath + UUID.randomUUID() + ".png";
 				Path path = Paths.get(picturePath);
 				plantPicture =
-						new SensorStationPicture(sensorStation, picturePath, LocalDateTime.now());
+						new SensorStationPicture(testSensorStation, picturePath, LocalDateTime.now());
 				plantPictureRepository.save(plantPicture);
 				Files.createDirectories(path.getParent());
 				Files.write(path, imageByte);
@@ -659,28 +659,30 @@ public class TestSensorStationController {
 			}
 		}
 
-		sensorStation.setSensorStationPictures(plantPictures);
-		sensorStationService.save(sensorStation);
+		testSensorStation.setSensorStationPictures(plantPictures);
+		sensorStationService.save(testSensorStation);
 
-		List<SensorStationPicture> pictures = plantPictureRepository.findAll();
-		assertEquals(pictures.size(), sensorStation.getSensorStationPictures().size());
+		List<SensorStationPicture> pictures = plantPictureRepository.findAll().stream()
+				.filter(p -> p.getSensorStation().getBdAddress().equals(bdAddress))
+				.toList();
+		assertEquals(pictures.size(), testSensorStation.getSensorStationPictures().size());
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/delete-all-sensor-station-pictures")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(person))
 								.param("sensorStationId",
-									   String.valueOf(sensorStation.getDeviceId()))
+									   String.valueOf(testSensorStation.getDeviceId()))
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
 		Optional<SensorStation> maybeSensorStation =
-				sensorStationRepository.findById(sensorStation.getDeviceId());
+				sensorStationRepository.findById(testSensorStation.getDeviceId());
 		if (maybeSensorStation.isEmpty()) {
 			fail("SensorStation not found");
 		}
-		sensorStation = maybeSensorStation.get();
-		assertEquals(0, sensorStation.getSensorStationPictures().size());
+		testSensorStation = maybeSensorStation.get();
+		assertEquals(0, testSensorStation.getSensorStationPictures().size());
 	}
 
 	@Test
