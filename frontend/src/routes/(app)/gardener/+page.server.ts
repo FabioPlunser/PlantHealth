@@ -421,6 +421,51 @@ export const actions = {
       });
   },
 
+  deleteAllPictures: async (event) => {
+    const { request, fetch } = event;
+    let formData = await request.formData();
+    let sensorStationId = String(formData.get("sensorStationId"));
+    let params = new URLSearchParams();
+    params.set("sensorStationId", sensorStationId);
+
+    let requestOptions = {
+      method: "POST",
+    };
+
+    await fetch(
+      `${BACKEND_URL}/delete-all-sensor-station-pictures?${params.toString()}`,
+      requestOptions
+    )
+      .then(async (res) => {
+        if (!res.ok) {
+          res = await res.json();
+          console.log("delete all pictures error", res);
+          logger.error("Error while deleting all pictures" + String(res));
+          toasts.addToast(
+            event.locals.user?.personId,
+            "error",
+            "Error while deleting all pictures"
+          );
+          throw error(500, "Error while deleting all pictures");
+        }
+        let data = await res.json();
+        toasts.addToast(
+          event.locals.user?.personId,
+          "success",
+          "All pictures deleted"
+        );
+      })
+      .catch((e) => {
+        logger.error("Error while deleting all pictures", { e });
+        toasts.addToast(
+          event.locals.user?.personId,
+          "error",
+          "Error while deleting all pictures"
+        );
+        throw error(500, "Error while deleting all pictures");
+      });
+  },
+
   uploadPicture: async (event) => {
     const { request, fetch } = event;
     let formData = await request.formData();
