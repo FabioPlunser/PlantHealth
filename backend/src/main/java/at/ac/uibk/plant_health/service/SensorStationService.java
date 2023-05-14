@@ -131,10 +131,12 @@ public class SensorStationService {
 	public void updateSensorStation(
 			SensorStation sensorStation, String name, Integer transferInterval
 	) {
-		if (name == null) return;
-		if (transferInterval == null) return;
-		sensorStation.setName(name);
-		sensorStation.getAccessPoint().setTransferInterval(transferInterval);
+		if (!Objects.isNull(name)) {
+			sensorStation.setName(name);
+		}
+		if (!Objects.isNull(transferInterval) && !Objects.isNull(sensorStation.getAccessPoint())) {
+			sensorStation.getAccessPoint().setTransferInterval(transferInterval);
+		}
 		save(sensorStation);
 	}
 
