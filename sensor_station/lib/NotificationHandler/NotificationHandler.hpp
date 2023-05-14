@@ -114,9 +114,12 @@ class NotificationHandler {
 				return ledConstroller->updateLEDStatus();
 			}
 			DEBUG_PRINT_POS(3, "New notification set.")
-			uint16_t ledOnMs[]	= {LED_TIME_NOTIFICATION_ON_MS};
-			uint16_t ledOffMs[] = {LED_TIME_NOTIFICATION_OFF_MS};
-			uint8_t arraySize	= sizeof(ledOnMs) / sizeof(ledOnMs[0]);
+			uint16_t ledOnMs[] = {
+				LED_TIME_NOTIFICATION_ON_MS, LED_TIME_NOTIFICATION_ON_MS};
+			uint16_t ledOffMs[] = {
+				LED_TIME_NOTIFICATION_BLINK_PAUSE_MS,
+				LED_TIME_NOTIFICATION_OFF_MS};
+			uint8_t arraySize = sizeof(ledOnMs) / sizeof(ledOnMs[0]);
 			uint8_t colorR =
 				DECOMPOSE_HEX_RGB_R(LED_COLOR_NOTIFICATION_PAIRING);
 			uint8_t colorG =
