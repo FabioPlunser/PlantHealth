@@ -112,7 +112,8 @@
               <!-- <option hidden class="hidden">{person.personId}</option> -->
               <option selected value={person.personId}>{person.username}</option
               >
-              <option value="null">No gardener assigned</option>
+              <input type="hidden" name="delete" value="true" />
+              <option value={person.personId}>Unassign</option>
             {:else}
               {#if i == 0}
                 <option>No gardener assigned</option>

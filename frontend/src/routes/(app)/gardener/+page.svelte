@@ -155,13 +155,20 @@
           <p class="text-xl font-bold">No SensorStations added yet</p>
         </div>
       {/if}
-      {#each data.dashboard.addedSensorStations as sensorStation, i (sensorStation.sensorStationId)}
-        <div in:fly={{ y: -200, duration: 200, delay: 200 * i }}>
-          <SensorStation {sensorStation} dates={data.dates} />
-        </div>
-      {/each}
+      <div class="grid grid-rows gap-2">
+        {#each data.dashboard.addedSensorStations as sensorStation, i (sensorStation.sensorStationId)}
+          <div in:fly={{ y: -200, duration: 200, delay: 200 * i }}>
+            <SensorStation {sensorStation} dates={data.dates} />
+          </div>
+        {/each}
+      </div>
     {/if}
     {#if assignedAdded}
+      {#if data.dashboard.assignedSensorStations.length === 0}
+        <div class="flex justify-center h-screen">
+          <p class="text-xl font-bold">No SensorStations assigned yet</p>
+        </div>
+      {/if}
       <div class="grid grid-rows gap-2">
         {#each data.dashboard.assignedSensorStations as sensorStation, i (sensorStation.sensorStationId)}
           <div
