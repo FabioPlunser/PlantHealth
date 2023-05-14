@@ -48,13 +48,15 @@
     <div>
       <button
         type="submit"
-        on:click={() => {
+        on:click={(event) => {
           let isDeleteConfirmed = confirm(
             `You will delete this sensor station permanently!`
           );
-          if (isDeleteConfirmed) {
-            throw redirect(307, "/admin/sensorstations");
+          if (!isDeleteConfirmed) {
+            event.preventDefault();
+            return;
           }
+          throw redirect(307, "/admin/sensorstations");
         }}
         formaction="?/delete"
       >

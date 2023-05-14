@@ -3,6 +3,7 @@ import { logger } from "$helper/logger";
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 import { toasts } from "$stores/toastStore";
+import type { ResponseSensorValues, Sensor, SensorStation } from "../../../../../app.js";
 
 interface _SensorStation extends SensorStation {
   data: Promise<any>;
@@ -41,25 +42,28 @@ export async function load({ fetch, depends, cookies }) {
   //-------------------------------------------------------------------------------------------------------------------------
   //-------------------------------------------------------------------------------------------------------------------------
   sensorStation.data = new Promise(async (resolve, reject) => {
-    let res = await fetch(
+    await fetch(
       `${BACKEND_URL}/get-sensor-station-data?sensorStationId=${
         sensorStation.sensorStationId
       }&from=${from.toISOString().split(".")[0]}&to=${
         to.toISOString().split(".")[0]
       }`
-    );
-    logger.info(
-      "Get sensor-station-data " +
-        "from: " +
-        JSON.stringify(from) +
-        " to: " +
-        JSON.stringify(to)
-    );
-    if (!res.ok) {
-      resolve(null);
-    }
-    res = await res.json();
-    resolve(res);
+    ).then((response) => {
+      logger.info(
+        "Get sensor-station-data " +
+          "from: " +
+          JSON.stringify(from) +
+          " to: " +
+          JSON.stringify(to)
+      );
+      if (!response.ok) {
+        resolve(null);
+      }
+      return response.json();
+    }).then((data) => {
+      let responseValues: ResponseSensorValues[] = data.data;
+      resolve(responseValues);
+    });
   });
   //-------------------------------------------------------------------------------------------------------------------------
   //-------------------------------------------------------------------------------------------------------------------------
@@ -329,5 +333,77 @@ export const actions = {
 
     cookies.set("from", newFrom.toISOString(), { path: "/" });
     cookies.set("to", newTo.toISOString(), { path: "/" });
+  },
+
+  deletePicture: async ({ request, fetch, locals }) => {
+    let formData = await request.formData();
+    let pictureId = formData.get("pictureId");
+
+    if (pictureId === null) {
+      logger.error("deletePicture: pictureId null");
+      toasts.addToast(locals.user.personId, "error", "Failed to delete picture no pictureId");
+      return;
+    }
+
+    let params = new URLSearchParams();
+    params.set("pictureId", pictureId.toString());
+
+    let parametersString = "?" + params.toString();
+    await fetch(`${BACKEND_URL}/delete-sensor-station-picture${parametersString}`, {
+      method: "POST",
+    })
+    .then((response) => {
+      if (!response.ok) {
+        logger.error("sensor-station-page", { response });
+        toasts.addToast(
+          locals.user.personId,
+          "error",
+          `Failed to delete picture: ${response.status} ${response.message}`
+        );
+      } else {
+        logger.info(`Deleted picture = ${pictureId}`);
+        toasts.addToast(
+          locals.user.personId,
+          "success",
+          "Deleted picture"
+        );
+      }
+    })
+  },
+  
+  deleteAllPictures: async ({ request, fetch, locals }) => {
+    let formData = await request.formData();
+    let sensorStationId = formData.get("sensorStationId");
+
+    if (sensorStationId === null) {
+      logger.error("deletePicture: pictureId null");
+      toasts.addToast(locals.user.personId, "error", "Failed to delete all pictures no sensorStationId");
+      return;
+    }
+
+    let params = new URLSearchParams();
+    params.set("sensorStationId", sensorStationId.toString());
+
+    let parametersString = "?" + params.toString();
+    await fetch(`${BACKEND_URL}/delete-all-sensor-station-pictures${parametersString}`, {
+      method: "POST",
+    })
+    .then((response) => {
+      if (!response.ok) {
+        logger.error("sensor-station-page", { response });
+        toasts.addToast(
+          locals.user.personId,
+          "error",
+          `Failed to delete all pictures: ${response.status} ${response.message}`
+        );
+      } else {
+        logger.info(`Deleted all pictures = ${sensorStationId}`);
+        toasts.addToast(
+          locals.user.personId,
+          "success",
+          "Deleted all pictures"
+        );
+      }
+    })
   },
 };
