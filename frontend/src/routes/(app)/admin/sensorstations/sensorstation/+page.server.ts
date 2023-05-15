@@ -22,8 +22,6 @@ export async function load({ fetch, depends, cookies }) {
   let from: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   let to: Date = new Date(Date.now());
   // if cookies are set overwrite the dates
-  console.log("cookieFrom: ", cookieFrom);
-  console.log("cookieTo: ", cookieTo);
   if (cookieFrom !== "" || cookieTo !== "") {
     from = new Date(cookieFrom);
     to = new Date(cookieTo);
@@ -361,7 +359,6 @@ export const actions = {
     }
     let newFrom = new Date(_from.toString());
     let newTo = new Date(_to.toString());
-    console.log(newTo);
 
     newFrom.setHours(0);
     newFrom.setMinutes(0);

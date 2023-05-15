@@ -8,7 +8,6 @@
 
   export let showModal: boolean;
   export let data: any = [];
-  $: console.log(data);
 </script>
 
 <Modal

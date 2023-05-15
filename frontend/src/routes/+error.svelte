@@ -17,8 +17,13 @@
     </p>
     <br />
     <p class="text-4xl flex justify-center text-center">
-      Oops... {$page.status == 404 ?
-					"It's not here anymore. Maybe Snoop Dog smoked it." : "Something went wrong!"}
+      {#if $page.status === 404 && $page.error?.message}
+        {$page.error.message}
+      {:else}
+        Oops... {$page.status === 404
+          ? "It's not here anymore. Maybe Snoop Dog smoked it."
+          : "Something went wrong!"}
+      {/if}
     </p>
     <div class="flex justify-center mt-9 ">
       <ul>
@@ -29,7 +34,11 @@
           </a>
         </li>
         <li>
-          <a href="/logout" class="btn btn-primary w-full mt-2">logout</a>
+          <a
+            href="/logout"
+            data-sveltekit-reload
+            class="btn btn-primary w-full mt-2">logout</a
+          >
         </li>
       </ul>
     </div>

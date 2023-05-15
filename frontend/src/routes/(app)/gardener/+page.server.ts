@@ -216,7 +216,6 @@ export async function load(event) {
           .then(async (res) => {
             if (!res.ok) {
               res = await res.json();
-              console.log("res", res);
               logger.error("Error while fetching picture", { res });
               toasts.addToast(
                 event.locals.user?.personId,
@@ -239,7 +238,6 @@ export async function load(event) {
               imageRef: encodedImage,
               creationDate: new Date(picture.timeStamp),
             };
-            console.log("newPicture", newPicture);
             resolve(newPicture);
           })
           .catch((e) => {
@@ -394,7 +392,6 @@ export const actions = {
       .then(async (res) => {
         if (!res.ok) {
           res = await res.json();
-          console.log("delete picture error", res);
           logger.error("Error while deleting picture" + String(res));
           toasts.addToast(
             event.locals.user?.personId,
@@ -439,7 +436,6 @@ export const actions = {
       .then(async (res) => {
         if (!res.ok) {
           res = await res.json();
-          console.log("delete all pictures error", res);
           logger.error("Error while deleting all pictures" + String(res));
           toasts.addToast(
             event.locals.user?.personId,
@@ -483,7 +479,6 @@ export const actions = {
       .then(async (res) => {
         if (!res.ok) {
           res = await res.json();
-          console.log(res);
           logger.error("Error while uploading picture" + String(res));
           toasts.addToast(
             event.locals.user?.personId,
@@ -493,7 +488,6 @@ export const actions = {
           throw error(500, "Error while uploading picture");
         }
         let data = await res.json();
-        console.log(res);
         toasts.addToast(
           event.locals.user?.personId,
           "success",
@@ -501,7 +495,6 @@ export const actions = {
         );
       })
       .catch((e) => {
-        console.log(e);
         logger.error("Error while uploading picture", { e });
         toasts.addToast(
           event.locals.user?.personId,

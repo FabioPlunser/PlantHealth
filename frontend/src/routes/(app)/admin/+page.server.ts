@@ -18,7 +18,6 @@ export async function load({ fetch }) {
   res = await fetch(`${BACKEND_URL}/get-logs`);
   let backendLogs = await res.json();
   backendLogs = backendLogs.logs;
-  console.log(backendLogs);
 
   let allLog = new Promise(async (resolve, reject) => {
     const filePath = path.resolve("./logs/all.log");
