@@ -49,6 +49,14 @@ public class SensorStationService {
 		return maybeSensorStation.get();
 	}
 
+	public List<SensorStation> findAssociated(Person person) {
+		if (person.getPermissions().contains(Permission.GARDENER)) {
+			return sensorStationRepository.findNewForGardener(person);
+		} else {
+			return sensorStationRepository.findNewForUser(person);
+		}
+	}
+
 	public List<SensorStation> findAll() {
 		return sensorStationRepository.findAll();
 	}

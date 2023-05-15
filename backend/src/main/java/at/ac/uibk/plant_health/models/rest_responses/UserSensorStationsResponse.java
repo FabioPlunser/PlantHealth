@@ -15,33 +15,10 @@ import lombok.experimental.SuperBuilder;
 public class UserSensorStationsResponse extends RestResponse implements Serializable {
 	private final List<InnerResponse> sensorStations;
 	public UserSensorStationsResponse(List<SensorStation> sensorStations, Person person) {
-		if (person.getPermissions().contains(Permission.GARDENER)) {
-			this.sensorStations =
-					sensorStations.stream()
-							.filter(s -> !s.isDeleted() && s.isUnlocked())
-							//							.filter(s -> {
-							//								if (s.getGardener() != null)
-							//									return
-							//! s.getGardener().equals(person); 								else
-							//! return false;
-							//							})
-							.filter(s
-									-> person.getSensorStationPersonReferences().stream().noneMatch(
-											r -> r.getSensorStation().equals(s)
-									))
-							.map(InnerResponse::new)
-							.toList();
-		} else {
-			this.sensorStations =
-					sensorStations.stream()
-							.filter(s -> !s.isDeleted() && s.isUnlocked())
-							.filter(s
-									-> person.getSensorStationPersonReferences().stream().noneMatch(
-											r -> r.getSensorStation().equals(s)
-									))
-							.map(InnerResponse::new)
-							.toList();
-		}
+		this.sensorStations =
+				sensorStations.stream()
+					.map(InnerResponse::new)
+					.toList();
 	}
 
 	@Getter

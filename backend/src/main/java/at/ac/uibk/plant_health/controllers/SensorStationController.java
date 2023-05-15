@@ -45,7 +45,7 @@ public class SensorStationController {
 					.toEntity();
 		}
 
-		return new UserSensorStationsResponse(sensorStationService.findAll(), person).toEntity();
+		return new UserSensorStationsResponse(sensorStationService.findAssociated(person), person).toEntity();
 	}
 
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
@@ -60,7 +60,6 @@ public class SensorStationController {
 		} catch (ServiceException e) {
 			return MessageResponse
 					.builder()
-
 					.message(e.getMessage())
 					.toEntity();
 		}
