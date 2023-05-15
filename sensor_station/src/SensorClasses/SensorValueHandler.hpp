@@ -234,7 +234,7 @@ class SensorValueHandlerClass {
 
 		bool setAccumulatedSensorValuesInBle() {
 			DEBUG_PRINT_POS(4, "\n");
-			if (soilHumidityAccumulator->getTotalWeight() == 0) {
+			if (soilHumidityAccumulator->getTotalWeight() <= 0) {
 				return false;
 			}
 			clearAllFlags();
@@ -277,6 +277,15 @@ class SensorValueHandlerClass {
 			luminosityAccumulator->reset();
 			set_sensor_data(sensorData);
 			return true;
+		}
+
+		void resetAccumulators() {
+			airHumidityAccumulator->reset();
+			airPressureAccumulator->reset();
+			airQualityAccumulator->reset();
+			airTemperatureAccumulator->reset();
+			soilHumidityAccumulator->reset();
+			luminosityAccumulator->reset();
 		}
 };
 

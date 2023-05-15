@@ -115,7 +115,7 @@ void loop() {
 	static bool prevSensorStationLockedStatus =
 		get_sensorstation_locked_status();
 	if (prevSensorStationLockedStatus != get_sensorstation_locked_status()) {
-		sensorValueHandler->resetAccumulator();
+		sensorValueHandler->resetAccumulators();
 		prevSensorStationLockedStatus = get_sensorstation_locked_status();
 	}
 	// If the time between sensor measurements passed the next measurement will
@@ -204,11 +204,11 @@ void setValueInVerifiedCentralDevice(BLEDevice & central) {
 			// setSensorValuesInBLE();
 			if (!sensorValueHandler->setAccumulatedSensorValuesInBle()) {
 				DEBUG_PRINT_POS(1, "SensorValueHandler returned false\n");
-				return;
+			} else {
+				clear_sensor_data_read_flag();
 			}
 			set_sensorstation_id(0);
 			setArduinoPowerStatus();
-			clear_sensor_data_read_flag();
 		}
 		unsigned long connectionStart = millis();
 		while (central.connected() &&
