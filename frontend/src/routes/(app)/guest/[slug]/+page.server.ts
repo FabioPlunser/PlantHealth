@@ -1,42 +1,27 @@
 import { BACKEND_URL } from "$env/static/private";
 import { logger } from "$lib/helper/logger";
-import { redirect } from "@sveltejs/kit";
+import { redirect, error } from "@sveltejs/kit";
 import type { Actions } from "./$types";
 
 export async function load({ locals, params, url, fetch }) {
-  let error = "";
-  console.log("LOAD GUEST PLANT");
+  let errorMsg = "";
   let roomName = "";
   let plantName = "";
   let possiblePictures = [];
-  try {
-    let sensorStationId = url.searchParams.get("sensorStationId");
-    console.log("LOAD GUEST PLANT 2");
-    let res = await fetch(
-      `${BACKEND_URL}/get-sensor-station-pictures?sensorStationId=${sensorStationId}`
-    );
-    console.log("LOAD GUEST PLANT 3");
-    if (!res.ok) {
-      console.log("LOAD GUEST PLANT 4");
-      console.log(await res.json());
-      if (res.status === 406) {
-        logger.error("Guest couldn't find sensor station", { res });
-        throw redirect(303, "/guest");
-      }
-      error = res.statusText;
-      return {
-        error,
-      };
-    }
-    console.log("LOAD GUEST PLANT 5");
-    res = await res.json();
-    possiblePictures = res?.pictures;
-    roomName = res.roomName;
-    plantName = res.plantName;
-  } catch (e) {
-    logger.error("Guest couldn't find sensor station", { e });
-    error = e.message;
-  }
+  let sensorStationId = url.searchParams.get("sensorStationId");
+  let res = await fetch(
+    `${BACKEND_URL}/get-sensor-station-pictures?sensorStationId=${sensorStationId}`
+  ).then((res) => {
+	if (!res.ok) {
+	  throw new error(404);
+	}
+	return res;
+  });
+
+  res = await res.json();
+  possiblePictures = res?.pictures;
+  roomName = res.roomName;
+  plantName = res.plantName;
 
   async function fetchPictures() {
     let pictures = [];
@@ -65,12 +50,12 @@ export async function load({ locals, params, url, fetch }) {
       }
       return pictures;
     } catch (e) {
-      error = e.message;
+      errorMsg = e.message;
     }
   }
 
   return {
-    error,
+    errorMsg,
     roomName,
     plantName,
     streamed: {
