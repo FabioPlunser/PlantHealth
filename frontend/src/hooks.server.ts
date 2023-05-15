@@ -31,8 +31,6 @@ export async function handle({ event, resolve }) {
     const response = await resolve(event);
     return response;
   }
-  // console.log("CurrentUser: ")
-  // console.table(event.locals.user);
   logger.info("User: " + JSON.stringify(event.locals.user));
 
   if (event.url.pathname.startsWith("/login")) {
@@ -85,7 +83,6 @@ export async function handleFetch({ request, fetch, event }) {
   };
 
   request.headers.set("Authorization", JSON.stringify(token));
-  // console.log(request.headers);
 
   return fetch(request);
 }

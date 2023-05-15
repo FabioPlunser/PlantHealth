@@ -10,18 +10,18 @@ export async function load(event) {
       error: null,
       streamed: {
         notifications: new Promise((resolve) => {
-          toasts.get(event.locals.user.personId).subscribe((value: any) => {
+          toasts.get(event.locals.user?.personId).subscribe((value: any) => {
             resolve(value);
           });
-          toasts.removeToast(event.locals.user.personId);
+          toasts.removeToast(event.locals.user?.personId);
         }),
       },
     };
   }
   try {
-    await fetch(`${BACKEND_URL}/get-user-permissions`);
-  } catch (err) {
-    logger.error("layout: get-user-permissions " + JSON.stringify(err));
+    await fetch(`${BACKEND_URL}/get-sensor-station-info`);
+  } catch (err: any) {
+    logger.error("Backend is down" + JSON.stringify(err));
     if (err.cause.code === "ECONNREFUSED") {
       return {
         error: "Backend is not reachable",

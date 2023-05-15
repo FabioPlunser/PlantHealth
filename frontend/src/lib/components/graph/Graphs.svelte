@@ -7,6 +7,7 @@
   import Line from "./Line.svelte";
   import MediaQuery from "$helper/MediaQuery.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
+  import { logger } from "$lib/helper/logger";
   // ---------------------------------------------------
   // ---------------------------------------------------
   export let data: any;
@@ -66,7 +67,7 @@
         graphData = createGraphData(res.data);
       })
       .catch((err: any) => {
-        console.log(err);
+        logger.error(err);
       });
   } else {
     addMissingSensors(data);
