@@ -46,8 +46,14 @@ public class TestSensorDataModel {
 
 			List<SensorData> sensorDataList = new ArrayList<>();
 
-			Sensor sensor = new Sensor("TEMPERATURE", "°C");
-			sensorRepository.save(sensor);
+			Sensor sensor;
+			Optional<Sensor> maybeSensor;
+			if ((maybeSensor = sensorRepository.findByType("TEMPERATURE")).isPresent()) {
+				sensor = maybeSensor.get();
+			} else {
+				sensor = new Sensor("TEMPERATURE", "°C");
+				sensorRepository.save(sensor);
+			}
 
 			SensorData sensorD = new SensorData(
 					LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS), rand.nextFloat(), 'n', sensor, station
