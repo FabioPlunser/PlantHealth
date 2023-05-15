@@ -110,9 +110,18 @@ void loop() {
 	}
 	unsigned long remainingSleepTime =
 		handleNotificationIfPresent(!notificationHandler->isEmpty());
+	// If the sensor station goes from unlocked to locked, all sensor data will
+	// be deleted to get the current sensor data on the next unlock.
+	static bool prevSensorStationLockedStatus =
+		get_sensorstation_locked_status();
+	if (prevSensorStationLockedStatus != get_sensorstation_locked_status()) {
+		sensorValueHandler->resetAccumulator();
+		prevSensorStationLockedStatus = get_sensorstation_locked_status();
+	}
 	// If the time between sensor measurements passed the next measurement will
-	// done.
-	if (millis() - previousSensorMeasurement > timeBetweenMeasures) {
+	// done, but only if the sensor station is unlocked.
+	if (get_sensorstation_locked_status() == true &&
+		millis() - previousSensorMeasurement > timeBetweenMeasures) {
 		unsigned long sensorReadStart = millis();
 		timeBetweenMeasures			  = calculateTimeBetweenMeasures(
 			  sensorReadStart, previousDataTransmission,
