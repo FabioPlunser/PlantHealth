@@ -116,7 +116,6 @@ public class SensorStationController {
 			@RequestParam(value = "transferInterval", required = false)
 			final Integer transferInterval, @RequestBody final List<SensorLimits> sensorLimits
 	) {
-		System.out.println("update sensor station");
 		try {
 			SensorStation sensorStation = sensorStationService.findById(sensorStationId);
 			sensorStationService.updateSensorStation(sensorStation, name, transferInterval);

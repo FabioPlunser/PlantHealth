@@ -26,8 +26,6 @@ public class AccessPointController {
 	@Autowired
 	private AccessPointService accessPointService;
 
-	private static final String LOCKED_MESSAGE = "AccessPoint is locked";
-
 	@PublicEndpoint
 	@WriteOperation
 	@PostMapping("/register-access-point")

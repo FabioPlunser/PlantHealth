@@ -118,9 +118,6 @@ public class SensorStationService {
 				throw new ServiceException("Could not save sensor limits", 500);
 			}
 		}
-		//		List<SensorLimits> allLimits = sensorLimitsRepository.findAll();
-		//		sensorStation.setSensorLimits(allLimits);
-		//		save(sensorStation);
 	}
 
 	/**
@@ -259,20 +256,24 @@ public class SensorStationService {
 				new ArrayList<>(sensorStation.getSensorStationPictures());
 		try {
 			for (SensorStationPicture picture : pictures) {
-				try {
-					Path path = Paths.get(picture.getPicturePath());
-					Files.delete(path);
-					plantPictureRepository.delete(picture);
-				} catch (Exception e) {
-					plantPictureRepository.delete(picture);
-					throw new ServiceException("Picture already deleted from server", 500);
-				}
+				savePicture(picture);
 
 				sensorStation.getSensorStationPictures().remove(picture);
 			}
 			save(sensorStation);
 		} catch (Exception e) {
 			throw new ServiceException("Failed to delete picture of the server", 500);
+		}
+	}
+
+	private void savePicture(SensorStationPicture picture) {
+		try {
+			Path path = Paths.get(picture.getPicturePath());
+			Files.delete(path);
+			plantPictureRepository.delete(picture);
+		} catch (Exception e) {
+			plantPictureRepository.delete(picture);
+			throw new ServiceException("Picture already deleted from server", 500);
 		}
 	}
 

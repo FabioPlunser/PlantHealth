@@ -1,7 +1,5 @@
 package at.ac.uibk.plant_health.config;
 
-import static java.util.stream.Collectors.toList;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
@@ -48,34 +46,42 @@ public class DumpConfig {
 	@EventListener(ApplicationReadyEvent.class)
 	public void loadDatabaseDump() {
 		try {
-			int num_admins = 1, num_gardeners = 3, num_users = 5, num_access_points = 2,
-				num_sensor_stations = 8, num_sensor_data = 500;
+			int numAdmins = 1;
+			int numGardeners = 3;
+			int numUsers = 5;
+			int numAccessPoints = 2;
+			int numSensorStations = 8;
+			int numSensorData = 500;
+
+			final String defaultPassword = "password";
+			final String emailSuffix = "@planthealth.at";
+
 			List<Person> admins =
-					IntStream.range(0, num_admins)
+					IntStream.range(0, numAdmins)
 							.mapToObj(
 									i
 									-> new Person(
-											"Admin_" + i, "admin" + i + "@planthealth.at",
-											"password", Set.of(Permission.ADMIN)
+											"Admin_" + i, "admin" + i + emailSuffix,
+											defaultPassword, Set.of(Permission.ADMIN)
 									)
 							)
 							.toList();
 			List<Person> gardeners =
-					IntStream.range(0, num_gardeners)
+					IntStream.range(0, numGardeners)
 							.mapToObj(
 									i
 									-> new Person(
-											"Gardener_" + i, "gardener" + i + "@planthealth.at",
-											"password", Set.of(Permission.GARDENER)
+											"Gardener_" + i, "gardener" + i + emailSuffix,
+											defaultPassword, Set.of(Permission.GARDENER)
 									)
 							)
 							.toList();
 			List<Person> users =
-					IntStream.range(0, num_users)
+					IntStream.range(0, numUsers)
 							.mapToObj(
 									i
 									-> new Person(
-											"User_" + i, "user" + i + "@planthealth.at", "password",
+											"User_" + i, "user" + i + emailSuffix, defaultPassword,
 											Set.of(Permission.USER)
 									)
 							)
@@ -84,13 +90,12 @@ public class DumpConfig {
 			gardeners.forEach(personService::save);
 			users.forEach(personService::save);
 
-			var aps = IntStream.range(0, num_access_points)
+			var aps = IntStream.range(0, numAccessPoints)
 							  .mapToObj(i -> {
 								  var ap = new AccessPoint(
 										  UUID.randomUUID(), "access_point_" + i, 60 + i, false
 								  );
 
-								  //                ap.setScanActive((i & 0x1) > 0);
 								  ap.setConnected((i & 0x2) > 0);
 								  ap.setUnlocked((i & 0x4) > 0);
 								  ap.setDeleted((i & 0x8) > 0);
@@ -111,7 +116,7 @@ public class DumpConfig {
 			sensorRepository.saveAll(sensors);
 
 			var sensorStations =
-					IntStream.range(0, num_sensor_stations)
+					IntStream.range(0, numSensorStations)
 							.mapToObj(i -> {
 								var s = new SensorStation(macAddress(), i);
 
@@ -144,7 +149,7 @@ public class DumpConfig {
 												.map(sensor -> {
 													var sl = new SensorLimits(
 															LocalDateTime.now(), (float) i,
-															(float) i + 50, i + 60, sensor,
+															i + 50, i + 60, sensor,
 															gardeners.get(i % gardeners.size()), s
 													);
 													sl.setDeleted((i & 0x1) == 0);
@@ -154,12 +159,16 @@ public class DumpConfig {
 								);
 
 								var sensorData =
-										IntStream.range(0, num_sensor_data)
+										IntStream.range(0, numSensorData)
 												.mapToObj(j -> {
-													boolean above = (j & 0x4) > 0,
-															below = (j & 0x8) > 0;
-													char alarm = above ? (below ? 'b' : 'h')
-																	   : (below ? 'l' : 'n');
+													boolean above = (j & 0x4) > 0;
+													boolean below = (j & 0x8) > 0;
+													char alarm;
+													if (above) {
+														alarm = below ? 'b' : 'h';
+													} else {
+														alarm = below ? 'l' : 'n';
+													}
 													return Stream.of(new SensorData(
 															LocalDateTime.now(), (float)i * 50 + j, alarm,
 															sensors.get(j % sensors.size()), s
@@ -173,7 +182,7 @@ public class DumpConfig {
 								s.setUnlocked((i & 0x2) > 0);
 								s.setDeleted((i & 0x4) > 0);
 
-								s.setAccessPoint(aps.get((i >> 1) % num_access_points));
+								s.setAccessPoint(aps.get((i >> 1) % numAccessPoints));
 
 								return s;
 							})
@@ -187,12 +196,13 @@ public class DumpConfig {
 					-> sensorStationPersonReferenceRepository.saveAll(s.getSensorStationPersonReferences())
 			);
 		} catch (Exception e) {
+			/* Ignore Exceptions because this is not Production Code */
 		}
 	}
 
-	private final static String CAPITAL_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	private final static String SMALL_LETTERS = "abcdefghijklmnopqrstuvwxyz";
-	private final static String NUMBERS = "0123456789";
+	private static final String CAPITAL_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	private static final String SMALL_LETTERS = "abcdefghijklmnopqrstuvwxyz";
+	private static final String NUMBERS = "0123456789";
 
 	public static String macAddress() {
 		int macAddressLength = 17;
@@ -200,9 +210,10 @@ public class DumpConfig {
 	}
 
 	public static String base(String alphabet, int n) {
+		Random random = new Random();
 		StringBuilder sb = new StringBuilder(n);
 		for (int i = 0; i < n; i++) {
-			int index = (int) (Math.random() * alphabet.length());
+			int index = random.nextInt() * alphabet.length();
 			sb.append(alphabet.charAt(index));
 		}
 		return sb.toString();

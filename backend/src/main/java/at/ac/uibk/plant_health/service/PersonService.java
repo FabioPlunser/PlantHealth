@@ -39,7 +39,6 @@ public class PersonService {
 	}
 
 	public List<Person> getGardener() {
-		//		return personRepository.findAll();
 		return personRepository.findAllByPermissionsIsContaining(Permission.GARDENER);
 	}
 
