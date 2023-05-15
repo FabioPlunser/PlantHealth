@@ -227,6 +227,44 @@ export const actions = {
         );
       }
     });
+
+    let unassign = Boolean(formData.get("delete"));
+    let gardenerId = String(formData.get("gardener"));
+
+    params = new URLSearchParams();
+    params.set("sensorStationId", sensorStationId);
+    params.set("gardenerId", gardenerId);
+
+    if (unassign) {
+      params.set("delete", true.toString());
+    }
+
+    let res = await fetch(
+      `${BACKEND_URL}/assign-gardener-to-sensor-station?${params.toString()}`,
+      {
+        method: "POST",
+      }
+    );
+    if (!res.ok) {
+      logger.error("Could not assign gardener to sensor station");
+      throw error(res.status, "Could not assign gardener to sensor station");
+    } else {
+      if (unassign) {
+        logger.info("Unassigned gardener from sensor station");
+        toasts.addToast(
+          locals.user.personId,
+          "success",
+          "Unassigned gardener from sensor station"
+        );
+      } else {
+        logger.info("Assigned gardener to sensor station");
+        toasts.addToast(
+          locals.user.personId,
+          "success",
+          "Assigned gardener to sensor station"
+        );
+      }
+    }
   },
 
   updateLimit: async ({ request, fetch, locals }) => {
@@ -288,13 +326,12 @@ export const actions = {
 
   delete: async ({ request, fetch, locals }) => {
     let formData = await request.formData();
-    let sensorStationId = formData.get("sensorStationId");
+    let sensorStationId: string = String(formData.get("sensorStationId"));
+
     let params = new URLSearchParams();
-    params.set("sensorStationnId", sensorStationId?.toString() ?? "");
+    params.set("sensorStationId", sensorStationId?.toString());
 
-    let parametersString = "?" + params.toString();
-
-    await fetch(`${BACKEND_URL}/delete-sensor-station${parametersString}`, {
+    await fetch(`${BACKEND_URL}/delete-sensor-station?${params.toString()}`, {
       method: "DELETE",
     }).then((response) => {
       if (!response.ok) {

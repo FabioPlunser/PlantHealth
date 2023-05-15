@@ -175,13 +175,11 @@ export const actions = {
   },
   delete: async ({ request, fetch, locals }) => {
     let formData = await request.formData();
-    let sensorStationId = formData.get("sensorStationId");
+    let sensorStationId = String(formData.get("sensorStationId"));
     let params = new URLSearchParams();
-    params.set("sensorStationnId", sensorStationId?.toString() ?? "");
+    params.set("sensorStationId", sensorStationId?.toString());
 
-    let parametersString = "?" + params.toString();
-
-    await fetch(`${BACKEND_URL}/delete-sensor-station${parametersString}`, {
+    await fetch(`${BACKEND_URL}/delete-sensor-station?${params.toString()}`, {
       method: "DELETE",
     }).then((response) => {
       if (!response.ok) {
