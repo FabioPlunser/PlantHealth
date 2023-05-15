@@ -13,6 +13,7 @@ import { toasts } from "$stores/toastStore";
  * since the function throws a redirect before returning anything, the return statement
  */
 export async function load(event) {
+  const { request, fetch } = event;
   // check if user is exists
   if (event.locals.user === undefined) {
     throw redirect(302, "/login");
@@ -27,33 +28,23 @@ export async function load(event) {
     throw redirect(302, "/login");
   }
 
-  // get user permissions from backend
-  let res = await fetch(`${BACKEND_URL}/get-user-permissions`).catch((err) => {
-    logger.error("get-user-permissions", { err });
-    throw redirect(302, "/logout");
-  });
-  if (!res.ok) {
-    toasts.addToast(
-      event.locals.user.personId,
-      "error",
-      "Error while fetching user permissions"
-    );
-    logger.error("get-user-permissions", { res });
-  }
-  if (res.ok) {
-    let data = await res.json();
-    if (
-      event.locals.user.permissions.toString() !== data.permissions.toString()
-    ) {
-      toasts.addToast(
-        event.locals.user.personId,
-        "error",
-        "User permissions do not match backend permissions"
-      );
-      logger.error("get-user-permissions", { res });
+  let res = await fetch(`${BACKEND_URL}/get-user-permissions`)
+    .then(async (res) => {
+      if (!res.ok) {
+        console.log(await res.json());
+        toasts.addToast(
+          event.locals.user?.personId,
+          "error",
+          "Error while fetching user permissions"
+        );
+        logger.error("Error while fetching user permissions");
+      }
+      return res;
+    })
+    .catch((err) => {
+      logger.error("get-user-permissions", { err });
       throw redirect(302, "/logout");
-    }
-  }
+    });
 
   //redirect to appropriate page
   if (event.locals.user.permissions.includes("ADMIN")) {
