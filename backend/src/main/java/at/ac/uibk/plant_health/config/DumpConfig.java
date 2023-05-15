@@ -211,15 +211,7 @@ public class DumpConfig {
 		return base(SMALL_LETTERS + CAPITAL_LETTERS + NUMBERS, macAddressLength);
 	}
 
-	private static final SecureRandom random;
-
-	static {
-		try {
-			random = SecureRandom.getInstanceStrong();
-		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException(e);
-		}
-	}
+	private static final SecureRandom random = new SecureRandom();
 
 	public static String base(String alphabet, int n) {
 		StringBuilder sb = new StringBuilder(n);
