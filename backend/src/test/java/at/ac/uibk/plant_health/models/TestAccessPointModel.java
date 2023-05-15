@@ -36,7 +36,6 @@ public class TestAccessPointModel {
 		accessPointRepository.deleteAll();
 	}
 
-	/*
 	@Test
 	void testRegisterAccessPoint() {
 		// given roomName and id
@@ -70,7 +69,7 @@ public class TestAccessPointModel {
 		accessPointRepository.save(savedAccessPoint);
 
 		assertTrue(accessPointRepository.findById(accessPoint.getDeviceId()).get().isUnlocked());
-		assertTrue(accessPointRepository.findById(accessPoint.getDeviceId()).get().isScanActive());
+		assertTrue(accessPointRepository.findById(accessPoint.getDeviceId()).get().getScanActive());
 	}
 
 	@Test
@@ -147,5 +146,4 @@ public class TestAccessPointModel {
 		);
 		assertEquals(5, sensorStationRepository.findAll().size());
 	}
-	*/
 }

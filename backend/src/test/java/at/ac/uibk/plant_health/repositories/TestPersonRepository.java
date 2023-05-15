@@ -1,5 +1,6 @@
 package at.ac.uibk.plant_health.repositories;
 
+import at.ac.uibk.plant_health.models.user.Authenticable;
 import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.service.PersonService;
 import org.junit.jupiter.api.Assertions;
