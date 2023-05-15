@@ -72,7 +72,7 @@
   /**
    * Array\<number\> where each number is a page size option
    */
-  export let pageSizeOptions: number[] = [5, 10, 20];
+  export let maxRowSize: number = 100;
 
   $: columnVisibility = isMediaNotMobile
     ? defaultColumnVisibility
@@ -266,7 +266,7 @@
           on:change={setPageSize}
           class="btn"
         >
-          {#each [5, 10, 20, 40, 80] as pageSize}
+          {#each [5, 10, 20, 40, 80, maxRowSize] as pageSize}
             <option value={pageSize}>
               Show {pageSize}
             </option>
