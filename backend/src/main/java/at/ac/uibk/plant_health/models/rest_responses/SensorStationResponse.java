@@ -65,7 +65,7 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 												));
 
 								return newestLimit
-										.map(limits -> new SensorLimitsResponse(limits))
+										.map(SensorLimitsResponse::new)
 										.orElseGet(
 												()
 														-> new SensorLimitsResponse(
@@ -83,7 +83,7 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 		}
 
 		@Getter
-		private static class SensorLimitsResponse {
+		private static class SensorLimitsResponse implements Serializable {
 			private final LocalDateTime timeStamp;
 			private final float upperLimit;
 			private final float lowerLimit;

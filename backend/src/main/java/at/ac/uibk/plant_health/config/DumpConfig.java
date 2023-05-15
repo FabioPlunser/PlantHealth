@@ -7,6 +7,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
@@ -148,8 +150,8 @@ public class DumpConfig {
 										sensors.stream()
 												.map(sensor -> {
 													var sl = new SensorLimits(
-															LocalDateTime.now(), (float) i,
-															i + 50, i + 60, sensor,
+															LocalDateTime.now(), i,
+															((float) i) + 50, i + 60, sensor,
 															gardeners.get(i % gardeners.size()), s
 													);
 													sl.setDeleted((i & 0x1) == 0);
@@ -209,8 +211,17 @@ public class DumpConfig {
 		return base(SMALL_LETTERS + CAPITAL_LETTERS + NUMBERS, macAddressLength);
 	}
 
+	private static final SecureRandom random;
+
+	static {
+		try {
+			random = SecureRandom.getInstanceStrong();
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public static String base(String alphabet, int n) {
-		Random random = new Random();
 		StringBuilder sb = new StringBuilder(n);
 		for (int i = 0; i < n; i++) {
 			int index = random.nextInt() * alphabet.length();

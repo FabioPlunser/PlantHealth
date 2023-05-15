@@ -3,8 +3,6 @@ package at.ac.uibk.plant_health.util;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-
 import at.ac.uibk.plant_health.models.user.Permission;
 import lombok.AccessLevel;
 import lombok.Getter;

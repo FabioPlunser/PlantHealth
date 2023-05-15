@@ -31,7 +31,6 @@ public interface AccessPointRepository extends CrudRepository<AccessPoint, UUID>
 	@Query("""
 		UPDATE #{#entityName}
 		SET isConnected = false
-		WHERE lastConnection < SUBTIME(CURRENT_TIME, MAKETIME(0,FLOOR(5*transferInterval/60),MOD(5*transferInterval,60)))
-	""")
+		WHERE lastConnection < SUBTIME(CURRENT_TIME, MAKETIME(0,FLOOR(5*transferInterval/60),MOD(5*transferInterval,60)))""")
 	int updateIsConnectedByLastConnection();
 }
