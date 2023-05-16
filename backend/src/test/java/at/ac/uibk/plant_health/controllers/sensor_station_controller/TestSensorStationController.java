@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -702,5 +703,166 @@ public class TestSensorStationController {
 		// check if sensor station is removed
 		assertTrue(sensorStationService.findById(sensorStation.getDeviceId()).isDeleted());
 		assertNull(sensorStationService.findById(sensorStation.getDeviceId()).getBdAddress());
+	}
+
+	@Test
+	void testGetSensorStationWithInvalidId() throws Exception {
+		Person person = createUserAndLogin(true, false);
+		mockMvc.perform(MockMvcRequestBuilders.get("/get-sensor-station")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("sensorStationId",
+								String.valueOf(UUID.randomUUID())))
+				.andExpectAll(status().isNotFound());
+	}
+
+	@Test
+	void testGetSensorStationInfoWithInvalidId() throws Exception {
+		Person person = createUserAndLogin(true, false);
+		mockMvc.perform(MockMvcRequestBuilders.get("/get-sensor-station-info")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("sensorStationId",
+								String.valueOf(UUID.randomUUID())))
+				.andExpectAll(status().isNotFound());
+	}
+
+	@Test
+	void testSetUnlockedSensorStationWithInvalidId() throws Exception {
+		Person person = createUserAndLogin(true, false);
+		mockMvc.perform(MockMvcRequestBuilders.put("/set-unlocked-sensor-station")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("sensorStationId",
+								String.valueOf(UUID.randomUUID()))
+						.param("unlocked", String.valueOf(false))
+				)
+				.andExpectAll(status().isNotFound());
+	}
+
+	@Test
+	void testUpdateSensorStationWithInvalidId() throws Exception {
+		Person person = createUserAndLogin(true, false);
+		mockMvc.perform(MockMvcRequestBuilders.put("/update-sensor-station")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("sensorStationId",
+								String.valueOf(UUID.randomUUID()))
+						.param("transferInterval", String.valueOf(10))
+						.content("[]")
+						.contentType(MediaType.APPLICATION_JSON)
+				)
+				.andExpectAll(status().isNotFound());
+	}
+
+	@Test
+	void testAssignGardenerToSensorStationWithInvalidId() throws Exception {
+		Person person = createUserAndLogin(true, false);
+		mockMvc.perform(MockMvcRequestBuilders.post("/assign-gardener-to-sensor-station")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("sensorStationId",
+								String.valueOf(UUID.randomUUID()))
+						.param("gardenerId", String.valueOf(UUID.randomUUID()))
+				)
+				.andExpectAll(status().isNotFound());
+	}
+
+	@Test
+	void testGetSensorStationDataWithInvalidId() throws Exception {
+		Person person = createUserAndLogin(true, false);
+		mockMvc.perform(MockMvcRequestBuilders.get("/get-sensor-station-data")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("sensorStationId",
+								String.valueOf(UUID.randomUUID()))
+						.param("from", String.valueOf(LocalDateTime.now()))
+						.param("to", String.valueOf(LocalDateTime.now()))
+				)
+				.andExpectAll(status().isNotFound());
+	}
+
+	@Test
+	void testGetSensorStationPicturesWithInvalidId() throws Exception {
+		Person person = createUserAndLogin(true, false);
+		mockMvc.perform(MockMvcRequestBuilders.get("/get-sensor-station-pictures")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("sensorStationId",
+								String.valueOf(UUID.randomUUID()))
+				)
+				.andExpectAll(status().isNotFound());
+	}
+
+	@Test
+	void testGetSensorStationPictureWithInvalidId() throws Exception {
+		Person person = createUserAndLogin(true, false);
+		mockMvc.perform(MockMvcRequestBuilders.get("/get-sensor-station-picture")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("pictureId",
+								String.valueOf(UUID.randomUUID()))
+				)
+				.andExpectAll(status().isNotFound());
+	}
+
+	@Test
+	void testGetNewsetSensorStationPictureWithInvalidId() throws Exception {
+		Person person = createUserAndLogin(true, false);
+		mockMvc.perform(MockMvcRequestBuilders.get("/get-newest-sensor-station-picture")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("sensorStationId",
+								String.valueOf(UUID.randomUUID()))
+				)
+				.andExpectAll(status().isNotFound());
+	}
+
+	@Test
+	void testDeleteSensorStationPictureWithInvalidId() throws Exception {
+		Person person = createUserAndLogin(true, false);
+		mockMvc.perform(MockMvcRequestBuilders.post("/delete-sensor-station-picture")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("pictureId",
+								String.valueOf(UUID.randomUUID()))
+				)
+				.andExpectAll(status().isNotFound());
+	}
+
+	@Test
+	void testDeleteAllSensorStationPictureWithInvalidId() throws Exception {
+		Person person = createUserAndLogin(true, false);
+		mockMvc.perform(MockMvcRequestBuilders.post("/delete-all-sensor-station-pictures")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("sensorStationId",
+								String.valueOf(UUID.randomUUID()))
+				)
+				.andExpectAll(status().isNotFound());
+	}
+
+	@Test
+	void testDeleteSensorStationWithInvalidId() throws Exception {
+		Person person = createUserAndLogin(true, false);
+		mockMvc.perform(MockMvcRequestBuilders.delete("/delete-sensor-station")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("sensorStationId",
+								String.valueOf(UUID.randomUUID()))
+				)
+				.andExpectAll(status().isNotFound());
 	}
 }

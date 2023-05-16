@@ -34,18 +34,11 @@ public class SensorStationController {
 	@PrincipalRequired(Person.class)
 	@GetMapping("/get-sensor-stations")
 	public RestResponseEntity getSensorStations(Person person) {
-		try {
-			if (person.getPermissions().contains(Permission.ADMIN)) {
-				return new AdminSensorStationsResponse(sensorStationService.findAll()).toEntity();
-			}
-		} catch (ServiceException e) {
-			return MessageResponse.builder()
-					.statusCode(e.getStatusCode())
-					.message(e.getMessage())
-					.toEntity();
+		if (person.getPermissions().contains(Permission.ADMIN)) {
+			return new AdminSensorStationsResponse(sensorStationService.findAll()).toEntity();
 		}
 
-		return new UserSensorStationsResponse(sensorStationService.findAll(), person).toEntity();
+		return new UserSensorStationsResponse(sensorStationService.findAssociated(person)).toEntity();
 	}
 
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
@@ -60,7 +53,7 @@ public class SensorStationController {
 		} catch (ServiceException e) {
 			return MessageResponse
 					.builder()
-
+					.statusCode(e.getStatusCode())
 					.message(e.getMessage())
 					.toEntity();
 		}
@@ -116,7 +109,6 @@ public class SensorStationController {
 			@RequestParam(value = "transferInterval", required = false)
 			final Integer transferInterval, @RequestBody final List<SensorLimits> sensorLimits
 	) {
-		System.out.println("update sensor station");
 		try {
 			SensorStation sensorStation = sensorStationService.findById(sensorStationId);
 			sensorStationService.updateSensorStation(sensorStation, name, transferInterval);
