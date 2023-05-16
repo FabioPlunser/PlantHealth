@@ -117,7 +117,66 @@ class TestPersonControllerGeneral {
 						.param("username", username)
 						.param("password", password)
 						.param("email", email)
-						.param("permissions", String.valueOf(permissions))
+						.param("permissions", String.join(",", permissions.stream().map(Permission::toString).toList()))
+				)
+				.andExpectAll(status().isOk());
+
+		Person person = personRepository.findByUsername(username).orElseThrow();
+
+		Assertions.assertAll(
+				() -> Assertions.assertTrue(passwordEncoder.matches(password, person.getPassword())),
+				() -> Assertions.assertEquals(email, person.getEmail()),
+				() -> Assertions.assertEquals(permissions, person.getPermissions())
+		);
+	}
+
+	@Test
+	public void testUpdateSettings() throws Exception {
+		Person user = createUserAndLogin(false, false);
+
+		String username = "testUpdateSettings";
+		String password = "password";
+		String email = "test@planthealth.at";
+
+		// run request
+		mockMvc.perform(MockMvcRequestBuilders.post("/update-settings")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(user))
+						.param("username", username)
+						.param("password", password)
+						.param("email", email)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
+
+		Person person = personRepository.findByUsername(username).orElseThrow();
+
+		Assertions.assertAll(
+				() -> Assertions.assertTrue(passwordEncoder.matches(password, person.getPassword())),
+				() -> Assertions.assertEquals(email, person.getEmail())
+		);
+	}
+
+	@Test
+	public void testUpdateUser() throws Exception {
+		Person user = createUserAndLogin(false, false);
+		Person admin = createUserAndLogin(true, false);
+
+		String username = "testUpdateUser";
+		String password = "password";
+		String email = "test@planthealth.at";
+		Set<Permission> permissions = Set.of(Permission.GARDENER);
+
+		// run request
+		mockMvc.perform(MockMvcRequestBuilders.post("/update-user")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(admin))
+						.param("personId", String.valueOf(user.getId()))
+						.param("username", username)
+						.param("password", password)
+						.param("email", email)
+						.param("permissions", String.join(",", permissions.stream().map(Permission::toString).toList()))
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
