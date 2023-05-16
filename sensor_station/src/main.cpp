@@ -267,7 +267,10 @@ void handleCentralDeviceIfPresent(
 				);
 				inPairingMode = false;
 			} else {
-				DEBUG_PRINT(1, "Disconnected and did not set unlocked bit.\n");
+				DEBUG_PRINT(
+					1, "Did not set unlocked bit. Initiating disconnect.\n"
+				);
+				central.disconnect();
 				return;
 			}
 		}
