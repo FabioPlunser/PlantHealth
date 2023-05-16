@@ -38,7 +38,8 @@ const schema = z.object({
 function is an asynchronous function that takes an object with three parameters: `cookies`,
 `request`, and `fetch`. */
 export const actions = {
-  register: async ({ cookies, request, fetch }) => {
+  register: async (event) => {
+    const { cookies, fetch, request } = event;
     const formData = await request.formData();
     const zod = schema.safeParse(Object.fromEntries(formData));
 
@@ -64,29 +65,26 @@ export const actions = {
       body: formData,
     };
 
-    let res: any = await fetch(`${BACKEND_URL}/register`, requestOptions).catch(
-      (error) => {
-        logger.error(`User ${formData.get("username")} failed to register`, {
-          error,
-        });
-      }
-    );
-
-    if (res.ok) {
-      res = await res.json();
-      logger.info(`User ${formData.get("username")} registered`);
-      cookies.set(
-        "token",
-        JSON.stringify({
-          token: res.token,
-          username: formData.get("username"),
-          permissions: res.permissions,
-          personId: res.personId,
-        })
+    let res = await fetch(`${BACKEND_URL}/register`, requestOptions);
+    if (!res.ok) {
+      logger.error(
+        `Error while registering in: ${res.status} ${res.statusText}`
       );
-      throw redirect(302, "/user");
-    } else {
-      return fail(400, { error: true, errors: res.message });
+      let data = await res.json();
+      return fail(500, { message: data.message });
     }
+
+    let data = await res.json();
+    logger.info(`User ${formData.get("username")} registered`);
+    cookies.set(
+      "token",
+      JSON.stringify({
+        token: data.token,
+        username: formData.get("username"),
+        permissions: data.permissions,
+        personId: data.personId,
+      })
+    );
+    throw redirect(302, "/user");
   },
 } satisfies Actions;
