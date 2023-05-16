@@ -19,7 +19,6 @@
   // ---------------------------------------------------
   export let sensorStation: any;
   export let dates: any;
-  $: console.log(sensorStation);
   // ---------------------------------------------------
   // ---------------------------------------------------
   let loading = false;
@@ -35,8 +34,6 @@
       loading = false;
     };
   };
-
-  $: console.table("sensorStation", sensorStation);
   let openPictureModal = false;
   let selectedPicture = "";
 </script>

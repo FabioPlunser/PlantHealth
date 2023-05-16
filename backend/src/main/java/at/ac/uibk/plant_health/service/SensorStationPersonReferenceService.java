@@ -51,15 +51,12 @@ public class SensorStationPersonReferenceService {
 			if (maybePerson.isEmpty()) throw new ServiceException("Could not find person", 404);
 			person = maybePerson.get();
 			person.addSensorStationReference(reference);
-			//			personService.save(person);
 
 			SensorStation sensorStation1 =
 					sensorStationService.findById(sensorStation.getDeviceId());
 			sensorStation1.addSensorStationReference(reference);
-			//			sensorStationService.save(sensorStation);
 
 			sensorStationPersonReferenceRepository.save(reference);
-
 		} catch (Exception e) {
 			log.error("Could not add sensor station to dashboard", e);
 			throw new ServiceException("Could not add sensor station to dashboard", 500);
@@ -91,16 +88,5 @@ public class SensorStationPersonReferenceService {
 			log.error("Could not remove sensor station from dashboard", e);
 			throw new ServiceException("Could not remove sensor station from dashboard", 500);
 		}
-		//		var maybePerson = personRepository.findById(person.getPersonId());
-		//		if (maybePerson.isEmpty()) return false;
-		//		var maybeSensorStation =
-		// sensorStationRepository.findById(sensorStation.getDeviceId()); 		if
-		//(maybeSensorStation.isEmpty()) return false;
-		//
-		//		person = maybePerson.get();
-		//		sensorStation = maybeSensorStation.get();
-		//
-		//		return sensorStationPersonReferenceRepository.deleteByPersonAndSensorStation(person,
-		// sensorStation) >= 1;
 	}
 }

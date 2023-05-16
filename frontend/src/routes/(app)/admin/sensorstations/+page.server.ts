@@ -23,7 +23,7 @@ export async function load({ fetch, request, depends, url }) {
     fromAccessPoints = true;
   }
 
-  let res = await fetch(`${BACKEND_URL}/get-sensor-stations`);
+  let res = await fetch(`${BACKEND_URL}/get-all-sensor-stations`);
   if (!res.ok) {
     logger.error("Could not get sensor stations");
     throw error(res.status, "Could not get sensor stations");
@@ -75,7 +75,7 @@ export const actions = {
     ).then((response: any) => {
       let time = new Date().toLocaleString();
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         throw error(response.status, response.statusText);
       } else {
         logger.info(
@@ -117,7 +117,7 @@ export const actions = {
       }),
     }).then((response) => {
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         toasts.addToast(
           locals.user.personId,
           "error",
@@ -175,17 +175,15 @@ export const actions = {
   },
   delete: async ({ request, fetch, locals }) => {
     let formData = await request.formData();
-    let sensorStationId = formData.get("sensorStationId");
+    let sensorStationId = String(formData.get("sensorStationId"));
     let params = new URLSearchParams();
-    params.set("sensorStationnId", sensorStationId?.toString() ?? "");
+    params.set("sensorStationId", sensorStationId?.toString());
 
-    let parametersString = "?" + params.toString();
-
-    await fetch(`${BACKEND_URL}/delete-sensor-station${parametersString}`, {
+    await fetch(`${BACKEND_URL}/delete-sensor-station?${params.toString()}`, {
       method: "DELETE",
     }).then((response) => {
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         toasts.addToast(
           locals.user.personId,
           "error",

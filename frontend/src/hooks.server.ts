@@ -8,7 +8,11 @@ import { logger } from "$helper/logger";
  * Add user to event.locals
  */
 export async function handle({ event, resolve }) {
-  logger.info("Handle request: " + JSON.stringify(event.request));
+  let user = {
+    personId: "test",
+    username: "teest",
+  };
+  logger.info("Handle request: ", { payload: user });
 
   let cookieToken = event.cookies.get("token") || "";
 
@@ -23,7 +27,7 @@ export async function handle({ event, resolve }) {
 
   if (cookieToken !== "") {
     event.locals.user = JSON.parse(cookieToken);
-    logger.info("Token found: " + JSON.stringify(event.locals.user));
+    logger.info("Token found: ", { payload: event.locals.user });
   } else {
     logger.error("No token found");
     event.locals.user.token = "";
@@ -31,9 +35,7 @@ export async function handle({ event, resolve }) {
     const response = await resolve(event);
     return response;
   }
-  // console.log("CurrentUser: ")
-  // console.table(event.locals.user);
-  logger.info("User: " + JSON.stringify(event.locals.user));
+  logger.info("User: ", { payload: event.locals.user });
 
   if (event.url.pathname.startsWith("/login")) {
     if (event.locals.user) {
@@ -85,20 +87,14 @@ export async function handleFetch({ request, fetch, event }) {
   };
 
   request.headers.set("Authorization", JSON.stringify(token));
-  // console.log(request.headers);
 
   return fetch(request);
 }
 
 export async function handleError({ error, event }) {
-  logger.error("HandleError Event: " + JSON.stringify(error.message));
+  logger.error("HandleError Event: ", { payload: error.message });
   return {
     message: error.message,
     errorId: error.errorId,
   };
 }
-// export const handleError = (({ event, error }) => {
-//   logger.error("HandleError Event: " + JSON.stringify(event));
-//   logger.error("HandleError Error: " + JSON.stringify(error));
-
-// }) satisfies HandleServerError;

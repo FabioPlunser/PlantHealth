@@ -22,8 +22,6 @@ export async function load({ fetch, depends, cookies }) {
   let from: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   let to: Date = new Date(Date.now());
   // if cookies are set overwrite the dates
-  console.log("cookieFrom: ", cookieFrom);
-  console.log("cookieTo: ", cookieTo);
   if (cookieFrom !== "" || cookieTo !== "") {
     from = new Date(cookieFrom);
     to = new Date(cookieTo);
@@ -167,7 +165,7 @@ export const actions = {
     ).then((response) => {
       let time = new Date().toLocaleString();
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         throw error(response.status, response.statusText);
       } else {
         logger.info(
@@ -210,7 +208,7 @@ export const actions = {
       }),
     }).then((response) => {
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         toasts.addToast(
           locals.user.personId,
           "error",
@@ -227,6 +225,44 @@ export const actions = {
         );
       }
     });
+
+    let unassign = Boolean(formData.get("delete"));
+    let gardenerId = String(formData.get("gardener"));
+
+    params = new URLSearchParams();
+    params.set("sensorStationId", sensorStationId);
+    params.set("gardenerId", gardenerId);
+
+    if (unassign) {
+      params.set("delete", true.toString());
+    }
+
+    let res = await fetch(
+      `${BACKEND_URL}/assign-gardener-to-sensor-station?${params.toString()}`,
+      {
+        method: "POST",
+      }
+    );
+    if (!res.ok) {
+      logger.error("Could not assign gardener to sensor station");
+      throw error(res.status, "Could not assign gardener to sensor station");
+    } else {
+      if (unassign) {
+        logger.info("Unassigned gardener from sensor station");
+        toasts.addToast(
+          locals.user.personId,
+          "success",
+          "Unassigned gardener from sensor station"
+        );
+      } else {
+        logger.info("Assigned gardener to sensor station");
+        toasts.addToast(
+          locals.user.personId,
+          "success",
+          "Assigned gardener to sensor station"
+        );
+      }
+    }
   },
 
   updateLimit: async ({ request, fetch, locals }) => {
@@ -273,7 +309,7 @@ export const actions = {
       }),
     }).then((response) => {
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         toasts.addToast(
           locals.user.personId,
           "error",
@@ -288,17 +324,16 @@ export const actions = {
 
   delete: async ({ request, fetch, locals }) => {
     let formData = await request.formData();
-    let sensorStationId = formData.get("sensorStationId");
+    let sensorStationId: string = String(formData.get("sensorStationId"));
+
     let params = new URLSearchParams();
-    params.set("sensorStationnId", sensorStationId?.toString() ?? "");
+    params.set("sensorStationId", sensorStationId?.toString());
 
-    let parametersString = "?" + params.toString();
-
-    await fetch(`${BACKEND_URL}/delete-sensor-station${parametersString}`, {
+    await fetch(`${BACKEND_URL}/delete-sensor-station?${params.toString()}`, {
       method: "DELETE",
     }).then((response) => {
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         toasts.addToast(
           locals.user.personId,
           "error",
@@ -324,7 +359,6 @@ export const actions = {
     }
     let newFrom = new Date(_from.toString());
     let newTo = new Date(_to.toString());
-    console.log(newTo);
 
     newFrom.setHours(0);
     newFrom.setMinutes(0);
@@ -333,8 +367,8 @@ export const actions = {
     newTo.setDate(newTo.getDate() + 1);
 
     logger.info("UpdateFromTo");
-    logger.info("from" + JSON.stringify(_from));
-    logger.info("to" + JSON.stringify(_to));
+    logger.info("from", { payload: _from });
+    logger.info("to", { payload: _to });
 
     cookies.set("from", newFrom.toISOString(), { path: "/" });
     cookies.set("to", newTo.toISOString(), { path: "/" });
@@ -365,7 +399,7 @@ export const actions = {
       }
     ).then((response) => {
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         toasts.addToast(
           locals.user.personId,
           "error",
@@ -403,7 +437,7 @@ export const actions = {
       }
     ).then((response) => {
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         toasts.addToast(
           locals.user.personId,
           "error",

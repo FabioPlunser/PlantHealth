@@ -26,6 +26,10 @@
       name: "Users", // includes gardeners
       path: "/admin/users",
     },
+    {
+      name: "Logs",
+      path: "/admin/logs",
+    },
   ];
 </script>
 

@@ -50,7 +50,6 @@
   let sensorStationData: ResponseSensorValues[] | null = null;
   $: {
     sensorStation.data.then((res: ResponseSensorValues[]) => {
-      console.log(res);
       sensorStationData = res;
     });
   }

@@ -25,7 +25,9 @@ export async function getSensorStationData(
         resolve(data);
       })
       .catch((e: any) => {
-        logger.error("Error while fetching sensor station data", { e });
+        logger.error("Error while fetching sensor station data", {
+          payload: e,
+        });
         toasts.addToast(
           event.locals.user?.personId,
           "error",

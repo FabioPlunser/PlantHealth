@@ -41,12 +41,22 @@ public class SensorStationService {
 	@Autowired
 	private PersonService personService;
 
+	private static final String NOT_FOUND_ERROR_MESSAGE = "Could not find SensorStation";
+
 	public SensorStation findById(UUID id) throws ServiceException {
 		Optional<SensorStation> maybeSensorStation = this.sensorStationRepository.findById(id);
 		if (maybeSensorStation.isEmpty()) {
-			throw new ServiceException("Could not find SensorStation", 404);
+			throw new ServiceException(NOT_FOUND_ERROR_MESSAGE, 404);
 		}
 		return maybeSensorStation.get();
+	}
+
+	public List<SensorStation> findAssociated(Person person) {
+		if (person.getPermissions().contains(Permission.GARDENER)) {
+			return sensorStationRepository.findNewForGardener(person);
+		} else {
+			return sensorStationRepository.findNewForUser(person);
+		}
 	}
 
 	public List<SensorStation> findAll() {
@@ -54,10 +64,13 @@ public class SensorStationService {
 	}
 
 	public SensorStation findByBdAddress(String bdAddress) throws ServiceException {
+		if (bdAddress == null) {
+			throw new ServiceException(NOT_FOUND_ERROR_MESSAGE, 404);
+		}
 		Optional<SensorStation> maybeSensorStation =
 				this.sensorStationRepository.findByBdAddress(bdAddress);
 		if (maybeSensorStation.isEmpty()) {
-			throw new ServiceException("Could not find SensorStation", 404);
+			throw new ServiceException(NOT_FOUND_ERROR_MESSAGE, 404);
 		}
 		return maybeSensorStation.get();
 	}
@@ -118,9 +131,6 @@ public class SensorStationService {
 				throw new ServiceException("Could not save sensor limits", 500);
 			}
 		}
-		//		List<SensorLimits> allLimits = sensorLimitsRepository.findAll();
-		//		sensorStation.setSensorLimits(allLimits);
-		//		save(sensorStation);
 	}
 
 	/**
@@ -259,20 +269,24 @@ public class SensorStationService {
 				new ArrayList<>(sensorStation.getSensorStationPictures());
 		try {
 			for (SensorStationPicture picture : pictures) {
-				try {
-					Path path = Paths.get(picture.getPicturePath());
-					Files.delete(path);
-					plantPictureRepository.delete(picture);
-				} catch (Exception e) {
-					plantPictureRepository.delete(picture);
-					throw new ServiceException("Picture already deleted from server", 500);
-				}
+				savePicture(picture);
 
 				sensorStation.getSensorStationPictures().remove(picture);
 			}
 			save(sensorStation);
 		} catch (Exception e) {
 			throw new ServiceException("Failed to delete picture of the server", 500);
+		}
+	}
+
+	private void savePicture(SensorStationPicture picture) {
+		try {
+			Path path = Paths.get(picture.getPicturePath());
+			Files.delete(path);
+			plantPictureRepository.delete(picture);
+		} catch (Exception e) {
+			plantPictureRepository.delete(picture);
+			throw new ServiceException("Picture already deleted from server", 500);
 		}
 	}
 

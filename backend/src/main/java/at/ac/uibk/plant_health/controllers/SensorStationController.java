@@ -35,19 +35,27 @@ public class SensorStationController {
 	@GetMapping("/get-sensor-stations")
 	public RestResponseEntity getSensorStations(Person person) {
 		try {
-			if (person.getPermissions().contains(Permission.ADMIN)) {
-				return new AdminSensorStationsResponse(sensorStationService.findAll()).toEntity();
-			}
+			return new SensorStationsResponse(sensorStationService.findAll(), person).toEntity();
 		} catch (ServiceException e) {
 			return MessageResponse.builder()
 					.statusCode(e.getStatusCode())
 					.message(e.getMessage())
 					.toEntity();
 		}
-
-		return new UserSensorStationsResponse(sensorStationService.findAll(), person).toEntity();
 	}
 
+	@AnyPermission({Permission.ADMIN})
+	@GetMapping("/get-all-sensor-stations")
+	public RestResponseEntity getAllSensorStations() {
+		try {
+			return new AdminSensorStationsResponse(sensorStationService.findAll()).toEntity();
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
+	}
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
 	@PrincipalRequired(Person.class)
 	@GetMapping("/get-sensor-station")
@@ -58,9 +66,8 @@ public class SensorStationController {
 			return new SensorStationResponse(sensorStationService.findById(sensorStationId), person)
 					.toEntity();
 		} catch (ServiceException e) {
-			return MessageResponse
-					.builder()
-
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
 					.message(e.getMessage())
 					.toEntity();
 		}
@@ -116,7 +123,6 @@ public class SensorStationController {
 			@RequestParam(value = "transferInterval", required = false)
 			final Integer transferInterval, @RequestBody final List<SensorLimits> sensorLimits
 	) {
-		System.out.println("update sensor station");
 		try {
 			SensorStation sensorStation = sensorStationService.findById(sensorStationId);
 			sensorStationService.updateSensorStation(sensorStation, name, transferInterval);

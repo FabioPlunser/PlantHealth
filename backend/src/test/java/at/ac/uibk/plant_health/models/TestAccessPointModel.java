@@ -2,6 +2,7 @@ package at.ac.uibk.plant_health.models;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import at.ac.uibk.plant_health.repositories.SensorDataRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,6 +25,8 @@ public class TestAccessPointModel {
 	private AccessPointRepository accessPointRepository;
 	@Autowired
 	private SensorStationRepository sensorStationRepository;
+	@Autowired
+	private SensorDataRepository sensorDataRepository;
 
 	// AccessPoint lifecycle:
 	// AccessPoint registers itself to the backend
@@ -31,23 +34,18 @@ public class TestAccessPointModel {
 	// AccessPoint found SensorStations
 	// AccessPoint sends sensorstation data to backend
 	@BeforeEach
+	@Transactional
 	void setup() {
+		// Delete all Data from the DB keeping in mind foreign key Constraints.
+		sensorDataRepository.deleteAll();
+		for (SensorStation s : sensorStationRepository.findAll()) {
+			// SensorStation is owning Side
+			// Ensure that owning side is empty, so
+			s.setAccessPoint(null);
+			sensorStationRepository.save(s);
+		}
 		sensorStationRepository.deleteAll();
 		accessPointRepository.deleteAll();
-	}
-
-	/*
-	@Test
-	void testRegisterAccessPoint() {
-		// given roomName and id
-		AccessPoint accessPoint = new AccessPoint(UUID.randomUUID(), "TestRoom", 10, false);
-		accessPointRepository.save(accessPoint);
-
-		assertEquals(
-				accessPoint.getDeviceId(),
-				accessPointRepository.findById(accessPoint.getDeviceId()).get().getDeviceId()
-		);
-		assertFalse(accessPointRepository.findAll().isEmpty());
 	}
 
 	@Test
@@ -70,11 +68,10 @@ public class TestAccessPointModel {
 		accessPointRepository.save(savedAccessPoint);
 
 		assertTrue(accessPointRepository.findById(accessPoint.getDeviceId()).get().isUnlocked());
-		assertTrue(accessPointRepository.findById(accessPoint.getDeviceId()).get().isScanActive());
+		assertTrue(accessPointRepository.findById(accessPoint.getDeviceId()).get().getScanActive());
 	}
 
 	@Test
-	@Transactional
 	void addFoundSensorStations() {
 		// given registered AccessPoint, found SensorStations
 		AccessPoint accessPoint = new AccessPoint(UUID.randomUUID(), "TestRoom", 10, false);
@@ -106,7 +103,6 @@ public class TestAccessPointModel {
 	}
 
 	@Test
-	@Transactional
 	void removeSensorStationsFromAccessPoint() {
 		// given registered AccessPoint, found SensorStations
 		AccessPoint accessPoint = new AccessPoint(UUID.randomUUID(), "TestRoom", 10, false);
@@ -115,7 +111,7 @@ public class TestAccessPointModel {
 		// given list of found sensorStations
 		List<SensorStation> sensorStations = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
-			String BD_ADDR = String.format("11:22:33:44:55:6%d", i);
+			String BD_ADDR = String.format("11:22:33:44:5%d:66", i);
 			sensorStations.add(new SensorStation(BD_ADDR, 255 - i));
 		}
 
@@ -136,7 +132,7 @@ public class TestAccessPointModel {
 				accessPointRepository.findById(accessPoint.getDeviceId()).get();
 		foundAccessPoint2.getSensorStations().remove(2);
 		foundAccessPoint2.getSensorStations().get(2).setAccessPoint(null);
-		accessPointRepository.save(foundAccessPoint2);
+		sensorStationRepository.save(foundAccessPoint2.getSensorStations().get(2));
 
 		assertEquals(
 				4,
@@ -145,7 +141,5 @@ public class TestAccessPointModel {
 						.getSensorStations()
 						.size()
 		);
-		assertEquals(5, sensorStationRepository.findAll().size());
 	}
-	*/
 }

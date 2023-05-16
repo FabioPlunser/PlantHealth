@@ -66,7 +66,7 @@
         graphData = createGraphData(res.data);
       })
       .catch((err: any) => {
-        console.log(err);
+        logger.error("Error while fetching data", { payload: err });
       });
   } else {
     addMissingSensors(data);

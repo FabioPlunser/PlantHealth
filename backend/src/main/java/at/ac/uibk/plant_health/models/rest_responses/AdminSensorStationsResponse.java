@@ -21,27 +21,4 @@ public class AdminSensorStationsResponse extends RestResponse implements Seriali
 									  .map(InnerResponse::new)
 									  .toList();
 	}
-	//	@Getter
-	//	public static class InnerResponse implements Serializable {
-	//		private final UUID sensorStationId;
-	//		private final String bdAddress;
-	//		private final String roomName;
-	//		private final String name;
-	//		private final Person gardener;
-	//		private final int dipSwitchId;
-	//		private final boolean unlocked;
-	//		private final boolean connected;
-	//		private final boolean deleted;
-	//		public InnerResponse(SensorStation sensorstation) {
-	//			this.sensorStationId = sensorstation.getDeviceId();
-	//			this.bdAddress = sensorstation.getBdAddress();
-	//			this.roomName = sensorstation.getAccessPoint().getRoomName();
-	//			this.name = sensorstation.getName();
-	//			this.gardener = sensorstation.getGardener();
-	//			this.dipSwitchId = sensorstation.getDipSwitchId();
-	//			this.unlocked = sensorstation.isUnlocked();
-	//			this.connected = sensorstation.isConnected();
-	//			this.deleted = sensorstation.isDeleted();
-	//		}
-	//	}
 }

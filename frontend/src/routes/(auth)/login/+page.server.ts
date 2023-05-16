@@ -48,7 +48,6 @@ export const actions = {
     let res = await event.fetch(`${BACKEND_URL}/login`, requestOptions);
 
     if (!res.ok) {
-      console.log(res);
       logger.error(`Error while logging in: ${res.status} ${res.statusText}`);
       return fail(500, { message: "Error while logging in" });
     }
@@ -70,7 +69,6 @@ export const actions = {
       `User ${username.toString()} logged in`
     );
     event.cookies.set("token", JSON.stringify(event.locals.user));
-    console.log("Login", event.cookies.get("token"));
     logger.info(`User: ${JSON.stringify(newUser)} loggedIn redirect`);
     throw redirect(307, "/");
   },

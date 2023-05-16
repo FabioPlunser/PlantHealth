@@ -26,9 +26,9 @@ public class SensorStationDataResponse extends RestResponse implements Serializa
 		if (!sensorStation.isDeleted()) {
 			this.data = sensorStation.getSensorData()
 								.stream()
-								.filter(data
-										-> data.getTimeStamp().isAfter(from)
-												&& data.getTimeStamp().isBefore(to))
+								.filter(sensorData
+										-> sensorData.getTimeStamp().isAfter(from)
+												&& sensorData.getTimeStamp().isBefore(to))
 								.collect(groupingBy(SensorData::getSensor))
 								.entrySet()
 								.stream()

@@ -1,14 +1,12 @@
 <script lang="ts">
-  import { enhance } from "$app/forms";
+  import { enhance, type SubmitFunction } from "$app/forms";
   import { fly, slide } from "svelte/transition";
-  import type { SubmitFunction } from "./$types.js";
 
   import Spinner from "$components/ui/Spinner.svelte";
   import Modal from "$components/ui/Modal.svelte";
 
   export let showModal: boolean;
   export let data: any = [];
-  $: console.log(data);
 </script>
 
 <Modal

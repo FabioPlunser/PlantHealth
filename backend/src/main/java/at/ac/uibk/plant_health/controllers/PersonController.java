@@ -114,7 +114,6 @@ public class PersonController {
 	 * @param username The new username
 	 * @param email The new email
 	 * @param password The new Password
-	 * @param permissions The new Permissions
 	 * @return A RESTResponse indicating Success
 	 */
 	@WriteOperation
@@ -123,11 +122,10 @@ public class PersonController {
 	public RestResponseEntity updateSettings(
 			Person person, @RequestParam(name = "username", required = false) final String username,
 			@RequestParam(name = "email", required = false) final String email,
-			@RequestParam(name = "permissions", required = false) final Set<Permission> permissions,
 			@RequestParam(name = "password", required = false) final String password
 	) {
 		UUID personId = person.getPersonId();
-		return updatePerson(personId, username, email, permissions, password);
+		return updatePerson(personId, username, email, null, password);
 	}
 
 	/**

@@ -25,7 +25,7 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 	}
 
 	@Getter
-	private static class InnerResponse {
+	private static class InnerResponse implements Serializable {
 		private final String bdAddress;
 		private final int dipSwitchId;
 		private final String name;
@@ -43,8 +43,8 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 			this.bdAddress = sensorStation.getBdAddress();
 			this.dipSwitchId = sensorStation.getDipSwitchId();
 			this.name = sensorStation.getName();
-			var access_point = sensorStation.getAccessPoint();
-			if (access_point != null) this.roomName = access_point.getRoomName(); else this.roomName = null;
+			var accessPoint = sensorStation.getAccessPoint();
+			if (accessPoint != null) this.roomName = accessPoint.getRoomName(); else this.roomName = null;
 			this.sensorStationId = sensorStation.getDeviceId();
 			this.gardener = sensorStation.getGardener();
 			this.unlocked = sensorStation.isUnlocked();
@@ -65,7 +65,7 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 												));
 
 								return newestLimit
-										.map(limits -> new SensorLimitsResponse(limits, person))
+										.map(SensorLimitsResponse::new)
 										.orElseGet(
 												()
 														-> new SensorLimitsResponse(
@@ -73,8 +73,7 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 																		LocalDateTime.now(), 0, 0,
 																		0, sensor, person,
 																		sensorStation
-																),
-																person
+																)
 														)
 										);
 							})
@@ -84,7 +83,7 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 		}
 
 		@Getter
-		private static class SensorLimitsResponse {
+		private static class SensorLimitsResponse implements Serializable {
 			private final LocalDateTime timeStamp;
 			private final float upperLimit;
 			private final float lowerLimit;
@@ -93,7 +92,7 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 			private final Person gardener;
 			private final boolean deleted;
 
-			public SensorLimitsResponse(SensorLimits sensorLimit, Person person) {
+			public SensorLimitsResponse(SensorLimits sensorLimit) {
 				this.timeStamp = sensorLimit.getTimeStamp();
 				this.upperLimit = sensorLimit.getUpperLimit();
 				this.lowerLimit = sensorLimit.getLowerLimit();
