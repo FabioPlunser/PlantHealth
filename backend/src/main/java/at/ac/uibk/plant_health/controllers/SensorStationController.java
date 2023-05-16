@@ -34,15 +34,8 @@ public class SensorStationController {
 	@PrincipalRequired(Person.class)
 	@GetMapping("/get-sensor-stations")
 	public RestResponseEntity getSensorStations(Person person) {
-		try {
-			if (person.getPermissions().contains(Permission.ADMIN)) {
-				return new AdminSensorStationsResponse(sensorStationService.findAll()).toEntity();
-			}
-		} catch (ServiceException e) {
-			return MessageResponse.builder()
-					.statusCode(e.getStatusCode())
-					.message(e.getMessage())
-					.toEntity();
+		if (person.getPermissions().contains(Permission.ADMIN)) {
+			return new AdminSensorStationsResponse(sensorStationService.findAll()).toEntity();
 		}
 
 		return new UserSensorStationsResponse(sensorStationService.findAssociated(person), person).toEntity();
@@ -60,6 +53,7 @@ public class SensorStationController {
 		} catch (ServiceException e) {
 			return MessageResponse
 					.builder()
+					.statusCode(e.getStatusCode())
 					.message(e.getMessage())
 					.toEntity();
 		}
