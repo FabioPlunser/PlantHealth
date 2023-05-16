@@ -1,6 +1,6 @@
 import { BACKEND_URL } from "$env/static/private";
 import type { Actions } from "./$types";
-import { redirect } from "@sveltejs/kit";
+import { redirect, error } from "@sveltejs/kit";
 import { logger } from "$helper/logger";
 import { toasts } from "$stores/toastStore";
 
@@ -38,9 +38,15 @@ export async function load({ locals, fetch, cookies }) {
   }
 
   // get all possible sensor stations from backend
-  let res = await fetch(`${BACKEND_URL}/get-sensor-stations`);
-  res = await res.json();
-  logger.info("get-sensor-stations", { res });
+  let res = await fetch(`${BACKEND_URL}/get-sensor-stations`)
+				.then((response) => {
+						if (!response.ok) {
+							logger.error("get-sensor-stations", { response });
+							throw new error(response.status);
+						}
+						return response.json();
+					});
+  logger.info("get-sensor-stations", res);
 
   // get newest picture for each sensor station
   let sensorStations = res?.sensorStations;
@@ -68,11 +74,17 @@ export async function load({ locals, fetch, cookies }) {
   }
 
   // fetch dashboard data
-  let dashboard: Dashboard = await fetch(`${BACKEND_URL}/get-dashboard-data`);
-  dashboard = await dashboard.json();
+  let dashboard: Dashboard = await fetch(`${BACKEND_URL}/get-dashboard-data`)
+								.then((response) => {
+									if (!response.ok) {
+										logger.error("get-dashboard-data", { response });
+										throw new error(response.status);
+									}
+									return response.json();
+								});
   logger.info("get-dashboard-data", { dashboard });
 
-  for (let sensorStation of dashboard.sensorStations) {
+  for (let sensorStation of dashboard?.sensorStations) {
     logger.info("get-sensor-station-data", { sensorStation });
     sensorStation.data = new Promise(async (resolve, reject) => {
       let res = await fetch(
@@ -96,7 +108,7 @@ export async function load({ locals, fetch, cookies }) {
     logger.info("get-sensor-station-pictures", { res });
 
     sensorStation.pictures = [];
-    for (let possiblePicture of res.pictures) {
+    for (let possiblePicture of res?.pictures ?? []) {
       logger.info("get-sensor-station-picture", { possiblePicture });
       let picturePromise = new Promise(async (resolve, reject) => {
         let pictureResponse = await fetch(
@@ -107,10 +119,13 @@ export async function load({ locals, fetch, cookies }) {
           reject(pictureResponse.statusText);
         }
         let blob = await pictureResponse.blob();
+        let file = new File([blob], possiblePicture.pictureId, {
+          type: blob.type,
+        });
         let arrayBuffer = await blob.arrayBuffer();
         let buffer = Buffer.from(arrayBuffer);
         let encodedImage =
-          "data:image/" + res.type + ";base64," + buffer.toString("base64");
+          "data:image/" + file.type + ";base64," + buffer.toString("base64");
         let picture: Picture = {
           imageRef: encodedImage,
           creationDate: new Date(possiblePicture.timeStamp),
@@ -152,12 +167,6 @@ export const actions = {
     );
     res = await res.json();
     logger.info("addToDashboard", { res });
-
-    let promise = new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve("done");
-      }, 2000);
-    });
   },
   /* `removeFromDashboard` is an action function that removes a sensor station from the user's
   dashboard. It receives an HTTP request object, extracts the form data submitted by the user, which

@@ -78,7 +78,7 @@
             />
           </div>
           {#if imageToUpload && !submitting}
-            <div class="mx-auto">
+            <div class="mx-auto w-1/3">
               <img
                 class="flext justify-center mx-auto mt-4 border-gray-500 border-2 rounded-xl shadow-xl"
                 src={imageToUpload}
@@ -99,9 +99,8 @@
       </div>
     </form>
 
-    <!-- {#if data?.streamed} -->
-    <div class="mt-6" transition:fly={{ y: -200, duration: 200 }}>
-      <ImagesGrid fetchPictures={data.streamed?.fetchPictures} />
+    <div class="mt-6">
+      <ImagesGrid pictures={data.streamed.pictures} />
     </div>
   </section>
 {/if}

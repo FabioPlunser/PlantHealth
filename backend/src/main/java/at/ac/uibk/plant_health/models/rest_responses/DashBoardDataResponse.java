@@ -22,6 +22,7 @@ public class DashBoardDataResponse extends RestResponse implements Serializable 
 									  .stream()
 									  .filter(SensorStationPersonReference::isInDashboard)
 									  .map(SensorStationPersonReference::getSensorStation)
+									  .filter(st -> !st.isDeleted())
 									  .map(DashboardSensorStation::new)
 									  .toList();
 	}
@@ -37,26 +38,16 @@ public class DashBoardDataResponse extends RestResponse implements Serializable 
 		private final boolean deleted;
 
 		public DashboardSensorStation(SensorStation sensorStation) {
-			if (!sensorStation.isDeleted()) {
-				this.name = sensorStation.getName();
-				this.roomName = sensorStation.getAccessPoint().getRoomName();
-				this.pictureIds = sensorStation.getSensorStationPictures()
-										  .stream()
-										  .map(SensorStationPicture::getPictureId)
-										  .toList();
-				this.sensorStationId = sensorStation.getDeviceId();
-				this.connected = sensorStation.isConnected();
-				this.unlocked = sensorStation.isUnlocked();
-				this.deleted = false;
-			} else {
-				this.name = null;
-				this.roomName = null;
-				this.pictureIds = null;
-				this.sensorStationId = null;
-				this.connected = false;
-				this.unlocked = false;
-				this.deleted = true;
-			}
+			this.name = sensorStation.getName();
+			this.roomName = sensorStation.getAccessPoint().getRoomName();
+			this.pictureIds = sensorStation.getSensorStationPictures()
+									  .stream()
+									  .map(SensorStationPicture::getPictureId)
+									  .toList();
+			this.sensorStationId = sensorStation.getDeviceId();
+			this.connected = sensorStation.isConnected();
+			this.unlocked = sensorStation.isUnlocked();
+			this.deleted = false;
 		}
 	}
 }

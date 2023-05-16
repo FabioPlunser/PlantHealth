@@ -20,7 +20,7 @@
 
 <div
   bind:this={wrapperEl}
-  class="wrapper mt-12"
+  class="mt-24 mr-4 w-fit fixed right-0"
   class:active={toast.visible}
   class:transition={!prefersReducedMotion()}
   style:--factor={factor}

@@ -50,7 +50,6 @@
   let sensorStationData: ResponseSensorValues[] | null = null;
   $: {
     sensorStation.data.then((res: ResponseSensorValues[]) => {
-      console.log(res);
       sensorStationData = res;
     });
   }
@@ -455,7 +454,7 @@
                                 formaction="?/deletePicture"
                               >
                                 <i
-                                  class="bi bi-trash text-4xl text-gray-400 hover:text-red-500"
+                                  class="bi bi-trash text-2xl text-black hover:text-red-500"
                                 />
                               </button>
                             </form>
