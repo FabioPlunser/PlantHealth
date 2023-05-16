@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class UserSensorStationsResponse extends RestResponse implements Serializable {
 	private final List<InnerResponse> sensorStations;
-	public UserSensorStationsResponse(List<SensorStation> sensorStations, Person person) {
+	public UserSensorStationsResponse(List<SensorStation> sensorStations) {
 		this.sensorStations =
 				sensorStations.stream()
 					.map(InnerResponse::new)

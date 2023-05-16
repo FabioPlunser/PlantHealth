@@ -41,7 +41,7 @@ public class SensorStationService {
 	@Autowired
 	private PersonService personService;
 
-	private final static String NOT_FOUND_ERROR_MESSAGE = "Could not find SensorStation";
+	private static final String NOT_FOUND_ERROR_MESSAGE = "Could not find SensorStation";
 
 	public SensorStation findById(UUID id) throws ServiceException {
 		Optional<SensorStation> maybeSensorStation = this.sensorStationRepository.findById(id);

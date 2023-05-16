@@ -38,7 +38,7 @@ public class SensorStationController {
 			return new AdminSensorStationsResponse(sensorStationService.findAll()).toEntity();
 		}
 
-		return new UserSensorStationsResponse(sensorStationService.findAssociated(person), person).toEntity();
+		return new UserSensorStationsResponse(sensorStationService.findAssociated(person)).toEntity();
 	}
 
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
