@@ -3,9 +3,7 @@ package at.ac.uibk.plant_health.models.rest_responses;
 import java.io.Serializable;
 import java.util.*;
 
-import at.ac.uibk.plant_health.models.SensorStationPersonReference;
 import at.ac.uibk.plant_health.models.device.SensorStation;
-import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
