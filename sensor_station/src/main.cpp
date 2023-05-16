@@ -38,6 +38,7 @@ double sensorValueWeightCalculationFunction(
 	unsigned long timeNow, unsigned long timeLastUpdate,
 	unsigned long timeLastReset
 );
+void checkResetButtonPressed();
 
 // ----- Global Variables ----- //
 
@@ -88,6 +89,9 @@ void loop() {
 	static unsigned long timeBetweenMeasures	   = 0;
 	static unsigned long previousDataTransmission  = millis();
 	static unsigned long previousSensorMeasurement = millis();
+
+	checkResetButtonPressed();
+
 #if PAIRING_BUTTON_REQUIRED
 	checkPairingButtonAndStatus(inPairingMode);
 	updateNotificationHandler_PairingMode(inPairingMode);
@@ -142,6 +146,25 @@ void loop() {
 }
 
 // ----- Functions ----- //
+
+void checkResetButtonPressed() {
+	static unsigned long timePressedStart = 0;
+	static bool isPressed				  = false;
+	if (digitalRead(PIN_BUTTON_3) == PinStatus::HIGH) {
+		DEBUG_PRINT_POS(2, "Reset button pressed!");
+		if (!isPressed) {
+			timePressedStart = millis();
+			isPressed		 = true;
+		} else {
+			if (millis() - timePressedStart > TIME_BUTTON_PRESS_TO_RESET) {
+				DEBUG_PRINT_POS(1, "Reset initiated!");
+				NVIC_SystemReset();
+			}
+		}
+	} else {
+		isPressed = false;
+	}
+}
 
 double sensorValueWeightCalculationFunction(
 	unsigned long timeNow, unsigned long timeLastUpdate,
