@@ -31,7 +31,6 @@ export async function load(event) {
   let res = await fetch(`${BACKEND_URL}/get-user-permissions`)
     .then(async (res) => {
       if (!res.ok) {
-        console.log(await res.json());
         toasts.addToast(
           event.locals.user?.personId,
           "error",
@@ -42,7 +41,7 @@ export async function load(event) {
       return res;
     })
     .catch((err) => {
-      logger.error("get-user-permissions", { err });
+      logger.error("get-user-permissions", { payload: err });
       throw redirect(302, "/logout");
     });
 

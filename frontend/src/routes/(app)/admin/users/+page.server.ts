@@ -17,13 +17,13 @@ export async function load({ fetch, depends }) {
   await fetch(`${BACKEND_URL}/get-all-users`)
     .then((response) => {
       if (!response.ok) {
-        logger.error("Couldn't get all users", { response });
+        logger.error("Couldn't get all users", { payload: response });
         throw error(response.status, response.statusText);
       }
       return response.json();
     })
     .then((data) => {
-      logger.info("Got all users", { data });
+      logger.info("Got all users", { payload: data });
       allUsers = data.items;
     });
   return { users: allUsers };
@@ -95,7 +95,7 @@ export const actions = {
     await fetch(`${BACKEND_URL}/create-user`, requestOptions)
       .then((response) => {
         if (!response.ok) {
-          logger.error("Couldn't create user", { response });
+          logger.error("Couldn't create user", { payload: response });
           throw error(response.status, response.statusText);
         }
         return response.json();
@@ -133,7 +133,7 @@ export const actions = {
     })
       .then((response) => {
         if (!response.ok) {
-          logger.error("Couldn't delete user", { response });
+          logger.error("Couldn't delete user", { payload: response });
           throw error(response.status, response.statusText);
         }
         return response.json();

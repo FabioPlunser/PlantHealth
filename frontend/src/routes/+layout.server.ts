@@ -21,7 +21,7 @@ export async function load(event) {
   try {
     await fetch(`${BACKEND_URL}/get-sensor-station-info`);
   } catch (err: any) {
-    logger.error("Backend is down" + JSON.stringify(err));
+    logger.error("Backend is down", { payload: err });
     if (err.cause.code === "ECONNREFUSED") {
       return {
         error: "Backend is not reachable",

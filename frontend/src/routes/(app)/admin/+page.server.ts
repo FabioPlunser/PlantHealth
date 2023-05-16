@@ -52,15 +52,13 @@ export async function load(event) {
         //---------------------------------------------------------------------
         if (sensorStations.length === 0) resolve([]);
         for (let sensorStation of sensorStations) {
-          console.log(sensorStation);
           sensorStation.newestPicture = new Promise(async (resolve, reject) => {
             await fetch(
               `${BACKEND_URL}/get-newest-sensor-station-picture?sensorStationId=${sensorStation.sensorStationId}`
             )
               .then(async (res) => {
                 if (!res.ok) {
-                  // logger.error("Error while fetching newest picture");
-                  // toasts.addToast(event.locals.user?.personId, "error", "Error while fetching newest picture");
+                  logger.error("Error while fetching newest picture");
                   resolve(null);
                 }
                 let blob = await res.blob();
@@ -161,7 +159,6 @@ export async function load(event) {
                   reject(await res.json());
                 }
                 let data = await res.json();
-                console.log(data);
                 resovle(data);
               })
               .catch((err) => {
@@ -196,7 +193,6 @@ export async function load(event) {
                 return [];
               }
               let data = await res.json();
-              console.log(data);
               return data.pictures;
             })
             .catch((err) => {
@@ -316,6 +312,11 @@ export const actions = {
             "Error while adding sensor station to dashboard"
           );
         }
+        toasts.addToast(
+          event.locals.user?.personId,
+          "success",
+          "Sensor station added to dashboard"
+        );
       })
       .catch((err) => {
         logger.error("Error while adding sensor station to dashboard");
@@ -345,6 +346,11 @@ export const actions = {
             "Error while removing sensor station from dashboard"
           );
         }
+        toasts.addToast(
+          event.locals.user?.personId,
+          "success",
+          "Sensor station removed from dashboard"
+        );
       })
       .catch((err) => {
         logger.error("Error while removing sensor station from dashboard");

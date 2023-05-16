@@ -65,7 +65,6 @@
 
   function onScanFailure(error: any) {
     // alert(`Code scan error = ${error}`);
-    // console.warn(`Code scan error = ${error}`);
   }
 </script>
 

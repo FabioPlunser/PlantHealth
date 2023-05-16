@@ -26,7 +26,7 @@ export async function load(event) {
     plantName = data.plantName;
 
     for (let possiblePicture of possiblePictures) {
-      logger.info("Fetching picture: " + possiblePicture.pictureId);
+      logger.info("Fetching picture: ", { payload: possiblePicture.pictureId });
       let promise = new Promise(async (resolve, reject) => {
         await fetch(
           `${BACKEND_URL}/get-sensor-station-picture?pictureId=${possiblePicture.pictureId}`

@@ -17,7 +17,9 @@ export async function getSensorStationPictures(
   )
     .then(async (res: any) => {
       if (!res.ok) {
-        logger.error("Error while fetching sensor station pictures", { res });
+        logger.error("Error while fetching sensor station pictures", {
+          payload: res,
+        });
         toasts.addToast(
           event.locals.user?.personId,
           "error",
@@ -29,7 +31,9 @@ export async function getSensorStationPictures(
       possiblePictures = data.pictureIds;
     })
     .catch((e: any) => {
-      logger.error("Error while fetching sensor station pictures", { e });
+      logger.error("Error while fetching sensor station pictures", {
+        payload: e,
+      });
       toasts.addToast(
         event.locals.user?.personId,
         "error",
@@ -51,7 +55,7 @@ export async function getSensorStationPictures(
       await fetch(`${BACKEND_URL}/get-picture?pictureId=${picture.picutreId}`)
         .then(async (res: any) => {
           if (!res.ok) {
-            logger.error("Error while fetching picture", { res });
+            logger.error("Error while fetching picture", { payload: res });
             toasts.addToast(
               event.locals.user?.personId,
               "error",
@@ -73,7 +77,7 @@ export async function getSensorStationPictures(
           resolve(newPicture);
         })
         .catch((e: any) => {
-          logger.error("Error while fetching picture", { e });
+          logger.error("Error while fetching picture", { payload: e });
           toasts.addToast(
             event.locals.user?.personId,
             "error",

@@ -75,7 +75,7 @@ export const actions = {
     ).then((response: any) => {
       let time = new Date().toLocaleString();
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         throw error(response.status, response.statusText);
       } else {
         logger.info(
@@ -117,7 +117,7 @@ export const actions = {
       }),
     }).then((response) => {
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         toasts.addToast(
           locals.user.personId,
           "error",
@@ -183,7 +183,7 @@ export const actions = {
       method: "DELETE",
     }).then((response) => {
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         toasts.addToast(
           locals.user.personId,
           "error",

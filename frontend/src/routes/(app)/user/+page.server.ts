@@ -38,20 +38,23 @@ export async function load({ locals, fetch, cookies }) {
   }
 
   // get all possible sensor stations from backend
-  let res = await fetch(`${BACKEND_URL}/get-sensor-stations`)
-				.then((response) => {
-						if (!response.ok) {
-							logger.error("get-sensor-stations", { response });
-							throw new error(response.status);
-						}
-						return response.json();
-					});
-  logger.info("get-sensor-stations", res);
+  let res = await fetch(`${BACKEND_URL}/get-sensor-stations`).then(
+    (response) => {
+      if (!response.ok) {
+        logger.error("get-sensor-stations", { payload: response });
+        throw new error(response.status);
+      }
+      return response.json();
+    }
+  );
+  logger.info("get-sensor-stations", { payload: res });
 
   // get newest picture for each sensor station
   let sensorStations = res?.sensorStations;
   for (let foundSensorStation of res?.sensorStations) {
-    logger.info("get-newest-sensor-station-picture", { foundSensorStation });
+    logger.info("get-newest-sensor-station-picture", {
+      payload: foundSensorStation,
+    });
     foundSensorStation.newestPicture = new Promise(async (resolve, reject) => {
       let res = await fetch(
         `${BACKEND_URL}/get-newest-sensor-station-picture?sensorStationId=${foundSensorStation.sensorStationId}`
@@ -74,18 +77,19 @@ export async function load({ locals, fetch, cookies }) {
   }
 
   // fetch dashboard data
-  let dashboard: Dashboard = await fetch(`${BACKEND_URL}/get-dashboard-data`)
-								.then((response) => {
-									if (!response.ok) {
-										logger.error("get-dashboard-data", { response });
-										throw new error(response.status);
-									}
-									return response.json();
-								});
+  let dashboard: Dashboard = await fetch(
+    `${BACKEND_URL}/get-dashboard-data`
+  ).then((response) => {
+    if (!response.ok) {
+      logger.error("get-dashboard-data", { payload: response });
+      throw new error(response.status);
+    }
+    return response.json();
+  });
   logger.info("get-dashboard-data", { dashboard });
 
   for (let sensorStation of dashboard?.sensorStations) {
-    logger.info("get-sensor-station-data", { sensorStation });
+    logger.info("get-sensor-station-data", { payload: sensorStation });
     sensorStation.data = new Promise(async (resolve, reject) => {
       let res = await fetch(
         `${BACKEND_URL}/get-sensor-station-data?sensorStationId=${
@@ -105,11 +109,11 @@ export async function load({ locals, fetch, cookies }) {
       `${BACKEND_URL}/get-sensor-station-pictures?sensorStationId=${sensorStation.sensorStationId}`
     );
     res = await res.json();
-    logger.info("get-sensor-station-pictures", { res });
+    logger.info("get-sensor-station-pictures", { payload: res });
 
     sensorStation.pictures = [];
     for (let possiblePicture of res?.pictures ?? []) {
-      logger.info("get-sensor-station-picture", { possiblePicture });
+      logger.info("get-sensor-station-picture", { payload: possiblePicture });
       let picturePromise = new Promise(async (resolve, reject) => {
         let pictureResponse = await fetch(
           `${BACKEND_URL}/get-sensor-station-picture?pictureId=${possiblePicture.pictureId}`
@@ -166,7 +170,7 @@ export const actions = {
       }
     );
     res = await res.json();
-    logger.info("addToDashboard", { res });
+    logger.info("addToDashboard", { payload: res });
   },
   /* `removeFromDashboard` is an action function that removes a sensor station from the user's
   dashboard. It receives an HTTP request object, extracts the form data submitted by the user, which
@@ -186,7 +190,7 @@ export const actions = {
     );
     res = await res.json();
 
-    logger.info("removeFromDashboard", { res });
+    logger.info("removeFromDashboard", { payload: res });
   },
 
   /* `updateFromTo` is an action function that is called when the user updates the date range for the
@@ -210,8 +214,8 @@ export const actions = {
     _to.setSeconds(59);
 
     logger.info("UpdateFromTo");
-    logger.info("from" + JSON.stringify(_from));
-    logger.info("to" + JSON.stringify(_to));
+    logger.info("from", { payload: _from });
+    logger.info("to", { payload: _to });
 
     cookies.set("from", _from, { path: "/" });
     cookies.set("to", _to, { path: "/" });

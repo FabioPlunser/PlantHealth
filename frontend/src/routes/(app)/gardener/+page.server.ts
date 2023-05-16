@@ -94,7 +94,7 @@ export async function load(event) {
         resolve(sensorStations);
       })
       .catch((e) => {
-        logger.error("Error while fetching sensor stations", { e });
+        logger.error("Error while fetching sensor stations", { payload: e });
         toasts.addToast(
           event.locals.user?.personId,
           "error",
@@ -141,7 +141,9 @@ export async function load(event) {
           resolve(data);
         })
         .catch((e) => {
-          logger.error("Error while fetching sensor station data", { e });
+          logger.error("Error while fetching sensor station data", {
+            payload: e,
+          });
           toasts.addToast(
             event.locals.user?.personId,
             "error",
@@ -161,7 +163,9 @@ export async function load(event) {
           resolve(data.sensorStation.sensorLimits);
         })
         .catch((e) => {
-          logger.error("Error while fetching sensor station data", { e });
+          logger.error("Error while fetching sensor station data", {
+            payload: e,
+          });
           toasts.addToast(
             event.locals.user?.personId,
             "error",
@@ -179,7 +183,9 @@ export async function load(event) {
     )
       .then(async (res) => {
         if (!res.ok) {
-          logger.error("Error while fetching sensor station pictures", { res });
+          logger.error("Error while fetching sensor station pictures", {
+            payload: res,
+          });
           toasts.addToast(
             event.locals.user?.personId,
             "error",
@@ -191,7 +197,9 @@ export async function load(event) {
         possiblePictures = data.pictures;
       })
       .catch((e) => {
-        logger.error("Error while fetching sensor station pictures", { e });
+        logger.error("Error while fetching sensor station pictures", {
+          payload: e,
+        });
         toasts.addToast(
           event.locals.user?.personId,
           "error",
@@ -216,7 +224,7 @@ export async function load(event) {
           .then(async (res) => {
             if (!res.ok) {
               res = await res.json();
-              logger.error("Error while fetching picture", { res });
+              logger.error("Error while fetching picture", { payload: res });
               toasts.addToast(
                 event.locals.user?.personId,
                 "error",
@@ -241,7 +249,7 @@ export async function load(event) {
             resolve(newPicture);
           })
           .catch((e) => {
-            logger.error("Error while fetching picture", { e });
+            logger.error("Error while fetching picture", { payload: e });
             toasts.addToast(
               event.locals.user?.personId,
               "error",
@@ -348,7 +356,7 @@ export const actions = {
       .then(async (res) => {
         if (!res.ok) {
           res = await res.json();
-          logger.error("Error while updating sensor station" + String(res));
+          logger.error("Error while updating sensor station", { payload: res });
           toasts.addToast(
             event.locals.user?.personId,
             "error",
@@ -364,7 +372,7 @@ export const actions = {
         );
       })
       .catch((e) => {
-        logger.error("Error while updating sensor station", { e });
+        logger.error("Error while updating sensor station", { payload: e });
         toasts.addToast(
           event.locals.user?.personId,
           "error",
@@ -392,7 +400,7 @@ export const actions = {
       .then(async (res) => {
         if (!res.ok) {
           res = await res.json();
-          logger.error("Error while deleting picture" + String(res));
+          logger.error("Error while deleting picture", { payload: res });
           toasts.addToast(
             event.locals.user?.personId,
             "error",
@@ -408,7 +416,7 @@ export const actions = {
         );
       })
       .catch((e) => {
-        logger.error("Error while deleting picture", { e });
+        logger.error("Error while deleting picture", { payload: e });
         toasts.addToast(
           event.locals.user?.personId,
           "error",
@@ -436,7 +444,7 @@ export const actions = {
       .then(async (res) => {
         if (!res.ok) {
           res = await res.json();
-          logger.error("Error while deleting all pictures" + String(res));
+          logger.error("Error while deleting all pictures", { payload: res });
           toasts.addToast(
             event.locals.user?.personId,
             "error",
@@ -452,7 +460,7 @@ export const actions = {
         );
       })
       .catch((e) => {
-        logger.error("Error while deleting all pictures", { e });
+        logger.error("Error while deleting all pictures", { payload: e });
         toasts.addToast(
           event.locals.user?.personId,
           "error",
@@ -479,7 +487,7 @@ export const actions = {
       .then(async (res) => {
         if (!res.ok) {
           res = await res.json();
-          logger.error("Error while uploading picture" + String(res));
+          logger.error("Error while uploading picture", { payload: res });
           toasts.addToast(
             event.locals.user?.personId,
             "error",
@@ -495,7 +503,7 @@ export const actions = {
         );
       })
       .catch((e) => {
-        logger.error("Error while uploading picture", { e });
+        logger.error("Error while uploading picture", { payload: e });
         toasts.addToast(
           event.locals.user?.personId,
           "error",
@@ -560,7 +568,7 @@ export const actions = {
       .then(async (res) => {
         if (!res.ok) {
           res = await res.json();
-          logger.error("Error while updating limit" + String(res));
+          logger.error("Error while updating limit", { payload: res });
           toasts.addToast(
             event.locals.user?.personId,
             "error",
@@ -576,7 +584,7 @@ export const actions = {
         );
       })
       .catch((e) => {
-        logger.error("Error while updating limit", { e });
+        logger.error("Error while updating limit", { payload: e });
         toasts.addToast(
           event.locals.user?.personId,
           "error",
@@ -597,7 +605,7 @@ export const actions = {
     from.setHours(0, 0, 0, 0);
     to.setHours(23, 59, 59, 999);
 
-    logger.info("Update from to" + JSON.stringify({ from, to }));
+    logger.info("Update from to", { payload: { from, to } });
 
     event.cookies.set("from", from.toISOString(), { path: "/" });
     event.cookies.set("to", to.toISOString(), { path: "/" });
@@ -614,7 +622,7 @@ export const actions = {
     ).then(async (res) => {
       if (!res.ok) {
         res = await res.json();
-        logger.error("Error while adding to dashboard" + String(res));
+        logger.error("Error while adding to dashboard", { payload: res });
         toasts.addToast(
           event.locals.user?.personId,
           "error",
@@ -642,7 +650,7 @@ export const actions = {
     ).then(async (res) => {
       if (!res.ok) {
         res = await res.json();
-        logger.error("Error while removing from dashboard" + String(res));
+        logger.error("Error while removing from dashboard", { payload: res });
         toasts.addToast(
           event.locals.user?.personId,
           "error",

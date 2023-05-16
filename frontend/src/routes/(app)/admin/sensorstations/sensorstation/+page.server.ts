@@ -165,7 +165,7 @@ export const actions = {
     ).then((response) => {
       let time = new Date().toLocaleString();
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         throw error(response.status, response.statusText);
       } else {
         logger.info(
@@ -208,7 +208,7 @@ export const actions = {
       }),
     }).then((response) => {
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         toasts.addToast(
           locals.user.personId,
           "error",
@@ -309,7 +309,7 @@ export const actions = {
       }),
     }).then((response) => {
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         toasts.addToast(
           locals.user.personId,
           "error",
@@ -333,7 +333,7 @@ export const actions = {
       method: "DELETE",
     }).then((response) => {
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         toasts.addToast(
           locals.user.personId,
           "error",
@@ -367,8 +367,8 @@ export const actions = {
     newTo.setDate(newTo.getDate() + 1);
 
     logger.info("UpdateFromTo");
-    logger.info("from" + JSON.stringify(_from));
-    logger.info("to" + JSON.stringify(_to));
+    logger.info("from", { payload: _from });
+    logger.info("to", { payload: _to });
 
     cookies.set("from", newFrom.toISOString(), { path: "/" });
     cookies.set("to", newTo.toISOString(), { path: "/" });
@@ -399,7 +399,7 @@ export const actions = {
       }
     ).then((response) => {
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         toasts.addToast(
           locals.user.personId,
           "error",
@@ -437,7 +437,7 @@ export const actions = {
       }
     ).then((response) => {
       if (!response.ok) {
-        logger.error("sensor-station-page", { response });
+        logger.error("sensor-station-page", { payload: response });
         toasts.addToast(
           locals.user.personId,
           "error",

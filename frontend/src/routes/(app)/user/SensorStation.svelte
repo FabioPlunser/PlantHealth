@@ -34,8 +34,6 @@
       loading = false;
     };
   };
-
-  $: console.table("sensorStation", sensorStation);
   let openPictureModal = false;
   let selectedPicture = "";
 </script>
