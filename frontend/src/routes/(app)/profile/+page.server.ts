@@ -154,14 +154,18 @@ export const actions = {
     });
 
     let canActiveUserChangeRoles: boolean =
-    locals.user.permissions.includes("ADMIN") &&
-    personId !== locals.user.personId;
+      locals.user.permissions.includes("ADMIN") &&
+      personId !== locals.user.personId;
 
     /*
      * We do not want the Admin to remove all permissions from a user so we cancel the action
      */
     if (canActiveUserChangeRoles && permissions.length <= 0) {
-      toasts.addToast(locals.user?.personId, "error", "Choose at least one Permission!");
+      toasts.addToast(
+        locals.user?.personId,
+        "error",
+        "Choose at least one Permission!"
+      );
     }
     let username = formData.get("username");
     let email = formData.get("email");
@@ -197,28 +201,25 @@ export const actions = {
     }
 
     let parametersString = "?" + params.toString();
-    
-    /* 
-     * Depending on the permission of the current user and if he is supposed to change the roles 
+
+    /*
+     * Depending on the permission of the current user and if he is supposed to change the roles
      * of the displayed user we fetch a different endpoint
      */
     if (canActiveUserChangeRoles) {
-    await fetch(`${BACKEND_URL}/update-user` + parametersString, {
-      method: "POST",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          logger.error("user-profile-page", { payload: response });
-          throw error(response.status, response.statusText);
-        }
-        return response.json();
+      await fetch(`${BACKEND_URL}/update-user` + parametersString, {
+        method: "POST",
       })
-      .then((data) => {
-        logger.info(
-          "Updated user: " +
-            JSON.stringify(data.message)
-        );
-      });
+        .then((response) => {
+          if (!response.ok) {
+            logger.error("user-profile-page", { payload: response });
+            throw error(response.status, response.statusText);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          logger.info("Updated user: " + JSON.stringify(data.message));
+        });
     } else {
       await fetch(`${BACKEND_URL}/update-user` + parametersString, {
         method: "POST",
@@ -231,13 +232,9 @@ export const actions = {
           return response.json();
         })
         .then((data) => {
-          logger.info(
-            "Updated user: " +
-              JSON.stringify(data.message)
-          );
+          logger.info("Updated user: " + JSON.stringify(data.message));
         });
     }
-
 
     // NOTE: Redirect if the user was redirected to profile from some other page
     if (source !== null) {

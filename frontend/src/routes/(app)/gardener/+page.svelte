@@ -15,13 +15,15 @@
   import { flexRender, type ColumnDef } from "@tanstack/svelte-table";
   import { TextCell } from "$components/table/cellComponents";
 
-
   // ---------------------------------------------------
   // ---------------------------------------------------
   import { onMount } from "svelte";
   import { add } from "$lib/components/toast/core/store";
   import UploadPicture from "./uploadPicture.svelte";
-  import { SensorStation, SensorStationsModal } from "$lib/components/ui/SensorStation";
+  import {
+    SensorStation,
+    SensorStationsModal,
+  } from "$lib/components/ui/SensorStation";
   let rendered = false;
   onMount(() => {
     rendered = true;
@@ -111,6 +113,7 @@
   // };
   // ----------------------------------
   // ----------------------------------
+  let searchTerm = "";
 </script>
 
 {#if rendered}
@@ -150,28 +153,31 @@
         >
       </div>
       {#if data.dashboard.addedSensorStations?.length === 0}
-      <h1 class="text-2xl font-bold flex justify-center items-center my-auto mt-2">
-        You have no Sensor Stations in your Dashboard yet.
-      </h1>
-    {:else}
-    <div class="m-4 flex justify-ceter">
-      <input
-        bind:value={searchTerm}
-        type="search"
-        name="searchRoom"
-        placeholder="Global Search"
-        class="input dark:input-bordered w-fit min-w-64 mx-auto dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
-      />
-    </div>
-      <div class="grid grid-rows gap-2 mt-2">
-        {#each data.dashboard.addedSensorStations as sensorStation, i (sensorStation.sensorStationId)}
-        {#if sensorStation.name.includes(searchTerm) || sensorStation.roomName.includes(searchTerm)}
-          <div class="">
-            <SensorStation {sensorStation} dates={data.dates} />
-          </div>
-          {/if}
-        {/each}
-      </div>
+        <h1
+          class="text-2xl font-bold flex justify-center items-center my-auto mt-2"
+        >
+          You have no Sensor Stations in your Dashboard yet.
+        </h1>
+      {:else}
+        <div class="m-4 flex justify-ceter">
+          <input
+            bind:value={searchTerm}
+            type="search"
+            name="searchRoom"
+            placeholder="Global Search"
+            class="input dark:input-bordered w-fit min-w-64 mx-auto dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
+          />
+        </div>
+        <div class="grid grid-rows gap-2 mt-2">
+          {#each data.dashboard.addedSensorStations as sensorStation, i (sensorStation.sensorStationId)}
+            {#if sensorStation.name.includes(searchTerm) || sensorStation.roomName.includes(searchTerm)}
+              <div class="">
+                <SensorStation {sensorStation} dates={data.dates} />
+              </div>
+            {/if}
+          {/each}
+        </div>
+      {/if}
     {/if}
     {#if assignedAdded}
       {#if data.dashboard.assignedSensorStations.length === 0}
