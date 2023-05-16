@@ -259,13 +259,17 @@ void handleCentralDeviceIfPresent(
 											  SENSOR_STATION_UNLOCKED_VALUE) {
 				delay(10);
 			}
-			if (!central.connected()) {
-				DEBUG_PRINT(1, "Did not set unlocked bit.\n");
+			if (get_sensorstation_locked_status() ==
+				SENSOR_STATION_UNLOCKED_VALUE) {
+				pairedDevice = central.address();
+				DEBUG_PRINTF(
+					1, "New device is: \"%s\".\n", pairedDevice.c_str()
+				);
+				inPairingMode = false;
+			} else {
+				DEBUG_PRINT(1, "Disconnected and did not set unlocked bit.\n");
 				return;
 			}
-			pairedDevice = central.address();
-			DEBUG_PRINTF(1, "New device is: \"%s\".\n", pairedDevice.c_str());
-			inPairingMode = false;
 		}
 		DEBUG_PRINTF(1, "Connected to %s.\n", central.address().c_str());
 		if (pairedDevice.compareTo(central.address()) == 0) {
