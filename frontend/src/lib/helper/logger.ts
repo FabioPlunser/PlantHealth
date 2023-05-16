@@ -1,9 +1,9 @@
-import { createLogger, format, transports, winston } from "winston";
+import { createLogger, format, transports } from "winston";
 const { combine, timestamp, printf } = format;
 
 const logFormat = printf(({ level, message, timestamp, payload }) => {
-  const logMessage = payload
-    ? `${message} ${JSON.stringify(payload)}`
+  const logMessage = JSON.stringify(payload)
+    ? `${message} ${payload.toString()}`
     : message;
   return `${timestamp} [${level.toUpperCase()}]: ${logMessage}`;
 });

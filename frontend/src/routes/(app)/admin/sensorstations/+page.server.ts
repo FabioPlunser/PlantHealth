@@ -23,7 +23,7 @@ export async function load({ fetch, request, depends, url }) {
     fromAccessPoints = true;
   }
 
-  let res = await fetch(`${BACKEND_URL}/get-sensor-stations`);
+  let res = await fetch(`${BACKEND_URL}/get-all-sensor-stations`);
   if (!res.ok) {
     logger.error("Could not get sensor stations");
     throw error(res.status, "Could not get sensor stations");

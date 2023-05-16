@@ -1,51 +1,17 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { fly } from "svelte/transition";
-  import Table from "$components/table/Table.svelte";
-  import { TextCell } from "$components/table/cellComponents";
-  import { flexRender } from "@tanstack/svelte-table";
-  import type { ColumnDef } from "@tanstack/svelte-table";
-  import { browser } from "$app/environment";
+  import Spinner from "$components/ui/Spinner.svelte";
+  import {
+    SensorStationsModal,
+    SensorStation,
+  } from "$lib/components/ui/SensorStation/index.js";
+  // import SensorStation from "./SensorStation.svelte";
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   export let data;
-  let frontendData: any[];
-  data.streamed.frontend.then((file) => {
-    frontendData = file;
-  });
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
+  $: console.log(data);
 
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
-  //severity, timeStamp, message, className, callerId
-  let columns: ColumnDef<any>[] = [
-    {
-      id: "timeStamp",
-      accessorKey: "timeStamp",
-      header: () => flexRender(TextCell, { text: "timeStamp" }),
-      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
-    },
-    {
-      id: "severity",
-      accessorKey: "severity",
-      header: () => flexRender(TextCell, { text: "severity" }),
-      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
-    },
-    {
-      id: "message",
-      accessorKey: "message",
-      header: () => flexRender(TextCell, { text: "message" }),
-      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
-    },
-  ];
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
-  let mobileColumnVisibility: ColumnVisibility = {
-    timeStamp: false,
-    className: false,
-    callerId: false,
-  };
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   let rendered = false;
@@ -54,20 +20,21 @@
   });
   // ---------------------------------------------------------
   // ---------------------------------------------------------
+  let showSensorStationsModal = false;
   let infoBadges = [
     {
       icon: "bi bi-router-fill",
-      number: data.numbers.numOfConnectedAccessPoints,
+      number: data.numbers.accessPoints,
       size: 32,
     },
     {
       icon: "bi bi-globe-europe-africa",
-      number: data.numbers.numOfConnectedSensorStations,
+      number: data.numbers.sensorStations,
       size: 34,
     },
     {
       icon: "bi bi-people-fill",
-      number: data.numbers.numOfUsers,
+      number: data.numbers.users,
       size: 32,
     },
   ];
@@ -77,14 +44,11 @@
 </script>
 
 {#if rendered}
-  <section class="overflow-auto">
-    <div
-      class="flex justify-center gap-6 mt-12"
-      in:fly={{ y: -200, duration: 400 }}
-    >
+  <section class="w-full h-full">
+    <div class="flex justify-center gap-6" in:fly={{ y: -200, duration: 400 }}>
       {#each infoBadges as badges}
         <div
-          class="relative rounded-full border-2 dark:border-none bg-base-100 drop-shadow-xl p-10"
+          class="relative rounded-full border-2 dark:border-none bg-base-100 shadow-md p-10"
         >
           <div class="mx-auto top-1 absolute -ml-[17px]">
             <i class="{badges.icon} mx-auto justify-center text-4xl" />
@@ -96,38 +60,45 @@
       {/each}
     </div>
 
-    <div class="flex justify-center mx-auto mt-10 overflow-auto">
+    {#await data.streamed.allSensorStations}
+      <Spinner fill="fill-primary" />
+    {:then sensorStations}
       <div>
-        <h1 class="text-3xl font-bold mx-auto flex justify-center">Logs</h1>
-        <div class="btn-group flex justify-center my-2">
-          <button
-            class="btn {logs === 'backend' ? 'btn-active' : ''}"
-            on:click={() => (logs = "backend")}>Backend</button
-          >
-          <button
-            class="btn {logs === 'frontend' ? 'btn-active' : ''}"
-            on:click={() => (logs = "frontend")}>Frontend</button
-          >
-        </div>
-        {#if logs === "backend"}
-          <Table
-            data={data.backend}
-            {columns}
-            {mobileColumnVisibility}
-            pageSizeOptions={[15, 30, 100, data.backend.length]}
-          />
-        {:else}
-          <Table
-            data={frontendData}
-            {columns}
-            {mobileColumnVisibility}
-            pageSizeOptions={[15, 30, 100, frontendData.length]}
-          />
-        {/if}
+        <SensorStationsModal
+          data={sensorStations}
+          bind:showModal={showSensorStationsModal}
+          on:close={() => (showSensorStationsModal = false)}
+        />
       </div>
-    </div>
+      <div class="flex justify-center mx-auto mt-2">
+        <button
+          class="btn btn-primary flex justify-center"
+          on:click={() => (showSensorStationsModal = true)}
+          >SensorStation</button
+        >
+      </div>
+    {:catch error}
+      <p class="text-red">Something went wrong: {JSON.stringify(error)}</p>
+    {/await}
+
+    {#await data.streamed.dashboardSensorStations}
+      <Spinner fill="fill-primary" />
+    {:then sensorStations}
+      {#if sensorStations?.length === 0}
+        <h1 class="text-2xl font-bold flex justify-center items-center my-auto">
+          You have no SensorStaions in the dashboard yet.
+        </h1>
+      {:else}
+        <div class="grid grid-rows gap-2 mt-2">
+          {#each sensorStations as sensorStation, i (sensorStation.sensorStationId)}
+            <div class="">
+              <SensorStation {sensorStation} dates={data.dates} />
+            </div>
+          {/each}
+        </div>
+      {/if}
+    {:catch error}
+      <p class="text-red">Something went wrong: {JSON.stringify(error)}</p>
+    {/await}
   </section>
 {/if}
-
-<style>
-</style>
