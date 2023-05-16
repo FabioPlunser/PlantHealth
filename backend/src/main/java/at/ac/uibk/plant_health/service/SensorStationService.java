@@ -62,6 +62,9 @@ public class SensorStationService {
 	}
 
 	public SensorStation findByBdAddress(String bdAddress) throws ServiceException {
+		if (bdAddress == null) {
+			throw new ServiceException("Could not find SensorStation", 404);
+		}
 		Optional<SensorStation> maybeSensorStation =
 				this.sensorStationRepository.findByBdAddress(bdAddress);
 		if (maybeSensorStation.isEmpty()) {

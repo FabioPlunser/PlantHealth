@@ -250,10 +250,12 @@ public class AccessPointService {
 				SensorStation dbSensorStation =
 						sensorStationService.findByBdAddress(sensorStation.getBdAddress());
 				if (!dbSensorStation.isUnlocked())
-					throw new ServiceException("SensorStation is locked", 401);
+					throw new ServiceException("SensorStation is locked", 409);
 				sensorStationService.addSensorData(dbSensorStation, sensorStation.getSensorData());
 			}
 			setLastConnection(accessPoint);
+		} catch (ServiceException s) {
+			throw s;
 		} catch (Exception e) {
 			throw new ServiceException("Could not set SensorStation data.", 500);
 		}
