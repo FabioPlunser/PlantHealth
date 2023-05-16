@@ -26,8 +26,6 @@ public class AccessPointController {
 	@Autowired
 	private AccessPointService accessPointService;
 
-	private static final String LOCKED_MESSAGE = "AccessPoint is locked";
-
 	@PublicEndpoint
 	@WriteOperation
 	@PostMapping("/register-access-point")
@@ -87,16 +85,8 @@ public class AccessPointController {
 	@GetMapping("/get-access-point-config")
 	@PrincipalRequired(AccessPoint.class)
 	public RestResponseEntity getAccessPointConfig(AccessPoint accessPoint) {
-		try {
-			accessPointService.findById(accessPoint.getDeviceId());
-			accessPointService.isUnlockedByDeviceId(accessPoint.getDeviceId());
-		} catch (ServiceException e) {
-			return MessageResponse.builder()
-					.statusCode(e.getStatusCode())
-					.message(e.getMessage())
-					.toEntity();
-		}
-
+		// This cannot fail because the AccessPoint has to exist and be unlocked.
+		// If that were not the case the Security Chain would not have authenticated the request.
 		return new AccessPointConfigResponse(accessPoint).toEntity();
 	}
 
@@ -106,16 +96,11 @@ public class AccessPointController {
 	public RestResponseEntity foundSensorStations(
 			AccessPoint accessPoint, @RequestBody final List<SensorStation> sensorStations
 	) {
-		try {
-			accessPointService.findById(accessPoint.getDeviceId());
-			accessPointService.isUnlockedByDeviceId(accessPoint.getDeviceId());
-			accessPointService.foundNewSensorStation(accessPoint, sensorStations);
-		} catch (ServiceException e) {
-			return MessageResponse.builder()
-					.statusCode(e.getStatusCode())
-					.message(e.getMessage())
-					.toEntity();
-		}
+		// This cannot fail because the AccessPoint has to exist and be unlocked.
+		// If that were not the case the Security Chain would not have authenticated the request.
+		// Saving the Sensor Stations can not fail because of the Structure of the Method
+		// (unless we run out of Memory in which case not saving a SensorStation is the least of our worries).
+		accessPointService.foundNewSensorStation(accessPoint, sensorStations);
 
 		return MessageResponse.builder()
 				.statusCode(200)
@@ -195,8 +180,6 @@ public class AccessPointController {
 			final AccessPoint accessPoint, @RequestBody final List<SensorStation> sensorStationList
 	) {
 		try {
-			accessPointService.findById(accessPoint.getDeviceId());
-			accessPointService.isUnlockedByDeviceId(accessPoint.getDeviceId());
 			accessPointService.setSensorStationData(sensorStationList, accessPoint);
 		} catch (ServiceException e) {
 			return MessageResponse.builder()

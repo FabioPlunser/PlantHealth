@@ -42,15 +42,6 @@ public interface PersonRepository extends CrudRepository<Person, UUID> {
 	);
 
 	@Transactional
-	default<S extends Person> S updateUserDetails(S person) {
-		return updateUserDetails(
-					   person.getPersonId(), person.getUsername(), person.getPermissions()
-			   ) == 1
-				? person
-				: null;
-	}
-
-	@Transactional
 	@Modifying
 	@Query("update Person p set p.username = :username, p.permissions = :permissions where p.id = :id"
 	)

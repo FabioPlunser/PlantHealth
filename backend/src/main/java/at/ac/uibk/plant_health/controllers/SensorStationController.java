@@ -66,9 +66,8 @@ public class SensorStationController {
 			return new SensorStationResponse(sensorStationService.findById(sensorStationId), person)
 					.toEntity();
 		} catch (ServiceException e) {
-			return MessageResponse
-					.builder()
-
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
 					.message(e.getMessage())
 					.toEntity();
 		}
@@ -124,7 +123,6 @@ public class SensorStationController {
 			@RequestParam(value = "transferInterval", required = false)
 			final Integer transferInterval, @RequestBody final List<SensorLimits> sensorLimits
 	) {
-		System.out.println("update sensor station");
 		try {
 			SensorStation sensorStation = sensorStationService.findById(sensorStationId);
 			sensorStationService.updateSensorStation(sensorStation, name, transferInterval);
