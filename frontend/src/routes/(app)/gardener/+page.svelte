@@ -9,7 +9,7 @@
   import BigPictureModal from "$components/ui/BigPictureModal.svelte";
   import Input from "$components/ui/Input.svelte";
   import Table from "$components/table/Table.svelte";
-  import LimitsCard from "$components/ui/SensorStation/LimitsCard.svelte";
+  import LimitsCard from "$lib/components/ui/SensorStation/LimitsCard.svelte";
   import FormError from "$components/ui/FormError.svelte";
   import SensorStationsModal from "./SensorstationsModal.svelte";
   import { flexRender, type ColumnDef } from "@tanstack/svelte-table";

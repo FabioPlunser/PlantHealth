@@ -42,7 +42,8 @@ public class DashBoardController {
 			if (person.getPermissions().contains(Permission.ADMIN))
 				return new AdminDashBoardResponse(
 							   sensorStationService.findAll(),
-							   accessPointService.findAllAccessPoints(), personService.getPersons()
+							   accessPointService.findAllAccessPoints(), personService.getPersons(),
+							   person
 				)
 						.toEntity();
 			if (person.getPermissions().contains(Permission.GARDENER)) {

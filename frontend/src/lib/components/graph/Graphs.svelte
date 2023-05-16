@@ -7,7 +7,6 @@
   import Line from "./Line.svelte";
   import MediaQuery from "$helper/MediaQuery.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
-  import { logger } from "$lib/helper/logger";
   // ---------------------------------------------------
   // ---------------------------------------------------
   export let data: any;
