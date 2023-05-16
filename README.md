@@ -1,79 +1,60 @@
 # Plant Health
 
-[![Pipeline Status](https://git.uibk.ac.at/informatik/qe/swess23/group1/g1t1/badges/main/pipeline.svg)](https://git.uibk.ac.at/informatik/qe/swess23/group1/g1t1/-/commits/main)
-[![Coverage](https://qe-sonarqube.uibk.ac.at/api/project_badges/measure?project=SWESS23_G1T1&metric=coverage&token=sqb_e89c28cb541c824fa55ab0dd3a5581255c4a05a4)](https://qe-sonarqube.uibk.ac.at/dashboard?id=SWESS23_G1T1)
-[![Quality Gate Status](https://qe-sonarqube.uibk.ac.at/api/project_badges/measure?project=SWESS23_G1T1&metric=alert_status&token=sqb_e89c28cb541c824fa55ab0dd3a5581255c4a05a4)](https://qe-sonarqube.uibk.ac.at/dashboard?id=SWESS23_G1T1)
+![Pipeline Status](https://git.uibk.ac.at/informatik/qe/swess23/group1/g1t1/badges/main/pipeline.svg)
+![Latest Release](https://git.uibk.ac.at/informatik/qe/swess23/group1/g1t1/-/badges/release.svg)
 
-[![Latest Release](https://git.uibk.ac.at/informatik/qe/swess23/group1/g1t1/-/badges/release.svg)](https://git.uibk.ac.at/informatik/qe/swess23/group1/g1t1/-/releases)
+## System Overview
 
-A system for keeping track of the Health of various Plants.
+For an overview of the system see the corresponding [Wiki](https://git.uibk.ac.at/informatik/qe/swess23/group1/g1t1/-/wikis/home).
 
-
-A plant is placed inside a sensor station container, the sensor station has a number of sensors that measure the humidity, air pressure, air humidity, air quality, temperature and light intensity of the environment.
-The sensor station then sends the data to the access point, which then sends the data to the backend server, which then stores the data in a database.
-The data is then displayed on a web server.
-
-## Overview
-
-The System is built from 5 different Components:
-
-- Central Backend Server managing all the data using a REST-API (named Backend).
-- A persistent Database connected to the Backend for persisting the Sensor data.
-- Web Server for displaying the data (named Frontend).
-- Accesspoints that communicate with the Sensorstations and report data back to the central Backend.
-- Sensorstations that record Earth Humidity, Air Pressure, Air Humidity, Air Quality, Temparature and Light Intensity for a given Plant.
-
-![Component Diagram](https://git.uibk.ac.at/informatik/qe/swess23/group1/g1t1/-/raw/media/Diagrams/component-diagram.drawio.png)
-
-## Setup instructions for acceptance test
+## Setup Instructions for Acceptance Test
 
 ### Frontend + Backend
 
-The Backend, Frontend and Database can be deployed using `docker compose up`.  
-See the `docker-compose.yml` to see the exposed ports.  
-If the Profile `test` is specified, then an `Adminer`-Instance is started that can be used to manually edit the database.
+1. Make sure that [Docker](https://www.docker.com/) is running on your machine. See [https://docs.docker.com/desktop/](https://docs.docker.com/desktop/) for installation instructions.
+2. Open a terminal and navigate to the root directory of the repository.
+3. Backend, frontend and database can be deployed by running the command `docker compose up`.  
+4. If not changed, the webapp can be reached via [http://localhost:3000/](http://localhost:3000/). See `docker-compose.yml` to see the exposed ports.
 
 ### Accesspoint
 
-1. Setup the Rasperry, configure it so that it has access to the network in which also frontend and backend are available and enable SSH
-2. Copy the whole directory `access_point` to the Rasperry
-3. SSH into the Rasperrry
-4. CD into the previously copied `access_point` directory
-5. Run `./configure`. The script will guide you through the access point initialization and provide all necessary pre-requisites. Use `http://<IP address of the machine running the backend>:8080` as your backend URL/IP. Confirm all other except the last dialogue with just pressing ENTER to keep default values. In the end, the script will ask you if you prefer to automatically start the access point. Enter `y` and the the main routine will automatically start (and even restart after reboots) after max. 1 minute. You can check the file `main.log` for log output. This file will only be created once the main routine is started. A command like `clear && tail -50 main.log` has proven helpful to analyze the log file.
-6. Once you don't need a running access point anymore, execute `./reset`. Main routine execution will be stopped and default state will be restored. Be aware that the database file, configuration file and all logfiles will be removed. Create copies before running `./reset` if you need backups of these files. You will have to re-execute step 5 to restart the access point.
+1. Setup the Raspberry Pi, configure it so that it has access to the network in which also frontend and backend are available and enable SSH.
+2. Copy the whole directory `access_point` to the Raspberry Pi.
+3. SSH into the Raspberrry Pi.
+4. CD into the previously copied `access_point` directory.
+5. Run `./configure`. The script will guide you through accesspoint initialization and provide all necessary pre-requisites. Use `http://<IP address of the machine running the backend>:8443` as your backend URL/IP. Confirm all other except the last dialogue with just pressing ENTER to keep default values. In the end, the script will ask you if you prefer to automatically start the access point. Enter `y` and the main routine will automatically start (and even restart after reboots) after max. 1 minute. You can check the file `main.log` for log output. This file will only be created once the main routine is started. A command like `clear && tail -50 main.log` has proven helpful to analyze the log file.
+6. Once you don't need a running accesspoint anymore, execute `./reset`. Main routine execution will be stopped and default state will be restored. Be aware that the database file, configuration file and all logfiles will be removed. Create copies before running `./reset` if you need backups of these files. You will have to re-execute step 5 to restart the accesspoint.
 
 ### Sensorstation
 
 TODO: Add directory of schematics and parts list
-1. Build the Arduino 33 BLE Sensorstation using the schematics in the "Software Concept" found in the wiki.
+1. Build the Arduino 33 BLE sensorstation using the schematics in the "Software Concept" found in the wiki.
 2. Setup the Arduino 33 BLE, connect it to your computer and upload the code from `sensorstation/sensorstation.ino` to the Arduino with PlatformIO. If you don't have PlatformIO installed, you can use the Arduino IDE, but you will have to install the `ArduinoBLE` library manually. If special configuration is needed, you can change the values in 'sensor_station/include/Defines.h'.
 3. Place the plant in the sensorstation and close the lid.
-4. Ones the arduino gets connected to power, it will immediately go into the pairing mode, resulting in the led blinking in the color defined in the Software Concept. The pairing mode will be active for 5 minutes. During this time, you can connect to the arduino using the Plant Health App. If the pairing mode is over, you can restart it by pressing the button on the arduino for 1 seconds. The pairing mode will be active for 5 minutes again.
-5. Once the arduino is conneted to the access point, it will send data to the backend and signal over the LED and piezo buzzer if a problem is detected, if not defined ptherwise in the 'sensor_station/include/Defines.h' file.
-6. To reset the sensor station one can just power it off or press the reset button 5 seconds long. The sensor station will then restart and go into pairing mode again without having a paired device.
+4. Once the Arduino gets connected to power, it will immediately go into the pairing mode, resulting in the led blinking in the color defined in the Software Concept. The pairing mode will be active for 5 minutes. During this time, you can connect to the Arduino using the Plant Health App. If the pairing mode is over, you can restart it by pressing the button on the Arduino for 1 seconds. The pairing mode will be active for 5 minutes again.
+5. Once the Arduino is conneted to the accesspoint, it will send data to the backend and signal over the LED and piezo buzzer if a problem is detected, if not defined otherwise in the 'sensor_station/include/Defines.h' file.
+6. To reset the sensorstation one can just power it off or press the reset button for 5 seconds. The sensorstation will then restart and go into pairing mode again without having a paired device.
 
 
 ## Development
-- Pre-commit hooks:
-    This project makes use of [pre-commit](https://pre-commit.com) to ensure a uniform coding style.
+- **Pre-commit hooks:**
+    - This project makes use of [pre-commit](https://pre-commit.com) to ensure a uniform coding style.
+    - For this to work you have to install `pre-commit` on your system (with pip) and then execute `pre-commit install` in the root of this repo. After that the pre-commit hooks should automatically run before you commit.
 
-    For this to work you have to install `pre-commit` on your system (with pip) and then execute `pre-commit install` in the root of this repo. After that the pre-commit hooks should automatically run before you commit.
-    
+- **Backend:**
+    - The backend is a Spring Boot application, for which gradle as well as maven are configured. 
+    - To run the application execute `gradle bootRun` or `mvn spring-boot:run` in the `backend` directory.
+	- The backend requires a MySQL database to be reachable using the credentials given in the `application.yml`. 
 
-- Backend 
-    The Backend is a Spring Boot Application, for which gradle as well as maven are configured. 
-    To run the application execute `gradle bootRun` or `mvn spring-boot:run` in the `backend` directory.
-	The Backend requires a MySQL Database to be reachable using the Credentials given in the `application.yml`. 
+- **Frontend:**
+    - The frontend is a Svelte.js application, that uses npm (pnpm is recommended).
+    - To start the dev server execute `pnpm dev` in the `frontend` directory.
 
-- Frontend 
-    The Frontend is a Svelte.js Application, that uses npm. **pnpm is recommended**
-    To start the dev server execute `pnpm dev` in the `frontend` directory.
+- **Accesspoint:**
+    - The accesspoint is a Raspberry Pi that runs a single Python script. 
 
-- Accesspoint
-    The Accesspoint is a Raspberry Pi that is run using a Python Script. 
-
-- Sensorstation
-    The Sensorstation is an Arduino 33 BLE that is programmed using [Platform IO](https://platformio.org/).
+- **Sensorstation:**
+    - The sensorstation is an Arduino 33 BLE that is programmed using [Platform IO](https://platformio.org/).
 	
 
 ## License
