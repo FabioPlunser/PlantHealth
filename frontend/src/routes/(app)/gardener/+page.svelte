@@ -11,16 +11,17 @@
   import Table from "$components/table/Table.svelte";
   import LimitsCard from "$lib/components/ui/SensorStation/LimitsCard.svelte";
   import FormError from "$components/ui/FormError.svelte";
-  import SensorStationsModal from "./SensorstationsModal.svelte";
+
   import { flexRender, type ColumnDef } from "@tanstack/svelte-table";
   import { TextCell } from "$components/table/cellComponents";
-  import SensorStation from "./SensorStation.svelte";
+
 
   // ---------------------------------------------------
   // ---------------------------------------------------
   import { onMount } from "svelte";
   import { add } from "$lib/components/toast/core/store";
   import UploadPicture from "./uploadPicture.svelte";
+  import { SensorStation, SensorStationsModal } from "$lib/components/ui/SensorStation";
   let rendered = false;
   onMount(() => {
     rendered = true;

@@ -51,8 +51,8 @@ export async function load({ request, url, fetch, locals }) {
     await fetch(`${BACKEND_URL}/get-all-permissions`)
       .then((response) => {
         if (!response.ok) {
-          logger.error("user-profile-page", { payload: response });
-          throw new error(response.status, response.statusText);
+          logger.error("user-profile-page", { response });
+          throw error(response.status, response.statusText);
         }
         return response.json();
       })
@@ -139,7 +139,7 @@ export const actions = {
     }
 
     /*
-     * For every permission BooleanButton in the form, parse the name to find which Permission it represents
+     *  NOTE: For every permission BooleanButton in the form, parse the name to find which Permission it represents
      * and add it to the permissions array
      */
     let permissions: string[] = [];
@@ -194,11 +194,8 @@ export const actions = {
         return response.json();
       })
       .then((data) => {
-        let time = new Date().toLocaleString();
         logger.info(
           "Updated user: " +
-            JSON.stringify(time) +
-            " " +
             JSON.stringify(data.message)
         );
       });
