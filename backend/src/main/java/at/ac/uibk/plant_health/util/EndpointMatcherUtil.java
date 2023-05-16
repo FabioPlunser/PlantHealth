@@ -3,8 +3,6 @@ package at.ac.uibk.plant_health.util;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-
 import at.ac.uibk.plant_health.models.user.Permission;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -60,17 +58,6 @@ public class EndpointMatcherUtil {
 		public static final String NOT_FOUND_ERROR_ENDPOINT = "/notFound";
 		public static final String ERROR_ENDPOINT = "/error";
 	}
-
-	private final String[] errorEndpoints =
-			// Get all Error Routes defined in this Class using Runtime Reflection
-			Arrays.stream(ErrorEndpoints.class.getDeclaredFields())
-					// Only get static Fields of type <String> which contain the Error
-					// Endpoints.
-					.filter(ReflectionUtil.isAssignableFromPredicate(String.class))
-					.filter(ReflectionUtil::isStaticField)
-					// Get the Endpoints
-					.map(ReflectionUtil::<String>getStaticFieldValueTyped)
-					.toArray(String[] ::new);
 	// endregion
 	// endregion
 

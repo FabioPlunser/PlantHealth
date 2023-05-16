@@ -1,0 +1,57 @@
+swa:
+  token:
+    expiration-duration: 1d
+  api:
+    base: /
+  scheduling:
+    rate:
+      in:
+        seconds: 15
+  pictures:
+    path: src/main/resources/static/images/
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+logging:
+  #  datasource:
+  #    url: jdbc:mysql://db:3306?createDatabaseIfNotExist=true
+  level:
+    web: INFO
+
+springdoc:
+  # Disable Swagger in Production
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger
+    enabled: true
+
+spring:
+  profiles:
+    active: "prod"
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/plant_health?createDatabaseIfNotExist=true
+    username: spring
+    password: password
+  h2:
+    console:
+      enabled: false
+  jpa:
+    hibernate:
+      dialect: org.hibernate.dialect.MySQLDialect
+      # Create Model Tables on Startup
+      ddl-auto: none
+  web:
+    resources:
+      # Disable static Resource Mapping
+      add-mappings: false
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB

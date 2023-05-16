@@ -4,6 +4,7 @@ import at.ac.uibk.plant_health.models.device.AccessPoint;
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
+import at.ac.uibk.plant_health.repositories.PersonRepository;
 import at.ac.uibk.plant_health.service.AccessPointService;
 import at.ac.uibk.plant_health.service.PersonService;
 import at.ac.uibk.plant_health.service.SensorStationPersonReferenceService;
@@ -13,6 +14,7 @@ import at.ac.uibk.plant_health.util.EndpointMatcherUtil;
 import at.ac.uibk.plant_health.util.MockAuthContext;
 import at.ac.uibk.plant_health.util.StringGenerator;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,14 +22,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static at.ac.uibk.plant_health.util.EndpointMatcherUtil.REGISTER_ENDPOINT;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpHeaders.USER_AGENT;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -50,6 +55,10 @@ class TestPersonControllerGeneral {
 	@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 	@Autowired
 	private MockMvc mockMvc;
+	@Autowired
+	private PersonRepository personRepository;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	private Person createUserAndLogin(boolean alsoAdmin, boolean alsoGardener) {
 		String username = StringGenerator.username();
@@ -65,6 +74,119 @@ class TestPersonControllerGeneral {
 		assertTrue(personService.create(person), "Unable to create user");
 		return (Person
 				) MockAuthContext.setLoggedInUser(personService.login(username, password).orElse(null));
+	}
+
+	@Test
+	public void testRegister() throws Exception {
+		String username = "testRegisterUser";
+		String password = "password";
+		String email = "test@planthealth.at";
+
+		// run request
+		mockMvc.perform(MockMvcRequestBuilders.post(REGISTER_ENDPOINT)
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.param("username", username)
+						.param("password", password)
+						.param("email", email)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
+
+		Person person = personRepository.findByUsername(username).orElseThrow();
+
+		Assertions.assertAll(
+				() -> Assertions.assertTrue(passwordEncoder.matches(password, person.getPassword())),
+				() -> Assertions.assertEquals(email, person.getEmail())
+		);
+	}
+
+	@Test
+	public void testCreateUser() throws Exception {
+		// create user and login
+		Person admin = createUserAndLogin(true, false);
+
+		String username = "testCreateUser";
+		String password = "password";
+		String email = "test@planthealth.at";
+		Set<Permission> permissions = Set.of(Permission.USER);
+
+		// run request
+		mockMvc.perform(MockMvcRequestBuilders.post("/create-user")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(admin))
+						.param("username", username)
+						.param("password", password)
+						.param("email", email)
+						.param("permissions", String.join(",", permissions.stream().map(Permission::toString).toList()))
+				)
+				.andExpectAll(status().isOk());
+
+		Person person = personRepository.findByUsername(username).orElseThrow();
+
+		Assertions.assertAll(
+				() -> Assertions.assertTrue(passwordEncoder.matches(password, person.getPassword())),
+				() -> Assertions.assertEquals(email, person.getEmail()),
+				() -> Assertions.assertEquals(permissions, person.getPermissions())
+		);
+	}
+
+	@Test
+	public void testUpdateSettings() throws Exception {
+		Person user = createUserAndLogin(false, false);
+
+		String username = "testUpdateSettings";
+		String password = "password";
+		String email = "test@planthealth.at";
+
+		// run request
+		mockMvc.perform(MockMvcRequestBuilders.post("/update-settings")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(user))
+						.param("username", username)
+						.param("password", password)
+						.param("email", email)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
+
+		Person person = personRepository.findByUsername(username).orElseThrow();
+
+		Assertions.assertAll(
+				() -> Assertions.assertTrue(passwordEncoder.matches(password, person.getPassword())),
+				() -> Assertions.assertEquals(email, person.getEmail())
+		);
+	}
+
+	@Test
+	public void testUpdateUser() throws Exception {
+		Person user = createUserAndLogin(false, false);
+		Person admin = createUserAndLogin(true, false);
+
+		String username = "testUpdateUser";
+		String password = "password";
+		String email = "test@planthealth.at";
+		Set<Permission> permissions = Set.of(Permission.GARDENER);
+
+		// run request
+		mockMvc.perform(MockMvcRequestBuilders.post("/update-user")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(admin))
+						.param("personId", String.valueOf(user.getId()))
+						.param("username", username)
+						.param("password", password)
+						.param("email", email)
+						.param("permissions", String.join(",", permissions.stream().map(Permission::toString).toList()))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
+
+		Person person = personRepository.findByUsername(username).orElseThrow();
+
+		Assertions.assertAll(
+				() -> Assertions.assertTrue(passwordEncoder.matches(password, person.getPassword())),
+				() -> Assertions.assertEquals(email, person.getEmail()),
+				() -> Assertions.assertEquals(permissions, person.getPermissions())
+		);
 	}
 
 	@Test

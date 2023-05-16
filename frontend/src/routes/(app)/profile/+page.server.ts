@@ -17,13 +17,22 @@ let source: string | null;
  * that
  */
 export async function load({ request, url, fetch, locals }) {
-  personId = url.searchParams.get("personId") ?? locals.user.personId;
+  // check if required variables are available
+  if (
+    (!url.searchParams.get("personId") && !locals?.user?.personId) ||
+    (!url.searchParams.get("username") && !locals?.user?.username) ||
+    (!url.searchParams.get("userPermissions") && !locals?.user?.permissions)
+  ) {
+    throw new error(403);
+  }
+
+  personId = url.searchParams.get("personId") ?? locals?.user?.personId;
   let username = url.searchParams.get("username") ?? locals.user.username;
   source = request.headers.get("referer");
 
-  logger.info("user-profile-page", { personId });
-  logger.info("user-profile-page", { username });
-  logger.info("user-profile-page", { source });
+  logger.info("user-profile-page", { payload: personId });
+  logger.info("user-profile-page", { payload: username });
+  logger.info("user-profile-page", { payload: source });
 
   let permissions =
     url.searchParams.get("userPermissions")?.split(",") ??
@@ -42,13 +51,13 @@ export async function load({ request, url, fetch, locals }) {
     await fetch(`${BACKEND_URL}/get-all-permissions`)
       .then((response) => {
         if (!response.ok) {
-          logger.error("user-profile-page", { response });
+          logger.error("user-profile-page", { payload: response });
           throw new error(response.status, response.statusText);
         }
         return response.json();
       })
       .then((data) => {
-        logger.info("user-profile-page", { data });
+        logger.info("user-profile-page", { payload: data });
         data.items.forEach((permission: string) => {
           userPermissions[permission.toLowerCase()] =
             permissions.includes(permission);
@@ -179,7 +188,7 @@ export const actions = {
     })
       .then((response) => {
         if (!response.ok) {
-          logger.error("user-profile-page", { response });
+          logger.error("user-profile-page", { payload: response });
           throw error(response.status, response.statusText);
         }
         return response.json();

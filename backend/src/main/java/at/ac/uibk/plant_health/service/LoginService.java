@@ -25,17 +25,21 @@ public class LoginService {
 	@Autowired
 	private SensorStationRepository sensorStationRepository;
 
-	public Optional<? extends UserDetails> login(TokenAuthentication token) {
+	public Optional<UserDetails> login(TokenAuthentication token) {
+		Optional<UserDetails> retVal;
 		if (token instanceof UserAuthentication userAuthentication) {
-			return personService.findByUsernameAndToken(
+			retVal = personService.findByUsernameAndToken(
 					userAuthentication.getUsername(), userAuthentication.getToken()
-			);
+			).map(p -> p);
 		} else if (token instanceof AccessPointAuthentication accessPointAuthentication) {
-			return accessPointRepository.findByAccessToken(accessPointAuthentication.getToken());
+			retVal = accessPointRepository.findByAccessToken(accessPointAuthentication.getToken())
+					.map(a -> a);
 		} else if (token instanceof SensorStationAuthentication sensorStationAuthentication) {
-			return sensorStationRepository.findById(sensorStationAuthentication.getToken());
+			retVal = sensorStationRepository.findById(sensorStationAuthentication.getToken())
+					.map(s -> s);
 		} else {
 			throw new InsufficientAuthenticationException("Internal Error!");
 		}
+		return retVal;
 	}
 }

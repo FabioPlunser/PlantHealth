@@ -3,7 +3,7 @@
   //---------------------------------------------------
   //---------------------------------------------------
   import SensorstationModal from "./SensorstationModal.svelte";
-  import SensorStation from "$components/ui/SensorStation/SensorStation.svelte";
+  import SensorStation from "./SensorStation.svelte";
   import DatePicker from "$lib/components/datepicker/DatePicker.svelte";
   //---------------------------------------------------
   //---------------------------------------------------

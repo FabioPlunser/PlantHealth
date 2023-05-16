@@ -3,9 +3,8 @@ package at.ac.uibk.plant_health.models.rest_responses;
 import java.awt.image.ImageProducer;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Stream;
 
 import at.ac.uibk.plant_health.models.SensorStationPersonReference;
 import at.ac.uibk.plant_health.models.device.SensorStation;
@@ -26,12 +25,13 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 	}
 
 	@Getter
-	private static class InnerResponse {
+	private static class InnerResponse implements Serializable {
 		private final String bdAddress;
 		private final int dipSwitchId;
 		private final String name;
 		private final String roomName;
 		private final UUID sensorStationId;
+		private final Person gardener;
 		private final boolean unlocked;
 		private final boolean connected;
 		private final boolean deleted;
@@ -43,39 +43,47 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 			this.bdAddress = sensorStation.getBdAddress();
 			this.dipSwitchId = sensorStation.getDipSwitchId();
 			this.name = sensorStation.getName();
-			this.roomName = sensorStation.getAccessPoint().getRoomName();
+			var accessPoint = sensorStation.getAccessPoint();
+			if (accessPoint != null) this.roomName = accessPoint.getRoomName(); else this.roomName = null;
 			this.sensorStationId = sensorStation.getDeviceId();
+			this.gardener = sensorStation.getGardener();
 			this.unlocked = sensorStation.isUnlocked();
 			this.connected = sensorStation.isConnected();
 			this.deleted = sensorStation.isDeleted();
-			if (sensorStation.getSensorLimits().size() > 0) {
-				this.sensorLimits =
-						sensorStation.getSensorLimits()
-								.stream()
-								.map(sensorLimit -> new SensorLimitsResponse(sensorLimit, person))
-								.toList();
 
-			} else {
-				this.sensorLimits = sensorStation.getSensorData()
-											.stream()
-											.map(SensorData::getSensor)
-											.distinct()
-											.map(d
-												 -> new SensorLimitsResponse(
-														 new SensorLimits(
-																 LocalDateTime.now(), 0, 0, 0, d,
-																 person, sensorStation
-														 ),
-														 person
-												 ))
-											.toList();
-			}
+			this.sensorLimits =
+					sensorStation.getSensorData()
+							.stream()
+							.map(SensorData::getSensor)
+							.distinct()
+							.map(sensor -> {
+								Optional<SensorLimits> newestLimit =
+										sensorStation.getSensorLimits()
+												.stream()
+												.filter(slr -> slr.getSensor().equals(sensor))
+												.max(Comparator.comparing(SensorLimits::getTimeStamp
+												));
+
+								return newestLimit
+										.map(SensorLimitsResponse::new)
+										.orElseGet(
+												()
+														-> new SensorLimitsResponse(
+																new SensorLimits(
+																		LocalDateTime.now(), 0, 0,
+																		0, sensor, person,
+																		sensorStation
+																)
+														)
+										);
+							})
+							.toList();
 			this.sensorStationPersonReferences = sensorStation.getSensorStationPersonReferences();
 			this.sensorStationPictures = sensorStation.getSensorStationPictures();
 		}
 
 		@Getter
-		private static class SensorLimitsResponse {
+		private static class SensorLimitsResponse implements Serializable {
 			private final LocalDateTime timeStamp;
 			private final float upperLimit;
 			private final float lowerLimit;
@@ -84,7 +92,7 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 			private final Person gardener;
 			private final boolean deleted;
 
-			public SensorLimitsResponse(SensorLimits sensorLimit, Person person) {
+			public SensorLimitsResponse(SensorLimits sensorLimit) {
 				this.timeStamp = sensorLimit.getTimeStamp();
 				this.upperLimit = sensorLimit.getUpperLimit();
 				this.lowerLimit = sensorLimit.getLowerLimit();

@@ -2,10 +2,15 @@
   import { enhance } from "$app/forms";
   import Input from "$components/ui/Input.svelte";
   import FormError from "$lib/helper/formError.svelte";
-
+  import toast from "$components/toast";
   import Logo from "$assets/Logo.svg?url";
 
   export let form;
+  $: {
+    if (form?.message) {
+      toast.error(form?.message);
+    }
+  }
 </script>
 
 <section class="flex justify-center items-center h-screen">

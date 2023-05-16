@@ -36,6 +36,12 @@
       icon: "bi bi-people-fill",
       iconName: "",
     },
+    {
+      name: "Logs",
+      path: "/admin/logs",
+      icon: "material-symbols-outlined",
+      iconName: "toc",
+    },
   ];
 </script>
 
@@ -51,7 +57,7 @@
         >
           {#each icons as icon}
             <div>
-              <a href={icon.path}>
+              <a href={icon.path} data-sveltekit-preload-code>
                 <div>
                   <i
                     class="{icon.icon} transform transition-transform active:scale-125 animation-spin flex justify-center text-4xl mx-auto shadow-2xl drop-shadow-2xl w-8 rouned-full {path ===

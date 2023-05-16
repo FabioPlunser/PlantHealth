@@ -53,14 +53,14 @@
             disabled={data?.error != null}
             class="btn text-white"
           >
-            <a href="/register" data-sveltekit-preload-code>Register</a>
+            <a href="/register">Register</a>
           </button>
           <button
             type="button"
             disabled={data?.error != null}
             class="btn btn-info text-white"
           >
-            <a href="/guest" data-sveltekit-preload-code>Guest</a>
+            <a href="/guest">Guest</a>
           </button>
         </div>
       </div>

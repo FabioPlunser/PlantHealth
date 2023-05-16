@@ -196,5 +196,3 @@
     </div>
   </section>
 {/if}
-
-<!-- <SensorStationDesktop {sensorStation} {dates} /> -->

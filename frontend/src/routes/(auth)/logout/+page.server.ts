@@ -10,14 +10,14 @@ import { logger } from "$helper/logger";
  * @returns The function is throwing a redirect error with a status code of 302 and a target URL of
  * "/login". Therefore, nothing is being returned explicitly.
  */
-export async function load({ locals, cookies }) {
-  let res = await fetch(`${BACKEND_URL}/logout`);
-  res = await res.json();
-  logger.info(`User ${locals.user.username} logged out`);
-
-  cookies.set("token", "");
+export async function load(event) {
+  let res = await event.fetch(`${BACKEND_URL}/logout`, {
+    method: "POST",
+  });
+  logger.info(`User ${event.locals.user?.username} logged out`);
+  event.cookies.getAll().forEach((cookie) => {
+    event.cookies.set(cookie.name, "", { maxAge: 0 });
+  });
 
   throw redirect(302, "/login");
-
-  return { success: true };
 }

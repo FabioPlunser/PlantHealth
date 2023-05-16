@@ -65,11 +65,10 @@
 
   function onScanFailure(error: any) {
     // alert(`Code scan error = ${error}`);
-    // console.warn(`Code scan error = ${error}`);
   }
 </script>
 
-<section class="mt-12">
+<section class="mt-12 h-screen">
   {#if isMobile}
     <h1 class="flex justify-center text-3xl font-bold">Scan QR-Code</h1>
     {#if !scanning}
@@ -86,18 +85,20 @@
   {/if}
   {#if !scanning}
     <div class="max-w-xl mx-auto">
-      <form method="POST" bind:this={form} use:enhance>
-        <h1 class="flex justify-center text-2xl">Type in Plant Code</h1>
-        <Input
-          field="sensorStationId"
-          type="text"
-          value={sensorStationIdQr}
-          placeholder="123456789"
-        />
-        <div class="flex justify-center mt-4">
-          <button class="btn btn-primary">Find</button>
-        </div>
-      </form>
+      <h1 class="flex justify-center text-2xl">Type in Plant Code</h1>
+      <input
+        class="input input-bordered flex justify-center w-full"
+        type="text"
+        bind:value={sensorStationIdQr}
+        placeholder="04ad024d-5439-4919-aa19-ea35da5f9997"
+      />
+      <div class="flex justify-center mt-4">
+        <a
+          href="guest/plant?sensorStationId={sensorStationIdQr}"
+          data-sveltekit-preload-code
+          class="btn btn-primary">Find</a
+        >
+      </div>
     </div>
   {/if}
 </section>
