@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { enhance } from "$app/forms";
+  import { enhance, type SubmitFunction } from "$app/forms";
   import FormError from "$helper/formError.svelte";
   import Input from "$components/ui/Input.svelte";
   import BooleanButton from "$lib/components/ui/BooleanButton.svelte";
@@ -15,6 +15,12 @@
   onMount(() => {
     isRendered = true;
   });
+  
+  const customEnhance: SubmitFunction = () => {
+    return async ({ update }) => {
+      await update({ reset: false });
+    };
+  };
 
   const isDisabled: boolean = !data.canActiveUserChangeRoles;
 
@@ -33,7 +39,7 @@
       method="POST"
       action="?/updateUser"
       class="flex justify-center"
-      use:enhance
+      use:enhance={customEnhance}
     >
       <div class="w-full max-w-md" in:slide={{ duration: 400, axis: "x" }}>
         <Input
