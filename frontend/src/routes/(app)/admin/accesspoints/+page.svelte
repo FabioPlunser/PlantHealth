@@ -43,14 +43,26 @@
   }
   // ---------------------------------------------------------
   // ---------------------------------------------------------
+  let searchTerm = "";
 </script>
 
 {#if rendered}
   <section class="h-full">
+    <div class="mb-4 flex justify-ceter">
+      <input
+        bind:value={searchTerm}
+        type="search"
+        name="searchRoom"
+        placeholder="Global Search"
+        class="input dark:input-bordered w-fit min-w-64 mx-auto dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
+      />
+    </div>
+    {searchTerm}
     {#if accessPoints.length > 0}
       <div class="flex justify-center mx-auto h-full">
         <div class="grid grid-rows md:grid-cols-2 gap-4 xl:grid-cols-3">
           {#each accessPoints as accessPoint, i (accessPoint.accessPointId)}
+          {#if accessPoint.roomName.includes(searchTerm)}
             <form
               in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
               method="POST"
@@ -169,6 +181,7 @@
                 </div>
               </div>
             </form>
+            {/if}
           {/each}
         </div>
       </div>
