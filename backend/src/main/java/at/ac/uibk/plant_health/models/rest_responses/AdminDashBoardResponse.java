@@ -23,10 +23,12 @@ public class AdminDashBoardResponse extends RestResponse implements Serializable
 			List<Person> personList, Person person
 	) {
 		this.numOfUsers = personList.size();
-		this.numOfConnectedSensorStations =
-				(int) sensorStationList.stream().filter(SensorStation::isConnected).count();
-		this.numOfConnectedAccessPoints =
-				(int) accessPointList.stream().filter(AccessPoint::isConnected).count();
+		this.numOfConnectedSensorStations = (int) sensorStationList.stream()
+													.filter(s -> !s.isDeleted() && s.isConnected())
+													.count();
+		this.numOfConnectedAccessPoints = (int) accessPointList.stream()
+												  .filter(a -> !a.isDeleted() && a.isConnected())
+												  .count();
 		this.sensorStations = person.getSensorStationPersonReferences()
 									  .stream()
 									  .filter(SensorStationPersonReference::isInDashboard)

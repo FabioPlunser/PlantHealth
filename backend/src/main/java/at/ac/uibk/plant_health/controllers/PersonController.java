@@ -125,7 +125,10 @@ public class PersonController {
 			@RequestParam(name = "password", required = false) final String password
 	) {
 		UUID personId = person.getPersonId();
-		return updatePerson(personId, username, email, null, password);
+		Set<GrantedAuthority> permissions = person.getPermissions();
+		return updatePerson(
+				personId, username, email, Permission.fromAuthorities(permissions), password
+		);
 	}
 
 	/**

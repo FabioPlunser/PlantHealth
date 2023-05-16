@@ -39,6 +39,10 @@ public enum Permission implements GrantedAuthority {
 		return (Set) ALL_PERMISSIONS;
 	}
 
+	public static Set<Permission> fromAuthorities(Set<GrantedAuthority> authorities) {
+		return (Set) authorities;
+	}
+
 	@Override
 	public String getAuthority() {
 		return this.toString();
