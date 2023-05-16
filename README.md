@@ -38,24 +38,23 @@ TODO: Add directory of schematics and parts list
 
 ## Development
 - **Pre-commit hooks:**
-    This project makes use of [pre-commit](https://pre-commit.com) to ensure a uniform coding style.
-
-    For this to work you have to install `pre-commit` on your system (with pip) and then execute `pre-commit install` in the root of this repo. After that the pre-commit hooks should automatically run before you commit.
+    - This project makes use of [pre-commit](https://pre-commit.com) to ensure a uniform coding style.
+    - For this to work you have to install `pre-commit` on your system (with pip) and then execute `pre-commit install` in the root of this repo. After that the pre-commit hooks should automatically run before you commit.
 
 - **Backend:**
-    The backend is a Spring Boot application, for which gradle as well as maven are configured. 
-    To run the application execute `gradle bootRun` or `mvn spring-boot:run` in the `backend` directory.
-	The backend requires a MySQL database to be reachable using the credentials given in the `application.yml`. 
+    - The backend is a Spring Boot application, for which gradle as well as maven are configured. 
+    - To run the application execute `gradle bootRun` or `mvn spring-boot:run` in the `backend` directory.
+	- The backend requires a MySQL database to be reachable using the credentials given in the `application.yml`. 
 
 - **Frontend:**
-    The frontend is a Svelte.js application, that uses npm. **pnpm is recommended**
-    To start the dev server execute `pnpm dev` in the `frontend` directory.
+    - The frontend is a Svelte.js application, that uses npm (pnpm is recommended).
+    - To start the dev server execute `pnpm dev` in the `frontend` directory.
 
 - **Accesspoint:**
-    The accesspoint is a Raspberry Pi that runs a single Python script. 
+    - The accesspoint is a Raspberry Pi that runs a single Python script. 
 
 - **Sensorstation:**
-    The sensorstation is an Arduino 33 BLE that is programmed using [Platform IO](https://platformio.org/).
+    - The sensorstation is an Arduino 33 BLE that is programmed using [Platform IO](https://platformio.org/).
 	
 
 ## License
