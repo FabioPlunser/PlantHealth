@@ -1,15 +1,7 @@
 # Plant Health
 
-<table>
-    <td>
-        <tr>
-            [![Pipeline Status](https://git.uibk.ac.at/informatik/qe/swess23/group1/g1t1/badges/main/pipeline.svg)]
-        </tr>
-        <tr>
-            [![Latest Release](https://git.uibk.ac.at/informatik/qe/swess23/group1/g1t1/-/badges/release.svg)]
-        </tr>
-    </td>
-</table>
+![Pipeline Status](https://git.uibk.ac.at/informatik/qe/swess23/group1/g1t1/badges/main/pipeline.svg)
+![Latest Release](https://git.uibk.ac.at/informatik/qe/swess23/group1/g1t1/-/badges/release.svg)
 
 ## System Overview
 
