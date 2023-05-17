@@ -2,8 +2,11 @@
   import { fly } from "svelte/transition";
   //---------------------------------------------------
   //---------------------------------------------------
-  import SensorstationModal from "./SensorstationModal.svelte";
-  import { SensorStation } from "$components/ui/sensorStation";
+  import {
+    SensorStationsModal,
+    SensorStation,
+  } from "$components/ui/sensorStation";
+
   import Spinner from "$components/ui/Spinner.svelte";
   //---------------------------------------------------
   //---------------------------------------------------
@@ -27,7 +30,7 @@
     {#await data.streamed.allSensorStations}
       <Spinner />
     {:then sensorStations}
-      <SensorstationModal
+      <SensorStationsModal
         data={sensorStations}
         bind:showModal={sensorStationModel}
         on:close={() => (sensorStationModel = false)}

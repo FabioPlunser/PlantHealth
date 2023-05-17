@@ -3,7 +3,6 @@
   import FormError from "$helper/formError.svelte";
   import Input from "$components/ui/Input.svelte";
   import BooleanButton from "$lib/components/ui/BooleanButton.svelte";
-  import toast from "$components/toast";
   import PasswordInput from "$lib/components/ui/PasswordInput.svelte";
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";
