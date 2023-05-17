@@ -5,7 +5,6 @@ import { redirect, error } from "@sveltejs/kit";
 import { errorHandler } from "$helper/errorHandler";
 import { logger } from "$helper/logger";
 import { toasts } from "$stores/toastStore";
-import type { Picture } from "../../../app";
 
 import {
   getAllSensorStations,

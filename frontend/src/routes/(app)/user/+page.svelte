@@ -33,14 +33,14 @@
     {:then sensorStations}
       <SensorStationsModal
         data={sensorStations}
-        bind:showModal={sensorStationModel}
-        on:close={() => (sensorStationModel = false)}
+        bind:showModal={sensorStationModal}
+        on:close={() => (sensorStationModal = false)}
       />
 
       <div class="flex justify-center">
         <button
           class="btn btn-primary"
-          on:click={() => (sensorStationModel = true)}>SensorStations</button
+          on:click={() => (sensorStationModal = true)}>SensorStations</button
         >
       </div>
     {/await}

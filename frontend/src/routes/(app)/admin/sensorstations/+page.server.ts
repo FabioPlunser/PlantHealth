@@ -52,6 +52,7 @@ export async function load(event) {
         })
         .catch((err) => {
           logger.error("Could not get gardener");
+          reject(err);
           throw error(500, "Could not get gardener");
         });
     }).catch((err) => {
