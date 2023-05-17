@@ -16,7 +16,7 @@ export async function load(event) {
   const { request, fetch } = event;
   // check if user is exists
   if (event.locals.user === undefined) {
-    throw redirect(302, "/login");
+    throw redirect(307, "/login");
   }
 
   // check if user has permissions
@@ -25,7 +25,7 @@ export async function load(event) {
     !event.locals.user.permissions.includes("GARDENER") &&
     !event.locals.user.permissions.includes("USER")
   ) {
-    throw redirect(302, "/login");
+    throw redirect(307, "/login");
   }
 
   let res = await fetch(`${BACKEND_URL}/get-user-permissions`)
@@ -38,6 +38,7 @@ export async function load(event) {
         );
         logger.error("Error while fetching user permissions");
       }
+      res = await res.json();
       return res;
     })
     .catch((err) => {

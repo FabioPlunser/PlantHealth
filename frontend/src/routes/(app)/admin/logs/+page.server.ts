@@ -35,7 +35,6 @@ export async function load({ fetch }) {
             const match = line.match(logRegex);
             if (match) {
               const [, timeStamp, severity, message] = match;
-              console.table({ timeStamp, severity, message });
               const logObject = { timeStamp, severity, message };
               logObject.timeStamp = new Date(
                 logObject.timeStamp

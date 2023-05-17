@@ -140,6 +140,7 @@ Usage:
                 <a
                   data-sveltekit-preload-code
                   href="/profile"
+                  data-sveltekit-reload
                   class="hover:text-gray-600 text-xl">Profile</a
                 >
                 <a

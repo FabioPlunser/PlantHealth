@@ -7,11 +7,6 @@ import { toasts } from "$stores/toastStore";
 
 import { getSensorStationData } from "./getData";
 import { getSensorStationPictures } from "./getPictures";
-import { format } from "path";
-
-interface Dashboard {
-  sensorStations: SensorStation[];
-}
 
 export async function load(event) {
   const { cookies, fetch } = event;
@@ -271,8 +266,8 @@ export async function load(event) {
   return {
     streamed: {
       sensorStations: allSensorStations,
+      dashboard: dashboard,
     },
-    dashboard,
     dates: {
       from,
       to,

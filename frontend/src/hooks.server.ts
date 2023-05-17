@@ -8,11 +8,7 @@ import { logger } from "$helper/logger";
  * Add user to event.locals
  */
 export async function handle({ event, resolve }) {
-  let user = {
-    personId: "test",
-    username: "teest",
-  };
-  logger.info("Handle request: ", { payload: user });
+  logger.info("Handle request: ", { payload: event });
 
   let cookieToken = event.cookies.get("token") || "";
 
@@ -38,8 +34,8 @@ export async function handle({ event, resolve }) {
   logger.info("User: ", { payload: event.locals.user });
 
   if (event.url.pathname.startsWith("/login")) {
-    if (event.locals.user) {
-      throw redirect(302, "/");
+    if (event.locals.user.token !== "") {
+      throw redirect(307, "/");
     }
   }
 

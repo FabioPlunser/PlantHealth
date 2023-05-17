@@ -53,7 +53,6 @@ export const actions = {
     }
 
     let data = await res.json();
-
     let username = formData.get("username") || "";
     let newUser: User = {
       personId: data.personId,
@@ -70,6 +69,5 @@ export const actions = {
     );
     event.cookies.set("token", JSON.stringify(event.locals.user));
     logger.info(`User: ${JSON.stringify(newUser)} loggedIn redirect`);
-    throw redirect(307, "/");
   },
 } satisfies Actions;

@@ -41,5 +41,4 @@
 >
   <slot />
   <div class="pb-96" />
-  <div class="pb-96" />
 </main>
