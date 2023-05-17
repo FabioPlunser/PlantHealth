@@ -3,6 +3,7 @@ import { fail, redirect, error } from "@sveltejs/kit";
 import { BACKEND_URL } from "$env/static/private";
 import { z } from "zod";
 import { logger } from "$helper/logger";
+import { toasts } from "$lib/stores/toastStore";
 
 let personId: string;
 let source: string | null;
@@ -124,7 +125,8 @@ export const actions = {
   /* `updateUser` is an action function that is responsible for updating user information based on the
   form data submitted by the user. It receives an object with properties `url`, `request`, and
   `fetch` as its argument. */
-  updateUser: async ({ url, request, fetch }) => {
+  updateUser: async (event) => {
+    const { url, request, fetch } = event;
     const formData = await request.formData();
     const zodData = schema.safeParse(Object.fromEntries(formData));
     if (formData.get("password") !== formData.get("passwordConfirm")) {
@@ -144,7 +146,7 @@ export const actions = {
     }
 
     /*
-     * For every permission BooleanButton in the form, parse the name to find which Permission it represents
+     *  NOTE: For every permission BooleanButton in the form, parse the name to find which Permission it represents
      * and add it to the permissions array
      */
     let permissions: string[] = [];
@@ -161,11 +163,18 @@ export const actions = {
     let email = String(formData.get("email"));
     let password = String(formData.get("password"));
 
-    let params = new URLSearchParams();
+    let canActiveUserChangeRoles: boolean | undefined =
+      event.locals.user?.permissions.includes("ADMIN") &&
+      personId !== event.locals.user?.personId;
 
+    let params = new URLSearchParams();
     params.set("personId", personId);
     params.set("username", username);
-    params.set("permissions", permissions.join(","));
+
+    if (canActiveUserChangeRoles) {
+      params.set("permissions", permissions.join(","));
+      return;
+    }
 
     logger.info(
       "Update user " +
@@ -188,29 +197,43 @@ export const actions = {
 
     let parametersString = "?" + params.toString();
 
-    await fetch(`${BACKEND_URL}/update-user` + parametersString, {
-      method: "POST",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          logger.error("user-profile-page", { payload: response });
-          throw error(response.status, response.statusText);
-        }
-        return response.json();
+    /*
+     * Depending on the permission of the current user and if he is supposed to change the roles
+     * of the displayed user we fetch a different endpoint
+     */
+    if (canActiveUserChangeRoles) {
+      await fetch(`${BACKEND_URL}/update-user` + parametersString, {
+        method: "POST",
       })
-      .then((data) => {
-        let time = new Date().toLocaleString();
-        logger.info(
-          "Updated user: " +
-            JSON.stringify(time) +
-            " " +
-            JSON.stringify(data.message)
-        );
-      });
+        .then((response) => {
+          if (!response.ok) {
+            logger.error("user-profile-page", { payload: response });
+            throw error(response.status, response.statusText);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          logger.info("Updated user: " + JSON.stringify(data.message));
+        });
+    } else {
+      await fetch(`${BACKEND_URL}/update-user` + parametersString, {
+        method: "POST",
+      })
+        .then((response) => {
+          if (!response.ok) {
+            logger.error("user-profile-page", { payload: response });
+            throw error(response.status, response.statusText);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          logger.info("Updated user: " + JSON.stringify(data.message));
+        });
+    }
 
     // NOTE: Redirect if the user was redirected to profile from some other page
     if (source !== null) {
       throw redirect(307, source);
     }
   },
-} satisfies Actions;
+};

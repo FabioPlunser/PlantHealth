@@ -111,7 +111,9 @@ public class TestAccessPointController {
 			accessPointService.register(accessPointId, "Office " + i);
 		}
 
-		List<AccessPoint> accessPointList = accessPointService.findAllAccessPoints();
+		List<AccessPoint> accessPointList = accessPointService.findAllAccessPoints().stream()
+				.filter(ap -> !ap.isDeleted())
+				.toList();
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/get-access-points")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
