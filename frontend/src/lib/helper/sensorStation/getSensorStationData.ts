@@ -1,5 +1,6 @@
 import { BACKEND_URL } from "$env/static/private";
-import { ErrorHandler } from "../errorHandler";
+import { errorHandler } from "../errorHandler";
+import { error } from "@sveltejs/kit";
 
 type Dates = {
   from: Date;
@@ -23,29 +24,32 @@ export async function getSensorStationData(
       .then(async (res: any) => {
         if (!res.ok) {
           let data = await res.json();
-          ErrorHandler(
+          errorHandler(
             event.locals.user?.personId,
             "Error while fetching sensor station data",
             data
           );
           reject(data);
+          throw error(res.status, "Error while fetching sensor station data");
         }
         let data = await res.json();
         resolve(data);
       })
       .catch((err: any) => {
-        ErrorHandler(
+        errorHandler(
           event.locals.user?.personId,
           "Error while fetching sensor station data",
           err
         );
         reject(err);
+        throw error(500, "Error while fetching sensor station data");
       });
   }).catch((err: any) => {
-    ErrorHandler(
+    errorHandler(
       event.locals.user?.personId,
       "Error while fetching sensor station data",
       err
     );
+    throw error(500, "Error while fetching sensor station data");
   });
 }

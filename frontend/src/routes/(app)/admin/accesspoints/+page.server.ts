@@ -1,79 +1,149 @@
 import { BACKEND_URL } from "$env/static/private";
 import { logger } from "$helper/logger";
 import { toasts } from "$stores/toastStore";
+import { errorHandler } from "$helper/errorHandler";
+import { error } from "@sveltejs/kit";
 
-// TODO: add validation and error handling (toast messages)
-export async function load({ fetch, depends, locals }) {
-  let res = await fetch(`${BACKEND_URL}/get-access-points`);
-  if (!res.ok) {
-    logger.error("Could not get access points");
-    throw new error(res.status, "Could not get access points");
-  }
-  res = await res.json();
-  logger.info("Got access points");
+export async function load(event) {
+  const { fetch, depends } = event;
   depends("app:getAccessPoints");
+
+  async function getAccessPoints(): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      await fetch(`${BACKEND_URL}/get-access-points`)
+        .then(async (res) => {
+          if (!res.ok) {
+            res = await res.json();
+            errorHandler(
+              event.locals.user?.personId,
+              "Error while getting access points",
+              res
+            );
+            reject(res);
+          }
+          let data = await res.json();
+          resolve(data.accessPoints);
+        })
+        .catch((err) => {
+          errorHandler(
+            event.locals.user?.personId,
+            "Error while getting access points",
+            err
+          );
+          reject(err);
+          throw error(500, "Error while getting access points");
+        });
+    });
+  }
+
   return {
-    accessPoints: res.accessPoints,
+    streamed: {
+      accessPoints: getAccessPoints(),
+    },
   };
 }
 
+//-------------------------------------------------------------
+//-------------------------------------------------------------
+//-------------------------------------------------------------
+//-------------------------------------------------------------
 export const actions = {
-  // TODO: add validation and error handling (toast messages)
-  unlock: async ({ cookies, request, fetch }) => {
+  unlock: async (event) => {
+    const { cookies, request, fetch } = event;
     const formData = await request.formData();
 
-    const res = await fetch(
-      `${BACKEND_URL}/set-unlocked-access-point?accessPointId=${formData.get(
-        "accessPointId"
-      )}&unlocked=${formData.get("unlocked")}`,
-      {
-        method: "POST",
-      }
-    );
-    if (!res.ok) {
-      logger.error("Could not unlock access point");
-      throw new error(res.status, "Could not unlock access point");
-    } else {
-      logger.info("Unlocked access point");
-    }
-  },
+    let params = new URLSearchParams();
+    params.append("accessPointId", String(formData.get("accessPointId")));
+    params.append("unlocked", String(formData.get("unlocked")));
 
-  // TODO: add validation and error handling (toast messages)
-  update: async ({ cookies, request, fetch }) => {
-    const formData = await request.formData();
-    let accessPointId = formData.get("accessPointId");
-    let roomName = formData.get("roomName");
-    let transferInterval = formData.get("transferInterval");
-
-    let res = await fetch(
-      `${BACKEND_URL}/update-access-point?accessPointId=${accessPointId}
-      &roomName=${roomName}&transferInterval=${transferInterval}`,
+    await fetch(
+      `${BACKEND_URL}/set-unlocked-access-point?${params.toString()}`,
       { method: "POST" }
-    );
-    if (!res.ok) {
-      logger.error("Could not update access point");
-      throw new error(res.status, "Could not update access point");
-    } else {
-      logger.info("Updated access point");
-    }
+    )
+      .then(async (res: any) => {
+        if (!res.ok) {
+          res = await res.json();
+          errorHandler(
+            event.locals.user?.personId,
+            "Error while unlocking access point",
+            res
+          );
+        }
+      })
+      .catch((err: any) => {
+        errorHandler(
+          event.locals.user?.personId,
+          "Error while unlocking access point",
+          err
+        );
+        throw error(500, "Error while unlocking access point");
+      });
   },
+  //---------------------------------------------
+  //
+  //---------------------------------------------
+  update: async (event) => {
+    const { cookies, request, fetch } = event;
+    const formData = await request.formData();
 
-  // TODO: add validation and error handling (toast messages)
-  scan: async ({ cookies, request, fetch }) => {
+    let params = new URLSearchParams();
+    params.append("accessPointId", String(formData.get("accessPointId")));
+    params.append("roomName", String(formData.get("roomName")));
+    params.append("transferInterval", String(formData.get("transferInterval")));
+
+    await fetch(`${BACKEND_URL}/update-access-point?${params.toString()}`, {
+      method: "POST",
+    })
+      .then(async (res: any) => {
+        if (!res.ok) {
+          res = await res.json();
+          errorHandler(
+            event.locals.user?.personId,
+            "Error while updating access point",
+            res
+          );
+        }
+      })
+      .catch((err: any) => {
+        errorHandler(
+          event.locals.user?.personId,
+          "Error while updating access point",
+          err
+        );
+        throw error(500, "Error while updating access point");
+      });
+  },
+  //---------------------------------------------
+  //
+  //---------------------------------------------
+  scan: async (event) => {
+    const { cookies, request, fetch } = event;
     const formData = await request.formData();
     let accessPointId = formData.get("accessPointId");
 
-    let res = await fetch(
+    await fetch(
       `${BACKEND_URL}/scan-for-sensor-stations?accessPointId=${accessPointId}`,
       { method: "POST" }
-    );
-    if (!res.ok) {
-      logger.error("Could not scan for sensor stations");
-      throw new error(res.status, "Could not scan for sensor stations");
-    } else {
-      logger.info("Scanned for sensor stations");
-    }
+    )
+      .then(async (res: any) => {
+        if (!res.ok) {
+          res = await res.json();
+          errorHandler(
+            event.locals.user?.personId,
+            "Error while scanning for sensor stations",
+            res
+          );
+        }
+      })
+      .catch((err: any) => {
+        errorHandler(
+          event.locals.user?.personId,
+          "Error while scanning for sensor stations",
+          err
+        );
+        throw error(500, "Error while scanning for sensor stations");
+      });
   },
 
-  delete: async ({ cookies, request, fetch }) => {},
-} satisfies Actions;
+  delete: async (event) => {},
+};

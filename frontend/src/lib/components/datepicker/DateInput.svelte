@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
   import { fly } from "svelte/transition";
   import { cubicInOut } from "svelte/easing";
-  import { toText } from "./date-utils.js";
-  import { parse, createFormat } from "./parse.js";
+  import { toText } from "./date-utils";
+  import { parse, createFormat } from "./parse";
   import DateTimePicker from "./DatePicker.svelte";
   import { writable } from "svelte/store";
   import { createEventDispatcher } from "svelte";
@@ -12,7 +12,7 @@
   const store = (() => {
     return {
       subscribe: innerStore.subscribe,
-      set: (d) => {
+      set: (d: any) => {
         if (d === null) {
           innerStore.set(null);
           value = d;
@@ -23,7 +23,7 @@
       },
     };
   })();
-  export let value = null;
+  export let value: any = null;
   $: store.set(value);
   export let min = new Date(defaultDate.getFullYear() - 20, 0, 1);
   export let max = new Date(defaultDate.getFullYear(), 11, 31, 23, 59, 59, 999);
@@ -36,12 +36,12 @@
   let formatTokens = createFormat(format);
   $: formatTokens = createFormat(format);
   export let locale = {};
-  function valueUpdate(value2, formatTokens2) {
+  function valueUpdate(value2: any, formatTokens2: any) {
     text = toText(value2, formatTokens2);
   }
   $: valueUpdate($store, formatTokens);
   export let text = toText($store, formatTokens);
-  function textUpdate(text2, formatTokens2) {
+  function textUpdate(text2: any, formatTokens2: any) {
     if (text2.length) {
       const result = parse(text2, formatTokens2, $store);
       if (result.date !== null) {
@@ -62,7 +62,7 @@
   export let visible = false;
   export let closeOnSelection = false;
   export let browseWithoutSelecting = false;
-  function onFocusOut(e) {
+  function onFocusOut(e: any) {
     if (
       e?.currentTarget instanceof HTMLElement &&
       e.relatedTarget &&
@@ -74,7 +74,7 @@
       visible = false;
     }
   }
-  function keydown(e) {
+  function keydown(e: any) {
     if (e.key === "Escape" && visible) {
       visible = false;
       e.preventDefault();
@@ -84,7 +84,7 @@
       e.preventDefault();
     }
   }
-  function onSelect(e) {
+  function onSelect(e: any) {
     dispatch("select", e.detail);
     if (closeOnSelection) {
       visible = false;
@@ -136,7 +136,6 @@
         on:focusout={onFocusOut}
         on:select={onSelect}
         bind:value={$store}
-        bind:visible
         {min}
         {max}
         {locale}

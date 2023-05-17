@@ -48,7 +48,7 @@
           type="file"
           accept="image/*"
           name="picture"
-          capture="camera"
+          capture="environment"
           on:change={(e) => onFileSelect(e)}
         />
       </label>

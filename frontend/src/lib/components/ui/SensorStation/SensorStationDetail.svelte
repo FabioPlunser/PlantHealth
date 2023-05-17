@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SensorStationsModal } from "$components/ui/SensorStation";
+  import { SensorStationsModal } from "$components/ui/sensorStation";
   import { fly } from "svelte/transition";
   import { enhance, type SubmitFunction } from "$app/forms";
   // ---------------------------------------------------
@@ -13,7 +13,7 @@
     UploadPicture,
     LimitsCard,
     SensorStationDetailTable,
-  } from "$components/ui/SensorStation";
+  } from "$components/ui/sensorStation";
   // ---------------------------------------------------
   // ---------------------------------------------------
   import { onMount } from "svelte";

@@ -1,5 +1,6 @@
 import { BACKEND_URL } from "$env/static/private";
-import { ErrorHandler } from "../errorHandler";
+import { errorHandler } from "../errorHandler";
+import { error } from "@sveltejs/kit";
 
 type Dates = {
   from: Date;
@@ -16,22 +17,24 @@ export async function getSensorStationPictures(
     .then(async (res: any) => {
       if (!res.ok) {
         let data = await res.json();
-        ErrorHandler(
+        errorHandler(
           event.locals.user?.personId,
           "Error while fetching sensor station pictures",
           data
         );
+        throw error(res.status, "Error while fetching sensor station pictures");
       }
 
       let data = await res.json();
       return data.pictures;
     })
     .catch((err: any) => {
-      ErrorHandler(
+      errorHandler(
         event.locals.user?.personId,
         "Error while fetching sensor station pictures",
         err
       );
+      throw error(500, "Error while fetching sensor station pictures");
     });
 
   let picturePromises: any[] = [];
@@ -44,7 +47,7 @@ export async function getSensorStationPictures(
         .then(async (res: any) => {
           if (!res.ok) {
             let data = await res.json();
-            ErrorHandler(
+            errorHandler(
               event.locals.user?.personId,
               "Error while fetching sensor station picture",
               data
@@ -66,7 +69,7 @@ export async function getSensorStationPictures(
           resolve(newPicture);
         })
         .catch((err: any) => {
-          ErrorHandler(
+          errorHandler(
             event.locals.user?.personId,
             "Error while fetching sensor station picture",
             err
@@ -74,11 +77,12 @@ export async function getSensorStationPictures(
           resolve(null);
         });
     }).catch((err: any) => {
-      ErrorHandler(
+      errorHandler(
         event.locals.user?.personId,
         "Error while fetching sensor station picture",
         err
       );
+      throw error(500, "Error while fetching sensor station pictures");
     });
     let picture = {
       pictureId: possiblePicture.pictureId,

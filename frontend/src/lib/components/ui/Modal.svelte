@@ -19,7 +19,7 @@
       handleDispatch();
     });
   }
-  function handleKeyDown(event) {
+  function handleKeyDown(event: any) {
     if (event.key === "Escape") {
       close();
     }

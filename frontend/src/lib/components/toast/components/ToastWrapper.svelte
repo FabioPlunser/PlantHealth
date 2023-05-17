@@ -1,11 +1,11 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { prefersReducedMotion } from "../core/utils";
   import ToastBar from "./ToastBar.svelte";
   import ToastMessage from "./ToastMessage.svelte";
-  export let toast;
-  export let setHeight;
-  let wrapperEl;
+  export let toast: any;
+  export let setHeight: any;
+  let wrapperEl: any;
   onMount(() => {
     setHeight(wrapperEl.getBoundingClientRect().height);
   });
@@ -39,14 +39,6 @@
 </div>
 
 <style>
-  .wrapper {
-    left: 0;
-    right: 0;
-    display: flex;
-    position: absolute;
-    transform: translateY(calc(var(--offset, 16px) * var(--factor) * 1px));
-  }
-
   .transition {
     transition: all 230ms cubic-bezier(0.21, 1.02, 0.73, 1);
   }

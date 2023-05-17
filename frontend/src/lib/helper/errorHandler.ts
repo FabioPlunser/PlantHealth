@@ -1,7 +1,7 @@
 import { logger } from "./logger";
 import { toasts } from "$stores/toastStore";
 
-export async function ErrorHandler(
+export async function errorHandler(
   personId: string | undefined,
   message: string,
   payload: any

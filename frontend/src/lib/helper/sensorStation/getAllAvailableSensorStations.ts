@@ -1,5 +1,6 @@
 import { BACKEND_URL } from "$env/static/private";
-import { ErrorHandler } from "../errorHandler";
+import { errorHandler } from "../errorHandler";
+import { error } from "@sveltejs/kit";
 
 export async function getAllSensorStations(event: any): Promise<any> {
   return new Promise(async (resolve, reject) => {
@@ -8,12 +9,13 @@ export async function getAllSensorStations(event: any): Promise<any> {
       .then(async (res: any) => {
         if (!res.ok) {
           let data = await res.json();
-          ErrorHandler(
+          errorHandler(
             event.locals.user?.personId,
             "Error while fetching all sensor stations",
             data
           );
           resolve([]);
+          throw error(res.status, "Error while fetching all sensor stations");
         }
 
         let data = await res.json();
@@ -26,12 +28,13 @@ export async function getAllSensorStations(event: any): Promise<any> {
         resolve(sensorStations);
       })
       .catch((err: any) => {
-        ErrorHandler(
+        errorHandler(
           event.locals.user?.personId,
           "Error while fetching all sensor stations",
           err
         );
-        resolve([]);
+        reject(err);
+        throw error(500, "Error while fetching all sensor stations");
       });
   });
 }
@@ -45,7 +48,7 @@ function getNewestPicture(event: any, sensorStations: any[]): void {
         )
         .then(async (res: any) => {
           if (!res.ok) {
-            // ErrorHandler(event.locals.user?.personId, "Error while fetching newest picture", res)
+            // errorHandler(event.locals.user?.personId, "Error while fetching newest picture", res)
             resolve(null);
           }
           let blob = await res.blob();

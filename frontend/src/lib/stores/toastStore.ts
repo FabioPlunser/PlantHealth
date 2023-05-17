@@ -15,7 +15,7 @@ const createToastStore = () => {
    * @param message - The `message` parameter is a string that represents the content of the toast
    * message that will be displayed to the user.
    */
-  const addToast = (id, type, message) => {
+  const addToast = (id: any, type: any, message: any) => {
     logger.info(
       "addToast: " +
         id +
@@ -36,7 +36,7 @@ const createToastStore = () => {
    * from a map or collection. The `removeToast` function takes this `id` as an argument and uses it to
    * delete the corresponding toast message from the map.
    */
-  const removeToast = (id) => {
+  const removeToast = (id: any) => {
     update((map) => {
       map.delete(id);
       return map;
@@ -47,9 +47,9 @@ const createToastStore = () => {
     subscribe,
     addToast,
     removeToast,
-    get: (id) => {
+    get: (id: any) => {
       return {
-        subscribe: (run) => {
+        subscribe: (run: any) => {
           subscribe((map) => {
             run(map.get(id));
           });

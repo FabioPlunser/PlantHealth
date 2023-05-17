@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
   import CheckmarkIcon from "./CheckmarkIcon.svelte";
   import ErrorIcon from "./ErrorIcon.svelte";
   import LoaderIcon from "./LoaderIcon.svelte";
-  export let toast;
+  export let toast: any;
   $: ({ type, icon, iconTheme } = toast);
 </script>
 

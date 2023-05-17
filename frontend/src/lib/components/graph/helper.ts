@@ -48,7 +48,7 @@ export function createGraphData(data: any) {
     //---------------------------------------------------------------
     //---------------------------------------------------------------
     graphData[sensorType] = {
-      labels: sensor.values.map((value) =>
+      labels: sensor.values.map((value: any) =>
         new Date(value.timeStamp).toLocaleString("de-DE")
       ),
       datasets: datasets,

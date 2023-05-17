@@ -3,7 +3,7 @@
   //---------------------------------------------------
   //---------------------------------------------------
   import SensorstationModal from "./SensorstationModal.svelte";
-  import SensorStation from "$components/ui/SensorStation/SensorStation.svelte";
+  import { SensorStation } from "$components/ui/sensorStation";
   import Spinner from "$components/ui/Spinner.svelte";
   //---------------------------------------------------
   //---------------------------------------------------

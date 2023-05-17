@@ -1,15 +1,15 @@
 import { BACKEND_URL } from "$env/static/private";
 import type { Actions } from "./$types";
-import { redirect } from "@sveltejs/kit";
+import { redirect, error } from "@sveltejs/kit";
 import { logger } from "$helper/logger";
 import { toasts } from "$stores/toastStore";
-import { ErrorHandler } from "$lib/helper/errorHandler";
+import { errorHandler } from "$lib/helper/errorHandler";
 
 import {
   getAllSensorStations,
   getSensorStationData,
   getSensorStationPictures,
-} from "$helper/SensorStation";
+} from "$helper/sensorStation";
 
 /**
  * Load function to fetch admint dashboard
@@ -45,12 +45,14 @@ export async function load(event) {
   let numbers = await fetch(`${BACKEND_URL}/get-dashboard`)
     .then(async (res) => {
       if (!res.ok) {
-        ErrorHandler(
+        errorHandler(
           String(event.locals.user?.personId),
           "Error while fetching dashboard sensor stations",
           await res.json()
         );
-        return await res.json();
+        throw error(res.status, {
+          message: "Error while fetching dashboard sensor stations",
+        });
       }
       let data = await res.json();
       return {
@@ -60,11 +62,14 @@ export async function load(event) {
       };
     })
     .catch((err) => {
-      ErrorHandler(
+      errorHandler(
         String(event.locals.user?.personId),
         "Error while fetching dashboard sensor stations",
         err
       );
+      throw error(500, {
+        message: "Error while fetching dashboard sensor stations",
+      });
     });
 
   async function getDashBoardSensorStations(): Promise<any> {
@@ -72,12 +77,15 @@ export async function load(event) {
       let sensorStations = await fetch(`${BACKEND_URL}/get-dashboard`).then(
         async (res) => {
           if (!res.ok) {
-            ErrorHandler(
+            errorHandler(
               String(event.locals.user?.personId),
               "Error while fetching dashboard sensor stations",
               await res.json()
             );
-            return await res.json();
+            reject(null);
+            throw error(res.status, {
+              message: "Error while fetching dashboard sensor stations",
+            });
           }
           let data = await res.json();
           return data?.sensorStations;
@@ -89,6 +97,15 @@ export async function load(event) {
         sensorStation.pictures = getSensorStationPictures(event, sensorStation);
       }
       resolve(sensorStations);
+    }).catch((err) => {
+      errorHandler(
+        String(event.locals.user?.personId),
+        "Error while fetching dashboard sensor stations",
+        err
+      );
+      throw error(500, {
+        message: "Error while fetching dashboard sensor stations",
+      });
     });
   }
 

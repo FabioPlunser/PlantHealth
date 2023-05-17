@@ -1,4 +1,4 @@
-import { redirect } from "@sveltejs/kit";
+import { redirect, error } from "@sveltejs/kit";
 import { BACKEND_URL } from "$env/static/private";
 import { logger } from "$helper/logger";
 import { toasts } from "$stores/toastStore";
@@ -37,6 +37,7 @@ export async function load(event) {
           "Error while fetching user permissions"
         );
         logger.error("Error while fetching user permissions");
+        throw error(res.status, "Error while fetching user permissions");
       }
       res = await res.json();
       return res;

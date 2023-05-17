@@ -16,19 +16,23 @@ let source: string | null;
  * property is an object with boolean values for each permission role, based on whether the user has
  * that
  */
-export async function load({ request, url, fetch, locals }) {
+export async function load(event) {
+  const { fetch, request, url } = event;
   // check if required variables are available
   if (
-    (!url.searchParams.get("personId") && !locals?.user?.personId) ||
-    (!url.searchParams.get("username") && !locals?.user?.username) ||
-    (!url.searchParams.get("userPermissions") && !locals?.user?.permissions)
+    (!url.searchParams.get("personId") && !event.locals?.user?.personId) ||
+    (!url.searchParams.get("username") && !event.locals?.user?.username) ||
+    (!url.searchParams.get("userPermissions") &&
+      !event.locals?.user?.permissions)
   ) {
-    throw new error(403);
+    throw error(403, "Missing required parameters");
   }
 
-  personId = url.searchParams.get("personId") ?? locals?.user?.personId;
-  let username = url.searchParams.get("username") ?? locals.user.username;
-  source = request.headers.get("referer");
+  let personId =
+    url.searchParams.get("personId") ?? event.locals.user?.personId;
+  let username =
+    url.searchParams.get("username") ?? event.locals.user?.username;
+  let source = request.headers.get("referer");
 
   logger.info("user-profile-page", { payload: personId });
   logger.info("user-profile-page", { payload: username });
@@ -36,11 +40,12 @@ export async function load({ request, url, fetch, locals }) {
 
   let permissions =
     url.searchParams.get("userPermissions")?.split(",") ??
-    locals.user.permissions;
+    event.locals.user?.permissions ??
+    [];
 
-  let canActiveUserChangeRoles: boolean =
-    locals.user.permissions.includes("ADMIN") &&
-    personId !== locals.user.personId;
+  let canActiveUserChangeRoles: boolean | undefined =
+    event.locals.user?.permissions.includes("ADMIN") &&
+    personId !== event.locals.user?.personId;
 
   let userPermissions: { [role: string]: boolean } = {};
 
@@ -52,7 +57,7 @@ export async function load({ request, url, fetch, locals }) {
       .then((response) => {
         if (!response.ok) {
           logger.error("user-profile-page", { payload: response });
-          throw new error(response.status, response.statusText);
+          throw error(response.status, response.statusText);
         }
         return response.json();
       })
@@ -152,9 +157,9 @@ export const actions = {
       }
     });
 
-    let username = formData.get("username");
-    let email = formData.get("email");
-    let password = formData.get("password");
+    let username = String(formData.get("username"));
+    let email = String(formData.get("email"));
+    let password = String(formData.get("password"));
 
     let params = new URLSearchParams();
 

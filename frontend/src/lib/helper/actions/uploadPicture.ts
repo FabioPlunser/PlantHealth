@@ -1,7 +1,7 @@
 import { BACKEND_URL } from "$env/static/private";
 import { logger } from "../logger";
 import { toasts } from "$stores/toastStore";
-import { ErrorHandler } from "../errorHandler";
+import { errorHandler } from "../errorHandler";
 
 export async function uploadPicture(event: any) {
   const { request, fetch } = event;
@@ -20,7 +20,7 @@ export async function uploadPicture(event: any) {
     .then(async (res: any) => {
       if (!res.ok) {
         res = await res.json();
-        ErrorHandler(
+        errorHandler(
           event.locals.user?.personId,
           "Error while uploading picture",
           res
@@ -34,7 +34,7 @@ export async function uploadPicture(event: any) {
       );
     })
     .catch((e: any) => {
-      ErrorHandler(
+      errorHandler(
         event.locals.user?.personId,
         "Error while uploading picture",
         e

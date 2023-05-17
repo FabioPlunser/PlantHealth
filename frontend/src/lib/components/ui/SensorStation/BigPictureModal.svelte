@@ -8,7 +8,7 @@
   export let imageRef: string;
   export let open = false;
 
-  function handleKeyDown(event) {
+  function handleKeyDown(event: any) {
     if (event.key === "Escape") {
       close();
     }

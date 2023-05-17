@@ -1,5 +1,7 @@
-import { redirect, error } from "@sveltejs/kit";
+import { redirect } from "@sveltejs/kit";
 import { logger } from "$helper/logger";
+import type { HandleServerError } from "@sveltejs/kit";
+
 /**
  * @type {Handle}
  * Check if user is logged in and has the correct permissions
@@ -34,7 +36,7 @@ export async function handle({ event, resolve }) {
   logger.info("User: ", { payload: event.locals.user });
 
   if (event.url.pathname.startsWith("/login")) {
-    if (event.locals.user.token !== "") {
+    if (event.locals.user?.token !== "" ?? false) {
       throw redirect(307, "/");
     }
   }
@@ -87,7 +89,11 @@ export async function handleFetch({ request, fetch, event }) {
   return fetch(request);
 }
 
-export async function handleError({ error, event }) {
+interface Error {
+  [key: string]: any;
+}
+
+export async function handleError(error: Error) {
   logger.error("HandleError Event: ", { payload: error.message });
   return {
     message: error.message,

@@ -1,12 +1,12 @@
-export function isLeapYear(year) {
+export function isLeapYear(year: any) {
   return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 }
-export function getMonthLength(year, month) {
+export function getMonthLength(year: any, month: any) {
   const feb = isLeapYear(year) ? 29 : 28;
   const monthLengths = [31, feb, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   return monthLengths[month];
 }
-export function toText(date, formatTokens) {
+export function toText(date: any, formatTokens: any) {
   let text = "";
   if (date) {
     for (const token of formatTokens) {
@@ -19,7 +19,7 @@ export function toText(date, formatTokens) {
   }
   return text;
 }
-export function getMonthDays(year, month) {
+export function getMonthDays(year: any, month: any) {
   const monthLength = getMonthLength(year, month);
   const days = [];
   for (let i = 0; i < monthLength; i++) {
@@ -31,11 +31,11 @@ export function getMonthDays(year, month) {
   }
   return days;
 }
-export function getCalendarDays(value, weekStartsOn) {
+export function getCalendarDays(value: any, weekStartsOn: any) {
   const year = value.getFullYear();
   const month = value.getMonth();
   const firstWeekday = new Date(year, month, 1).getDay();
-  let days = [];
+  let days: any[] = [];
   // add last month
   const daysBefore = (firstWeekday - weekStartsOn + 7) % 7;
   if (daysBefore > 0) {

@@ -3,7 +3,7 @@
   import { onMount } from "svelte";
   // ----------------------------------
   // ----------------------------------
-  import { SensorStationDetail } from "$components/ui/SensorStation";
+  import { SensorStationDetail } from "$components/ui/sensorStation";
 
   // ----------------------------------
   // ----------------------------------

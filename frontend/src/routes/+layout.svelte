@@ -1,11 +1,11 @@
 <script lang="ts">
   import "../app.css";
   import toast, { Toaster } from "$components/toast";
-
-  export let data;
+  import type { ToastPosition } from "$components/toast";
+  export let data: any;
   $: {
-    data?.streamed?.notifications.then((notification) => {
-      let position = "top-right";
+    data?.streamed?.notifications.then((notification: any) => {
+      let position: ToastPosition = "top-right";
       let toastId = "";
       if (notification) {
         switch (notification.type) {

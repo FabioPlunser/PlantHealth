@@ -4,14 +4,14 @@ import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 import { toasts } from "$stores/toastStore";
 
-import { ErrorHandler } from "$helper/ErrorHandler";
+import { errorHandler } from "$helper/errorHandler";
 
 import {
   getAllSensorStations,
   getSensorStationData,
   getSensorStationPictures,
   getSensorStationLimits,
-} from "$helper/SensorStation";
+} from "$helper/sensorStation";
 
 export async function load(event) {
   const { cookies, fetch } = event;
@@ -38,11 +38,12 @@ export async function load(event) {
     `${BACKEND_URL}/get-sensor-station?sensorStationId=${sensorStationId}`
   );
   if (!res.ok) {
-    ErrorHandler(
+    errorHandler(
       event.locals.user?.personId,
       "Couldn't get sensor station",
       res
     );
+    throw error(500, "Couldn't get sensor station");
   }
   let data = await res.json();
   let sensorStation = data.sensorStation;
@@ -89,6 +90,7 @@ import {
   updateSensorStation,
   unlockSensorStation,
 } from "$helper/actions";
+
 export const actions = {
   unlock: async (event) => {
     unlockSensorStation(event);

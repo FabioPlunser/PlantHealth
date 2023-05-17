@@ -1,7 +1,7 @@
 import { BACKEND_URL } from "$env/static/private";
 import { logger } from "../logger";
 import { toasts } from "$stores/toastStore";
-import { ErrorHandler } from "../errorHandler";
+import { errorHandler } from "../errorHandler";
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 
@@ -23,7 +23,7 @@ export async function unlockSensorStation(event: any) {
   )
     .then(async (res) => {
       if (!res.ok) {
-        ErrorHandler(
+        errorHandler(
           event.locals.user?.personId,
           "Couldn't unlock sensor station",
           await res.json()
@@ -38,7 +38,7 @@ export async function unlockSensorStation(event: any) {
       }
     })
     .catch((err) => {
-      ErrorHandler(
+      errorHandler(
         event.locals.user?.personId,
         "Couldn't unlock sensor station",
         err

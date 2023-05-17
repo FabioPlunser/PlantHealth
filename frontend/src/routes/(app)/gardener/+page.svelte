@@ -1,7 +1,5 @@
 <script lang="ts">
   import { fly } from "svelte/transition";
-  import { enhance } from "$app/forms";
-  import type { SubmitFunction } from "$app/forms";
   // ---------------------------------------------------
   // ---------------------------------------------------
   import Spinner from "$components/ui/Spinner.svelte";
@@ -10,7 +8,7 @@
     SensorStationsModal,
     SensorStation,
     SensorStationDetail,
-  } from "$components/ui/SensorStation";
+  } from "$components/ui/sensorStation";
   // ---------------------------------------------------
   // ---------------------------------------------------
   import { onMount } from "svelte";

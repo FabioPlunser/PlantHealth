@@ -67,7 +67,10 @@ export const actions = {
       "sueccess",
       `User ${username.toString()} logged in`
     );
-    event.cookies.set("token", JSON.stringify(event.locals.user));
+    event.cookies.set("token", JSON.stringify(event.locals.user), {
+      secure: false,
+      path: "/",
+    });
     logger.info(`User: ${JSON.stringify(newUser)} loggedIn redirect`);
   },
 } satisfies Actions;

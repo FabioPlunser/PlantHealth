@@ -1,7 +1,7 @@
 import { BACKEND_URL } from "$env/static/private";
 import { logger } from "../logger";
 import { toasts } from "$stores/toastStore";
-import { ErrorHandler } from "../errorHandler";
+import { errorHandler } from "../errorHandler";
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 
@@ -58,7 +58,7 @@ export async function updateSensorStation(event: any) {
     .then(async (res: any) => {
       if (!res.ok) {
         res = await res.json();
-        ErrorHandler(
+        errorHandler(
           event.locals.user?.personId,
           "Error while updating sensor station",
           res
@@ -72,7 +72,7 @@ export async function updateSensorStation(event: any) {
       );
     })
     .catch((e: any) => {
-      ErrorHandler(
+      errorHandler(
         event.locals.user?.personId,
         "Error while updating sensor station",
         e

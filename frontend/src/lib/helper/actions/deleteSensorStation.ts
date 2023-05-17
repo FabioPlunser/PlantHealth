@@ -1,7 +1,7 @@
 import { BACKEND_URL } from "$env/static/private";
 import { logger } from "../logger";
 import { toasts } from "$stores/toastStore";
-import { ErrorHandler } from "../errorHandler";
+import { errorHandler } from "../errorHandler";
 import { error } from "@sveltejs/kit";
 
 export async function deleteSensorStation(event: any) {
@@ -17,7 +17,7 @@ export async function deleteSensorStation(event: any) {
   })
     .then(async (res: any) => {
       if (!res.ok) {
-        ErrorHandler(
+        errorHandler(
           event.locals.user?.personId,
           "Error while deleting sensor station",
           res
@@ -32,7 +32,7 @@ export async function deleteSensorStation(event: any) {
       }
     })
     .catch((e: any) => {
-      ErrorHandler(
+      errorHandler(
         event.locals.user?.personId,
         "Error while deleting sensor station",
         e

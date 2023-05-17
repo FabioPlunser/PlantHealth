@@ -60,32 +60,34 @@ public class StartupConfig {
 					Permission.adminAuthorities()
 			);
 			if (this.personService.create(person)) {
-				log.info(String.format("Created User \"%s\" with Password \"%s\" and Token \"%s\"",
+				log.info(String.format(
+						"Created User \"%s\" with Password \"%s\" and Token \"%s\"",
 						person.getUsername(), unhashedPassword, person.getToken()
 				));
 			}
-        }
-    }
+		}
+	}
 
-    /**
-     * Helper Class for easier Handling of the possible Profiles.
-     */
-    public enum Profile {
-        DEBUG,
-        PROD,
-        TEST,
-        OTHER;
+	/**
+	 * Helper Class for easier Handling of the possible Profiles.
+	 */
+	public enum Profile {
+		DEBUG,
+		PROD,
+		TEST,
+		DOCKER,
+		OTHER;
 
-        public static Profile fromString(String string) {
-            try {
-                return Profile.valueOf(string.toUpperCase());
-            } catch (Exception e) {
-                return Profile.OTHER;
-            }
-        }
+		public static Profile fromString(String string) {
+			try {
+				return Profile.valueOf(string.toUpperCase());
+			} catch (Exception e) {
+				return Profile.OTHER;
+			}
+		}
 
-        public boolean isUnknown() {
-            return this == OTHER;
-        }
-    }
+		public boolean isUnknown() {
+			return this == OTHER;
+		}
+	}
 }

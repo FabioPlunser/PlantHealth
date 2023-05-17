@@ -1,7 +1,7 @@
 import { BACKEND_URL } from "$env/static/private";
 import { logger } from "../logger";
 import { toasts } from "$stores/toastStore";
-import { ErrorHandler } from "../errorHandler";
+import { errorHandler } from "../errorHandler";
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 
@@ -17,7 +17,7 @@ export async function addToDashboard(event: any) {
     .then(async (res: any) => {
       if (!res.ok) {
         res = await res.json();
-        ErrorHandler(
+        errorHandler(
           event.locals.user?.personId,
           "Error while adding to dashboard",
           res
@@ -31,10 +31,10 @@ export async function addToDashboard(event: any) {
       );
     })
     .catch((err: any) => {
-      ErrorHandler(
+      errorHandler(
         event.locals.user?.personId,
         "Error while adding to dashboard",
-        res
+        err
       );
       throw error(500, "Error while adding to dashboard");
     });

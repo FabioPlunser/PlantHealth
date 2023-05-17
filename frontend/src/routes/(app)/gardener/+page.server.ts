@@ -2,7 +2,7 @@ import { BACKEND_URL } from "$env/static/private";
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 
-import { ErrorHandler } from "$helper/errorHandler";
+import { errorHandler } from "$helper/errorHandler";
 import { logger } from "$helper/logger";
 import { toasts } from "$stores/toastStore";
 
@@ -11,7 +11,7 @@ import {
   getSensorStationData,
   getSensorStationPictures,
   getSensorStationLimits,
-} from "$helper/SensorStation";
+} from "$helper/sensorStation";
 
 export async function load(event) {
   const { cookies, fetch } = event;
@@ -38,7 +38,7 @@ export async function load(event) {
   let data = await fetch(`${BACKEND_URL}/get-dashboard`)
     .then(async (res) => {
       if (!res.ok) {
-        ErrorHandler(
+        errorHandler(
           event.locals.user?.personId,
           "Error while fetching dashboard sensor stations",
           await res.json()
@@ -47,12 +47,12 @@ export async function load(event) {
       return await res.json();
     })
     .catch((e) => {
-      ErrorHandler(
+      errorHandler(
         event.locals.user?.personId,
         "Error while fetching dashboard sensor stations",
         e
       );
-      return null;
+      throw error(500, "Error while fetching dashboard sensor stations");
     });
 
   let dashBoardSensorStations = data?.addedSensorStations;
@@ -69,7 +69,7 @@ export async function load(event) {
 
       resolve(dashBoardSensorStations);
     }).catch((e) => {
-      ErrorHandler(
+      errorHandler(
         event.locals.user?.personId,
         "Error while fetching dashboard sensor stations",
         e
@@ -100,12 +100,12 @@ export async function load(event) {
       }
       resolve(assignedSensorStations);
     }).catch((e) => {
-      ErrorHandler(
+      errorHandler(
         event.locals.user?.personId ?? "unknown",
         "Error while fetching dashboard sensor stations",
         e
       );
-      return null;
+      throw error(500, "Error while fetching dashboard sensor stations");
     });
   }
 

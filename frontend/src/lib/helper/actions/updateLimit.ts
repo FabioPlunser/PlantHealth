@@ -1,7 +1,7 @@
 import { BACKEND_URL } from "$env/static/private";
 import { logger } from "../logger";
 import { toasts } from "$stores/toastStore";
-import { ErrorHandler } from "../errorHandler";
+import { errorHandler } from "../errorHandler";
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 
@@ -74,7 +74,7 @@ export async function updateLimit(event: any) {
     .then(async (res: any) => {
       if (!res.ok) {
         res = await res.json();
-        ErrorHandler(
+        errorHandler(
           event.locals.user?.personId,
           "Error while updating limit",
           res
@@ -84,10 +84,10 @@ export async function updateLimit(event: any) {
       toasts.addToast(event.locals.user?.personId, "success", "Limit updated");
     })
     .catch((e: any) => {
-      ErrorHandler(
+      errorHandler(
         event.locals.user?.personId,
         "Error while updating limit",
-        res
+        e
       );
       throw error(500, "Error while updating limit");
     });

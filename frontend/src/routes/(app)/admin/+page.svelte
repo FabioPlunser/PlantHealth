@@ -5,7 +5,7 @@
   import {
     SensorStationsModal,
     SensorStation,
-  } from "$lib/components/ui/SensorStation/index.js";
+  } from "$components/ui/sensorStation";
   // import SensorStation from "./SensorStation.svelte";
   // ---------------------------------------------------------
   // ---------------------------------------------------------
@@ -43,7 +43,7 @@
 </script>
 
 {#if rendered}
-  <section class="w-full h-full">
+  <section class="w-full h-full mt-4">
     <div class="flex justify-center gap-6" in:fly={{ y: -200, duration: 400 }}>
       {#each infoBadges as badges}
         <div

@@ -1,7 +1,7 @@
 import { BACKEND_URL } from "$env/static/private";
 import { logger } from "../logger";
 import { toasts } from "$stores/toastStore";
-import { ErrorHandler } from "../errorHandler";
+import { errorHandler } from "../errorHandler";
 import { error } from "@sveltejs/kit";
 
 export async function deletePicture(event: any) {
@@ -22,7 +22,7 @@ export async function deletePicture(event: any) {
     .then(async (res: any) => {
       if (!res.ok) {
         res = await res.json();
-        ErrorHandler(
+        errorHandler(
           event.locals.user?.personId,
           "Error while deleting picture",
           res
@@ -35,8 +35,8 @@ export async function deletePicture(event: any) {
         "Picture deleted"
       );
     })
-    .catch((e) => {
-      ErrorHandler(
+    .catch((e: any) => {
+      errorHandler(
         event.locals.user?.personId,
         "Error while deleting picture",
         e
