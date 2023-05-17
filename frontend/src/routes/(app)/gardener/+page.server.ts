@@ -2,11 +2,16 @@ import { BACKEND_URL } from "$env/static/private";
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 
+import { ErrorHandler } from "$helper/errorHandler";
 import { logger } from "$helper/logger";
 import { toasts } from "$stores/toastStore";
 
-import { getSensorStationData } from "./getData";
-import { getSensorStationPictures } from "./getPictures";
+import {
+  getAllSensorStations,
+  getSensorStationData,
+  getSensorStationPictures,
+  getSensorStationLimits,
+} from "$helper/SensorStation";
 
 export async function load(event) {
   const { cookies, fetch } = event;
@@ -21,262 +26,99 @@ export async function load(event) {
     from = new Date(cookieFrom);
     to = new Date(cookieTo);
   }
+
+  let dates = {
+    from: from,
+    to: to,
+  };
+
   //---------------------------------------------------------------------
   // get all sensor stations available to add to dashboard
   //---------------------------------------------------------------------
-  let allSensorStations = new Promise(async (resolve, reject) => {
-    await fetch(`${BACKEND_URL}/get-sensor-stations`)
-      .then(async (res) => {
-        if (!res.ok) {
-          logger.error(
-            `Error while fetching sensor stations: ${res.status} ${res.statusText}`
-          );
-          toasts.addToast(
-            event.locals.user?.personId,
-            "error",
-            "Error while fetching sensor stations"
-          );
-          reject(null);
-        }
-        let data = await res.json();
-        let sensorStations = data.sensorStations;
-        //---------------------------------------------------------------------
-        // get newest picture for possible sensor stations
-        //---------------------------------------------------------------------
-        for (let foundSensorStation of sensorStations) {
-          foundSensorStation.newestPicture = new Promise(
-            async (resolve, reject) => {
-              await fetch(
-                `${BACKEND_URL}/get-newest-sensor-station-picture?sensorStationId=${foundSensorStation.sensorStationId}`
-              )
-                .then(async (pictureResponse) => {
-                  if (!pictureResponse.ok) {
-                    logger.error(
-                      `Error while fetching sensor station picture: ${pictureResponse.status} ${pictureResponse.statusText}`
-                    );
-                    toasts.addToast(
-                      event.locals.user?.personId,
-                      "error",
-                      "Error while fetching sensor station picture"
-                    );
-                    resolve(null);
-                  }
-                  let blob = await pictureResponse.blob();
-                  let file = new File([blob], "image", { type: blob.type });
-                  let arrayBuffer = await blob.arrayBuffer();
-                  let buffer = Buffer.from(arrayBuffer);
-                  let encodedImage =
-                    "data:image/" +
-                    blob.type +
-                    ";base64," +
-                    buffer.toString("base64");
-                  resolve(encodedImage);
-                })
-                .catch((e) => {
-                  logger.error("Error while fetching sensor station picture", {
-                    e,
-                  });
-                  toasts.addToast(
-                    event.locals.user?.personId,
-                    "error",
-                    "Error while fetching sensor station picture"
-                  );
-                  reject(null);
-                });
-            }
-          );
-        }
-        resolve(sensorStations);
-      })
-      .catch((e) => {
-        logger.error("Error while fetching sensor stations", { payload: e });
-        toasts.addToast(
+  let data = await fetch(`${BACKEND_URL}/get-dashboard`)
+    .then(async (res) => {
+      if (!res.ok) {
+        ErrorHandler(
           event.locals.user?.personId,
-          "error",
-          "Error while fetching sensor stations"
+          "Error while fetching dashboard sensor stations",
+          await res.json()
         );
-        reject(null);
-      });
-  });
-  //---------------------------------------------------------------------
-  // get all sensor stations in dashboard or assigned to gardener
-  //---------------------------------------------------------------------
-  let res = await fetch(`${BACKEND_URL}/get-dashboard`);
-  if (!res.ok) {
-    logger.error(
-      `Error while fetching dashboard data: ${res.status} ${res.statusText}`
-    );
-    throw error(res.status, "Error while fetching dashboard data");
-  }
-  let dashboard = await res.json();
-  //---------------------------------------------------------------------
-  //
-  //---------------------------------------------------------------------
-  for (let sensorStation of dashboard.addedSensorStations) {
-    getSensorStationData(event, fetch, sensorStation, from, to);
-    getSensorStationPictures(event, fetch, sensorStation);
-  }
-  //---------------------------------------------------------------------
-  // Iterate through all assigned sensor stations and get alle pictures and data as a promise
-  //---------------------------------------------------------------------
-  for (let sensorStation of dashboard.assignedSensorStations) {
-    //---------------------------------------------------------------------
-    // Get sensor station data
-    //---------------------------------------------------------------------
-    sensorStation.data = new Promise(async (resolve, reject) => {
-      await fetch(
-        `${BACKEND_URL}/get-sensor-station-data?sensorStationId=${
-          sensorStation.sensorStationId
-        }&from=${from.toISOString().split(".")[0]}&to=${
-          to.toISOString().split(".")[0]
-        }`
-      )
-        .then(async (res) => {
-          let data = await res.json();
-          resolve(data);
-        })
-        .catch((e) => {
-          logger.error("Error while fetching sensor station data", {
-            payload: e,
-          });
-          toasts.addToast(
-            event.locals.user?.personId,
-            "error",
-            "Error while fetching sensor station data"
-          );
-          reject(e);
-        });
+      }
+      return await res.json();
+    })
+    .catch((e) => {
+      ErrorHandler(
+        event.locals.user?.personId,
+        "Error while fetching dashboard sensor stations",
+        e
+      );
+      return null;
     });
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    sensorStation.limits = new Promise(async (resolve, reject) => {
-      await fetch(
-        `${BACKEND_URL}/get-sensor-station?sensorStationId=${sensorStation.sensorStationId}`
-      )
-        .then(async (res) => {
-          let data = await res.json();
-          resolve(data.sensorStation.sensorLimits);
-        })
-        .catch((e) => {
-          logger.error("Error while fetching sensor station data", {
-            payload: e,
-          });
-          toasts.addToast(
-            event.locals.user?.personId,
-            "error",
-            "Error while fetching sensor station data"
-          );
-          reject(e);
-        });
-    });
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    let possiblePictures: any[] = [];
-    sensorStation.pictures = [];
-    await fetch(
-      `${BACKEND_URL}/get-sensor-station-pictures?sensorStationId=${sensorStation.sensorStationId}`
-    )
-      .then(async (res) => {
-        if (!res.ok) {
-          logger.error("Error while fetching sensor station pictures", {
-            payload: res,
-          });
-          toasts.addToast(
-            event.locals.user?.personId,
-            "error",
-            "Error while fetching sensor station pictures"
-          );
-          possiblePictures = [];
-        }
-        let data = await res.json();
-        possiblePictures = data.pictures;
-      })
-      .catch((e) => {
-        logger.error("Error while fetching sensor station pictures", {
-          payload: e,
-        });
-        toasts.addToast(
-          event.locals.user?.personId,
-          "error",
-          "Error while fetching sensor station pictures"
+
+  let dashBoardSensorStations = data?.addedSensorStations;
+  async function getDashBoardSensorStations(): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      if (dashBoardSensorStations.length == 0) resolve([]);
+      for (let sensorStation of dashBoardSensorStations) {
+        sensorStation.data = getSensorStationData(event, sensorStation, dates);
+        sensorStation.pictures = await getSensorStationPictures(
+          event,
+          sensorStation
         );
-        possiblePictures = [];
-        throw error(500, "Error while fetching sensor station pictures");
-      });
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    if (!possiblePictures) {
-      sensorStation.pictures = [];
-      continue;
-    }
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
-    for (let picture of possiblePictures) {
-      let picturePromise = new Promise(async (resolve, reject) => {
-        await fetch(
-          `${BACKEND_URL}/get-sensor-station-picture?pictureId=${picture.pictureId}`
-        )
-          .then(async (res) => {
-            if (!res.ok) {
-              res = await res.json();
-              logger.error("Error while fetching picture", { payload: res });
-              toasts.addToast(
-                event.locals.user?.personId,
-                "error",
-                "Error while fetching picture"
-              );
-              resolve(null);
-            }
-            let blob = await res.blob();
-            let file = new File([blob], picture.pictureId, { type: blob.type });
-            let arrayBuffer = await blob.arrayBuffer();
-            let buffer = Buffer.from(arrayBuffer);
-            let encodedImage =
-              "data:image/" +
-              file.type +
-              ";base64," +
-              buffer.toString("base64");
-            let newPicture: Picture = {
-              pictureId: picture.pictureId,
-              imageRef: encodedImage,
-              creationDate: new Date(picture.timeStamp),
-            };
-            resolve(newPicture);
-          })
-          .catch((e) => {
-            logger.error("Error while fetching picture", { payload: e });
-            toasts.addToast(
-              event.locals.user?.personId,
-              "error",
-              "Error while fetching picture"
-            );
-            reject(null);
-          });
-      });
-      let sensorStationPicture: any = {
-        pictureId: picture.pictureId,
-        promise: picturePromise,
-      };
-      sensorStation.pictures.push(sensorStationPicture);
-    }
-    //---------------------------------------------------------------------
-    //---------------------------------------------------------------------
+      }
+
+      resolve(dashBoardSensorStations);
+    }).catch((e) => {
+      ErrorHandler(
+        event.locals.user?.personId,
+        "Error while fetching dashboard sensor stations",
+        e
+      );
+      return null;
+    });
+  }
+
+  let assignedSensorStations = data?.assignedSensorStations;
+  async function getAssignedSensorStations(): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      if (assignedSensorStations.length == 0)
+        reject("No assigned sensor stations found");
+      for (let assignedSensorStation of assignedSensorStations) {
+        assignedSensorStation.data = getSensorStationData(
+          event,
+          assignedSensorStation,
+          dates
+        );
+        assignedSensorStation.pictures = await getSensorStationPictures(
+          event,
+          assignedSensorStation
+        );
+        assignedSensorStation.limits = getSensorStationLimits(
+          event,
+          assignedSensorStation
+        );
+      }
+      resolve(assignedSensorStations);
+    }).catch((e) => {
+      ErrorHandler(
+        event.locals.user?.personId,
+        "Error while fetching dashboard sensor stations",
+        e
+      );
+      return null;
+    });
   }
 
   return {
+    dates,
     streamed: {
-      sensorStations: allSensorStations,
-      dashboard: dashboard,
-    },
-    dates: {
-      from,
-      to,
+      allSensorStations: getAllSensorStations(event),
+      dashBoardSensorStations: getDashBoardSensorStations(),
+      assignedSensorStations: getAssignedSensorStations(),
     },
   };
 }
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 

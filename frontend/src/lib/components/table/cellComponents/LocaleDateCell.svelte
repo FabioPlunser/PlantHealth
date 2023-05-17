@@ -2,4 +2,4 @@
   export let date: Date;
 </script>
 
-<span>{date.toLocaleDateString()}</span>
+<span>{date.toLocaleString("de-DE")}</span>

@@ -1,5 +1,5 @@
 import { BACKEND_URL } from "$env/static/private";
-import { ErrorHandler } from "./errorHandler";
+import { ErrorHandler } from "../errorHandler";
 
 type Dates = {
   from: Date;

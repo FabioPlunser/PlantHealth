@@ -160,10 +160,10 @@
                 <div class="carousel space-x-4">
                   {#if sensorStation.pictures}
                     {#if sensorStation.pictures.length > 0}
-                      {#each sensorStation?.pictures as picture}
-                        {#await picture}
+                      {#each sensorStation?.pictures as picture, i (picture.pictureId)}
+                        {#await picture.promise}
                           <Spinner fill="fill-primary" />
-                        {:then data}}
+                        {:then data}
                           <div class="carousel-item">
                             <div>
                               <!-- svelte-ignore a11y-click-events-have-key-events -->

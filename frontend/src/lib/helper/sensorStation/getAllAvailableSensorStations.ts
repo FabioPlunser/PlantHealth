@@ -1,5 +1,5 @@
 import { BACKEND_URL } from "$env/static/private";
-import { ErrorHandler } from "./errorHandler";
+import { ErrorHandler } from "../errorHandler";
 
 export async function getAllSensorStations(event: any): Promise<any> {
   return new Promise(async (resolve, reject) => {

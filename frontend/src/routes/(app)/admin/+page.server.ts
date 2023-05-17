@@ -3,7 +3,7 @@ import type { Actions } from "./$types";
 import { redirect } from "@sveltejs/kit";
 import { logger } from "$helper/logger";
 import { toasts } from "$stores/toastStore";
-import { ErrorHandler } from "$helper/SensorStation/errorHandler";
+import { ErrorHandler } from "$lib/helper/errorHandler";
 
 import {
   getAllSensorStations,
@@ -39,70 +39,6 @@ export async function load(event) {
     from: from,
     to: to,
   };
-  //---------------------------------------------------------------------
-  /**
-   * Get all available sensor stations to be added to the dashboard
-   */
-  //---------------------------------------------------------------------
-
-  // let allSensorStations = new Promise(async (resolve, reject) => {
-  //   await fetch(`${BACKEND_URL}/get-sensor-stations`)
-  //     .then(async (res) => {
-  //       if (!res.ok) {
-  //         logger.error("Error while fetching all sensor stations");
-  //         toasts.addToast(
-  //           event.locals.user?.personId,
-  //           "error",
-  //           "Error while fetching sensor stations"
-  //         );
-  //         reject(await res.json());
-  //       }
-  //       let data = await res.json();
-  //       let sensorStations = data?.sensorStations;
-  //       //---------------------------------------------------------------------
-  //       // get newest picture of sensor stations
-  //       //---------------------------------------------------------------------
-  //       if (sensorStations.length === 0) resolve([]);
-  //       for (let sensorStation of sensorStations) {
-  //         sensorStation.newestPicture = new Promise(async (resolve, reject) => {
-  //           await fetch(
-  //             `${BACKEND_URL}/get-newest-sensor-station-picture?sensorStationId=${sensorStation.sensorStationId}`
-  //           )
-  //             .then(async (res) => {
-  //               if (!res.ok) {
-  //                 logger.error("Error while fetching newest picture");
-  //                 resolve(null);
-  //               }
-  //               let blob = await res.blob();
-  //               let file = new File([blob], "image", { type: blob.type });
-  //               let arrayBuffer = await blob.arrayBuffer();
-  //               let buffer = Buffer.from(arrayBuffer);
-  //               let encodedImage =
-  //                 "data:image/" +
-  //                 blob.type +
-  //                 ";base64," +
-  //                 buffer.toString("base64");
-  //               resolve(encodedImage);
-  //             })
-  //             .catch((err) => {
-  //               // logger.error("Error while fetching newest picture");
-  //               // toasts.addToast(event.locals.user?.personId, "error", "Error while fetching newest picture");
-  //               resolve(null);
-  //             });
-  //         });
-  //       }
-  //       resolve(sensorStations);
-  //     })
-  //     .catch((err) => {
-  //       logger.error("Error while fetching all sensor stations");
-  //       toasts.addToast(
-  //         event.locals.user?.personId,
-  //         "error",
-  //         "Error while fetching sensor stations"
-  //       );
-  //       reject(err);
-  //     });
-  // });
   //---------------------------------------------------------------------
   // get all sensor stations in dashboard
   //---------------------------------------------------------------------

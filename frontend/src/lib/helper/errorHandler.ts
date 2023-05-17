@@ -1,4 +1,4 @@
-import { logger } from "../logger";
+import { logger } from "./logger";
 import { toasts } from "$stores/toastStore";
 
 export async function ErrorHandler(

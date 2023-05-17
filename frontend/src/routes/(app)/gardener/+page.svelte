@@ -1,6 +1,7 @@
 <script lang="ts">
   import { fly } from "svelte/transition";
-  import { enhance, type SubmitFunction } from "$app/forms";
+  import { enhance } from "$app/forms";
+  import type { SubmitFunction } from "$app/forms";
   // ---------------------------------------------------
   // ---------------------------------------------------
   import Graphs from "$components/graph/Graphs.svelte";
@@ -22,8 +23,6 @@
   // ---------------------------------------------------
   // ---------------------------------------------------
   import { onMount } from "svelte";
-  import { add } from "$lib/components/toast/core/store";
-  import UploadPicture from "./uploadPicture.svelte";
   let rendered = false;
   onMount(() => {
     rendered = true;
@@ -31,18 +30,18 @@
   // ---------------------------------------------------
   // ---------------------------------------------------
   export let data;
+  $: console.log(data);
   export let form;
 
-  let sensorStations: any[] = [];
-  $: {
-    data.streamed.sensorStations.then((res: any) => {
-      sensorStations = res;
-    });
-  }
+  // let sensorStations: any[] = [];
+  // $: {
+  //   data.streamed.sensorStations.then((res: any) => {
+  //     sensorStations = res;
+  //   });
+  // }
   // ---------------------------------------------------
   // ---------------------------------------------------
-  let loading = false;
-  let assignedAdded = true;
+  let assignedAdded = false;
   let showPicture = false;
   let selectedPicture: any = null;
   let newDates = data.dates;
@@ -52,6 +51,7 @@
   let sensorStationsModal = false;
   // ---------------------------------------------------
   // ---------------------------------------------------
+  let loading = true;
   const customEnhance: SubmitFunction = () => {
     loading = true;
     return async ({ update }) => {
@@ -61,23 +61,19 @@
   };
   // ---------------------------------------------------
   // ---------------------------------------------------
-  // let sensorStationsData = {
-  //   dates: data.dates,
-  //   sensorStations: data.dashboard.assignedSensorStations
-  // }
+  $: sensorStationsData = {
+    dates: data.dates,
+    sensorStations: data.streamed.assignedSensorStations,
+  };
+  // ---------------------------------------------------
+  // ---------------------------------------------------
 </script>
 
-<!-- 
 {#if rendered}
   <BigPictureModal
     bind:imageRef={selectedPicture}
     bind:open={showPicture}
     on:close={() => (showPicture = false)}
-  />
-  <SensorStationsModal
-    data={sensorStations}
-    bind:showModal={sensorStationsModal}
-    on:close={() => (sensorStationsModal = false)}
   />
 
   <section class="mt-12">
@@ -96,29 +92,48 @@
       >
     </div>
     {#if !assignedAdded}
-      <div class="flex justify-center mb-5">
-        <button
-          class="btn btn-primary"
-          on:click={() => {
-            sensorStationsModal = true;
-          }}>SensorStations</button
-        >
-      </div>
-      {#if data.dashboard.addedSensorStations.length === 0}
-        <div class="flex justify-center h-screen">
-          <p class="text-xl font-bold">No SensorStations added yet</p>
+      {#await data.streamed.allSensorStations}
+        <Spinner />
+      {:then sensorStations}
+        <SensorStationsModal
+          data={sensorStations}
+          bind:showModal={sensorStationsModal}
+          on:close={() => (sensorStationsModal = false)}
+        />
+        <div class="flex justify-center mb-5">
+          <button
+            class="btn btn-primary"
+            on:click={() => {
+              sensorStationsModal = true;
+            }}>SensorStations</button
+          >
         </div>
-      {/if}
-      <div class="grid grid-rows gap-2">
-        {#each data.dashboard.addedSensorStations as sensorStation, i (sensorStation.sensorStationId)}
-          <div in:fly={{ y: -200, duration: 200, delay: 200 * i }}>
-            <SensorStation {sensorStation} dates={data.dates} />
+      {:catch err}
+        <p class="text-red">{err}</p>
+      {/await}
+
+      {#await data.streamed.dashBoardSensorStations}
+        <Spinner />
+      {:then sensorStations}
+        {#if sensorStations.length === 0}
+          <div class="flex justify-center h-screen">
+            <p class="text-xl font-bold">No SensorStations added yet</p>
           </div>
-        {/each}
-      </div>
+        {/if}
+        <div class="grid grid-rows gap-2">
+          {#each sensorStations as sensorStation, i (sensorStation.sensorStationId)}
+            <div in:fly={{ y: -200, duration: 200, delay: 200 * i }}>
+              <SensorStation {sensorStation} dates={data.dates} />
+            </div>
+          {/each}
+        </div>
+      {:catch err}
+        <p class="text-red">{err}</p>
+      {/await}
     {/if}
+
     {#if assignedAdded}
-      <SensorStationDetail data={sensorStationsData} {form}/>
+      <SensorStationDetail data={sensorStationsData} {form} />
     {/if}
   </section>
-{/if} -->
+{/if}

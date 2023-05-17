@@ -1,5 +1,5 @@
 import { BACKEND_URL } from "$env/static/private";
-import { ErrorHandler } from "./errorHandler";
+import { ErrorHandler } from "../errorHandler";
 
 type Dates = {
   from: Date;
@@ -34,12 +34,12 @@ export async function getSensorStationPictures(
       );
     });
 
-  let picturePromises: Promise<any>[] = [];
+  let picturePromises: any[] = [];
 
   for (let possiblePicture of possiblePictures) {
     let picturePromise = new Promise(async (resolve, reject) => {
       await fetch(
-        `${BACKEND_URL}/get-sensor-station-picturepictureId=${possiblePicture.pictureId}`
+        `${BACKEND_URL}/get-sensor-station-picture?pictureId=${possiblePicture.pictureId}`
       )
         .then(async (res: any) => {
           if (!res.ok) {
@@ -80,8 +80,11 @@ export async function getSensorStationPictures(
         err
       );
     });
-    picturePromises.push(picturePromise);
+    let picture = {
+      pictureId: possiblePicture.pictureId,
+      promise: picturePromise,
+    };
+    picturePromises.push(picture);
   }
-
   return picturePromises;
 }
