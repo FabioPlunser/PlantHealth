@@ -309,7 +309,7 @@ unsigned long handleNotificationIfPresent(bool notificationPresent) {
 									   TIME_CHECK_BLE_CENTRAL_PRESENT_MS -
 										   (millis() - startNotificationCheck)
 		) {
-			DEBUG_PRINTF_POS(2, "Will wait for %ld ms\n", timeTillNext);
+			DEBUG_PRINTF_POS(3, "Will wait for %ld ms\n", timeTillNext);
 			delay(timeTillNext);
 			timeTillNext = notificationHandler->update();
 		}
