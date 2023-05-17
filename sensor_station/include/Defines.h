@@ -16,7 +16,7 @@
  * 3 -> Even more notifications. (Not used so far)
  * 4 -> Full call stack of every function call. (Not implemented so far)
  */
-#define DEBUG_PRINT_LEVEL 2
+#define DEBUG_PRINT_LEVEL 0
 
 /* If DO_HARDWARE_TEST is defined the hardware tests will be executet to test
  all the connected devices of the Arduino. Otherwise the main programm will be
@@ -62,7 +62,7 @@
  * Determins if the pizeo buzzer will output sound if a notification is present.
  * If ALWAYS_IN_SILEND_MODE is set to TRUE this will have no effect.
  */
-#define USE_PIEZO_BUZZER					   FALSE
+#define USE_PIEZO_BUZZER					   TRUE
 
 // ---------------------------
 // |    Predefined Values    |
@@ -77,7 +77,7 @@
 #define UPDATE_INTERVAL_BME680_MS_MAX		   1000
 #define DURATION_IN_PAIRING_MODE_MS			   (5 * 60'000)
 #define TIME_CHECK_BLE_CENTRAL_PRESENT_MS	   1000
-#define TIMEOUT_TIME_BLE_CONNECTION_MS		   500'000
+#define TIMEOUT_TIME_BLE_CONNECTION_MS		   (30 * 1000)
 #define TIME_IN_NOTIFICATION_SILENCE_MODE_MS   (30 * 60'000)
 #define TIME_BETWEEN_SENSOR_MEASUREMENTS_MIN_S 30
 #define TIME_BETWEEN_SENSOR_MEASUREMENTS_MAX_S (5 * 60)
