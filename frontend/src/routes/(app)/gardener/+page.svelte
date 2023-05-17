@@ -4,22 +4,13 @@
   import type { SubmitFunction } from "$app/forms";
   // ---------------------------------------------------
   // ---------------------------------------------------
-  import Graphs from "$components/graph/Graphs.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
-  import DateInput from "$components/datepicker/DateInput.svelte";
   import BigPictureModal from "$components/ui/BigPictureModal.svelte";
-  import Input from "$components/ui/Input.svelte";
-  import Table from "$components/table/Table.svelte";
-  import LimitsCard from "$lib/components/ui/SensorStation/LimitsCard.svelte";
-  import FormError from "$components/ui/FormError.svelte";
   import {
     SensorStationsModal,
     SensorStation,
     SensorStationDetail,
   } from "$components/ui/SensorStation";
-  import { flexRender, type ColumnDef } from "@tanstack/svelte-table";
-  import { TextCell } from "$components/table/cellComponents";
-
   // ---------------------------------------------------
   // ---------------------------------------------------
   import { onMount } from "svelte";
@@ -32,33 +23,12 @@
   export let data;
   $: console.log(data);
   export let form;
-
-  // let sensorStations: any[] = [];
-  // $: {
-  //   data.streamed.sensorStations.then((res: any) => {
-  //     sensorStations = res;
-  //   });
-  // }
   // ---------------------------------------------------
   // ---------------------------------------------------
   let assignedAdded = false;
   let showPicture = false;
   let selectedPicture: any = null;
-  let newDates = data.dates;
-  let dateNow = new Date(Date.now()).toLocaleDateString();
-  let state = "graph";
-  let limitsTable = false;
   let sensorStationsModal = false;
-  // ---------------------------------------------------
-  // ---------------------------------------------------
-  let loading = true;
-  const customEnhance: SubmitFunction = () => {
-    loading = true;
-    return async ({ update }) => {
-      await update({ reset: false });
-      loading = false;
-    };
-  };
   // ---------------------------------------------------
   // ---------------------------------------------------
   $: sensorStationsData = {

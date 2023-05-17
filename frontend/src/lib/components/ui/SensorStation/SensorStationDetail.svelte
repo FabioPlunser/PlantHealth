@@ -77,10 +77,15 @@
   // ---------------------------------------------------
   // ---------------------------------------------------
   let sensorStations: any[] = [];
-  $: data.sensorStations.then((res: any) => {
-    sensorStations = res;
-  });
-
+  $: {
+    if (data.sensorStations instanceof Promise) {
+      data.sensorStations.then((res: any) => {
+        sensorStations = res;
+      });
+    } else {
+      sensorStations = data.sensorStations;
+    }
+  }
   let search = "";
 </script>
 

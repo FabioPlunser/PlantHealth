@@ -23,180 +23,69 @@ export async function load({ fetch, request, depends, url }) {
     fromAccessPoints = true;
   }
 
-  let res = await fetch(`${BACKEND_URL}/get-all-sensor-stations`);
-  if (!res.ok) {
-    logger.error("Could not get sensor stations");
-    throw error(res.status, "Could not get sensor stations");
-  }
-  res = await res.json();
-  logger.info("Got sensor stations");
-
-  let gardener = await fetch(`${BACKEND_URL}/get-all-gardener`);
-  if (!gardener.ok) {
-    logger.error("Could not get gardener");
-    throw error(gardener.status, "Could not get gardener");
-  } else {
-    gardener = await gardener.json();
-    gardener = gardener.items;
-  }
-
   depends("app:getSensorStations");
+
+  let getSensorStations = await fetch(`${BACKEND_URL}/get-all-sensor-stations`)
+    .then(async (res) => {
+      if (!res.ok) {
+        logger.error("Could not get sensor stations");
+        throw error(res.status, "Could not get sensor stations");
+      }
+      let data = await res.json();
+      return data.sensorStations;
+    })
+    .catch((err) => {
+      logger.error("Could not get sensor stations");
+      throw error(500, "Could not get sensor stations");
+    });
+
+  let gardener = await fetch(`${BACKEND_URL}/get-all-gardener`)
+    .then(async (res) => {
+      if (!res.ok) {
+        logger.error("Could not get gardener");
+        throw error(res.status, "Could not get gardener");
+      }
+      let data = await res.json();
+      return data.items;
+    })
+    .catch((err) => {
+      logger.error("Could not get gardener");
+      throw error(500, "Could not get gardener");
+    });
+
   return {
     fromAccessPoints,
     gardener,
-    sensorStations: res.sensorStations,
+    streamed: {
+      sensorStations: getSensorStations,
+    },
   };
 }
 
-const nameSchema = z.object({
-  name: z
-    .string({ required_error: "Name is required" })
-    .min(1, { message: "Name is required" })
-    .max(32, { message: "Name must be less than 32 characters" })
-    .trim(),
-});
+//-------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------
+import {
+  deleteSensorStation,
+  updateSensorStation,
+  unlockSensorStation,
+} from "$helper/actions";
+
 export const actions = {
-  // TODO: add validation and error handling (toast messages)
-  unlock: async ({ request, fetch }) => {
-    const formData = await request.formData();
-    let sensorStationId = formData.get("sensorStationId");
-    let unlocked = formData.get("unlocked");
-
-    let params = new URLSearchParams();
-    params.set("sensorStationId", sensorStationId?.toString() ?? "");
-    params.set("unlocked", unlocked?.toString() ?? "");
-
-    let parametersString = "?" + params.toString();
-    await fetch(
-      `${BACKEND_URL}/set-unlocked-sensor-station${parametersString}`,
-      {
-        method: "POST",
-      }
-    ).then((response: any) => {
-      let time = new Date().toLocaleString();
-      if (!response.ok) {
-        logger.error("sensor-station-page", { payload: response });
-        throw error(response.status, response.statusText);
-      } else {
-        logger.info(
-          `unlocked set to = ${unlocked} for sensor station with id = ${sensorStationId}`
-        );
-      }
-    });
+  unlock: async (event) => {
+    await unlockSensorStation(event);
   },
-  update: async ({ request, fetch, locals }) => {
-    const formData = await request.formData();
-    const zodData = nameSchema.safeParse(Object.fromEntries(formData));
-
-    // validate name input
-    if (!zodData.success) {
-      // Loop through the errors array and create a custom errors array
-      const errors = zodData.error.errors.map((error) => {
-        return {
-          field: error.path[0],
-          message: error.message,
-        };
-      });
-
-      return fail(400, { error: true, errors });
-    }
-
-    let sensorStationId: string = String(formData.get("sensorStationId"));
-    let sensorStationName: string = String(formData.get("name"));
-    let params = new URLSearchParams();
-
-    params.set("sensorStationId", sensorStationId);
-    params.set("sensorStationName", sensorStationName);
-
-    let parametersString = "?" + params.toString();
-
-    await fetch(`${BACKEND_URL}/update-sensor-station${parametersString}`, {
-      method: "POST",
-      body: JSON.stringify({
-        limits: [],
-      }),
-    }).then((response) => {
-      if (!response.ok) {
-        logger.error("sensor-station-page", { payload: response });
-        toasts.addToast(
-          locals.user.personId,
-          "error",
-          `Failed to update name: ${response.status} ${response.message}`
-        );
-      } else {
-        logger.info(
-          `updated sensor station name for sensor station with id = ${sensorStationId} to name = ${sensorStationName}`
-        );
-        toasts.addToast(
-          locals.user.personId,
-          "success",
-          "Updated sensor station name"
-        );
-      }
-    });
-
-    let unassign = Boolean(formData.get("delete"));
-    let gardenerId = String(formData.get("gardener"));
-
-    params = new URLSearchParams();
-    params.set("sensorStationId", sensorStationId);
-    params.set("gardenerId", gardenerId);
-
-    if (unassign) {
-      params.set("delete", true.toString());
-    }
-
-    let res = await fetch(
-      `${BACKEND_URL}/assign-gardener-to-sensor-station?${params.toString()}`,
-      {
-        method: "POST",
-      }
-    );
-    if (!res.ok) {
-      logger.error("Could not assign gardener to sensor station");
-      throw error(res.status, "Could not assign gardener to sensor station");
-    } else {
-      if (unassign) {
-        logger.info("Unassigned gardener from sensor station");
-        toasts.addToast(
-          locals.user.personId,
-          "success",
-          "Unassigned gardener from sensor station"
-        );
-      } else {
-        logger.info("Assigned gardener to sensor station");
-        toasts.addToast(
-          locals.user.personId,
-          "success",
-          "Assigned gardener to sensor station"
-        );
-      }
-    }
+  //---------------------------------------------------------------------
+  //
+  //---------------------------------------------------------------------
+  update: async (event) => {
+    await updateSensorStation(event);
   },
+  //---------------------------------------------------------------------
+  //
+  //---------------------------------------------------------------------
   delete: async ({ request, fetch, locals }) => {
-    let formData = await request.formData();
-    let sensorStationId = String(formData.get("sensorStationId"));
-    let params = new URLSearchParams();
-    params.set("sensorStationId", sensorStationId?.toString());
-
-    await fetch(`${BACKEND_URL}/delete-sensor-station?${params.toString()}`, {
-      method: "DELETE",
-    }).then((response) => {
-      if (!response.ok) {
-        logger.error("sensor-station-page", { payload: response });
-        toasts.addToast(
-          locals.user.personId,
-          "error",
-          `Failed to delete sensor station: ${response.status} ${response.message}`
-        );
-      } else {
-        logger.info(`Deleted sensor station = ${sensorStationId}`);
-        toasts.addToast(
-          locals.user.personId,
-          "success",
-          "Deleted sensor station"
-        );
-      }
-    });
+    await deleteSensorStation({ request, fetch, locals });
   },
 };

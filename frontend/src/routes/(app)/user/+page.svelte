@@ -3,14 +3,13 @@
   //---------------------------------------------------
   //---------------------------------------------------
   import SensorstationModal from "./SensorstationModal.svelte";
-  import SensorStation from "./SensorStation.svelte";
-  import DatePicker from "$lib/components/datepicker/DatePicker.svelte";
+  import SensorStation from "$components/ui/SensorStation/SensorStation.svelte";
+  import Spinner from "$components/ui/Spinner.svelte";
   //---------------------------------------------------
   //---------------------------------------------------
   export let data;
   //---------------------------------------------------
   //---------------------------------------------------
-  // initial animations
   import { onMount } from "svelte";
   let rendered = false;
   onMount(() => {
@@ -24,38 +23,47 @@
 </script>
 
 {#if rendered}
-  <SensorstationModal
-    data={data?.sensorStations}
-    bind:showModal={sensorStationModel}
-    on:close={() => (sensorStationModel = false)}
-  />
-
   <section>
-    <div class="flex justify-center">
-      <button
-        class="btn btn-primary"
-        on:click={() => (sensorStationModel = true)}>SensorStations</button
-      >
-    </div>
+    {#await data.streamed.allSensorStations}
+      <Spinner />
+    {:then sensorStations}
+      <SensorstationModal
+        data={sensorStations}
+        bind:showModal={sensorStationModel}
+        on:close={() => (sensorStationModel = false)}
+      />
 
-    <div class="flex justify-center mt-20">
-      <div class="gap-4 grid jusitfy-center w-full">
-        {#each data?.dashboard?.sensorStations as sensorStation, i (sensorStation.sensorStationId)}
-          <div
-            in:fly={{ y: -200, duration: 200, delay: 200 * i }}
-            out:fly={{ y: -200, duration: 200 }}
-          >
-            <SensorStation {sensorStation} dates={data.dates} />
+      <div class="flex justify-center">
+        <button
+          class="btn btn-primary"
+          on:click={() => (sensorStationModel = true)}>SensorStations</button
+        >
+      </div>
+    {/await}
+
+    {#await data.streamed.dashBoardSensorStations}
+      <Spinner />
+    {:then sensorStations}
+      {#if sensorStations.length === 0}
+        <div class="flex justify-center mt-20">
+          <h1 class="text-2xl font-bold">
+            You have no SensorStations in your Dashboard
+          </h1>
+        </div>
+      {:else}
+        <div class="flex justify-center mt-20">
+          <div class="gap-4 grid jusitfy-center w-full">
+            {#each sensorStations as sensorStation, i (sensorStation.sensorStationId)}
+              <div
+                in:fly={{ y: -200, duration: 200, delay: 200 * i }}
+                out:fly={{ y: -200, duration: 200 }}
+              >
+                <SensorStation {sensorStation} dates={data.dates} />
+              </div>
+            {/each}
           </div>
-        {/each}
-      </div>
-    </div>
-    {#if data?.dashboard?.sensorStations.length === 0}
-      <div class="flex justify-center mt-20">
-        <h1 class="text-2xl font-bold">
-          You have no SensorStations in your Dashboard
-        </h1>
-      </div>
-    {/if}
+        </div>
+      {/if}
+    {/await}
   </section>
 {/if}

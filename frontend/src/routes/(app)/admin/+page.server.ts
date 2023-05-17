@@ -102,72 +102,20 @@ export async function load(event) {
   };
 }
 
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+import { addToDashboard, removeFromDashboard } from "$helper/actions";
+
 export const actions = {
   addToDashboard: async (event) => {
-    const { request, fetch } = event;
-    let formData = await request.formData();
-    let sensorStationId: string = String(formData.get("sensorStationId"));
-
-    await fetch(
-      `${BACKEND_URL}/add-to-dashboard?sensorStationId=${sensorStationId}`,
-      { method: "POST" }
-    )
-      .then(async (res: any) => {
-        if (!res.ok) {
-          logger.error("Error while adding sensor station to dashboard");
-          toasts.addToast(
-            event.locals.user?.personId,
-            "error",
-            "Error while adding sensor station to dashboard"
-          );
-        }
-        toasts.addToast(
-          event.locals.user?.personId,
-          "success",
-          "Sensor station added to dashboard"
-        );
-      })
-      .catch((err) => {
-        logger.error("Error while adding sensor station to dashboard");
-        toasts.addToast(
-          event.locals.user?.personId,
-          "error",
-          "Error while adding sensor station to dashboard"
-        );
-      });
+    await addToDashboard(event);
   },
-
+  //---------------------------------------------------------------------
+  //
+  //---------------------------------------------------------------------
   removeFromDashboard: async (event) => {
-    const { request, fetch } = event;
-    let formData = await request.formData();
-    let sensorStationId: string = String(formData.get("sensorStationId"));
-
-    await fetch(
-      `${BACKEND_URL}/remove-from-dashboard?sensorStationId=${sensorStationId}`,
-      { method: "POST" }
-    )
-      .then(async (res: any) => {
-        if (!res.ok) {
-          logger.error("Error while removing sensor station from dashboard");
-          toasts.addToast(
-            event.locals.user?.personId,
-            "error",
-            "Error while removing sensor station from dashboard"
-          );
-        }
-        toasts.addToast(
-          event.locals.user?.personId,
-          "success",
-          "Sensor station removed from dashboard"
-        );
-      })
-      .catch((err) => {
-        logger.error("Error while removing sensor station from dashboard");
-        toasts.addToast(
-          event.locals.user?.personId,
-          "error",
-          "Error while removing sensor station from dashboard"
-        );
-      });
+    await removeFromDashboard(event);
   },
 };

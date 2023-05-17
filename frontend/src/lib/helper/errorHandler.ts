@@ -2,7 +2,7 @@ import { logger } from "./logger";
 import { toasts } from "$stores/toastStore";
 
 export async function ErrorHandler(
-  personId: string,
+  personId: string | undefined,
   message: string,
   payload: any
 ) {
