@@ -23,11 +23,9 @@
     let reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = (e) => {
-      imageToUpload = e.target.result;
+      imageToUpload = e.target?.result;
     };
   }
-
-  export let form;
 
   let submitting = false;
 
@@ -73,7 +71,7 @@
               type="file"
               accept="image/*"
               name="picture"
-              capture="camera"
+              capture="environment"
               on:change={(e) => onFileSelected(e)}
             />
           </div>

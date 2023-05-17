@@ -1,23 +1,22 @@
-<script>
-  import { getMonthLength, getCalendarDays } from "./date-utils.js";
-  import { getInnerLocale } from "./locale.js";
+<script lang="ts">
+  import { getMonthLength, getCalendarDays } from "./date-utils";
+  import { getInnerLocale } from "./locale";
   import { createEventDispatcher } from "svelte";
 
   const dispatch = createEventDispatcher();
-  function cloneDate(d) {
+  function cloneDate(d: any) {
     return new Date(d.getTime());
   }
 
-  export let value = null;
-  export let visible = false;
+  export let value: any = null;
 
-  function setValue(d) {
+  function setValue(d: any) {
     if (d.getTime() !== value?.getTime()) {
       browseDate = clamp(d, min, max);
       value = cloneDate(browseDate);
     }
   }
-  function browse(d) {
+  function browse(d: any) {
     browseDate = clamp(d, min, max);
     if (!browseWithoutSelecting && value) {
       setValue(browseDate);
@@ -32,7 +31,7 @@
   } else if (value && value < min) {
     setValue(min);
   }
-  function clamp(d, min2, max2) {
+  function clamp(d: any, min2: any, max2: any) {
     if (d > max2) {
       return cloneDate(max2);
     } else if (d < min2) {
@@ -49,7 +48,7 @@
   }
   let years = getYears(min, max);
   $: years = getYears(min, max);
-  function getYears(min2, max2) {
+  function getYears(min2: any, max2: any) {
     let years2 = [];
     for (let i = min2.getFullYear(); i <= max2.getFullYear(); i++) {
       years2.push(i);
@@ -60,12 +59,12 @@
   $: iLocale = getInnerLocale(locale);
   export let browseWithoutSelecting = false;
   $: browseYear = browseDate.getFullYear();
-  function setYear(newYear) {
+  function setYear(newYear: any) {
     browseDate.setFullYear(newYear);
     browse(browseDate);
   }
   $: browseMonth = browseDate.getMonth();
-  function setMonth(newMonth) {
+  function setMonth(newMonth: any) {
     let newYear = browseDate.getFullYear();
     if (newMonth === 12) {
       newMonth = 0;
@@ -89,7 +88,7 @@
     );
   }
   $: calendarDays = getCalendarDays(browseDate, iLocale.weekStartsOn);
-  function selectDay(calendarDay) {
+  function selectDay(calendarDay: any) {
     if (dayIsInRange(calendarDay, min, max)) {
       browseDate.setFullYear(0);
       browseDate.setMonth(0);
@@ -101,7 +100,7 @@
       dispatch("select");
     }
   }
-  function dayIsInRange(calendarDay, min2, max2) {
+  function dayIsInRange(calendarDay: any, min2: any, max2: any) {
     const date = new Date(
       calendarDay.year,
       calendarDay.month,
@@ -119,7 +118,7 @@
     );
     return date >= minDate && date <= maxDate;
   }
-  function shiftKeydown(e) {
+  function shiftKeydown(e: any) {
     if (e.shiftKey && e.key === "ArrowUp") {
       setYear(browseDate.getFullYear() - 1);
     } else if (e.shiftKey && e.key === "ArrowDown") {
@@ -134,7 +133,7 @@
     e.preventDefault();
     return true;
   }
-  function yearKeydown(e) {
+  function yearKeydown(e: any) {
     let shift = e.shiftKey || e.altKey;
     if (shift) {
       shiftKeydown(e);
@@ -153,7 +152,7 @@
     }
     e.preventDefault();
   }
-  function monthKeydown(e) {
+  function monthKeydown(e: any) {
     let shift = e.shiftKey || e.altKey;
     if (shift) {
       shiftKeydown(e);
@@ -168,7 +167,7 @@
     }
     e.preventDefault();
   }
-  function keydown(e) {
+  function keydown(e: any) {
     let shift = e.shiftKey || e.altKey;
     if (e.target?.tagName === "SELECT") {
       return;
@@ -383,25 +382,8 @@
     box-sizing: content-box;
   }
 
-  .month {
-    flex-grow: 1;
-  }
-
   .year {
     flex-grow: 1;
-  }
-
-  .page-button {
-    background-color: transparent;
-    width: 1.5rem;
-    height: 1.5rem;
-    flex-shrink: 0;
-    border-radius: 5px;
-    box-sizing: border-box;
-    border: 1px solid transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   select.dummy-select {

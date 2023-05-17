@@ -10,14 +10,13 @@
   } from "@tanstack/svelte-table";
   import { writable } from "svelte/store";
   import SortSymbol from "./SortSymbol.svelte";
-  import type { NodeJS } from "node:types";
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";
 
   let query = "(min-width: 580px)";
   let isRendered = false;
-  let mql;
-  let mqlListener;
+  let mql: any;
+  let mqlListener: any;
   let wasMounted = false;
   let isMediaNotMobile = false;
 
@@ -36,9 +35,9 @@
     }
   }
 
-  function addNewListener(query) {
+  function addNewListener(query: any) {
     mql = window.matchMedia(query);
-    mqlListener = (v) => (isMediaNotMobile = v.matches);
+    mqlListener = (v: any) => (isMediaNotMobile = v.matches);
     mql.addListener(mqlListener);
     isMediaNotMobile = mql.matches;
   }
@@ -80,7 +79,7 @@
 
   let globalFilter = "";
 
-  $: options = writable<TableOptions<User>>({
+  $: options = writable<TableOptions<any>>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
@@ -140,8 +139,6 @@
       };
     });
   }
-
-  let table;
   $: table = createSvelteTable(options);
 
   let timer: NodeJS.Timeout;

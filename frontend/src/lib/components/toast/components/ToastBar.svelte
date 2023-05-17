@@ -1,13 +1,13 @@
-<script>
+<script lang="ts">
   import ToastIcon from "./ToastIcon.svelte";
   import { prefersReducedMotion } from "../core/utils";
   import ToastMessage from "./ToastMessage.svelte";
-  export let toast;
-  export let position = void 0;
+  export let toast: any;
+  export let position: any = void 0;
   export let style = "";
-  export let Component = void 0;
-  let factor;
-  let animation;
+  export let Component: any = void 0;
+  let factor: any;
+  let animation: any;
   $: {
     const top = (toast.position || position || "top-center").includes("top");
     factor = top ? 1 : -1;

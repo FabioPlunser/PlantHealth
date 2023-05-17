@@ -159,33 +159,35 @@
               <div class="p-4 m-4">
                 <div class="carousel space-x-4">
                   {#if sensorStation.pictures}
-                    {#each sensorStation?.pictures as picture}
-                      {#await picture}
-                        <Spinner fill="fill-primary" />
-                      {:then data}
-                        <div class="carousel-item">
-                          <div>
-                            <!-- svelte-ignore a11y-click-events-have-key-events -->
-                            <img
-                              on:click={() => {
-                                selectedPicture = data.imageRef;
-                                openPictureModal = true;
-                              }}
-                              src={data.imageRef}
-                              alt="SensorStationPicture"
-                              class="rounded-2xl shadow-xl cursor-pointer w-64"
-                            />
-                            <h1 class="flex justify-center">
-                              {data.creationDate.toLocaleDateString()}
-                            </h1>
+                    {#if sensorStation.pictures.length > 0}
+                      {#each sensorStation?.pictures as picture, i (picture.pictureId)}
+                        {#await picture.promise}
+                          <Spinner fill="fill-primary" />
+                        {:then data}
+                          <div class="carousel-item">
+                            <div>
+                              <!-- svelte-ignore a11y-click-events-have-key-events -->
+                              <img
+                                on:click={() => {
+                                  selectedPicture = data.imageRef;
+                                  openPictureModal = true;
+                                }}
+                                src={data.imageRef}
+                                alt="SensorStationPicture"
+                                class="rounded-2xl shadow-xl cursor-pointer w-64"
+                              />
+                              <h1 class="flex justify-center">
+                                {data.creationDate.toLocaleDateString()}
+                              </h1>
+                            </div>
                           </div>
-                        </div>
-                      {:catch error}
-                        <h1>Error: {error.message}</h1>
-                      {/await}
-                    {/each}
-                  {:else}
-                    <h1>Not Pictures found</h1>
+                        {:catch error}
+                          <h1>Error: {error.message}</h1>
+                        {/await}
+                      {/each}
+                    {:else}
+                      <h1>Not Pictures found</h1>
+                    {/if}
                   {/if}
                 </div>
               </div>

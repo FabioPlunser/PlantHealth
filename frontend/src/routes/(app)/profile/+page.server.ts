@@ -17,19 +17,23 @@ let source: string | null;
  * property is an object with boolean values for each permission role, based on whether the user has
  * that
  */
-export async function load({ request, url, fetch, locals }) {
+export async function load(event) {
+  const { fetch, request, url } = event;
   // check if required variables are available
   if (
-    (!url.searchParams.get("personId") && !locals?.user?.personId) ||
-    (!url.searchParams.get("username") && !locals?.user?.username) ||
-    (!url.searchParams.get("userPermissions") && !locals?.user?.permissions)
+    (!url.searchParams.get("personId") && !event.locals?.user?.personId) ||
+    (!url.searchParams.get("username") && !event.locals?.user?.username) ||
+    (!url.searchParams.get("userPermissions") &&
+      !event.locals?.user?.permissions)
   ) {
-    throw new error(403);
+    throw error(403, "Missing required parameters");
   }
 
-  personId = url.searchParams.get("personId") ?? locals?.user?.personId;
-  let username = url.searchParams.get("username") ?? locals.user.username;
-  source = request.headers.get("referer");
+  let personId =
+    url.searchParams.get("personId") ?? event.locals.user?.personId;
+  let username =
+    url.searchParams.get("username") ?? event.locals.user?.username;
+  let source = request.headers.get("referer");
 
   logger.info("user-profile-page", { payload: personId });
   logger.info("user-profile-page", { payload: username });
@@ -37,11 +41,12 @@ export async function load({ request, url, fetch, locals }) {
 
   let permissions =
     url.searchParams.get("userPermissions")?.split(",") ??
-    locals.user.permissions;
+    event.locals.user?.permissions ??
+    [];
 
-  let canActiveUserChangeRoles: boolean =
-    locals.user.permissions.includes("ADMIN") &&
-    personId !== locals.user.personId;
+  let canActiveUserChangeRoles: boolean | undefined =
+    event.locals.user?.permissions.includes("ADMIN") &&
+    personId !== event.locals.user?.personId;
 
   let userPermissions: { [role: string]: boolean } = {};
 
@@ -52,7 +57,7 @@ export async function load({ request, url, fetch, locals }) {
     await fetch(`${BACKEND_URL}/get-all-permissions`)
       .then((response) => {
         if (!response.ok) {
-          logger.error("user-profile-page", { response });
+          logger.error("user-profile-page", { payload: response });
           throw error(response.status, response.statusText);
         }
         return response.json();
@@ -120,7 +125,8 @@ export const actions = {
   /* `updateUser` is an action function that is responsible for updating user information based on the
   form data submitted by the user. It receives an object with properties `url`, `request`, and
   `fetch` as its argument. */
-  updateUser: async ({ url, request, fetch, locals }) => {
+  updateUser: async (event) => {
+    const { url, request, fetch } = event;
     const formData = await request.formData();
     const zodData = schema.safeParse(Object.fromEntries(formData));
     if (formData.get("password") !== formData.get("passwordConfirm")) {
@@ -153,26 +159,15 @@ export const actions = {
       }
     });
 
-    let canActiveUserChangeRoles: boolean =
-      locals.user.permissions.includes("ADMIN") &&
-      personId !== locals.user.personId;
+    let username = String(formData.get("username"));
+    let email = String(formData.get("email"));
+    let password = String(formData.get("password"));
 
-    /*
-     * We do not want the Admin to remove all permissions from a user so we cancel the action
-     */
-    if (canActiveUserChangeRoles && permissions.length <= 0) {
-      toasts.addToast(
-        locals.user?.personId,
-        "error",
-        "Choose at least one Permission!"
-      );
-    }
-    let username = formData.get("username");
-    let email = formData.get("email");
-    let password = formData.get("password");
+    let canActiveUserChangeRoles: boolean | undefined =
+      event.locals.user?.permissions.includes("ADMIN") &&
+      personId !== event.locals.user?.personId;
 
     let params = new URLSearchParams();
-
     params.set("personId", personId);
     params.set("username", username);
 
@@ -241,4 +236,4 @@ export const actions = {
       throw redirect(307, source);
     }
   },
-} satisfies Actions;
+};

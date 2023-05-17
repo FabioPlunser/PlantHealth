@@ -4,7 +4,7 @@
 #ifdef DO_MAIN
 
 #include "../lib/NotificationHandler/SensorErrors.h"
-// #include "../lib/ErrorHandler/SensorErrors.h"
+// #include "../lib/errorHandler/SensorErrors.h"
 #include "SensorClasses/AirSensor.cpp"
 #include "SensorClasses/DipSwitch.cpp"
 #include "SensorClasses/Hydrometer.cpp"

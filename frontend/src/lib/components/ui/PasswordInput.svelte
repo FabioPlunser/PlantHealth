@@ -12,6 +12,7 @@
 </script>
 
 <div>
+  <!-- svelte-ignore a11y-label-has-associated-control -->
   <label class="label">
     <span class="label-text font-bold">{label}</span>
   </label>

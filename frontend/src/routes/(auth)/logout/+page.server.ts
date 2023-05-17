@@ -11,13 +11,14 @@ import { logger } from "$helper/logger";
  * "/login". Therefore, nothing is being returned explicitly.
  */
 export async function load(event) {
+  event.cookies.getAll().forEach((cookie) => {
+    event.cookies.set(cookie.name, "", { secure: false, maxAge: 0 });
+  });
+
   let res = await event.fetch(`${BACKEND_URL}/logout`, {
     method: "POST",
   });
   logger.info(`User ${event.locals.user?.username} logged out`);
-  event.cookies.getAll().forEach((cookie) => {
-    event.cookies.set(cookie.name, "", { maxAge: 0 });
-  });
 
   throw redirect(302, "/login");
 }

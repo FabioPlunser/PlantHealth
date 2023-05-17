@@ -1,5 +1,4 @@
 <script lang="ts">
-  import toast from "$components/toast";
   import AddUserModal from "./AddUserModal.svelte";
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";
@@ -12,7 +11,7 @@
   } from "$components/table/cellComponents";
   import { flexRender } from "@tanstack/svelte-table";
   import type { ColumnDef } from "@tanstack/svelte-table";
-
+  import Spinner from "$components/ui/Spinner.svelte";
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   let isRendered = false;
@@ -83,14 +82,21 @@
 {/if}
 {#if isRendered}
   <section>
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <btn
-      class="btn btn-primary flex justify-center w-fit mx-auto m-4"
-      on:click={() => (addUserModal = true)}
-      in:slide={{ duration: 400, axis: "y" }}>Add User</btn
-    >
-    <div class="flex justify-center">
-      <Table data={data.users} {columns} {mobileColumnVisibility} />
-    </div>
+    {#await data.streamed.users}
+      <Spinner />
+    {:then users}
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <btn
+        class="btn btn-primary flex justify-center w-fit mx-auto m-4"
+        on:click={() => (addUserModal = true)}
+        in:slide={{ duration: 400, axis: "y" }}>Add User</btn
+      >
+
+      <div class="flex justify-center">
+        <Table data={users} {columns} {mobileColumnVisibility} />
+      </div>
+    {:catch error}
+      <p class="text-red-500">{error}</p>
+    {/await}
   </section>
 {/if}

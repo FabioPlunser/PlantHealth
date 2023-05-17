@@ -1,11 +1,11 @@
 <script lang="ts">
   import "../app.css";
   import toast, { Toaster } from "$components/toast";
-
-  export let data;
+  import type { ToastPosition } from "$components/toast";
+  export let data: any;
   $: {
-    data?.streamed?.notifications.then((notification) => {
-      let position = "top-right";
+    data?.streamed?.notifications.then((notification: any) => {
+      let position: ToastPosition = "top-right";
       let toastId = "";
       if (notification) {
         switch (notification.type) {
@@ -40,6 +40,5 @@
   class="dark:bg-gradient-to-br from-gray-900 via-gray-900 to-violet-900 bg-fixed overflow-clip"
 >
   <slot />
-  <div class="pb-96" />
   <div class="pb-96" />
 </main>

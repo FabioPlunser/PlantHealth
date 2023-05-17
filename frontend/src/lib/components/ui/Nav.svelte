@@ -33,15 +33,6 @@
   ];
 </script>
 
-<!-- @component
-Navbar / header component
-
-Usage:
-  ```tsx
-<Nav/>
-``` 
--->
-
 <nav class="navbar">
   <div class="flex justify-center mx-auto">
     <a href="/" data-sveltekit-reload class="absolute left-0 ml-4">
@@ -140,6 +131,7 @@ Usage:
                 <a
                   data-sveltekit-preload-code
                   href="/profile"
+                  data-sveltekit-reload
                   class="hover:text-gray-600 text-xl">Profile</a
                 >
                 <a

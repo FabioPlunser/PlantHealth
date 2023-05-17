@@ -31,7 +31,7 @@ class NotificationHandler {
 		} ledErrorParam = {0};
 
 	public:
-		static NotificationHandler & getErrorHandler(
+		static NotificationHandler & geterrorHandler(
 			uint8_t ledPinRed, uint8_t ledPinGreen, uint8_t ledPinBlue
 		) {
 			static NotificationHandler errorHandler(

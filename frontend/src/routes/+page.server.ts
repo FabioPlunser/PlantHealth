@@ -1,4 +1,4 @@
-import { redirect } from "@sveltejs/kit";
+import { redirect, error } from "@sveltejs/kit";
 import { BACKEND_URL } from "$env/static/private";
 import { logger } from "$helper/logger";
 import { toasts } from "$stores/toastStore";
@@ -16,7 +16,7 @@ export async function load(event) {
   const { request, fetch } = event;
   // check if user is exists
   if (event.locals.user === undefined) {
-    throw redirect(302, "/login");
+    throw redirect(307, "/login");
   }
 
   // check if user has permissions
@@ -25,7 +25,7 @@ export async function load(event) {
     !event.locals.user.permissions.includes("GARDENER") &&
     !event.locals.user.permissions.includes("USER")
   ) {
-    throw redirect(302, "/login");
+    throw redirect(307, "/login");
   }
 
   let res = await fetch(`${BACKEND_URL}/get-user-permissions`)
@@ -37,7 +37,9 @@ export async function load(event) {
           "Error while fetching user permissions"
         );
         logger.error("Error while fetching user permissions");
+        throw error(res.status, "Error while fetching user permissions");
       }
+      res = await res.json();
       return res;
     })
     .catch((err) => {

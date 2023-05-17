@@ -6,6 +6,7 @@
   import { onMount } from "svelte";
   import Input from "$lib/components/ui/Input.svelte";
   import StationInfo from "./sensorstation/StationInfo.svelte";
+  import Spinner from "$components/ui/Spinner.svelte";
   // ----------------------------------
   // ----------------------------------
   let rendered = false;
@@ -18,9 +19,12 @@
   // ----------------------------------
   export let data;
   export let form;
+
+  let sensorStations: any[] = [];
+  let promise = data.streamed.sensorStations;
   $: {
     if (data.fromAccessPoints && $apSensorStations.length > 0) {
-      data.sensorStations = $apSensorStations;
+      sensorStations = $apSensorStations;
     }
   }
   // ----------------------------------
@@ -29,14 +33,16 @@
 </script>
 
 {#if rendered}
-  {#if data.sensorStations}
-    {#if data.sensorStations.length > 0}
+  {#await promise}
+    <Spinner />
+  {:then sensorStations}
+    {#if sensorStations.length > 0}
       <section>
         <div class="mb-2 flex justify-center text-center">
           {#if data.fromAccessPoints && $apSensorStations.length > 0}
             <div class="text-xl font-bold">
               <h1 class="">Sensorstations of AccessPoint:</h1>
-              <h1 class="">{data.sensorStations[0].roomName}</h1>
+              <h1 class="">{sensorStations[0].roomName}</h1>
               <button
                 on:click={() => invalidate("app:getSensorStations")}
                 class="btn btn-primary">Get all SensorStations</button
@@ -57,8 +63,8 @@
         </div>
         <div class="flex justify-center mx-auto">
           <div class="grid grid-rows md:grid-cols-3 gap-4">
-            {#each data.sensorStations as sensorStation, i (sensorStation.sensorStationId)}
-              {#if sensorStation.name.includes(searchTerm) || sensorStation.roomName.includes(searchTerm) || sensorStation.bdAddress.includes(searchTerm) || sensorStation.dipSwitchId
+            {#each sensorStations as sensorStation, i (sensorStation.sensorStationId)}
+              {#if sensorStation.roomName.includes(searchTerm) || sensorStation.bdAddress.includes(searchTerm) || sensorStation.dipSwitchId
                   .toString()
                   .includes(searchTerm)}
                 <div
@@ -87,5 +93,5 @@
         </h1>
       </section>
     {/if}
-  {/if}
+  {/await}
 {/if}

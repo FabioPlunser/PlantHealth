@@ -14,7 +14,6 @@ declare namespace App {
   // interface PrivateEnv {}
   // interface PublicEnv {}
 }
-
 declare module "*.svg?component" {
   import type { ComponentType, SvelteComponentTyped } from "svelte";
   import type { SVGAttributes } from "svelte/elements";

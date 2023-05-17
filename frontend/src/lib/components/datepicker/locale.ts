@@ -18,7 +18,7 @@ export function getLocaleDefaults() {
     weekStartsOn: 1,
   };
 }
-export function getInnerLocale(locale = {}) {
+export function getInnerLocale(locale: any) {
   const innerLocale = getLocaleDefaults();
   if (typeof locale.weekStartsOn === "number") {
     innerLocale.weekStartsOn = locale.weekStartsOn;
@@ -28,7 +28,7 @@ export function getInnerLocale(locale = {}) {
   return innerLocale;
 }
 /** Create a Locale from a date-fns locale */
-export function localeFromDateFnsLocale(dateFnsLocale) {
+export function localeFromDateFnsLocale(dateFnsLocale: any) {
   const locale = getLocaleDefaults();
   if (typeof dateFnsLocale?.options?.weekStartsOn === "number") {
     locale.weekStartsOn = dateFnsLocale.options.weekStartsOn;

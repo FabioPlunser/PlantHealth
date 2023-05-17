@@ -3,30 +3,44 @@ import { BACKEND_URL } from "$env/static/private";
 import { fail, redirect, error } from "@sveltejs/kit";
 import { z } from "zod";
 import { logger } from "$helper/logger";
+import { errorHandler } from "$helper/errorHandler";
 
-/**
- * This function fetches all users from a backend URL and returns them as an object.
- * @param  - - `fetch`: a function used to make HTTP requests to the backend server
- * @returns An object with a property `users` that contains an array of `User` objects. The `load`
- * function fetches data from a backend API endpoint and assigns the response data to the `allUsers`
- * variable, which is then returned as part of the object.
- */
-export async function load({ fetch, depends }) {
-  let allUsers: User[];
+export async function load(event) {
+  const { fetch } = event;
 
-  await fetch(`${BACKEND_URL}/get-all-users`)
-    .then((response) => {
-      if (!response.ok) {
-        logger.error("Couldn't get all users", { payload: response });
-        throw error(response.status, response.statusText);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      logger.info("Got all users", { payload: data });
-      allUsers = data.items;
+  async function getUsers(): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      await fetch(`${BACKEND_URL}/get-all-users`)
+        .then(async (res) => {
+          if (!res.ok) {
+            res = await res.json();
+            errorHandler(
+              event.locals.user?.personId,
+              "Error while getting users",
+              res
+            );
+            reject(res);
+          }
+          let data = await res.json();
+          resolve(data.items);
+        })
+        .catch((err) => {
+          errorHandler(
+            event.locals.user?.personId,
+            "Error while getting users",
+            err
+          );
+          reject(err);
+          throw error(500, "Error while getting users");
+        });
     });
-  return { users: allUsers };
+  }
+
+  return {
+    streamed: {
+      users: getUsers(),
+    },
+  };
 }
 
 const schema = z.object({
@@ -59,14 +73,8 @@ const schema = z.object({
 });
 
 export const actions = {
-  /* This is a function that creates a new user by sending a POST request to a backend API endpoint. It
- first retrieves the form data from the request using `request.formData()`, then validates the form
- data using a Zod schema. If the form data is invalid, it returns a 400 error with the validation
- errors. If the passwords do not match, it returns a 400 error with a message indicating that the
- passwords do not match. If the form data is valid and the passwords match, it sends a POST request
- to the backend API endpoint with the form data as the request body. If the request is successful,
- it logs a message indicating that a new user has been created. */
-  createUser: async ({ request, fetch, locals }) => {
+  createUser: async (event) => {
+    const { request, fetch } = event;
     const formData = await request.formData();
     const zod = schema.safeParse(Object.fromEntries(formData));
 
@@ -93,60 +101,56 @@ export const actions = {
     };
 
     await fetch(`${BACKEND_URL}/create-user`, requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          logger.error("Couldn't create user", { payload: response });
-          throw error(response.status, response.statusText);
+      .then(async (res) => {
+        if (!res.ok) {
+          res = await res.json();
+          errorHandler(
+            event.locals.user?.personId,
+            "Error while creating user",
+            res
+          );
         }
-        return response.json();
       })
-      .then((data) => {
-        let time = new Date().toLocaleString();
-        logger.info(
-          "Created user: " +
-            JSON.stringify(time) +
-            JSON.stringify(locals.user.personId) +
-            JSON.stringify(locals.user.username) +
-            JSON.stringify(data)
+      .catch((err) => {
+        errorHandler(
+          event.locals.user?.personId,
+          "Error while creating user",
+          err
         );
+        throw error(500, "Error while creating user");
       });
   },
-
-  /* The `deleteUser` function is a Svelte action that deletes a user by sending a DELETE request to a
- backend API endpoint. It first retrieves the form data from the request using `request.formData()`,
- then gets the `personId` from the form data. It then creates a URLSearchParams object with the
- `personId` as a parameter and appends it to the backend URL. It then sends a DELETE request to the
- backend API endpoint with the URLSearchParams object as the query string and the `personId` as the
- value of the `personId` parameter. If the request is successful, it logs a message indicating that
- the user has been deleted. */
-  deleteUser: async ({ request, fetch, locals }) => {
+  //---------------------------------------------
+  //
+  //---------------------------------------------
+  deleteUser: async (event) => {
+    const { request, fetch } = event;
     const formData = await request.formData();
     let personId = formData.get("personId");
 
     let params = new URLSearchParams();
     params.set("personId", personId?.toString() ?? "");
 
-    let parametersString = "?" + params.toString();
-
-    await fetch(`${BACKEND_URL}/delete-user` + parametersString, {
+    await fetch(`${BACKEND_URL}/delete-user?${params.toString()}`, {
       method: "DELETE",
     })
-      .then((response) => {
-        if (!response.ok) {
-          logger.error("Couldn't delete user", { payload: response });
-          throw error(response.status, response.statusText);
+      .then(async (res) => {
+        if (!res.ok) {
+          res = await res.json();
+          errorHandler(
+            event.locals.user?.personId,
+            "Error while deleting user",
+            res
+          );
         }
-        return response.json();
       })
-      .then((data) => {
-        let time = new Date().toLocaleString();
-        logger.info(
-          "Deleted user: " +
-            JSON.stringify(time) +
-            JSON.stringify(locals.user.personId) +
-            JSON.stringify(locals.user.username) +
-            JSON.stringify(data)
+      .catch((err) => {
+        errorHandler(
+          event.locals.user?.personId,
+          "Error while deleting user",
+          err
         );
+        throw error(500, "Error while deleting user");
       });
   },
-} satisfies Actions;
+};

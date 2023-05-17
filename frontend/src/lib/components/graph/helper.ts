@@ -32,8 +32,8 @@ export function createGraphData(data: any) {
       backgroundColor: "rgba(75,192,192,0.5)",
       borderColor: "rgba(75,192,192,1)",
       pointBackgroundColor: pointBackgroundColor,
-      pointRadius: 7,
-      pointHoverRadius: 7,
+      pointRadius: 4,
+      pointHoverRadius: 4,
       xAxisID: "x",
       yAxisID: "y",
       data: sensorData,
@@ -48,7 +48,7 @@ export function createGraphData(data: any) {
     //---------------------------------------------------------------
     //---------------------------------------------------------------
     graphData[sensorType] = {
-      labels: sensor.values.map((value) =>
+      labels: sensor.values.map((value: any) =>
         new Date(value.timeStamp).toLocaleString("de-DE")
       ),
       datasets: datasets,

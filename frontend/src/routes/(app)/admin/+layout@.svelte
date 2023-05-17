@@ -8,7 +8,6 @@
 
   import AdminNav from "$components/ui/adminNav.svelte";
   import Nav from "$components/ui/Nav.svelte";
-  export let data;
 
   let links = [
     {

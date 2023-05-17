@@ -1,6 +1,6 @@
 import { getMonthLength } from "./date-utils.js";
 /** Parse a string according to the supplied format tokens. Returns a date if successful, and the missing punctuation if there is any that should be after the string */
-export function parse(str, tokens, baseDate) {
+export function parse(str: any, tokens: any, baseDate: any) {
   let missingPunctuation = "";
   let valid = true;
   baseDate = baseDate || new Date(2020, 0, 1, 0, 0, 0, 0);
@@ -11,7 +11,7 @@ export function parse(str, tokens, baseDate) {
   let minutes = baseDate.getMinutes();
   let seconds = baseDate.getSeconds();
   const ms = baseDate.getMilliseconds();
-  function parseString(token) {
+  function parseString(token: any) {
     for (let i = 0; i < token.length; i++) {
       if (str.startsWith(token[i])) {
         str = str.slice(1);
@@ -22,7 +22,7 @@ export function parse(str, tokens, baseDate) {
       }
     }
   }
-  function parseUint(pattern, min, max) {
+  function parseUint(pattern: any, min: any, max: any) {
     const matches = str.match(pattern);
     if (matches?.[0]) {
       str = str.slice(matches[0].length);
@@ -38,7 +38,7 @@ export function parse(str, tokens, baseDate) {
       return null;
     }
   }
-  function parseToken(token) {
+  function parseToken(token: any) {
     if (typeof token === "string") {
       parseString(token);
     } else if (token.id === "yyyy") {
@@ -76,43 +76,43 @@ export function parse(str, tokens, baseDate) {
     missingPunctuation: missingPunctuation,
   };
 }
-function twoDigit(value) {
+function twoDigit(value: any) {
   return ("0" + value.toString()).slice(-2);
 }
 const ruleTokens = [
   {
     id: "yyyy",
-    toString: (d) => d.getFullYear().toString(),
+    toString: (d: any) => d.getFullYear().toString(),
   },
   {
     id: "MM",
-    toString: (d) => twoDigit(d.getMonth() + 1),
+    toString: (d: any) => twoDigit(d.getMonth() + 1),
   },
   {
     id: "dd",
-    toString: (d) => twoDigit(d.getDate()),
+    toString: (d: any) => twoDigit(d.getDate()),
   },
   {
     id: "HH",
-    toString: (d) => twoDigit(d.getHours()),
+    toString: (d: any) => twoDigit(d.getHours()),
   },
   {
     id: "mm",
-    toString: (d) => twoDigit(d.getMinutes()),
+    toString: (d: any) => twoDigit(d.getMinutes()),
   },
   {
     id: "ss",
-    toString: (d) => twoDigit(d.getSeconds()),
+    toString: (d: any) => twoDigit(d.getSeconds()),
   },
 ];
-function parseRule(s) {
+function parseRule(s: any) {
   for (const token of ruleTokens) {
     if (s.startsWith(token.id)) {
       return token;
     }
   }
 }
-export function createFormat(s) {
+export function createFormat(s: any) {
   const tokens = [];
   while (s.length > 0) {
     const token = parseRule(s);

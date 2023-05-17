@@ -83,7 +83,8 @@ export const actions = {
         username: formData.get("username"),
         permissions: data.permissions,
         personId: data.personId,
-      })
+      }),
+      { secure: false, path: "/" }
     );
     throw redirect(302, "/user");
   },
