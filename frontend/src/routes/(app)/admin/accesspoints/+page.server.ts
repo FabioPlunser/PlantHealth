@@ -1,6 +1,7 @@
 import { BACKEND_URL } from "$env/static/private";
 import { logger } from "$helper/logger";
 import { toasts } from "$stores/toastStore";
+import { error, type Actions } from "@sveltejs/kit";
 
 // TODO: add validation and error handling (toast messages)
 export async function load({ fetch, depends, locals }) {
@@ -69,11 +70,37 @@ export const actions = {
     );
     if (!res.ok) {
       logger.error("Could not scan for sensor stations");
-      throw new error(res.status, "Could not scan for sensor stations");
+      throw error(res.status, "Could not scan for sensor stations");
     } else {
       logger.info("Scanned for sensor stations");
     }
   },
 
-  delete: async ({ cookies, request, fetch }) => {},
+  delete: async ({ cookies, request, fetch, locals }) => {
+    let formData = await request.formData();
+    let sensorStationId: string = String(formData.get("accessPointId"));
+
+    let params = new URLSearchParams();
+    params.set("accessPointId", sensorStationId?.toString());
+
+    await fetch(`${BACKEND_URL}/delete-access-point?${params.toString()}`, {
+      method: "DELETE",
+    }).then((response) => {
+      if (!response.ok) {
+        logger.error("access-point-page", { payload: response });
+        toasts.addToast(
+          locals.user.personId,
+          "error",
+          `Failed to delete access point: ${response.status} ${response.message}`
+        );
+      } else {
+        logger.info(`Deleted access point = ${sensorStationId}`);
+        toasts.addToast(
+          locals.user.personId,
+          "success",
+          "Deleted access point"
+        );
+      }
+    });
+  },
 } satisfies Actions;

@@ -3,6 +3,7 @@ import type { Actions } from "./$types";
 import { redirect, error } from "@sveltejs/kit";
 import { logger } from "$helper/logger";
 import { toasts } from "$stores/toastStore";
+import type { Picture } from "../../../app";
 
 interface Dashboard {
   sensorStations: [

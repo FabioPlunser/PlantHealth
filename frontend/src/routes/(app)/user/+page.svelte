@@ -2,8 +2,10 @@
   import { fly } from "svelte/transition";
   //---------------------------------------------------
   //---------------------------------------------------
-  import SensorstationModal from "./SensorstationModal.svelte";
-  import SensorStation from "./SensorStation.svelte";
+  import {
+    SensorStationsModal,
+    SensorStation,
+  } from "$lib/components/ui/SensorStation/index.js";
   import DatePicker from "$lib/components/datepicker/DatePicker.svelte";
   //---------------------------------------------------
   //---------------------------------------------------
@@ -18,43 +20,51 @@
   });
   //---------------------------------------------------
   //---------------------------------------------------
-  let sensorStationModel = false;
+  let sensorStationModal = false;
   //---------------------------------------------------
   //---------------------------------------------------
+  let searchTerm = "";
 </script>
 
 {#if rendered}
-  <SensorstationModal
+  <SensorStationsModal
     data={data?.sensorStations}
-    bind:showModal={sensorStationModel}
-    on:close={() => (sensorStationModel = false)}
+    bind:showModal={sensorStationModal}
+    on:close={() => (sensorStationModal = false)}
   />
 
   <section>
     <div class="flex justify-center">
       <button
         class="btn btn-primary"
-        on:click={() => (sensorStationModel = true)}>SensorStations</button
+        on:click={() => (sensorStationModal = true)}>SensorStations</button
       >
     </div>
 
-    <div class="flex justify-center mt-20">
-      <div class="gap-4 grid jusitfy-center w-full">
-        {#each data?.dashboard?.sensorStations as sensorStation, i (sensorStation.sensorStationId)}
-          <div
-            in:fly={{ y: -200, duration: 200, delay: 200 * i }}
-            out:fly={{ y: -200, duration: 200 }}
-          >
-            <SensorStation {sensorStation} dates={data.dates} />
-          </div>
-        {/each}
+    {#if data?.dashboard?.sensorStations?.length === 0}
+      <h1
+        class="text-2xl font-bold flex justify-center items-center my-auto mt-2"
+      >
+        You have no Sensor Stations in your Dashboard yet.
+      </h1>
+    {:else}
+      <div class="m-4 flex justify-ceter">
+        <input
+          bind:value={searchTerm}
+          type="search"
+          name="searchRoom"
+          placeholder="Global Search"
+          class="input dark:input-bordered w-fit min-w-64 mx-auto dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
+        />
       </div>
-    </div>
-    {#if data?.dashboard?.sensorStations.length === 0}
-      <div class="flex justify-center mt-20">
-        <h1 class="text-2xl font-bold">
-          You have no SensorStations in your Dashboard
-        </h1>
+      <div class="grid grid-rows gap-2 mt-2">
+        {#each data?.dashboard?.sensorStations as sensorStation, i (sensorStation.sensorStationId)}
+          {#if sensorStation.name.includes(searchTerm) || sensorStation.roomName.includes(searchTerm)}
+            <div class="">
+              <SensorStation {sensorStation} dates={data.dates} />
+            </div>
+          {/if}
+        {/each}
       </div>
     {/if}
   </section>

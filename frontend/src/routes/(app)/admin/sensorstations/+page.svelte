@@ -58,7 +58,7 @@
         <div class="flex justify-center mx-auto">
           <div class="grid grid-rows md:grid-cols-3 gap-4">
             {#each data.sensorStations as sensorStation, i (sensorStation.sensorStationId)}
-              {#if sensorStation.roomName.includes(searchTerm) || sensorStation.bdAddress.includes(searchTerm) || sensorStation.dipSwitchId
+              {#if sensorStation.name.includes(searchTerm) || sensorStation.roomName.includes(searchTerm) || sensorStation.bdAddress.includes(searchTerm) || sensorStation.dipSwitchId
                   .toString()
                   .includes(searchTerm)}
                 <div

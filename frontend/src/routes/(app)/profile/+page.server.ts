@@ -3,6 +3,7 @@ import { fail, redirect, error } from "@sveltejs/kit";
 import { BACKEND_URL } from "$env/static/private";
 import { z } from "zod";
 import { logger } from "$helper/logger";
+import { toasts } from "$lib/stores/toastStore";
 
 let personId: string;
 let source: string | null;
@@ -51,8 +52,8 @@ export async function load({ request, url, fetch, locals }) {
     await fetch(`${BACKEND_URL}/get-all-permissions`)
       .then((response) => {
         if (!response.ok) {
-          logger.error("user-profile-page", { payload: response });
-          throw new error(response.status, response.statusText);
+          logger.error("user-profile-page", { response });
+          throw error(response.status, response.statusText);
         }
         return response.json();
       })
@@ -119,7 +120,7 @@ export const actions = {
   /* `updateUser` is an action function that is responsible for updating user information based on the
   form data submitted by the user. It receives an object with properties `url`, `request`, and
   `fetch` as its argument. */
-  updateUser: async ({ url, request, fetch }) => {
+  updateUser: async ({ url, request, fetch, locals }) => {
     const formData = await request.formData();
     const zodData = schema.safeParse(Object.fromEntries(formData));
     if (formData.get("password") !== formData.get("passwordConfirm")) {
@@ -139,7 +140,7 @@ export const actions = {
     }
 
     /*
-     * For every permission BooleanButton in the form, parse the name to find which Permission it represents
+     *  NOTE: For every permission BooleanButton in the form, parse the name to find which Permission it represents
      * and add it to the permissions array
      */
     let permissions: string[] = [];
@@ -152,6 +153,20 @@ export const actions = {
       }
     });
 
+    let canActiveUserChangeRoles: boolean =
+      locals.user.permissions.includes("ADMIN") &&
+      personId !== locals.user.personId;
+
+    /*
+     * We do not want the Admin to remove all permissions from a user so we cancel the action
+     */
+    if (canActiveUserChangeRoles && permissions.length <= 0) {
+      toasts.addToast(
+        locals.user?.personId,
+        "error",
+        "Choose at least one Permission!"
+      );
+    }
     let username = formData.get("username");
     let email = formData.get("email");
     let password = formData.get("password");
@@ -160,7 +175,11 @@ export const actions = {
 
     params.set("personId", personId);
     params.set("username", username);
-    params.set("permissions", permissions.join(","));
+
+    if (canActiveUserChangeRoles) {
+      params.set("permissions", permissions.join(","));
+      return;
+    }
 
     logger.info(
       "Update user " +
@@ -183,25 +202,39 @@ export const actions = {
 
     let parametersString = "?" + params.toString();
 
-    await fetch(`${BACKEND_URL}/update-user` + parametersString, {
-      method: "POST",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          logger.error("user-profile-page", { payload: response });
-          throw error(response.status, response.statusText);
-        }
-        return response.json();
+    /*
+     * Depending on the permission of the current user and if he is supposed to change the roles
+     * of the displayed user we fetch a different endpoint
+     */
+    if (canActiveUserChangeRoles) {
+      await fetch(`${BACKEND_URL}/update-user` + parametersString, {
+        method: "POST",
       })
-      .then((data) => {
-        let time = new Date().toLocaleString();
-        logger.info(
-          "Updated user: " +
-            JSON.stringify(time) +
-            " " +
-            JSON.stringify(data.message)
-        );
-      });
+        .then((response) => {
+          if (!response.ok) {
+            logger.error("user-profile-page", { payload: response });
+            throw error(response.status, response.statusText);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          logger.info("Updated user: " + JSON.stringify(data.message));
+        });
+    } else {
+      await fetch(`${BACKEND_URL}/update-user` + parametersString, {
+        method: "POST",
+      })
+        .then((response) => {
+          if (!response.ok) {
+            logger.error("user-profile-page", { payload: response });
+            throw error(response.status, response.statusText);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          logger.info("Updated user: " + JSON.stringify(data.message));
+        });
+    }
 
     // NOTE: Redirect if the user was redirected to profile from some other page
     if (source !== null) {

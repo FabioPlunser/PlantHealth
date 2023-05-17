@@ -1,8 +1,7 @@
 <script lang="ts">
-  export let field: string; 
+  export let field: string;
   export let form: any;
 </script>
-
 
 {#if form?.error}
   {#each form?.errors as error}

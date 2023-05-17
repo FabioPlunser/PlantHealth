@@ -11,16 +11,19 @@
   import Table from "$components/table/Table.svelte";
   import LimitsCard from "$lib/components/ui/SensorStation/LimitsCard.svelte";
   import FormError from "$components/ui/FormError.svelte";
-  import SensorStationsModal from "./SensorstationsModal.svelte";
+
   import { flexRender, type ColumnDef } from "@tanstack/svelte-table";
   import { TextCell } from "$components/table/cellComponents";
-  import SensorStation from "./SensorStation.svelte";
 
   // ---------------------------------------------------
   // ---------------------------------------------------
   import { onMount } from "svelte";
   import { add } from "$lib/components/toast/core/store";
   import UploadPicture from "./uploadPicture.svelte";
+  import {
+    SensorStation,
+    SensorStationsModal,
+  } from "$lib/components/ui/SensorStation";
   let rendered = false;
   onMount(() => {
     rendered = true;
@@ -110,6 +113,7 @@
   // };
   // ----------------------------------
   // ----------------------------------
+  let searchTerm = "";
 </script>
 
 {#if rendered}
@@ -148,18 +152,32 @@
           }}>SensorStations</button
         >
       </div>
-      {#if data.dashboard.addedSensorStations.length === 0}
-        <div class="flex justify-center h-screen">
-          <p class="text-xl font-bold">No SensorStations added yet</p>
+      {#if data.dashboard.addedSensorStations?.length === 0}
+        <h1
+          class="text-2xl font-bold flex justify-center items-center my-auto mt-2"
+        >
+          You have no Sensor Stations in your Dashboard yet.
+        </h1>
+      {:else}
+        <div class="m-4 flex justify-ceter">
+          <input
+            bind:value={searchTerm}
+            type="search"
+            name="searchRoom"
+            placeholder="Global Search"
+            class="input dark:input-bordered w-fit min-w-64 mx-auto dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
+          />
+        </div>
+        <div class="grid grid-rows gap-2 mt-2">
+          {#each data.dashboard.addedSensorStations as sensorStation, i (sensorStation.sensorStationId)}
+            {#if sensorStation.name.includes(searchTerm) || sensorStation.roomName.includes(searchTerm)}
+              <div class="">
+                <SensorStation {sensorStation} dates={data.dates} />
+              </div>
+            {/if}
+          {/each}
         </div>
       {/if}
-      <div class="grid grid-rows gap-2">
-        {#each data.dashboard.addedSensorStations as sensorStation, i (sensorStation.sensorStationId)}
-          <div in:fly={{ y: -200, duration: 200, delay: 200 * i }}>
-            <SensorStation {sensorStation} dates={data.dates} />
-          </div>
-        {/each}
-      </div>
     {/if}
     {#if assignedAdded}
       {#if data.dashboard.assignedSensorStations.length === 0}
