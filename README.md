@@ -27,9 +27,8 @@ For an overview of the system see the corresponding [Wiki](https://git.uibk.ac.a
 
 ### Sensorstation
 
-TODO: Add directory of schematics and parts list
-1. Build the Arduino 33 BLE sensorstation using the schematics in the "Software Concept" found in the wiki.
-2. Setup the Arduino 33 BLE, connect it to your computer and upload the code from `sensorstation/sensorstation.ino` to the Arduino with PlatformIO. If you don't have PlatformIO installed, you can use the Arduino IDE, but you will have to install the `ArduinoBLE` library manually. If special configuration is needed, you can change the values in 'sensor_station/include/Defines.h'.
+1. Build the Arduino 33 BLE sensorstation using the schematics in the "Software Concept" found in the wiki, or take the Fritzing file in `sensor_station/CircuitePlan/Arduino.fzz` as reference.
+2. Setup the Arduino 33 BLE, connect it to your computer and upload the code from `sensor_station/src/main.cpp` to the Arduino with PlatformIO. If you don't have PlatformIO installed, you can use the Arduino IDE, but you will have to install the required librarys manually. If special configuration is needed, you can change the values in `sensor_station/include/Defines.h`.
 3. Place the plant in the sensorstation and close the lid.
 4. Once the Arduino gets connected to power, it will immediately go into the pairing mode, resulting in the led blinking in the color defined in the Software Concept. The pairing mode will be active for 5 minutes. During this time, you can connect to the Arduino using the Plant Health App. If the pairing mode is over, you can restart it by pressing the button on the Arduino for 1 seconds. The pairing mode will be active for 5 minutes again.
 5. Once the Arduino is conneted to the accesspoint, it will send data to the backend and signal over the LED and piezo buzzer if a problem is detected, if not defined otherwise in the 'sensor_station/include/Defines.h' file.
