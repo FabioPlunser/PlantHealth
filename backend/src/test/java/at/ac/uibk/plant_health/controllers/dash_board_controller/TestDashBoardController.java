@@ -96,7 +96,7 @@ public class TestDashBoardController {
 		AnyOf<String> nameMatcher =
 				Matchers.anyOf(Matchers.equalTo(s1.getName()), Matchers.equalTo(s2.getName()));
 
-		mockMvc.perform(MockMvcRequestBuilders.get("/get-dashboard-data")
+		mockMvc.perform(MockMvcRequestBuilders.get("/get-dashboard")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(person))
@@ -134,7 +134,7 @@ public class TestDashBoardController {
 		sensorStationService.addSensorData(s1, data1);
 		sensorStationService.addSensorData(s1, data2);
 
-		mockMvc.perform(MockMvcRequestBuilders.get("/get-dashboard-data")
+		mockMvc.perform(MockMvcRequestBuilders.get("/get-dashboard")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(person))
