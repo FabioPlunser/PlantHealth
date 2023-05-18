@@ -89,6 +89,26 @@
                     class="card w-full min-w-full h-fit bg-base-100 shadow-2xl"
                   >
                     <div class="card-body">
+                      <div>
+                        <button
+                          type="submit"
+                          on:click={(event) => {
+                            let isDeleteConfirmed = confirm(
+                              `You will delete this access point permanently!`
+                            );
+                            if (!isDeleteConfirmed) {
+                              event.preventDefault();
+                              return;
+                            }
+                            throw redirect(307, "/admin/accesspoints");
+                          }}
+                          formaction="?/delete"
+                        >
+                          <i
+                            class="absolute top-0 right-0 m-4 bi bi-trash text-4xl hover:text-red-500"
+                          />
+                        </button>
+                      </div>
                       <label class="" for="transferInterval">
                         <span class="label-text text-xl font-bold">Room:</span>
                         <input
