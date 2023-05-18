@@ -89,8 +89,9 @@ export const actions = {
   //
   //---------------------------------------------------------------------
   update: async (event) => {
-    await updateSensorStation(event);
-    await assignGardener(event);
+    let formData = await event.request.formData();
+    await updateSensorStation(event, formData);
+    await assignGardener(event, formData);
   },
   //---------------------------------------------------------------------
   //

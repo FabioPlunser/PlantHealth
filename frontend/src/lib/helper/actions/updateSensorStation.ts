@@ -13,9 +13,14 @@ const nameSchema = z.object({
     .trim(),
 });
 
-export async function updateSensorStation(event: any) {
+export async function updateSensorStation(
+  event: any,
+  formData: any | undefined
+) {
   const { request, fetch } = event;
-  const formData = await request.formData();
+  if (!formData) {
+    formData = await request.formData();
+  }
   const zodData = nameSchema.safeParse({
     name: formData.get("name"),
     transferInterval: Number(formData.get("transferInterval")),
@@ -51,20 +56,20 @@ export async function updateSensorStation(event: any) {
       "Content-Type": "application/json",
     },
   };
+
+  let message = "Error while updating sensor station";
   await fetch(
     `${BACKEND_URL}/update-sensor-station?${params.toString()}`,
     requestOptions
   )
     .then(async (res: any) => {
       if (!res.ok) {
-        res = await res.json();
-        errorHandler(
-          event.locals.user?.personId,
-          "Error while updating sensor station",
-          res
-        );
+        let data = await res.json();
+        errorHandler(event.locals.user?.personId, data.message, data);
+        message = data.message;
       }
       let data = await res.json();
+      console.log(data);
       toasts.addToast(
         event.locals.user?.personId,
         "success",
@@ -72,11 +77,7 @@ export async function updateSensorStation(event: any) {
       );
     })
     .catch((e: any) => {
-      errorHandler(
-        event.locals.user?.personId,
-        "Error while updating sensor station",
-        e
-      );
-      throw error(500, "Error while updating sensor station");
+      errorHandler(event.locals.user?.personId, message, e);
+      // throw error(500, {message: "Error while updating sensor station"});
     });
 }

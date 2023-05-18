@@ -136,7 +136,7 @@ public class SensorStationController {
 
 		return MessageResponse.builder()
 				.statusCode(200)
-				.message("Successfully set sensor limits")
+				.message("Successfully updated Sensor Station")
 				.toEntity();
 	}
 

@@ -89,12 +89,8 @@ export async function handleFetch({ request, fetch, event }) {
   return fetch(request);
 }
 
-interface Error {
-  [key: string]: any;
-}
-
-export async function handleError(error: Error) {
-  logger.error("HandleError Event: ", { payload: error.message });
+export async function handleError(error) {
+  logger.error("HandleError Event: ", { payload: error });
   return {
     message: error.message,
     errorId: error.errorId,

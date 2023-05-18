@@ -5,9 +5,12 @@ import { errorHandler } from "../errorHandler";
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 
-export async function assignGardener(event: any) {
+export async function assignGardener(event: any, formData?: any) {
+  console.log(event, formData);
   const { request, fetch } = event;
-  const formData = await request.formData();
+  if (!formData) {
+    formData = await request.formData();
+  }
 
   let sensorStationId = String(formData.get("sensorStationId"));
   let unassign = Boolean(formData.get("unassign"));
@@ -47,6 +50,8 @@ export async function assignGardener(event: any) {
         "Error while assigning gardener to sensor station",
         e
       );
-      throw error(500, "Error while assigning gardener to sensor station");
+      throw error(500, {
+        message: "Error while assigning gardener to sensor station",
+      });
     });
 }
