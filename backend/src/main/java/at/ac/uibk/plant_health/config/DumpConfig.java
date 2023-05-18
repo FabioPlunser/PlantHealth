@@ -106,10 +106,10 @@ public class DumpConfig {
 		accessPointRepository.saveAll(aps);
 
 		List<Pair<String, String>> sensorKeyValues =
-				List.of(Pair.of("TEMPERATURE", "°C"), Pair.of("HUMIDITY", "%"),
-						Pair.of("PRESSURE", "hPa"), Pair.of("SOILHUMIDITY", "%"),
-						Pair.of("LIGHTINTENSITY", "lm"), Pair.of("AIRQUALITY", "%"),
-						Pair.of("BATTERYLEVEL", "%"));
+				List.of(Pair.of("Temperature", "°C"), Pair.of("Air Humidity", "%"),
+						Pair.of("Air Pressure", "hPa"), Pair.of("Earth Humidity", "%"),
+						Pair.of("Light Intensity", "lm"), Pair.of("Air Quality", "%"),
+						Pair.of("Battery Level", "%"));
 		var sensors = sensorKeyValues.stream()
 							  .map(p -> new Sensor(p.getFirst(), p.getSecond()))
 							  .toList();
