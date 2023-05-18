@@ -3,7 +3,7 @@
   import Spinner from "$components/ui/Spinner.svelte";
   import { onMount } from "svelte";
   import { string } from "zod";
-
+  import { BigPictureModal } from "$components/ui/SensorStation";
   // ----------------------------------------------- //
   let rendered = false;
   onMount(() => {
@@ -12,7 +12,16 @@
   // ----------------------------------------------- //
 
   export let pictures: any = [];
+
+  let openPictureModal = false;
+  let selectedPicture = "";
 </script>
+
+<BigPictureModal
+  on:close={() => (openPictureModal = false)}
+  imageRef={selectedPicture}
+  open={openPictureModal}
+/>
 
 {#if rendered}
   {#if pictures.lenght === 0}
@@ -34,10 +43,15 @@
             in:fly={{ y: -200, duration: 500, delay: 200 }}
             class="shrink-0 snap-center "
           >
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
             <img
               alt="Plant"
-              class="rounded-xl shadow-xl backdrop-blur-2xl"
+              class="rounded-xl shadow-xl backdrop-blur-2xl cursor-pointer"
               src={data.imageRef}
+              on:click={() => {
+                selectedPicture = data.imageRef;
+                openPictureModal = true;
+              }}
             />
             <h1 class="flex justify-center">
               Date: {data.creationDate.toLocaleDateString()}
