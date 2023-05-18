@@ -53,11 +53,7 @@ public class AccessPointController {
 	@ReadOperation
 	@GetMapping("/get-access-points")
 	public RestResponseEntity getAccessPoints() {
-		return new AccessPointListResponse(accessPointService.findAllAccessPoints()
-												   .stream()
-												   .filter(ap -> !ap.isDeleted())
-												   .toList())
-				.toEntity();
+		return new AccessPointListResponse(accessPointService.findAllAccessPoints()).toEntity();
 	}
 
 	@AnyPermission(Permission.ADMIN)

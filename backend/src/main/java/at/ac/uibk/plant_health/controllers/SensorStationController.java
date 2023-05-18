@@ -48,9 +48,7 @@ public class SensorStationController {
 	@GetMapping("/get-all-sensor-stations")
 	public RestResponseEntity getAllSensorStations() {
 		try {
-			return new AdminSensorStationsResponse(sensorStationService.findAll().stream()
-					.filter(st -> !st.isDeleted())
-					.toList()).toEntity();
+			return new AdminSensorStationsResponse(sensorStationService.findAll()).toEntity();
 		} catch (ServiceException e) {
 			return MessageResponse.builder()
 					.statusCode(e.getStatusCode())

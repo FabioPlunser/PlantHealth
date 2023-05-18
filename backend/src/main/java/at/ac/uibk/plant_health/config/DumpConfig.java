@@ -106,10 +106,10 @@ public class DumpConfig {
 		accessPointRepository.saveAll(aps);
 
 		List<Pair<String, String>> sensorKeyValues =
-				List.of(Pair.of("TEMPERATURE", "°C"), Pair.of("HUMIDITY", "%"),
-						Pair.of("PRESSURE", "hPa"), Pair.of("SOILHUMIDITY", "%"),
-						Pair.of("LIGHTINTENSITY", "lm"), Pair.of("AIRQUALITY", "%"),
-						Pair.of("BATTERYLEVEL", "%"));
+				List.of(Pair.of("Temperature", "°C"), Pair.of("Air Humidity", "%"),
+						Pair.of("Air Pressure", "hPa"), Pair.of("Earth Humidity", "%"),
+						Pair.of("Light Intensity", "lm"), Pair.of("Air Quality", "%"),
+						Pair.of("Battery Level", "%"));
 		var sensors = sensorKeyValues.stream()
 							  .map(p -> new Sensor(p.getFirst(), p.getSecond()))
 							  .toList();
@@ -161,8 +161,8 @@ public class DumpConfig {
 							var sensorData =
 									IntStream.range(0, numSensorData)
 											.mapToObj(j -> {
-												boolean above = (j & 0x4) > 0;
-												boolean below = (j & 0x8) > 0;
+												boolean above = j > 0.9 * numSensorData;
+												boolean below = j < 0.1 * numSensorData;
 												char alarm;
 												if (above) {
 													alarm = below ? 'b' : 'h';
