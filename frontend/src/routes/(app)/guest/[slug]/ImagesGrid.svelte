@@ -2,8 +2,8 @@
   import { fly } from "svelte/transition";
   import Spinner from "$components/ui/Spinner.svelte";
   import { onMount } from "svelte";
-  import { string } from "zod";
-  import { BigPictureModal } from "$components/ui/SensorStation";
+
+  import { BigPictureModal } from "$components/ui/sensorStation";
   // ----------------------------------------------- //
   let rendered = false;
   onMount(() => {

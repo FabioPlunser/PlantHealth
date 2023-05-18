@@ -7,7 +7,6 @@
 
   import Camera from "$lib/assets/icons/Camera.svg?component";
   import type { SubmitFunction } from "./$types.js";
-  import { BigPictureModal } from "$components/ui/SensorStation";
   // ----------------------------------------------- //
   let isRendered = false;
   onMount(() => {
