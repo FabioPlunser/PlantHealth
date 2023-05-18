@@ -87,6 +87,24 @@ public class SensorData implements Serializable {
 		this.sensorStation = sensorStation;
 	}
 
+	public void setAlarm(String alarm) {
+		this.alarm = alarm;
+		switch (alarm) {
+			case "h" -> {
+				this.aboveLimit = true;
+				this.belowLimit = false;
+			}
+			case "l" -> {
+				this.aboveLimit = false;
+				this.belowLimit = true;
+			}
+			default -> {
+				this.aboveLimit = false;
+				this.belowLimit = false;
+			}
+		}
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
