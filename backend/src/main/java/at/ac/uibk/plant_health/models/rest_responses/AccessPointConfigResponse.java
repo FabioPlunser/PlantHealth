@@ -34,7 +34,7 @@ public class AccessPointConfigResponse extends RestResponse implements Serializa
 		this.sensorStations =
 				accessPoint.getSensorStations()
 						.stream()
-						.filter(station -> station.isDeleted() && station.isUnlocked())
+						.filter(station -> !station.isDeleted() && station.isUnlocked())
 						.map(SensorStationInfo::new)
 						.toList();
 	}
