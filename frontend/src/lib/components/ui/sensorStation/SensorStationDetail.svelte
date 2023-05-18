@@ -85,7 +85,7 @@
       sensorStations = data.sensorStations;
     }
   }
-  let search = "";
+  let searchTerm = "";
 </script>
 
 {#if rendered}
@@ -95,8 +95,18 @@
     on:close={() => (showPicture = false)}
   />
   <section>
+    <div class="mb-4 flex justify-ceter">
+      <input
+        bind:value={searchTerm}
+        type="search"
+        name="searchRoom"
+        placeholder="Global Search"
+        class="input dark:input-bordered w-fit min-w-64 mx-auto dark:bg-gray-800 bg-gray-200 dark:text-white text-black mt-4"
+      />
+    </div>
     <div class="grid grid-rows gap-2">
       {#each sensorStations as sensorStation, i (sensorStation.sensorStationId)}
+      {#if sensorStation.name.includes(searchTerm) || sensorStation.roomName.includes(searchTerm)}
         <div
           class="m-0 p-0 w-full sm:max-w-10/12 2xl:max-w-8/12 mx-auto"
           in:fly={{ y: -200, duration: 200, delay: 200 * i }}
@@ -288,33 +298,6 @@
                     <Spinner />
                   {:then data}
                     <SensorStationDetailTable {data} />
-                    <!-- <input class="input input-bordered m-1 bg-gray-300" bind:value={search} placeholder="Search" />
-                    <div class="overflow-auto">
-                      <table class="table table-zebra w-full h-full">
-                        <thead>
-                          <tr>
-                            <th>TimeStamp</th>
-                            <th>sensorType</th>
-                            <th>value</th>
-                            <th>alarm</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {#each data.data as sensor, i}
-                            {#if sensor.sensorType.toLowerCase().includes(search.toLowerCase())}
-                              {#each sensor.values as value}
-                                <tr>
-                                  <th>{new Date(value.timeStamp).toLocaleString("de-DE")}</th>
-                                  <th>{sensor.sensorType}</th>
-                                  <td>{value.value}</td>
-                                  <td>{value.alarm}</td>
-                                </tr>
-                              {/each}
-                            {/if}
-                          {/each}
-                        </tbody>
-                      </table>
-                    </div> -->
                   {/await}
                 </div>
                 <h1>Table</h1>
@@ -450,6 +433,7 @@
             {/if}
           </div>
         </div>
+        {/if}
       {/each}
     </div>
   </section>

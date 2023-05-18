@@ -141,9 +141,43 @@ export const actions = {
           "Error while scanning for sensor stations",
           err
         );
-        throw error(500, "Error while scanning for sensor stations");
+        throw error(500, "Error while scanning for access point");
       });
   },
 
-  delete: async (event) => {},
+  delete: async (event) => {
+    const { request, fetch } = event;
+  let formData = await request.formData();
+  let accessPointId: string = String(formData.get("accessPointId"));
+
+  let params = new URLSearchParams();
+  params.set("accessPointId", accessPointId);
+
+  await fetch(`${BACKEND_URL}/delete-access-point?${params.toString()}`, {
+    method: "DELETE",
+  })
+    .then((res: any) => {
+      if (!res.ok) {
+        errorHandler(
+          event.locals.user?.personId,
+          "Error while deleting access point",
+          res
+        );
+      } else {
+        logger.info(`Deleted access point = ${accessPointId}`);
+        toasts.addToast(
+          event.locals.user?.personId,
+          "success",
+          "Deleted access point"
+        );
+      }
+    })
+    .catch((e: any) => {
+      errorHandler(
+        event.locals.user?.personId,
+        "Error while deleting access point",
+        e
+      );
+    });
+  },
 };
