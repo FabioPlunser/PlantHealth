@@ -1,5 +1,6 @@
 package at.ac.uibk.plant_health.repositories;
 
+import at.ac.uibk.plant_health.models.user.Person;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
@@ -18,4 +19,17 @@ public interface SensorStationRepository extends CrudRepository<SensorStation, U
 	List<SensorStation> findByIsUnlockedAndIsDeleted(boolean isUnlocked, boolean isDeleted);
 
 	Optional<SensorStation> findByBdAddress(String bdAddress);
+
+	default List<SensorStation> findNewForGardener(Person gardener) {
+		return findByGardenerAndSensorStationPersonReferences_PersonAndIsUnlockedTrueAndIsDeletedFalseAndSensorStationPersonReferences_IsAssignedFalseAndSensorStationPersonReferences_InDashboardFalse(gardener, gardener);
+	}
+
+	default List<SensorStation> findNewForUser(Person person) {
+		return findByIsUnlockedTrueAndIsDeletedFalseAndSensorStationPersonReferences_PersonAndSensorStationPersonReferences_InDashboardFalse(person);
+	}
+
+	List<SensorStation> findByGardenerAndSensorStationPersonReferences_PersonAndIsUnlockedTrueAndIsDeletedFalseAndSensorStationPersonReferences_IsAssignedFalseAndSensorStationPersonReferences_InDashboardFalse(Person gardener, Person person);
+
+	List<SensorStation> findByIsUnlockedTrueAndIsDeletedFalseAndSensorStationPersonReferences_PersonAndSensorStationPersonReferences_InDashboardFalse(Person person);
+
 }

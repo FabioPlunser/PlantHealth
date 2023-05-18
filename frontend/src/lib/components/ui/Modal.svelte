@@ -8,6 +8,7 @@
    */
   export let open = false;
   export let closeOnBodyClick = true;
+  export let _class = "";
 
   function handleDispatch() {}
   const previously_focused =
@@ -18,39 +19,62 @@
       handleDispatch();
     });
   }
-  function handleKeyDown(event) {
+  function handleKeyDown(event: any) {
     if (event.key === "Escape") {
       close();
     }
   }
 </script>
 
+<!-- @component
+This is a Modal component. It is used to display a modal on the screen.
+Usage: 
+```html
+
+<script lang="ts">
+  import Modal from "$components/ui/Modal.svelte";
+  export let open = false;
+<script/>
+
+<Modal {open} on:close={() => (open = false)} closeOnBodyClick={false}>
+  <div>
+    <h1>SensorData</h1>
+  </div>
+  <div class="mx-auto">
+    <button class="btn btn-info" on:click={() => (open = false)}
+      >Close</button
+    >
+  </div>
+</Modal>
+```
+-->
+
 <svelte:window on:keydown={handleKeyDown} />
 
 {#if closeOnBodyClick}
   <div
-    class="modal min-w-fit cursor-pointer max-w-none"
+    class="modal cursor-pointer"
     class:modal-open={open}
     on:keydown={handleKeyDown}
     on:click={close}
   >
     <div
       transition:scale={{ duration: 150 }}
-      class="modal-box w-auto relative overflow-auto bg-base-300 max-w-none"
+      class="modal-box bg-base-300 {_class} max-w-none"
     >
       <slot />
     </div>
   </div>
 {:else}
   <div
-    class="modal min-w-fit cursor-pointer max-w-none"
+    class="modal cursor-pointer"
     class:modal-open={open}
     on:keydown={handleKeyDown}
     on:click|self={close}
   >
     <div
       transition:scale={{ duration: 150 }}
-      class="modal-box w-auto relative overflow-auto bg-base-300 max-w-none"
+      class="modal-box bg-base-100 {_class} max-w-none"
     >
       <slot />
     </div>

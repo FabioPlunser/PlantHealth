@@ -1,10 +1,8 @@
 package at.ac.uibk.plant_health.service;
 
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Files;
@@ -15,12 +13,14 @@ import java.util.*;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.exceptions.ServiceException;
-import at.ac.uibk.plant_health.models.plant.PlantPicture;
 import at.ac.uibk.plant_health.models.plant.Sensor;
 import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
+import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
+import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.repositories.*;
+import jakarta.transaction.Transactional;
 
 @Service
 public class SensorStationService {
@@ -38,13 +38,25 @@ public class SensorStationService {
 	private SensorLimitsRepository sensorLimitsRepository;
 	@Value("${swa.pictures.path}")
 	private String picturesPath;
+	@Autowired
+	private PersonService personService;
+
+	private static final String NOT_FOUND_ERROR_MESSAGE = "Could not find SensorStation";
 
 	public SensorStation findById(UUID id) throws ServiceException {
 		Optional<SensorStation> maybeSensorStation = this.sensorStationRepository.findById(id);
 		if (maybeSensorStation.isEmpty()) {
-			throw new ServiceException("Could not find SensorStation", 404);
+			throw new ServiceException(NOT_FOUND_ERROR_MESSAGE, 404);
 		}
 		return maybeSensorStation.get();
+	}
+
+	public List<SensorStation> findAssociated(Person person) {
+		if (person.getPermissions().contains(Permission.GARDENER)) {
+			return sensorStationRepository.findNewForGardener(person);
+		} else {
+			return sensorStationRepository.findNewForUser(person);
+		}
 	}
 
 	public List<SensorStation> findAll() {
@@ -52,12 +64,21 @@ public class SensorStationService {
 	}
 
 	public SensorStation findByBdAddress(String bdAddress) throws ServiceException {
+		if (bdAddress == null) {
+			throw new ServiceException(NOT_FOUND_ERROR_MESSAGE, 404);
+		}
 		Optional<SensorStation> maybeSensorStation =
 				this.sensorStationRepository.findByBdAddress(bdAddress);
 		if (maybeSensorStation.isEmpty()) {
-			throw new ServiceException("Could not find SensorStation", 404);
+			throw new ServiceException(NOT_FOUND_ERROR_MESSAGE, 404);
 		}
 		return maybeSensorStation.get();
+	}
+
+	public SensorStation sensorStationExists(String bdAddress) {
+		Optional<SensorStation> maybeSensorStation =
+				this.sensorStationRepository.findByBdAddress(bdAddress);
+		return maybeSensorStation.orElse(null);
 	}
 
 	public SensorStation save(SensorStation sensorStation) throws ServiceException {
@@ -84,26 +105,28 @@ public class SensorStationService {
 	/**
 	 * Set sensor limits of sensor station.
 	 * @param sensorLimits
-	 * @param sensorStationId
+	 * @param sensorStation
 	 * @return
 	 */
-	// @Transactional
+	@Transactional
 	public void setSensorLimits(
-			List<SensorLimits> sensorLimits, UUID sensorStationId, Person person
+			List<SensorLimits> sensorLimits, SensorStation sensorStation, Person person
 	) throws ServiceException {
-		SensorStation sensorStation = findById(sensorStationId);
+		if (!sensorStation.isUnlocked()) throw new ServiceException("SensorStation is locked", 403);
+		if (sensorStation.isDeleted()) throw new ServiceException("SensorStation is deleted", 403);
 		for (SensorLimits limit : sensorLimits) {
-			Optional<Sensor> sensor = sensorRepository.findByType(limit.getSensor().getType());
-			if (sensor.isEmpty())
+			Optional<Sensor> maybeSensor = sensorRepository.findByType(limit.getSensor().getType());
+			if (maybeSensor.isEmpty())
 				throw new ServiceException(
 						"Sensor " + limit.getSensor().getType() + " not found", 500
 				);
-			limit.setSensor(sensor.get());
-			limit.setGardener(person);
-			limit.setSensorStation(sensorStation);
-			limit.setTimeStamp(LocalDateTime.now());
+			Sensor sensor = maybeSensor.get();
+			SensorLimits newLimit = new SensorLimits(
+					LocalDateTime.now(), limit.getLowerLimit(), limit.getUpperLimit(),
+					limit.getThresholdDuration(), sensor, person, sensorStation
+			);
 			try {
-				sensorLimitsRepository.save(limit);
+				sensorLimitsRepository.save(newLimit);
 			} catch (Exception e) {
 				throw new ServiceException("Could not save sensor limits", 500);
 			}
@@ -111,19 +134,63 @@ public class SensorStationService {
 	}
 
 	/**
+	 * Update name of SensorStation
+	 * @param sensorStation
+	 * @param name
+	 */
+	public void updateSensorStation(
+			SensorStation sensorStation, String name, Integer transferInterval
+	) {
+		if (!Objects.isNull(name)) {
+			sensorStation.setName(name);
+		}
+		if (!Objects.isNull(transferInterval) && !Objects.isNull(sensorStation.getAccessPoint())) {
+			sensorStation.getAccessPoint().setTransferInterval(transferInterval);
+		}
+		save(sensorStation);
+	}
+
+	public void assignGardenerToSensorStation(
+			SensorStation sensorStation, UUID personId, boolean delete
+	) throws ServiceException {
+		if (delete) {
+			sensorStation.setGardener(null);
+			save(sensorStation);
+			return;
+		}
+		Optional<Person> maybePerson = personService.findById(personId);
+		if (maybePerson.isEmpty()) throw new ServiceException("Person does not exist", 404);
+		Person person = maybePerson.get();
+		if (!person.getPermissions().contains(Permission.GARDENER))
+			throw new ServiceException("Person is not a gardener", 403);
+		sensorStation.setGardener(maybePerson.get());
+		save(sensorStation);
+	}
+	/**
 	 * Get pictures of SensorStation
 	 * @param sensorStationId
 	 * @return list of base64 encoded pictures
 	 */
-	public List<PlantPicture> getPictures(UUID sensorStationId) throws ServiceException {
+	public List<SensorStationPicture> getPictures(UUID sensorStationId) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
-		return sensorStation.getPlantPictures();
+		return sensorStation.getSensorStationPictures();
 	}
 
-	public PlantPicture getPicture(UUID pictureId) throws ServiceException {
-		Optional<PlantPicture> maybePicture = plantPictureRepository.findById(pictureId);
+	public SensorStationPicture getPicture(UUID pictureId) throws ServiceException {
+		Optional<SensorStationPicture> maybePicture = plantPictureRepository.findById(pictureId);
 		if (maybePicture.isEmpty()) throw new ServiceException("Picture does not exist", 404);
 		return maybePicture.get();
+	}
+
+	public SensorStationPicture getNewestPicture(UUID sensorStationId) throws ServiceException {
+		try {
+			SensorStation sensorStation = findById(sensorStationId);
+			return plantPictureRepository.findDistinctFirstBySensorStationOrderByTimeStampDesc(
+					sensorStation
+			);
+		} catch (Exception e) {
+			throw new ServiceException("Could not get newest picture", 500);
+		}
 	}
 
 	/**
@@ -133,26 +200,39 @@ public class SensorStationService {
 	 */
 	public void uploadPicture(MultipartFile picture, UUID sensorStationId) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
-		PlantPicture plantPicture = null;
+		SensorStationPicture plantPicture = null;
 		try {
 			String extension = Objects.requireNonNull(picture.getContentType()).split("/")[1];
 			String picturePath = picturesPath + UUID.randomUUID() + "." + extension;
 			Path path = Paths.get(picturePath);
 
-			plantPicture = new PlantPicture(sensorStation, picturePath, LocalDateTime.now());
+			plantPicture =
+					new SensorStationPicture(sensorStation, picturePath, LocalDateTime.now());
 			plantPictureRepository.save(plantPicture);
 
 			Files.createDirectories(path.getParent());
 			Files.write(path, picture.getBytes());
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new ServiceException("Could not save picture", 500);
 		}
 
-		List<PlantPicture> sensorStationPictures = sensorStation.getPlantPictures();
+		List<SensorStationPicture> sensorStationPictures = sensorStation.getSensorStationPictures();
 		sensorStationPictures.add(plantPicture);
-		sensorStation.setPlantPictures(sensorStationPictures);
+		sensorStation.setSensorStationPictures(sensorStationPictures);
 		save(sensorStation);
+	}
+
+	public byte[] convertPictureToByteArray(SensorStationPicture picture) throws ServiceException {
+		try {
+			return Files.readAllBytes(Paths.get(picture.getPicturePath()));
+		} catch (Exception e) {
+			throw new ServiceException("Could not get picture resource", 500);
+		}
+	}
+
+	public String getPictureName(UUID pictureId) throws ServiceException {
+		SensorStationPicture picture = getPicture(pictureId);
+		return picture.getPicturePath().split("/")[2];
 	}
 
 	/**
@@ -162,16 +242,16 @@ public class SensorStationService {
 	 * @throws ServiceException
 	 */
 	public void deletePicture(UUID pictureId) throws ServiceException {
-		Optional<PlantPicture> maybePicture = plantPictureRepository.findById(pictureId);
+		Optional<SensorStationPicture> maybePicture = plantPictureRepository.findById(pictureId);
 		if (maybePicture.isEmpty()) throw new ServiceException("Picture does not exist", 404);
-		PlantPicture picture = maybePicture.get();
+		SensorStationPicture picture = maybePicture.get();
 		SensorStation sensorStation = picture.getSensorStation();
 
 		try {
 			Path path = Paths.get(picture.getPicturePath());
 			Files.delete(path);
 			plantPictureRepository.delete(picture);
-			sensorStation.getPlantPictures().remove(picture);
+			sensorStation.getSensorStationPictures().remove(picture);
 			save(sensorStation);
 		} catch (Exception e) {
 			throw new ServiceException("Failed to delete pictue of the server", 500);
@@ -185,23 +265,28 @@ public class SensorStationService {
 	 */
 	public void deleteAllPictures(UUID sensorStationId) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
-		List<PlantPicture> pictures = new ArrayList<>(sensorStation.getPlantPictures());
+		List<SensorStationPicture> pictures =
+				new ArrayList<>(sensorStation.getSensorStationPictures());
 		try {
-			for (PlantPicture picture : pictures) {
-				try {
-					Path path = Paths.get(picture.getPicturePath());
-					Files.delete(path);
-					plantPictureRepository.delete(picture);
-				} catch (Exception e) {
-					plantPictureRepository.delete(picture);
-					throw new ServiceException("Picture already deleted from server", 500);
-				}
+			for (SensorStationPicture picture : pictures) {
+				savePicture(picture);
 
-				sensorStation.getPlantPictures().remove(picture);
+				sensorStation.getSensorStationPictures().remove(picture);
 			}
 			save(sensorStation);
 		} catch (Exception e) {
 			throw new ServiceException("Failed to delete picture of the server", 500);
+		}
+	}
+
+	private void savePicture(SensorStationPicture picture) {
+		try {
+			Path path = Paths.get(picture.getPicturePath());
+			Files.delete(path);
+			plantPictureRepository.delete(picture);
+		} catch (Exception e) {
+			plantPictureRepository.delete(picture);
+			throw new ServiceException("Picture already deleted from server", 500);
 		}
 	}
 
@@ -233,5 +318,34 @@ public class SensorStationService {
 				throw new ServiceException("Could not save sensor data", 500);
 			}
 		}
+	}
+
+	public void isDeleted(SensorStation sensorStation) throws ServiceException {
+		if (sensorStation.isDeleted()) {
+			throw new ServiceException("Sensor station is deleted", 400);
+		}
+	}
+
+	/**
+	 * Deletes a sensor station
+	 *
+	 * @param sensorStationId
+	 * @throws ServiceException
+	 */
+	public void deleteSensorStation(UUID sensorStationId) throws ServiceException {
+		Optional<SensorStation> maybeSensorStation =
+				sensorStationRepository.findById(sensorStationId);
+		if (maybeSensorStation.isEmpty()) {
+			throw new ServiceException("Sensor station not found", 404);
+		}
+		SensorStation sensorStation = maybeSensorStation.get();
+		if (sensorStation.isDeleted()) {
+			throw new ServiceException("Sensor station already deleted", 404);
+		}
+		sensorStation.setDeleted(true);
+		sensorStation.setUnlocked(false);
+		sensorStation.setBdAddress(null);
+		sensorStation.setAccessPoint(null);
+		sensorStationRepository.save(sensorStation);
 	}
 }

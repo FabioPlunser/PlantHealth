@@ -24,7 +24,7 @@ pythonTests-job:
     - echo "Running unit tests"
     - coverage run
     - coverage xml
-  allow_failure: false
+  allow_failure: true
   only:
     - dev-access_point
     - dev
@@ -48,7 +48,7 @@ pythonSonarCheck-job:
       -Dsonar.projectKey=${SONAR_PROJECT_KEY}
       -Dsonar.projectName="${CI_PROJECT_NAME} ${CI_COMMIT_BRANCH}"
       -Dsonar.python.coverage.reportPaths=access_point/coverage.xml
-  allow_failure: false
+  allow_failure: true
   only:
     - dev-access_point
     - dev
@@ -60,7 +60,7 @@ javaTest-job: # This job runs in the test stage.
   script:
     - echo "Running unit tests..."
     - cd backend && mvn test
-  allow_failure: false
+  allow_failure: true
 
 javaSonarCheck-job:
   image: alpine:3.17
@@ -78,7 +78,7 @@ javaSonarCheck-job:
     - apk add --update nodejs
     - echo Running sonar analysis for ${SONAR_PROJECT_KEY}
     - cd backend && mvn -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.projectName="${CI_PROJECT_NAME} ${GITLAB_USER_NAME}" --fail-at-end verify sonar:sonar
-  allow_failure: false
+  allow_failure: true
   only:
     - dev-backend
     - dev

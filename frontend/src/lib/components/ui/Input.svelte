@@ -4,15 +4,19 @@
   export let placeholder: string = "";
   export let type: string = "";
   export let value: any = null;
+  let _class = "";
+  export { _class as class };
 </script>
 
-<label class="label">
-  <span class="label-text font-bold">{label}</span>
-</label>
-<input
-  {value}
-  name={field}
-  {type}
-  {placeholder}
-  class="input input-bordered w-full bg-gray-800 text-white"
-/>
+<div>
+  <label class="" for={field}>
+    <span class="label-text text-xl font-bold">{label}</span>
+    <input
+      {value}
+      name={field}
+      {type}
+      {placeholder}
+      class="input input-bordered w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black caret-red-200 {_class}"
+    />
+  </label>
+</div>

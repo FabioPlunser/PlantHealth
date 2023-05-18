@@ -1,6 +1,7 @@
 import { dismiss, remove, upsert } from "./store";
 import { resolveValue } from "./types";
 import { genId } from "./utils";
+
 const createToast = (message, type = "blank", opts) => ({
   createdAt: Date.now(),
   visible: true,
@@ -14,12 +15,13 @@ const createToast = (message, type = "blank", opts) => ({
   ...opts,
   id: opts?.id || genId(),
 });
+
 const createHandler = (type) => (message, options) => {
   const toast = createToast(message, type, options);
   upsert(toast);
   return toast.id;
 };
-const toast = (message, opts) => createHandler("blank")(message, opts);
+const toast = (type, message, opts) => createHandler(type)(message, opts);
 toast.error = createHandler("error");
 toast.success = createHandler("success");
 toast.loading = createHandler("loading");

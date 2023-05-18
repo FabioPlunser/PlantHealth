@@ -1,5 +1,5 @@
-<script>
-  export let toast;
+<script lang="ts">
+  export let toast: any;
 </script>
 
 <div class="message" {...toast.ariaProps}>

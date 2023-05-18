@@ -31,11 +31,12 @@ public class AccessPointConfigResponse extends RestResponse implements Serializa
 		this.roomName = accessPoint.getRoomName();
 		this.pairingMode = accessPoint.getScanActive();
 		this.transferInterval = accessPoint.getTransferInterval();
-		this.sensorStations = accessPoint.getSensorStations()
-									  .stream()
-									  .filter(SensorStation::isUnlocked)
-									  .map(SensorStationInfo::new)
-									  .toList();
+		this.sensorStations =
+				accessPoint.getSensorStations()
+						.stream()
+						.filter(station -> !station.isDeleted() && station.isUnlocked())
+						.map(SensorStationInfo::new)
+						.toList();
 	}
 
 	@Getter

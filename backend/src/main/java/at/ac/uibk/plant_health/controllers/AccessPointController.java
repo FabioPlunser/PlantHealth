@@ -26,8 +26,6 @@ public class AccessPointController {
 	@Autowired
 	private AccessPointService accessPointService;
 
-	private static final String LOCKED_MESSAGE = "AccessPoint is locked";
-
 	@PublicEndpoint
 	@WriteOperation
 	@PostMapping("/register-access-point")
@@ -87,35 +85,28 @@ public class AccessPointController {
 	@GetMapping("/get-access-point-config")
 	@PrincipalRequired(AccessPoint.class)
 	public RestResponseEntity getAccessPointConfig(AccessPoint accessPoint) {
-		try {
-			accessPointService.findById(accessPoint.getDeviceId());
-			accessPointService.isUnlockedByDeviceId(accessPoint.getDeviceId());
-		} catch (ServiceException e) {
-			return MessageResponse.builder()
-					.statusCode(e.getStatusCode())
-					.message(e.getMessage())
-					.toEntity();
-		}
-
+		accessPointService.setLastConnection(accessPoint);
+		// This cannot fail because the AccessPoint has to exist and be unlocked.
+		// If that were not the case the Security Chain would not have authenticated the request.
 		return new AccessPointConfigResponse(accessPoint).toEntity();
 	}
 
 	@WriteOperation
-	@PostMapping("/found-sensor-stations")
+	@RequestMapping(
+			value = "/found-sensor-stations", method = {RequestMethod.POST, RequestMethod.PUT}
+	)
 	@PrincipalRequired(AccessPoint.class)
-	public RestResponseEntity foundSensorStations(
+	public RestResponseEntity
+	foundSensorStations(
 			AccessPoint accessPoint, @RequestBody final List<SensorStation> sensorStations
 	) {
-		try {
-			accessPointService.findById(accessPoint.getDeviceId());
-			accessPointService.isUnlockedByDeviceId(accessPoint.getDeviceId());
-			accessPointService.foundNewSensorStation(accessPoint, sensorStations);
-		} catch (ServiceException e) {
-			return MessageResponse.builder()
-					.statusCode(e.getStatusCode())
-					.message(e.getMessage())
-					.toEntity();
-		}
+		// This cannot fail because the AccessPoint has to exist and be unlocked.
+		// If that were not the case the Security Chain would not have authenticated the request.
+		// Saving the Sensor Stations can not fail because of the Structure of the Method
+		// (unless we run out of Memory in which case not saving a SensorStation is the least of our
+		// worries).
+		accessPointService.setLastConnection(accessPoint);
+		accessPointService.foundNewSensorStation(accessPoint, sensorStations);
 
 		return MessageResponse.builder()
 				.statusCode(200)
@@ -147,8 +138,8 @@ public class AccessPointController {
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
 	@PostMapping("/set-access-point-transfer-interval")
 	public RestResponseEntity setAPTransferInterval(
-			@RequestParam("accessPointId") final UUID accessPointId,
-			@RequestParam("transferInterval") final int transferInterval
+			@RequestParam(name = "accessPointId") final UUID accessPointId,
+			@RequestParam(name = "transferInterval") final int transferInterval
 	) {
 		try {
 			accessPointService.findById(accessPointId);
@@ -166,15 +157,37 @@ public class AccessPointController {
 				.toEntity();
 	}
 
+	@AnyPermission({Permission.ADMIN})
+	@PostMapping("/update-access-point")
+	public RestResponseEntity updateAccessPoint(
+			@RequestParam(name = "accessPointId") final UUID accessPointId,
+			@RequestParam(name = "roomName") final String roomName,
+			@RequestParam(name = "transferInterval") final int transferInterval
+	) {
+		try {
+			accessPointService.findById(accessPointId);
+			accessPointService.updateAccessPointInfo(accessPointId, roomName, transferInterval);
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
+
+		return MessageResponse.builder()
+				.statusCode(200)
+				.message("Successfully updated access point info")
+				.toEntity();
+	}
+
 	@PostMapping("/transfer-data")
 	@PrincipalRequired(AccessPoint.class)
 	public RestResponseEntity transferData(
 			final AccessPoint accessPoint, @RequestBody final List<SensorStation> sensorStationList
 	) {
 		try {
-			accessPointService.findById(accessPoint.getDeviceId());
-			accessPointService.isUnlockedByDeviceId(accessPoint.getDeviceId());
-			accessPointService.setSensorStationData(sensorStationList);
+			accessPointService.setLastConnection(accessPoint);
+			accessPointService.setSensorStationData(sensorStationList, accessPoint);
 		} catch (ServiceException e) {
 			return MessageResponse.builder()
 					.statusCode(e.getStatusCode())
@@ -186,5 +199,22 @@ public class AccessPointController {
 				.statusCode(200)
 				.message("Successfully transfered data")
 				.toEntity();
+	}
+
+	@AnyPermission({Permission.ADMIN})
+	@DeleteMapping("/delete-access-point")
+	@WriteOperation
+	public RestResponseEntity deleteAccessPoint(@RequestParam("accessPointId"
+	) final UUID accessPointId) {
+		try {
+			accessPointService.deleteAccessPoint(accessPointId);
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
+
+		return MessageResponse.builder().statusCode(200).message("Deleted AccessPoint").toEntity();
 	}
 }

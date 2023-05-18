@@ -2,6 +2,8 @@ import type { Actions } from "./$types";
 import { BACKEND_URL } from "$env/static/private";
 import { fail, redirect } from "@sveltejs/kit";
 import { z } from "zod";
+import { logger } from "$helper/logger";
+import { toasts } from "$stores/toastStore";
 
 const schema = z.object({
   username: z
@@ -18,9 +20,12 @@ const schema = z.object({
     .trim(),
 });
 
+/* This code exports an object named `actions` that contains a single function named `login`. The
+`login` function is an asynchronous function that takes an object with three parameters: `cookies`,
+`request`, and `fetch`. */
 export const actions = {
-  login: async ({ cookies, request, fetch }) => {
-    const formData = await request.formData();
+  login: async (event) => {
+    const formData = await event.request.formData();
     const zodData = schema.safeParse(Object.fromEntries(formData));
 
     if (!zodData.success) {
@@ -40,30 +45,33 @@ export const actions = {
       body: formData,
     };
 
-    let res = null;
-    try {
-      res = await fetch(`http://${BACKEND_URL}/login`, requestOptions);
-    } catch (error) {
-      console.log("login", error);
-      return fail(503, { message: "Server connection refused" });
-      return { success: false };
+    let res = await event.fetch(`${BACKEND_URL}/login`, requestOptions);
+
+    if (!res.ok) {
+      logger.error(`Error while logging in: ${res.status} ${res.statusText}`);
+      let data = await res.json();
+      return fail(500, { message: data.message });
     }
 
-    if (res.status >= 200 && res.status < 300) {
-      res = await res.json();
-      console.log("login", res);
-      cookies.set(
-        "token",
-        JSON.stringify({
-          token: res.token,
-          username: formData.get("username"),
-          permissions: res.permissions,
-          personId: res.personId,
-        })
-      );
-      throw redirect(302, "/");
-    } else {
-      return fail(401, { message: res.message });
-    }
+    let data = await res.json();
+    let username = formData.get("username") || "";
+    let newUser: User = {
+      personId: data.personId,
+      username: username.toString(),
+      permissions: data.permissions,
+      token: data.token,
+    };
+
+    event.locals.user = newUser;
+    toasts.addToast(
+      event.locals.user.personId,
+      "sueccess",
+      `User ${username.toString()} logged in`
+    );
+    event.cookies.set("token", JSON.stringify(event.locals.user), {
+      secure: false,
+      path: "/",
+    });
+    logger.info(`User: ${JSON.stringify(newUser)} loggedIn redirect`);
   },
 } satisfies Actions;

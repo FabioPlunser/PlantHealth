@@ -1,114 +1,102 @@
 <script lang="ts">
-  import type { PageData, ActionData } from "./$types";
-  import toast from "$components/toast";
   import AddUserModal from "./AddUserModal.svelte";
-  import EditUserModal from "./EditUserModal.svelte";
-  import type { ColumnDef, TableOptions } from "@tanstack/svelte-table";
+  import { onMount } from "svelte";
+  import { slide } from "svelte/transition";
+  import Table from "$components/table/Table.svelte";
   import {
-    createSvelteTable,
-    flexRender,
-    getCoreRowModel,
-  } from "@tanstack/svelte-table";
-  import { writable } from "svelte/store";
-
-  type User = {
-    username: string;
-    token: string;
-    permissions: string[];
-    email: string;
-    personId: string;
-  };
-
-  export let data: PageData;
-
-  $: {
-    if (data?.message) {
-      toast.error(data.message);
-    }
-  }
-
-  const defaultColumns: ColumnDef<User>[] = [
+    RoleBadges,
+    TextCell,
+    HrefWithIcon,
+    FormActionButtonConfirm,
+  } from "$components/table/cellComponents";
+  import { flexRender } from "@tanstack/svelte-table";
+  import type { ColumnDef } from "@tanstack/svelte-table";
+  import Spinner from "$components/ui/Spinner.svelte";
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+  let isRendered = false;
+  onMount(() => {
+    isRendered = true;
+  });
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+  export let data;
+  export let form;
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+  let addUserModal = false;
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+  let columns: ColumnDef<User>[] = [
     {
-      accessorKey: "personId",
-      header: () => "ID",
-      cell: (info) => info.getValue(),
-    },
-    {
+      id: "username",
       accessorKey: "username",
-      header: () => "Username",
-      cell: (info) => info.getValue(),
+      header: () => flexRender(TextCell, { text: "Username" }),
+      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
     },
     {
+      id: "email",
       accessorKey: "email",
-      header: () => "Email",
-      cell: (info) => info.getValue(),
+      header: () => flexRender(TextCell, { text: "Email" }),
+      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
     },
     {
+      id: "permissions",
       accessorKey: "permissions",
-      header: () => "Permissions",
-      cell: (info) => info.getValue(),
+      header: () => flexRender(TextCell, { text: "Permissions" }),
+      cell: (info) => flexRender(RoleBadges, { roles: info.getValue() }),
+    },
+    {
+      id: "edit",
+      accessorKey: "_", // NOTE: blanc accessor so we get the row
+      header: () => flexRender(TextCell, { text: "Edit" }),
+      cell: ({ row }) =>
+        flexRender(HrefWithIcon, {
+          href: `/profile?personId=${row.original.personId}&username=${row.original.username}&userPermissions=${row.original.permissions}`,
+          iconClass: "bi bi-pencil-square text-3xl hover:text-gray-500",
+        }),
+    },
+    {
+      id: "delete",
+      accessorKey: "_", // NOTE: blanc accessor so we get the row
+      header: () => flexRender(TextCell, { text: "Delete" }),
+      cell: ({ row }) =>
+        flexRender(FormActionButtonConfirm, {
+          method: "POST",
+          action: "?/deleteUser",
+          formActionValue: row.original.personId,
+          confirmMessage: `You will delete this user ${row.original.username.toUpperCase()} permanently!`,
+          iconClass: "bi bi-trash text-3xl hover:text-red-500",
+        }),
     },
   ];
-
-  const options = writable<TableOptions<User>>({
-    data: data.users,
-    columns: defaultColumns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
-  const table = createSvelteTable(options);
-
-  export let form: ActionData;
-
-  let editModal = false;
-  let addUserModal = false;
-  let selectedUser: any = null;
+  // ---------------------------------------------------------
+  let mobileColumnVisibility: ColumnVisibility = {
+    email: false,
+    permissions: false,
+  };
 </script>
-
-{#if editModal}
-  <EditUserModal bind:showModal={editModal} {form} {selectedUser} />
-{/if}
 
 {#if addUserModal}
   <AddUserModal bind:showModal={addUserModal} {form} />
 {/if}
+{#if isRendered}
+  <section>
+    {#await data.streamed.users}
+      <Spinner />
+    {:then users}
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <btn
+        class="btn btn-primary flex justify-center w-fit mx-auto m-4"
+        on:click={() => (addUserModal = true)}
+        in:slide={{ duration: 400, axis: "y" }}>Add User</btn
+      >
 
-<btn
-  class="btn btn-primary flex justify-center w-fit mx-auto m-4"
-  on:click={() => (addUserModal = true)}>Add User</btn
->
-<div class="flex justify-center">
-  <table class="table">
-    <thead>
-      {#each $table.getHeaderGroups() as headerGroup}
-        <tr>
-          {#each headerGroup.headers as header}
-            <th colspan={header.colSpan}>
-              {#if !header.isPlaceholder}
-                <svelte:component
-                  this={flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
-                />
-              {/if}
-            </th>
-          {/each}
-        </tr>
-      {/each}
-    </thead>
-    <tbody>
-      {#each $table.getRowModel().rows as row}
-        <tr>
-          {#each row.getVisibleCells() as cell}
-            <td>
-              <svelte:component
-                this={flexRender(cell.column.columnDef.cell, cell.getContext())}
-              />
-            </td>
-          {/each}
-        </tr>
-      {/each}
-    </tbody>
-  </table>
-</div>
+      <div class="flex justify-center">
+        <Table data={users} {columns} {mobileColumnVisibility} />
+      </div>
+    {:catch error}
+      <p class="text-red-500">{error}</p>
+    {/await}
+  </section>
+{/if}

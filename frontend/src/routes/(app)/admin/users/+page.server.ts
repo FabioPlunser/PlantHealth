@@ -1,18 +1,47 @@
-import type { Actions, PageServerLoad } from "./$types";
+import type { Actions } from "./$types";
 import { BACKEND_URL } from "$env/static/private";
 import { fail, redirect, error } from "@sveltejs/kit";
 import { z } from "zod";
+import { logger } from "$helper/logger";
+import { errorHandler } from "$helper/errorHandler";
 
-export const load = (async ({ fetch }) => {
-  let res = await fetch(`http://${BACKEND_URL}/get-all-users`);
-  let res_json = await res.json();
-  if (res?.ok) {
-    console.log("SUCCESS");
-    return { success: true, users: res_json.items };
-  } else if (!res.ok) {
-    return { success: false, message: res_json.message };
+export async function load(event) {
+  const { fetch } = event;
+
+  async function getUsers(): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      await fetch(`${BACKEND_URL}/get-all-users`)
+        .then(async (res) => {
+          if (!res.ok) {
+            res = await res.json();
+            errorHandler(
+              event.locals.user?.personId,
+              "Error while getting users",
+              res
+            );
+            reject(res);
+          }
+          let data = await res.json();
+          resolve(data.items);
+        })
+        .catch((err) => {
+          errorHandler(
+            event.locals.user?.personId,
+            "Error while getting users",
+            err
+          );
+          reject(err);
+          throw error(500, "Error while getting users");
+        });
+    });
   }
-}) satisfies PageServerLoad;
+
+  return {
+    streamed: {
+      users: getUsers(),
+    },
+  };
+}
 
 const schema = z.object({
   username: z
@@ -44,10 +73,10 @@ const schema = z.object({
 });
 
 export const actions = {
-  createUser: async ({ cookies, request, fetch, event }) => {
+  createUser: async (event) => {
+    const { request, fetch } = event;
     const formData = await request.formData();
     const zod = schema.safeParse(Object.fromEntries(formData));
-    console.log(formData);
 
     if (formData.get("password") !== formData.get("passwordConfirm")) {
       return fail(400, { error: true, errors: "Passwords do not match" });
@@ -66,33 +95,62 @@ export const actions = {
     }
 
     var requestOptions = {
+      // change to PUT once backend is up to date
       method: "POST",
       body: formData,
     };
 
-    let res = await fetch(`http://${BACKEND_URL}/create-user`, requestOptions);
-    res = await res.json();
+    await fetch(`${BACKEND_URL}/create-user`, requestOptions)
+      .then(async (res) => {
+        if (!res.ok) {
+          res = await res.json();
+          errorHandler(
+            event.locals.user?.personId,
+            "Error while creating user",
+            res
+          );
+        }
+      })
+      .catch((err) => {
+        errorHandler(
+          event.locals.user?.personId,
+          "Error while creating user",
+          err
+        );
+        throw error(500, "Error while creating user");
+      });
   },
+  //---------------------------------------------
+  //
+  //---------------------------------------------
+  deleteUser: async (event) => {
+    const { request, fetch } = event;
+    const formData = await request.formData();
+    let personId = formData.get("personId");
 
-  updateUser: async ({ fetch, event }) => {
-    const formData = new FormData();
+    let params = new URLSearchParams();
+    params.set("personId", personId?.toString() ?? "");
+
+    await fetch(`${BACKEND_URL}/delete-user?${params.toString()}`, {
+      method: "DELETE",
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          res = await res.json();
+          errorHandler(
+            event.locals.user?.personId,
+            "Error while deleting user",
+            res
+          );
+        }
+      })
+      .catch((err) => {
+        errorHandler(
+          event.locals.user?.personId,
+          "Error while deleting user",
+          err
+        );
+        throw error(500, "Error while deleting user");
+      });
   },
-
-  deleteUser: async ({ fetch, event }) => {
-    const formData = new FormData();
-    formData.append("id", event.query.get("id"));
-
-    var requestOptions = {
-      method: "POST",
-      body: formData,
-    };
-
-    let res = await fetch(`http://${BACKEND_URL}/delete-user`, requestOptions);
-
-    res = await res.json();
-
-    if (res.success) {
-      // throw redirect(302, "/");
-    }
-  },
-} satisfies Actions;
+};

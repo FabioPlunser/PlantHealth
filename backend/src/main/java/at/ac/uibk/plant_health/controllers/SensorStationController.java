@@ -1,28 +1,25 @@
 package at.ac.uibk.plant_health.controllers;
 
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.MalformedURLException;
-import java.nio.file.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.annotations.AnyPermission;
 import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
 import at.ac.uibk.plant_health.models.annotations.PublicEndpoint;
+import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.exceptions.ServiceException;
-import at.ac.uibk.plant_health.models.plant.PlantPicture;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
+import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
 import at.ac.uibk.plant_health.models.rest_responses.*;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
@@ -33,12 +30,48 @@ public class SensorStationController {
 	@Autowired
 	private SensorStationService sensorStationService;
 
-	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
+	@AnyPermission({Permission.ADMIN, Permission.GARDENER, Permission.USER})
+	@PrincipalRequired(Person.class)
 	@GetMapping("/get-sensor-stations")
-	public RestResponseEntity getSensorStations() {
-		return new SensorStationResponse(sensorStationService.findAll()).toEntity();
+	public RestResponseEntity getSensorStations(Person person) {
+		try {
+			return new SensorStationsResponse(sensorStationService.findAll(), person).toEntity();
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
 	}
 
+	@AnyPermission({Permission.ADMIN})
+	@GetMapping("/get-all-sensor-stations")
+	public RestResponseEntity getAllSensorStations() {
+		try {
+			return new AdminSensorStationsResponse(sensorStationService.findAll()).toEntity();
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
+	}
+	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
+	@PrincipalRequired(Person.class)
+	@GetMapping("/get-sensor-station")
+	public RestResponseEntity getSensorStation(
+			Person person, @RequestParam("sensorStationId") final UUID sensorStationId
+	) {
+		try {
+			return new SensorStationResponse(sensorStationService.findById(sensorStationId), person)
+					.toEntity();
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
+	}
 	@PublicEndpoint
 	@GetMapping("/get-sensor-station-info")
 	public RestResponseEntity getSensorStationInfo(@RequestParam("sensorStationId"
@@ -58,7 +91,7 @@ public class SensorStationController {
 
 	@AnyPermission(Permission.ADMIN)
 	@RequestMapping(
-			value = "/set-unlock-sensor-station", method = {RequestMethod.POST, RequestMethod.PUT}
+			value = "/set-unlocked-sensor-station", method = {RequestMethod.POST, RequestMethod.PUT}
 	)
 	public RestResponseEntity
 	setLockSensorStation(
@@ -80,14 +113,20 @@ public class SensorStationController {
 
 	@AnyPermission({Permission.GARDENER, Permission.ADMIN})
 	@PrincipalRequired(Person.class)
-	@RequestMapping(value = "/set-sensor-limits", method = {RequestMethod.POST, RequestMethod.PUT})
-	public RestResponseEntity setSensorLimits(
+	@RequestMapping(
+			value = "/update-sensor-station", method = {RequestMethod.POST, RequestMethod.PUT}
+	)
+	public RestResponseEntity
+	setSensorLimits(
 			Person person, @RequestParam("sensorStationId") final UUID sensorStationId,
-			@RequestBody final List<SensorLimits> sensorLimits
+			@RequestParam(value = "sensorStationName", required = false) final String name,
+			@RequestParam(value = "transferInterval", required = false)
+			final Integer transferInterval, @RequestBody final List<SensorLimits> sensorLimits
 	) {
 		try {
-			sensorStationService.findById(sensorStationId);
-			sensorStationService.setSensorLimits(sensorLimits, sensorStationId, person);
+			SensorStation sensorStation = sensorStationService.findById(sensorStationId);
+			sensorStationService.updateSensorStation(sensorStation, name, transferInterval);
+			sensorStationService.setSensorLimits(sensorLimits, sensorStation, person);
 		} catch (ServiceException e) {
 			return MessageResponse.builder()
 					.statusCode(e.getStatusCode())
@@ -95,7 +134,57 @@ public class SensorStationController {
 					.toEntity();
 		}
 
-		return MessageResponse.builder().statusCode(200).toEntity();
+		return MessageResponse.builder()
+				.statusCode(200)
+				.message("Successfully set sensor limits")
+				.toEntity();
+	}
+
+	@AnyPermission(Permission.ADMIN)
+	@PostMapping("/assign-gardener-to-sensor-station")
+	public RestResponseEntity assignGardenerToSensorStation(
+			@RequestParam("sensorStationId") final UUID sensorStationId,
+			@RequestParam("gardenerId") final UUID gardenerId,
+			@RequestParam(value = "delete", required = false) final boolean delete
+	) {
+		try {
+			sensorStationService.assignGardenerToSensorStation(
+					sensorStationService.findById(sensorStationId), gardenerId, delete
+			);
+			return MessageResponse.builder()
+					.statusCode(200)
+					.message("Successfully assigned gardener to sensor station")
+					.toEntity();
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
+	}
+
+	@AnyPermission({Permission.GARDENER, Permission.ADMIN, Permission.USER})
+	@PrincipalRequired(Person.class)
+	@GetMapping("/get-sensor-station-data")
+	public RestResponseEntity getSensorStationData(
+			Person person, @RequestParam("sensorStationId") final UUID sensorStationId,
+			@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") @RequestParam("from"
+			) final LocalDateTime from,
+			@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") @RequestParam("to"
+			) final LocalDateTime to
+	) {
+		try {
+			sensorStationService.isDeleted(sensorStationService.findById(sensorStationId));
+			return new SensorStationDataResponse(
+						   sensorStationService.findById(sensorStationId), from, to
+			)
+					.toEntity();
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
 	}
 
 	@PublicEndpoint
@@ -109,9 +198,6 @@ public class SensorStationController {
 			@RequestParam("sensorStationId") final UUID sensorStationId,
 			@RequestParam("picture") final MultipartFile picture
 	) {
-		System.out.println(picture.getOriginalFilename());
-		System.out.println(picture.getName());
-		System.out.println(picture.getContentType());
 		try {
 			sensorStationService.findById(sensorStationId);
 			sensorStationService.uploadPicture(picture, sensorStationId);
@@ -153,19 +239,48 @@ public class SensorStationController {
 			produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
 	)
 	public ResponseEntity<byte[]>
-	getSensorStationPicture(@RequestParam("pictureId") final UUID pictureId) throws Exception {
-		PlantPicture picture = sensorStationService.getPicture(pictureId);
-		String extension = picture.getPicturePath().split("\\.")[1];
-		Path file = Paths.get(picture.getPicturePath());
-		Resource resource = new UrlResource(file.toUri());
-		System.out.println(picture.getPicturePath());
-		System.out.println(resource);
-		System.out.println(file);
-		return ResponseEntity.ok()
-				.contentType(MediaType.parseMediaType("image/" + extension))
-				.header(HttpHeaders.CONTENT_DISPOSITION,
-						"attachment; filename=\"" + resource.getFilename() + "\"")
-				.body(Files.readAllBytes(file));
+	getSensorStationPicture(@RequestParam("pictureId") final UUID pictureId) {
+		try {
+			SensorStationPicture picture = sensorStationService.getPicture(pictureId);
+			String extension = picture.getPicturePath().split("\\.")[1];
+			String name = picture.getPicturePath().split("\\.")[0];
+			byte[] contents = sensorStationService.convertPictureToByteArray(picture);
+
+			return ResponseEntity.ok()
+					.contentType(MediaType.parseMediaType("image/" + extension))
+					.header(HttpHeaders.CONTENT_DISPOSITION,
+							"attachment; filename=\"" + name + "\"")
+					.body(contents);
+		} catch (ServiceException e) {
+			return ResponseEntity.status(e.getStatusCode()).body(null);
+		}
+	}
+
+	@AnyPermission({Permission.ADMIN, Permission.GARDENER, Permission.USER})
+	@ReadOperation
+	@GetMapping(
+			value = "/get-newest-sensor-station-picture",
+			produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+	)
+	public ResponseEntity<byte[]>
+	getNewestSensorStationPicture(@RequestParam("sensorStationId") final UUID sensorStationId)
+			throws Exception {
+		try {
+			sensorStationService.findById(sensorStationId);
+			SensorStationPicture picture = sensorStationService.getNewestPicture(sensorStationId);
+
+			String extension = picture.getPicturePath().split("\\.")[1];
+			String name = picture.getPicturePath().split("\\.")[0];
+			byte[] contents = sensorStationService.convertPictureToByteArray(picture);
+
+			return ResponseEntity.ok()
+					.contentType(MediaType.parseMediaType("image/" + extension))
+					.header(HttpHeaders.CONTENT_DISPOSITION,
+							"attachment; filename=\"" + name + "\"")
+					.body(contents);
+		} catch (ServiceException e) {
+			return ResponseEntity.status(e.getStatusCode()).build();
+		}
 	}
 
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
@@ -206,6 +321,26 @@ public class SensorStationController {
 		return MessageResponse.builder()
 				.statusCode(200)
 				.message("Delete all pictures of SensorStation " + sensorStationId)
+				.toEntity();
+	}
+
+	@AnyPermission({Permission.ADMIN})
+	@WriteOperation
+	@DeleteMapping("/delete-sensor-station")
+	public RestResponseEntity deleteSensorStation(@RequestParam("sensorStationId"
+	) final UUID sensorStationId) {
+		try {
+			sensorStationService.deleteSensorStation(sensorStationId);
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
+
+		return MessageResponse.builder()
+				.statusCode(200)
+				.message("Deleted SensorStation " + sensorStationId)
 				.toEntity();
 	}
 }

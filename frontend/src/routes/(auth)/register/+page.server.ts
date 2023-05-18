@@ -2,6 +2,8 @@ import type { Actions } from "./$types";
 import { BACKEND_URL } from "$env/static/private";
 import { fail, redirect } from "@sveltejs/kit";
 import { z } from "zod";
+import { logger } from "$helper/logger";
+import { toasts } from "$stores/toastStore";
 
 const schema = z.object({
   username: z
@@ -32,11 +34,14 @@ const schema = z.object({
     .trim(),
 });
 
+/* This code exports an object named `actions` that contains a single function named `register`. This
+function is an asynchronous function that takes an object with three parameters: `cookies`,
+`request`, and `fetch`. */
 export const actions = {
-  register: async ({ cookies, request, fetch }) => {
+  register: async (event) => {
+    const { cookies, fetch, request } = event;
     const formData = await request.formData();
     const zod = schema.safeParse(Object.fromEntries(formData));
-    console.log(formData);
 
     if (formData.get("password") !== formData.get("passwordConfirm")) {
       return fail(400, { error: true, errors: "Passwords do not match" });
@@ -53,33 +58,34 @@ export const actions = {
 
       return fail(400, { error: true, errors });
     }
+    formData.delete("passwordConfirm");
 
     var requestOptions = {
       method: "POST",
       body: formData,
     };
 
-    let res = await fetch(
-      `http://${BACKEND_URL}/register`,
-      requestOptions
-    ).catch((error) => console.log("error", error));
-
-    res = await res.json();
-    console.log(res);
-
-    if (res.success) {
-      cookies.set(
-        "token",
-        JSON.stringify({
-          token: res.token,
-          permissions: res.permissions,
-          personId: res.personId,
-        })
+    let res = await fetch(`${BACKEND_URL}/register`, requestOptions);
+    if (!res.ok) {
+      logger.error(
+        `Error while registering in: ${res.status} ${res.statusText}`
       );
-      throw redirect(302, "/");
-    } else {
-      // TODO: add to toast notifications.
-      return fail(400, { error: true, errors: res.message });
+      let data = await res.json();
+      return fail(500, { message: data.message });
     }
+
+    let data = await res.json();
+    logger.info(`User ${formData.get("username")} registered`);
+    cookies.set(
+      "token",
+      JSON.stringify({
+        token: data.token,
+        username: formData.get("username"),
+        permissions: data.permissions,
+        personId: data.personId,
+      }),
+      { secure: false, path: "/" }
+    );
+    throw redirect(302, "/user");
   },
 } satisfies Actions;

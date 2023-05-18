@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import at.ac.uibk.plant_health.models.plant.SensorData;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -48,8 +50,6 @@ import at.ac.uibk.plant_health.util.StringGenerator;
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-@ExtendWith({SetupH2Console.class})
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TestAccessPointController {
 	@Autowired
 	private AccessPointService accessPointService;
@@ -111,7 +111,9 @@ public class TestAccessPointController {
 			accessPointService.register(accessPointId, "Office " + i);
 		}
 
-		List<AccessPoint> accessPointList = accessPointService.findAllAccessPoints();
+		List<AccessPoint> accessPointList = accessPointService.findAllAccessPoints().stream()
+				.filter(ap -> !ap.isDeleted())
+				.toList();
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/get-access-points")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
@@ -154,7 +156,7 @@ public class TestAccessPointController {
 	}
 
 	@Test
-	void setUnlockAccessPoint() throws Exception {
+	void setUnlockedAccessPoint() throws Exception {
 		Person person = createUserAndLogin(true);
 		UUID selfAssignedId = UUID.randomUUID();
 		accessPointService.register(selfAssignedId, "Office1");
@@ -235,11 +237,14 @@ public class TestAccessPointController {
 
 	@Test
 	void scanForSensorStations() throws Exception {
+		// precondition AccessPoint is registered and connected
 		Person person = createUserAndLogin(true);
 		UUID selfAssignedId = UUID.randomUUID();
 		accessPointService.register(selfAssignedId, "Office1");
 		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
 		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
+		accessPoint = accessPointService.findById(accessPoint.getDeviceId());
+		accessPointService.setLastConnection(accessPoint);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/scan-for-sensor-stations")
 								.header(HttpHeaders.USER_AGENT, "MockTests")
@@ -278,6 +283,28 @@ public class TestAccessPointController {
 	}
 
 	@Test
+	void updateAccessPoint() throws Exception {
+		Person person = createUserAndLogin(true);
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/update-access-point")
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(person))
+								.param("accessPointId", String.valueOf(accessPoint.getDeviceId()))
+								.param("roomName", "Office2")
+								.param("transferInterval", "10")
+								.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
+
+		accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+		assertEquals(10, accessPoint.getTransferInterval());
+		assertEquals("Office2", accessPoint.getRoomName());
+	}
+
+	@Test
 	void transferData() throws Exception {
 		UUID selfAssignedId = UUID.randomUUID();
 		accessPointService.register(selfAssignedId, "Office1");
@@ -297,13 +324,15 @@ public class TestAccessPointController {
 		sensorMap.put("LIGHTINTENSITY", "lux");
 		sensorMap.put("GASPRESSURE", "ppm");
 
+		List<String> bdAddresses = new ArrayList<>();
 		for (int i = 0; i < sensorStationsCount; i++) {
-			String BdAddress = StringGenerator.macAddress();
-			SensorStation sS = new SensorStation(BdAddress, 255 - i);
+			bdAddresses.add(StringGenerator.macAddress());
+			SensorStation sS = new SensorStation(bdAddresses.get(i), 255 - i);
+			sS.setUnlocked(true);
 			sensorStationService.save(sS);
 
 			ObjectNode sensorStation = mapper.createObjectNode();
-			sensorStation.put("bdAddress", BdAddress);
+			sensorStation.put("bdAddress", bdAddresses.get(i));
 			sensorStation.put("dipSwitchId", 255 - i);
 			sensorStation.put("connectionAlive", rand.nextBoolean());
 
@@ -335,7 +364,190 @@ public class TestAccessPointController {
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
-		assertEquals(sensorMap.size() * sensorStationsCount, sensorDataRepository.findAll().size());
-		assertEquals(sensorMap.size(), sensorRepository.findAll().size());
+		List<SensorData> availableData = sensorDataRepository.findAll().stream()
+				.filter(d -> bdAddresses.contains(d.getSensorStation().getBdAddress()))
+				.toList();
+		assertEquals(sensorMap.size() * sensorStationsCount, availableData.size());
+	}
+
+	@Test
+	void deleteAccessPoint() throws Exception {
+		Person person = createUserAndLogin(true);
+		// access point registers
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
+
+		// one sensor station assigned
+		String bdAddress = StringGenerator.macAddress();
+		SensorStation sensorStation = new SensorStation(bdAddress, 4);
+		sensorStation.setAccessPoint(accessPoint);
+		sensorStationService.save(sensorStation);
+
+		// run request
+		mockMvc.perform(MockMvcRequestBuilders.delete("/delete-access-point")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("accessPointId", String.valueOf(accessPoint.getDeviceId()))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk());
+
+		// check if access point is removed
+		assertTrue(accessPointService.findById(accessPoint.getDeviceId()).isDeleted());
+		assertNull(accessPointService.findById(accessPoint.getDeviceId()).getSelfAssignedId());
+
+		// check if assigned sensor station is also deleted
+		assertTrue(sensorStationService.findById(sensorStation.getDeviceId()).isDeleted());
+	}
+
+	@Test
+	public void testSetUnlockedAccessPointWithInvalidId() throws Exception {
+		Person person = createUserAndLogin(true);
+		// run request
+		mockMvc.perform(MockMvcRequestBuilders.post("/set-unlocked-access-point")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("accessPointId", String.valueOf(UUID.randomUUID()))
+						.param("unlocked", String.valueOf(false))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isNotFound());
+	}
+
+	@Test
+	public void testScanForSensorStationsWithInvalidId() throws Exception {
+		Person person = createUserAndLogin(true);
+		// run request
+		mockMvc.perform(MockMvcRequestBuilders.post("/scan-for-sensor-stations")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("accessPointId", String.valueOf(UUID.randomUUID()))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isNotFound());
+	}
+
+	@Test
+	public void testSetAccessPointTransferIntervalWithInvalidId() throws Exception {
+		Person person = createUserAndLogin(true);
+		// run request
+		mockMvc.perform(MockMvcRequestBuilders.post("/set-access-point-transfer-interval")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("accessPointId", String.valueOf(UUID.randomUUID()))
+						.param("transferInterval", String.valueOf(10))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isNotFound());
+	}
+
+	@Test
+	public void testUpdateAccessPointWithInvalidId() throws Exception {
+		Person person = createUserAndLogin(true);
+		// run request
+		mockMvc.perform(MockMvcRequestBuilders.post("/update-access-point")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("accessPointId", String.valueOf(UUID.randomUUID()))
+						.param("roomName", "")
+						.param("transferInterval", String.valueOf(10))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isNotFound());
+	}
+
+	@Test
+	public void testTransferDataWithLockedSensorStation() throws Exception {
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
+
+		accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+
+		ArrayNode sensorStations = mapper.createArrayNode();
+
+		Map<String, String> sensorMap = new HashMap<>();
+		sensorMap.put("TEMPERATURE", "°C");
+		sensorMap.put("HUMIDITY", "%");
+		sensorMap.put("PRESSURE", "hPa");
+		sensorMap.put("SOILHUMIDITY", "%");
+		sensorMap.put("LIGHTINTENSITY", "lux");
+		sensorMap.put("GASPRESSURE", "ppm");
+
+		SensorStation sS = new SensorStation(StringGenerator.macAddress(), 255);
+		sS.setUnlocked(false);
+		sensorStationService.save(sS);
+
+		ObjectNode sensorStation = mapper.createObjectNode();
+		sensorStation.put("bdAddress", sS.getBdAddress());
+		sensorStation.put("dipSwitchId", 255);
+		sensorStation.put("connectionAlive", rand.nextBoolean());
+
+		ArrayNode sensorData = mapper.createArrayNode();
+		for (int j = 0; j < sensorMap.size(); j++) {
+			ObjectNode data = mapper.createObjectNode();
+			LocalDateTime now = LocalDateTime.now();
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+			data.put("timeStamp", now.format(formatter));
+			data.put("value", rand.nextDouble());
+			data.put("alarm", "h");
+
+			ObjectNode sensor = mapper.createObjectNode();
+			sensor.put("type", sensorMap.keySet().toArray()[j].toString());
+			sensor.put("unit", sensorMap.values().toArray()[j].toString());
+			data.set("sensor", sensor);
+			sensorData.addPOJO(data);
+		}
+		sensorStation.set("sensorData", sensorData);
+		sensorStations.add(sensorStation);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/transfer-data")
+						.header(HttpHeaders.USER_AGENT, "AccessPoint")
+						.header(HttpHeaders.AUTHORIZATION,
+								"{ \"token\":\"" + accessPoint.getAccessToken().toString()
+										+ "\"}")
+						.content(sensorStations.toString())
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isConflict());
+	}
+
+	@Test
+	public void testTransferDataWithoutSensorStation() throws Exception {
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
+
+		accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+
+		ArrayNode sensorStations = mapper.createArrayNode();
+		ObjectNode sensorStation = mapper.createObjectNode();
+		sensorStation.set("sensorData", null);
+		sensorStations.add(sensorStation);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/transfer-data")
+						.header(HttpHeaders.USER_AGENT, "AccessPoint")
+						.header(HttpHeaders.AUTHORIZATION,
+								"{ \"token\":\"" + accessPoint.getAccessToken().toString()
+										+ "\"}")
+						.content(sensorStations.toString())
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isNotFound());
+	}
+
+	@Test
+	public void testDeleteAccessPointWithInvalidId() throws Exception {
+		Person person = createUserAndLogin(true);
+		// run request
+		mockMvc.perform(MockMvcRequestBuilders.delete("/delete-access-point")
+						.header(HttpHeaders.USER_AGENT, "MockTests")
+						.header(HttpHeaders.AUTHORIZATION,
+								AuthGenerator.generateToken(person))
+						.param("accessPointId", String.valueOf(UUID.randomUUID()))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isNotFound());
 	}
 }

@@ -114,7 +114,6 @@ public class PersonController {
 	 * @param username The new username
 	 * @param email The new email
 	 * @param password The new Password
-	 * @param permissions The new Permissions
 	 * @return A RESTResponse indicating Success
 	 */
 	@WriteOperation
@@ -123,11 +122,13 @@ public class PersonController {
 	public RestResponseEntity updateSettings(
 			Person person, @RequestParam(name = "username", required = false) final String username,
 			@RequestParam(name = "email", required = false) final String email,
-			@RequestParam(name = "permissions", required = false) final Set<Permission> permissions,
 			@RequestParam(name = "password", required = false) final String password
 	) {
 		UUID personId = person.getPersonId();
-		return updatePerson(personId, username, email, permissions, password);
+		Set<GrantedAuthority> permissions = person.getPermissions();
+		return updatePerson(
+				personId, username, email, Permission.fromAuthorities(permissions), password
+		);
 	}
 
 	/**
@@ -197,17 +198,26 @@ public class PersonController {
 
 	// region GET Endpoints
 	/**
-	 * Endpoint for Admins to get all users.
+	 * Endpoint for Admins to get all users, except the calling user himself.
 	 *
 	 * @return A RestReponse containing a List of all users.
 	 */
 	@ReadOperation
+	@PrincipalRequired(Person.class)
 	@AnyPermission(Permission.ADMIN)
 	@GetMapping("/get-all-users")
-	public RestResponse getAllUsers() {
-		return new ListResponse<>(personService.getPersons());
+	public RestResponse getAllUsers(Person person) {
+		return new ListResponse<>(personService.getPersons().stream()
+				.filter(p -> !p.equals(person))
+				.toList());
 	}
 
+	@ReadOperation
+	@AnyPermission(Permission.ADMIN)
+	@GetMapping("/get-all-gardener")
+	public RestResponse getAllGardener() {
+		return new ListResponse<>(personService.getGardener());
+	}
 	/**
 	 * Endpoint for Admins to get all possible Permission so that they don't
 	 * need to be changed manually on frontend.

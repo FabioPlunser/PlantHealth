@@ -1,24 +1,32 @@
 <script lang="ts">
-  import { Chart as ChartJs, LineController, registerables } from "chart.js";
-  import Chart from "./Chart.svelte";
+  // import Line from "$lib/components/graph/wrapper/Line.svelte";
+  import { Line } from "$components/graph/wrapper";
 
-  ChartJs.register(...registerables);
-  ChartJs.register(LineController);
-  export let chart: any = null;
-  export let width: number;
-  export let height: number;
-  let props: any;
-  let chartRef;
-  $: props = $$props;
+  import {
+    Chart as ChartJS,
+    Title,
+    Tooltip,
+    Legend,
+    LineElement,
+    LinearScale,
+    PointElement,
+    CategoryScale,
+  } from "chart.js";
+
+  ChartJS.register(
+    Title,
+    Tooltip,
+    Legend,
+    LineElement,
+    LinearScale,
+    PointElement,
+    CategoryScale
+  );
+
+  export let data: any;
+  export let options: any;
 </script>
 
 <div class="w-full h-full">
-  <Chart
-    bind:width
-    bind:height
-    bind:this={chartRef}
-    bind:chart
-    type="line"
-    {...props}
-  />
+  <Line {data} {options} />
 </div>

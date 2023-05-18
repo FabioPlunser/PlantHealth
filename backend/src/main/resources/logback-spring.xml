@@ -19,10 +19,10 @@
     <!-- Appenders -->
     <appender name="CONSOLE" class="ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>TRACE</level>
+            <level>INFO</level>
         </filter>
         <encoder class="PatternLayoutEncoder">
-            <pattern>%-4relative [%thread] %-5level %logger{35} -%kvp- %msg %n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-4relative [%thread] %-5level %logger{35} -%kvp- %msg %n</pattern>
         </encoder>
     </appender>
 
@@ -38,7 +38,7 @@
             <level>INFO</level>
         </filter>
         <encoder class="PatternLayoutEncoder">
-            <pattern>%-4relative [%thread] %-5level %logger{35} -%kvp- %msg %n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-4relative [%thread] %-5level %logger{35} -%kvp- %msg %n</pattern>
         </encoder>
     </appender>
 
@@ -54,7 +54,7 @@
             <level>WARN</level>
         </filter>
         <encoder class="PatternLayoutEncoder">
-            <pattern>%-4relative [%thread] %-5level %logger{35} -%kvp- %msg %n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-4relative [%thread] %-5level %logger{35} -%kvp- %msg %n</pattern>
         </encoder>
     </appender>
 

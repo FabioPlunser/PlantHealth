@@ -26,14 +26,14 @@ public class LogResponse extends RestResponse implements Serializable {
 	@Getter
 	private class InnerLog implements Serializable {
 		public final Log.LogLevel severity;
-		public final LocalDateTime timestamp;
+		public final LocalDateTime timeStamp;
 		public final String message;
 		public final String className;
 		public final String callerId;
 
 		public InnerLog(Log log) {
 			this.severity = log.getSeverity();
-			this.timestamp = log.getTimeStamp();
+			this.timeStamp = log.getTimeStamp();
 			this.message = log.getMessage();
 			this.className = log.getClassName();
 			this.callerId = log.getCallerId();

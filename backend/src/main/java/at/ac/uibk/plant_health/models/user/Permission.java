@@ -25,6 +25,10 @@ public enum Permission implements GrantedAuthority {
 		return Set.of(ADMIN);
 	}
 
+	public static Set<GrantedAuthority> gardenerAuthorities() {
+		return Set.of(GARDENER);
+	}
+
 	private static final Set<Permission> ALL_PERMISSIONS = Set.of(Permission.values());
 
 	public static Set<Permission> allPermissions() {
@@ -33,6 +37,10 @@ public enum Permission implements GrantedAuthority {
 
 	public static Set<GrantedAuthority> allAuthorities() {
 		return (Set) ALL_PERMISSIONS;
+	}
+
+	public static Set<Permission> fromAuthorities(Set<GrantedAuthority> authorities) {
+		return (Set) authorities;
 	}
 
 	@Override

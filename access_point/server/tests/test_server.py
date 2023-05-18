@@ -48,20 +48,20 @@ def test_get_config(requests_mock: Mocker):
                                                 'sensors': [{'sensorName': 'sensor 1-1',
                                                              'limits': {'lowerLimit': -12.34,
                                                                         'upperLimit': 56.78},
-                                                             'thresholdTime': 99},
+                                                             'alarmThresholdTime': 99},
                                                             {'sensorName': 'sensor 1-2',
                                                              'limits': {'lowerLimit': -87.65,
                                                                         'upperLimit': 43.12},
-                                                             'thresholdTime': 100}]},
+                                                             'alarmThresholdTime': 100}]},
                                                {'bdAddress': 'bd adr 2',
                                                 'sensors': [{'sensorName': 'sensor 2-1',
                                                              'limits': {'lowerLimit': 12.34,
                                                                         'upperLimit': -56.78},
-                                                             'thresholdTime': 101},
+                                                             'alarmThresholdTime': 101},
                                                             {'sensorName': 'sensor 2-2',
                                                              'limits': {'lowerLimit': 87.65,
                                                                         'upperLimit': -43.12},
-                                                             'thresholdTime': 102}]}]})
+                                                             'alarmThresholdTime': 102}]}]})
     access_point_config, sensor_station_config = backend.get_config()
     assert access_point_config['room_name'] == 'new'
     assert access_point_config['scan_active'] == True

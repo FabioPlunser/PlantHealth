@@ -2,6 +2,8 @@ package at.ac.uibk.plant_health.models.device;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,16 +12,17 @@ import java.io.Serializable;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.SensorStationPersonReference;
-import at.ac.uibk.plant_health.models.plant.PlantPicture;
 import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.plant.SensorLimits;
+import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
+import at.ac.uibk.plant_health.models.user.Person;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
 @Setter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Table(name = "sensor_station")
 // NOTE: This changes the name of the "id"-Column inherited from Device to "sensor_station_id"
@@ -31,11 +34,17 @@ public class SensorStation extends Device implements Serializable {
 
 	@Column(name = "plant_name")
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
-	private String name = null;
+	private String name = "SensorStation";
 
 	@JdbcTypeCode(SqlTypes.INTEGER)
 	@Column(name = "dip_switch_id", nullable = false)
 	private int dipSwitchId;
+
+	@JsonIgnore
+	@Fetch(FetchMode.SELECT)
+	@OneToOne()
+	//	@JoinColumn(name = "gardener_id")
+	private Person gardener = null;
 
 	@JsonIgnore
 	@ManyToOne
@@ -55,7 +64,7 @@ public class SensorStation extends Device implements Serializable {
 			fetch = FetchType.EAGER, mappedBy = "sensorStation", orphanRemoval = true,
 			cascade = CascadeType.ALL
 	)
-	private List<PlantPicture> plantPictures = new ArrayList<>();
+	private List<SensorStationPicture> sensorStationPictures = new ArrayList<>();
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -74,9 +83,9 @@ public class SensorStation extends Device implements Serializable {
 
 	@Override
 	public String toString() {
-		return "SensorStation [bdAddress=" + bdAddress + ", name=" + name + ", dipSwitchId="
-				+ dipSwitchId + ", accessPoint=" + accessPoint + ", sensorStationPersonReferences="
-				+ sensorStationPersonReferences + ", sensorData=" + sensorData + "]";
+		return "SensorStation [bdAddress=" + bdAddress + ", name=" + name
+				+ ", dipSwitchId=" + dipSwitchId + ", accessPoint=" + accessPoint
+				+ ", sensorStationPersonReferences=" + sensorStationPersonReferences + "]";
 	}
 
 	@Override

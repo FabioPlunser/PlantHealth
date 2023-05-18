@@ -2,7 +2,7 @@ application-secrets.yml
 application.yml
 target
 *.db
-
+build
 # Logs
 logs
 *.log
@@ -32,3 +32,6 @@ dist-ssr
 #ccls
 .ccls-cache/
 .ccls
+
+frontend/build/
+test
