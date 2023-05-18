@@ -148,8 +148,10 @@ public class DumpConfig {
 									sensors.stream()
 											.map(sensor -> {
 												var sl = new SensorLimits(
-														LocalDateTime.now(), i,
-														((float) i) + 50, i + 60, sensor,
+														LocalDateTime.now(),
+														(float)(0.9 * numSensorData) + 100,
+														(float)(0.1 * numSensorData) + 100,
+														60, sensor,
 														gardeners.get(i % gardeners.size()), s
 												);
 												sl.setDeleted(false);
@@ -170,7 +172,7 @@ public class DumpConfig {
 													alarm = below ? 'l' : 'n';
 												}
 												return Stream.of(new SensorData(
-														LocalDateTime.now(), (float)i * 50 + j, alarm,
+														LocalDateTime.now(), (float)100 + j, alarm,
 														sensors.get(j % sensors.size()), s
 												));
 											})
