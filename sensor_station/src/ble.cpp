@@ -362,6 +362,9 @@ bool initialize_communication() {
 	BLE.setAdvertisedService(soil_humidity_sensor_service);
 	soil_humidity_sensor_service.addCharacteristic(soil_humidity_characteristic
 	);
+	soil_humidity_sensor_service.addCharacteristic(
+		soil_humidity_valid_characteristic
+	);
 	BLE.addService(soil_humidity_sensor_service);
 
 	// ----- Air Sensor Services ----- //
