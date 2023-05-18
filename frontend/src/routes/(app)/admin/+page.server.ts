@@ -94,7 +94,10 @@ export async function load(event) {
 
       for (let sensorStation of sensorStations) {
         sensorStation.data = getSensorStationData(event, sensorStation, dates);
-        sensorStation.pictures = getSensorStationPictures(event, sensorStation);
+        sensorStation.pictures = await getSensorStationPictures(
+          event,
+          sensorStation
+        );
       }
       resolve(sensorStations);
     }).catch((err) => {
@@ -123,7 +126,11 @@ export async function load(event) {
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
-import { addToDashboard, removeFromDashboard } from "$helper/actions";
+import {
+  addToDashboard,
+  removeFromDashboard,
+  updateFromTo,
+} from "$helper/actions";
 
 export const actions = {
   addToDashboard: async (event) => {
@@ -134,5 +141,11 @@ export const actions = {
   //---------------------------------------------------------------------
   removeFromDashboard: async (event) => {
     await removeFromDashboard(event);
+  },
+  //---------------------------------------------------------------------
+  //
+  //---------------------------------------------------------------------
+  updateFromTo: async (event) => {
+    await updateFromTo(event);
   },
 };

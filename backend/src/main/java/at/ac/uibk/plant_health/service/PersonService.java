@@ -1,6 +1,8 @@
 package at.ac.uibk.plant_health.service;
 
+import at.ac.uibk.plant_health.repositories.SensorLimitsRepository;
 import at.ac.uibk.plant_health.repositories.SensorStationPersonReferenceRepository;
+import at.ac.uibk.plant_health.repositories.SensorStationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +24,12 @@ import lombok.extern.slf4j.Slf4j;
 public class PersonService {
 	@Autowired
 	private PersonRepository personRepository;
+
+	@Autowired
+	private SensorStationRepository sensorStationRepository;
+
+	@Autowired
+	private SensorLimitsRepository sensorLimitsRepository;
 
 	@Autowired
 	private SensorStationPersonReferenceRepository sensorStationPersonReferenceRepository;
@@ -218,6 +226,17 @@ public class PersonService {
 				return false;
 			}
 			Person person = maybePerson.get();
+
+			sensorStationRepository.findAll().stream()
+							.filter(st -> st.getGardener() != null)
+							.filter(st -> st.getGardener().equals(person))
+							.forEach(st -> {st.setGardener(null); sensorStationRepository.save(st);});
+
+			sensorLimitsRepository.findAll().stream()
+							.filter(sl -> sl.getGardener() != null)
+							.filter(sl -> sl.getGardener().equals(person))
+							.forEach(sl -> {sl.setGardener(null); sensorLimitsRepository.save(sl);});
+
 			sensorStationPersonReferenceRepository.deleteAll(person.getSensorStationPersonReferences());
 			this.personRepository.deleteById(personId);
 			return true;
