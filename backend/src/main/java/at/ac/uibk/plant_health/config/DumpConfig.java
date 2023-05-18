@@ -124,7 +124,7 @@ public class DumpConfig {
 
 							var refs =
 									Stream.concat(IntStream.range(0, users.size())
-														  .filter(j -> (i & j) == 0)
+														  .filter(j -> (i % 3) == (j % 3))
 														  .mapToObj(
 																  j
 																  -> new SensorStationPersonReference(
