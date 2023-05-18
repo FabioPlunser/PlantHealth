@@ -61,7 +61,7 @@
             type="search"
             name="searchRoom"
             placeholder="Global Search"
-            class="input dark:input-bordered w-fit min-w-64 mx-auto dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
+            class="input dark:input-bordered w-fit min-w-64 mx-auto dark:bg-gray-800 bg-gray-200 dark:text-white text-black mt-4"
           />
         </div>
         <div class="flex justify-center mt-20">
