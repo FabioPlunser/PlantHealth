@@ -55,15 +55,26 @@
           </h1>
         </div>
       {:else}
+        <div class="mb-4 flex justify-ceter">
+          <input
+            bind:value={searchTerm}
+            type="search"
+            name="searchRoom"
+            placeholder="Global Search"
+            class="input dark:input-bordered w-fit min-w-64 mx-auto dark:bg-gray-800 bg-gray-200 dark:text-white text-black mt-4"
+          />
+        </div>
         <div class="flex justify-center mt-20">
           <div class="gap-4 grid jusitfy-center w-full">
             {#each sensorStations as sensorStation, i (sensorStation.sensorStationId)}
-              <div
-                in:fly={{ y: -200, duration: 200, delay: 200 * i }}
-                out:fly={{ y: -200, duration: 200 }}
-              >
-                <SensorStation {sensorStation} dates={data.dates} />
-              </div>
+              {#if sensorStation.name.includes(searchTerm) || sensorStation.roomName.includes(searchTerm)}
+                <div
+                  in:fly={{ y: -200, duration: 200, delay: 200 * i }}
+                  out:fly={{ y: -200, duration: 200 }}
+                >
+                  <SensorStation {sensorStation} dates={data.dates} />
+                </div>
+              {/if}
             {/each}
           </div>
         </div>
