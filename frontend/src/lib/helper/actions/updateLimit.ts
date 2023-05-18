@@ -89,6 +89,6 @@ export async function updateLimit(event: any) {
         "Error while updating limit",
         e
       );
-      throw error(500, "Error while updating limit");
+      throw error(500, { message: "Error while updating limit" });
     });
 }
