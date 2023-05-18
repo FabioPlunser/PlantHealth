@@ -89,6 +89,7 @@ public class AccessPointController {
 	@GetMapping("/get-access-point-config")
 	@PrincipalRequired(AccessPoint.class)
 	public RestResponseEntity getAccessPointConfig(AccessPoint accessPoint) {
+		accessPointService.setLastConnection(accessPoint);
 		// This cannot fail because the AccessPoint has to exist and be unlocked.
 		// If that were not the case the Security Chain would not have authenticated the request.
 		return new AccessPointConfigResponse(accessPoint).toEntity();
@@ -108,6 +109,7 @@ public class AccessPointController {
 		// Saving the Sensor Stations can not fail because of the Structure of the Method
 		// (unless we run out of Memory in which case not saving a SensorStation is the least of our
 		// worries).
+		accessPointService.setLastConnection(accessPoint);
 		accessPointService.foundNewSensorStation(accessPoint, sensorStations);
 
 		return MessageResponse.builder()
@@ -188,6 +190,7 @@ public class AccessPointController {
 			final AccessPoint accessPoint, @RequestBody final List<SensorStation> sensorStationList
 	) {
 		try {
+			accessPointService.setLastConnection(accessPoint);
 			accessPointService.setSensorStationData(sensorStationList, accessPoint);
 		} catch (ServiceException e) {
 			return MessageResponse.builder()

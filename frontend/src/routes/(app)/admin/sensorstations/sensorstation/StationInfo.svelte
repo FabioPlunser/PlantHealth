@@ -31,14 +31,7 @@
   //---------------------------------------------------------------
 </script>
 
-<form
-  method="post"
-  use:enhance={() => {
-    return async ({ update }) => {
-      await update({ reset: false });
-    };
-  }}
->
+<form method="post" use:enhance>
   <div class="float margin-right text-2xl">
     <input
       type="hidden"

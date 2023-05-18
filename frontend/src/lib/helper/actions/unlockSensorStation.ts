@@ -6,7 +6,7 @@ import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 
 export async function unlockSensorStation(event: any) {
-  const { request } = event;
+  const { request, fetch } = event;
   const formData = await request.formData();
   let sensorStationId = String(formData.get("sensorStationId"));
   let unlocked = String(formData.get("unlocked"));
@@ -21,7 +21,7 @@ export async function unlockSensorStation(event: any) {
       method: "POST",
     }
   )
-    .then(async (res) => {
+    .then(async (res: any) => {
       if (!res.ok) {
         errorHandler(
           event.locals.user?.personId,
@@ -37,7 +37,7 @@ export async function unlockSensorStation(event: any) {
         );
       }
     })
-    .catch((err) => {
+    .catch((err: any) => {
       errorHandler(
         event.locals.user?.personId,
         "Couldn't unlock sensor station",

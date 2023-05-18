@@ -24,7 +24,6 @@
   // ---------------------------------------------------
   // ---------------------------------------------------
   export let data: any;
-  $: console.log(data);
   export let form: any;
   let newDates = data.dates;
   let loading = false;
@@ -123,7 +122,7 @@
                   <label>
                     <h1 class="label-text font-bold">Name:</h1>
                     <input
-                      class="w-36 rounded-2xl p-2 border border-gray-400 dark:border-gray-700 bg-gray-200 dark:text-white text-black"
+                      class="w-36 rounded-2xl p-2 border dark:bg-gray-800 bg-gray-200 dark:border-gray-700 bg-gray-200 dark:text-white text-black"
                       type="text"
                       name="name"
                       value={sensorStation.name}
@@ -140,7 +139,8 @@
                   >
                     <h1 class="label-text font-bold">TransferInterval [s]:</h1>
                     <input
-                      class="w-36 rounded-2xl p-2 border border-gray-400 dark:border-gray-700 bg-gray-200 dark:text-white text-black"
+                      name="transferInterval"
+                      class="w-36 rounded-2xl p-2 border dark:bg-gray-800 bg-gray-200 dark:border-gray-700 bg-gray-200 dark:text-white text-black"
                       value={sensorStation.transferInterval}
                     />
                     <FormError

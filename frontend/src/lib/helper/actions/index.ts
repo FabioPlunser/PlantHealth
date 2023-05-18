@@ -8,6 +8,7 @@ import { updateSensorStation } from "./updateSensorStation.js";
 import { unlockSensorStation } from "./unlockSensorStation.js";
 import { addToDashboard } from "./addToDashboard.js";
 import { removeFromDashboard } from "./removeFromDashboard.js";
+import { assignGardener } from "./assignGardener";
 
 export {
   uploadPicture,
@@ -20,4 +21,5 @@ export {
   unlockSensorStation,
   addToDashboard,
   removeFromDashboard,
+  assignGardener,
 };

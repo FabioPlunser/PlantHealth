@@ -35,6 +35,7 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 		private final boolean unlocked;
 		private final boolean connected;
 		private final boolean deleted;
+		private final int transferInterval;
 		private final List<SensorLimitsResponse> sensorLimits;
 		private final List<SensorStationPersonReference> sensorStationPersonReferences;
 		private final List<SensorStationPicture> sensorStationPictures;
@@ -44,12 +45,20 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 			this.dipSwitchId = sensorStation.getDipSwitchId();
 			this.name = sensorStation.getName();
 			var accessPoint = sensorStation.getAccessPoint();
-			if (accessPoint != null) this.roomName = accessPoint.getRoomName(); else this.roomName = null;
+			if (accessPoint != null)
+				this.roomName = accessPoint.getRoomName();
+			else
+				this.roomName = null;
 			this.sensorStationId = sensorStation.getDeviceId();
 			this.gardener = sensorStation.getGardener();
 			this.unlocked = sensorStation.isUnlocked();
 			this.connected = sensorStation.isConnected();
 			this.deleted = sensorStation.isDeleted();
+			if (sensorStation.getAccessPoint() != null) {
+				this.transferInterval = sensorStation.getAccessPoint().getTransferInterval();
+			} else {
+				this.transferInterval = 0;
+			}
 
 			this.sensorLimits =
 					sensorStation.getSensorData()
@@ -64,8 +73,7 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 												.max(Comparator.comparing(SensorLimits::getTimeStamp
 												));
 
-								return newestLimit
-										.map(SensorLimitsResponse::new)
+								return newestLimit.map(SensorLimitsResponse::new)
 										.orElseGet(
 												()
 														-> new SensorLimitsResponse(

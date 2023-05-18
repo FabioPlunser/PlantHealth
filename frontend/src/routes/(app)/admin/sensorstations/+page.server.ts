@@ -78,6 +78,7 @@ import {
   deleteSensorStation,
   updateSensorStation,
   unlockSensorStation,
+  assignGardener,
 } from "$helper/actions";
 
 export const actions = {
@@ -89,6 +90,7 @@ export const actions = {
   //---------------------------------------------------------------------
   update: async (event) => {
     await updateSensorStation(event);
+    await assignGardener(event);
   },
   //---------------------------------------------------------------------
   //

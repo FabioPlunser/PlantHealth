@@ -2,7 +2,7 @@ import { writable } from "svelte/store";
 
 let sensors = [
   {
-    sensorType: "TEMPERATURE",
+    sensorType: "Temperature",
     sensorUnit: "°C",
     bootstrap: "bi-thermometer-half",
     google: "",

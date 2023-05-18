@@ -21,7 +21,7 @@
   export let form;
 
   let sensorStations: any[] = [];
-  let promise = data.streamed.sensorStations;
+  $: promise = data.streamed.sensorStations;
   $: {
     if (data.fromAccessPoints && $apSensorStations.length > 0) {
       sensorStations = $apSensorStations;

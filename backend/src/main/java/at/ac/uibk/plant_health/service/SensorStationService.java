@@ -137,17 +137,19 @@ public class SensorStationService {
 	 * Update name of SensorStation
 	 * @param sensorStation
 	 * @param name
+	 * @param transferInterval
 	 */
 	public void updateSensorStation(
 			SensorStation sensorStation, String name, Integer transferInterval
-	) {
-		if (!Objects.isNull(name)) {
+	) throws ServiceException {
+		try {
+			System.out.println(transferInterval);
 			sensorStation.setName(name);
-		}
-		if (!Objects.isNull(transferInterval) && !Objects.isNull(sensorStation.getAccessPoint())) {
 			sensorStation.getAccessPoint().setTransferInterval(transferInterval);
+			save(sensorStation);
+		} catch (Exception e) {
+			throw new ServiceException("Could not update SensorStation", 500);
 		}
-		save(sensorStation);
 	}
 
 	public void assignGardenerToSensorStation(

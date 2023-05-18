@@ -49,7 +49,8 @@ export const actions = {
 
     if (!res.ok) {
       logger.error(`Error while logging in: ${res.status} ${res.statusText}`);
-      return fail(500, { message: "Error while logging in" });
+      let data = await res.json();
+      return fail(500, { message: data.message });
     }
 
     let data = await res.json();
