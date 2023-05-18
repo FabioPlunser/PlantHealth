@@ -161,8 +161,8 @@ public class DumpConfig {
 							var sensorData =
 									IntStream.range(0, numSensorData)
 											.mapToObj(j -> {
-												boolean above = (j & 0x4) > 0;
-												boolean below = (j & 0x8) > 0;
+												boolean above = j > 0.9 * numSensorData;
+												boolean below = j < 0.1 * numSensorData;
 												char alarm;
 												if (above) {
 													alarm = below ? 'b' : 'h';
