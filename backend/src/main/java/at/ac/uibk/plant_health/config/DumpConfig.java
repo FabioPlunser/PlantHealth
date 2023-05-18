@@ -165,11 +165,13 @@ public class DumpConfig {
 											.mapToObj(j -> {
 												boolean above = j > 0.9 * numSensorData;
 												boolean below = j < 0.1 * numSensorData;
-												char alarm;
+												String alarm;
 												if (above) {
-													alarm = below ? 'b' : 'h';
-												} else {
-													alarm = below ? 'l' : 'n';
+													alarm = "h";
+												} else if(below) {
+													alarm = "l";
+												} else{
+													alarm = "n";
 												}
 												return Stream.of(new SensorData(
 														LocalDateTime.now(), (float)100 + j, alarm,

@@ -93,6 +93,18 @@
             type="submit"
             class="btn btn-primary"
             in:slide={{ duration: 400, axis: "x" }}
+            on:click={(event) => {
+              if (!data.canActiveUserChangeRoles) {
+                // HACK: check if user changes their own profile
+                let isDeleteConfirmed = confirm(
+                  `You will be logged out! Do you wish to proceed?`
+                );
+                if (!isDeleteConfirmed) {
+                  event.preventDefault();
+                  return;
+                }
+              }
+            }}
           >
             submit
           </button>

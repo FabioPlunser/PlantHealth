@@ -216,7 +216,7 @@ public class TestSensorStationController {
 			}
 			sensor = sensorRepository.findByType(sensor.getType()).get();
 			SensorData sensorData =
-					new SensorData(LocalDateTime.now(), 0, 'h', sensor, sensorStation);
+					new SensorData(LocalDateTime.now(), 0, "h", sensor, sensorStation);
 			sensorDataRepository.save(sensorData);
 		}
 		sensorStation.setSensorData(sensorDataRepository.findAll());
@@ -500,7 +500,7 @@ public class TestSensorStationController {
 		for (int d = 0; d < 14; d++) {
 			for (int i = 0; i < sensorMap.size(); i++) {
 				SensorData sensorData = new SensorData(
-						LocalDateTime.now().minusDays(d), rand.nextFloat(), 'h', sensors.get(i),
+						LocalDateTime.now().minusDays(d), rand.nextFloat(), "h", sensors.get(i),
 						sensorStation
 
 				);

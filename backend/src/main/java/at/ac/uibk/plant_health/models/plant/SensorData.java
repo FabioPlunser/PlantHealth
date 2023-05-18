@@ -3,6 +3,7 @@ package at.ac.uibk.plant_health.models.plant;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -35,6 +36,10 @@ public class SensorData implements Serializable {
 	@Column(name = "sensor_value", nullable = false)
 	private float value;
 
+	@JdbcTypeCode(SqlTypes.NVARCHAR)
+	@Column(name = "sensor_alarm", nullable = false)
+	private String alarm;
+
 	@JdbcTypeCode(SqlTypes.BOOLEAN)
 	@Column(name = "above_limit", nullable = false)
 	private boolean aboveLimit;
@@ -42,10 +47,6 @@ public class SensorData implements Serializable {
 	@JdbcTypeCode(SqlTypes.BOOLEAN)
 	@Column(name = "below_limit", nullable = false)
 	private boolean belowLimit;
-
-	@JdbcTypeCode(SqlTypes.NVARCHAR)
-	@Column(name = "sensor_alarm", nullable = false)
-	private char alarm;
 
 	@ManyToOne
 	@JoinColumn(name = "sensor_id", nullable = false)
@@ -61,18 +62,18 @@ public class SensorData implements Serializable {
 	private boolean isDeleted = false;
 
 	public SensorData(
-			LocalDateTime timeStamp, float value, char alarm, Sensor sensor,
+			LocalDateTime timeStamp, float value, String alarm, Sensor sensor,
 			SensorStation sensorStation
 	) {
 		this.timeStamp = timeStamp;
 		this.value = value;
 		this.alarm = alarm;
 		switch (alarm) {
-			case 'h' -> {
+			case "h" -> {
 				this.aboveLimit = true;
 				this.belowLimit = false;
 			}
-			case 'l' -> {
+			case "l" -> {
 				this.aboveLimit = false;
 				this.belowLimit = true;
 			}
@@ -84,16 +85,6 @@ public class SensorData implements Serializable {
 
 		this.sensor = sensor;
 		this.sensorStation = sensorStation;
-	}
-
-	@JsonIgnore
-	public char getAlarm() {
-		if (this.aboveLimit) {
-			return 'h';
-		} else if (this.belowLimit) {
-			return 'l';
-		}
-		return 'n';
 	}
 
 	@Override

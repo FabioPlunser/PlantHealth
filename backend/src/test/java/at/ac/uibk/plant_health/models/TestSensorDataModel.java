@@ -56,7 +56,7 @@ public class TestSensorDataModel {
 			}
 
 			SensorData sensorD = new SensorData(
-					LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS), rand.nextFloat(), 'n', sensor, station
+					LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS), rand.nextFloat(), "n", sensor, station
 			);
 			sensorDataRepository.save(sensorD);
 
