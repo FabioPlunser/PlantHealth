@@ -3,6 +3,7 @@ import { logger } from "$helper/logger";
 import { toasts } from "$stores/toastStore";
 import { errorHandler } from "$helper/errorHandler";
 import { error } from "@sveltejs/kit";
+import { updateFromTo } from "$helper/actions";
 
 export async function load(event) {
   const { fetch, depends } = event;
@@ -147,37 +148,40 @@ export const actions = {
 
   delete: async (event) => {
     const { request, fetch } = event;
-  let formData = await request.formData();
-  let accessPointId: string = String(formData.get("accessPointId"));
+    let formData = await request.formData();
+    let accessPointId: string = String(formData.get("accessPointId"));
 
-  let params = new URLSearchParams();
-  params.set("accessPointId", accessPointId);
+    let params = new URLSearchParams();
+    params.set("accessPointId", accessPointId);
 
-  await fetch(`${BACKEND_URL}/delete-access-point?${params.toString()}`, {
-    method: "DELETE",
-  })
-    .then((res: any) => {
-      if (!res.ok) {
+    await fetch(`${BACKEND_URL}/delete-access-point?${params.toString()}`, {
+      method: "DELETE",
+    })
+      .then((res: any) => {
+        if (!res.ok) {
+          errorHandler(
+            event.locals.user?.personId,
+            "Error while deleting access point",
+            res
+          );
+        } else {
+          logger.info(`Deleted access point = ${accessPointId}`);
+          toasts.addToast(
+            event.locals.user?.personId,
+            "success",
+            "Deleted access point"
+          );
+        }
+      })
+      .catch((e: any) => {
         errorHandler(
           event.locals.user?.personId,
           "Error while deleting access point",
-          res
+          e
         );
-      } else {
-        logger.info(`Deleted access point = ${accessPointId}`);
-        toasts.addToast(
-          event.locals.user?.personId,
-          "success",
-          "Deleted access point"
-        );
-      }
-    })
-    .catch((e: any) => {
-      errorHandler(
-        event.locals.user?.personId,
-        "Error while deleting access point",
-        e
-      );
-    });
+      });
+  },
+  updateFromTo: async (event) => {
+    await updateFromTo(event);
   },
 };
