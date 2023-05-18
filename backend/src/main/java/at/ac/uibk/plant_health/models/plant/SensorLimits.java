@@ -59,9 +59,9 @@ public class SensorLimits implements Serializable {
 
 	@JsonIgnore
 	@Fetch(FetchMode.SELECT)
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "gardener_id", nullable = false)
-	private Person gardener;
+	@ManyToOne(optional = true)
+	@JoinColumn(name = "gardener_id", nullable = true)
+	private Person gardener = null;
 
 	@JsonIgnore
 	@ManyToOne(optional = false)
