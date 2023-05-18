@@ -198,15 +198,16 @@ public class PersonController {
 
 	// region GET Endpoints
 	/**
-	 * Endpoint for Admins to get all users.
+	 * Endpoint for Admins to get all users, except the calling user himself.
 	 *
 	 * @return A RestReponse containing a List of all users.
 	 */
 	@ReadOperation
+	@PrincipalRequired(Person.class)
 	@AnyPermission(Permission.ADMIN)
 	@GetMapping("/get-all-users")
-	public RestResponse getAllUsers() {
-		return new ListResponse<>(personService.getPersons());
+	public RestResponse getAllUsers(Person person) {
+		return new ListResponse<>(personService.getPersons().stream().filter(p -> !p.equals(person)).toList());
 	}
 
 	@ReadOperation
