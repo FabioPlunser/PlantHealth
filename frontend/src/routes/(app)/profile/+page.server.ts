@@ -29,11 +29,10 @@ export async function load(event) {
     throw error(403, "Missing required parameters");
   }
 
-  let personId =
-    url.searchParams.get("personId") ?? event.locals.user?.personId;
+  personId = url.searchParams.get("personId") ?? event.locals.user?.personId;
   let username =
     url.searchParams.get("username") ?? event.locals.user?.username;
-  let source = request.headers.get("referer");
+  source = request.headers.get("referer");
 
   logger.info("user-profile-page", { payload: personId });
   logger.info("user-profile-page", { payload: username });
@@ -53,7 +52,7 @@ export async function load(event) {
   logger.info("user-profile-page", { permissions });
 
   if (canActiveUserChangeRoles) {
-    logger.info("Change roles");
+    logger.info("can change roles");
     await fetch(`${BACKEND_URL}/get-all-permissions`)
       .then((response) => {
         if (!response.ok) {
@@ -144,7 +143,6 @@ export const actions = {
 
       return fail(400, { error: true, errors });
     }
-
     /*
      *  NOTE: For every permission BooleanButton in the form, parse the name to find which Permission it represents
      * and add it to the permissions array
@@ -158,7 +156,6 @@ export const actions = {
         }
       }
     });
-
     let username = String(formData.get("username"));
     let email = String(formData.get("email"));
     let password = String(formData.get("password"));
@@ -173,7 +170,6 @@ export const actions = {
 
     if (canActiveUserChangeRoles) {
       params.set("permissions", permissions.join(","));
-      return;
     }
 
     logger.info(
@@ -216,7 +212,8 @@ export const actions = {
           logger.info("Updated user: " + JSON.stringify(data.message));
         });
     } else {
-      await fetch(`${BACKEND_URL}/update-user` + parametersString, {
+      console.log("FETCH USER" + parametersString);
+      await fetch(`${BACKEND_URL}/update-settings` + parametersString, {
         method: "POST",
       })
         .then((response) => {
@@ -228,6 +225,7 @@ export const actions = {
         })
         .then((data) => {
           logger.info("Updated user: " + JSON.stringify(data.message));
+          throw redirect(307, "/logout");
         });
     }
 
