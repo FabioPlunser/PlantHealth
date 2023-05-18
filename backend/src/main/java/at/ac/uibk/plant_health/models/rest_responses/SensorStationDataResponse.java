@@ -73,7 +73,7 @@ public class SensorStationDataResponse extends RestResponse implements Serializa
 		private final double value;
 		private final boolean isAboveLimit;
 		private final boolean isBelowLimit;
-		private final char alarm;
+		private final String alarm;
 
 		public TimeStampedSensorData(SensorData sensorData) {
 			this.timeStamp = sensorData.getTimeStamp();
