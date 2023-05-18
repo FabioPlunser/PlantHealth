@@ -29,12 +29,6 @@ public class DashBoardController {
 	private AccessPointService accessPointService;
 
 	@PrincipalRequired(Person.class)
-	@GetMapping("/get-dashboard-data")
-	public RestResponseEntity getDashboardData(Person person) {
-		return new DashBoardDataResponse(person).toEntity();
-	}
-
-	@PrincipalRequired(Person.class)
 	@GetMapping("/get-dashboard")
 	public RestResponseEntity getDashboard(Person person) {
 		try {
