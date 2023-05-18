@@ -1,0 +1,14 @@
+{
+	"devDependencies": {
+		"@poppanator/sveltekit-svg": "^3.0.0",
+		"date-picker-svelte": "^2.4.3",
+		"html5-qrcode": "^2.3.8",
+		"svelte-chartjs": "^3.1.2",
+		"zod": "^3.21.4"
+	},
+	"dependencies": {
+		"@tanstack/svelte-table": "^8.9.1",
+		"svelte": "^3.59.1",
+		"vite": "^4.3.5"
+	}
+}

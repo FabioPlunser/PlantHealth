@@ -1,4 +1,6 @@
 logging:
+  datasource:
+    url: "jdbc:h2:mem:testdb"
   level:
     web: TRACE
 
@@ -19,3 +21,4 @@ spring:
 # format_sql: true
 # show-sql: true
 # -------------------------------------------------------------------------------------------------- #
+

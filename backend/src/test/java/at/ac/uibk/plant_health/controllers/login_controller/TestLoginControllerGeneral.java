@@ -5,6 +5,7 @@ import static org.springframework.http.HttpHeaders.USER_AGENT;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,20 +13,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
-import at.ac.uibk.plant_health.models.Permission;
-import at.ac.uibk.plant_health.models.Person;
+import at.ac.uibk.plant_health.models.user.Permission;
+import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.service.PersonService;
 import at.ac.uibk.plant_health.util.AuthGenerator;
 import at.ac.uibk.plant_health.util.EndpointMatcherUtil;
+import at.ac.uibk.plant_health.util.MockAuthContext;
 import at.ac.uibk.plant_health.util.StringGenerator;
+import jakarta.transaction.Transactional;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -39,6 +41,21 @@ class TestLoginControllerGeneral {
 	@Autowired
 	private MockMvc mockMvc;
 
+	private Person createUserAndLogin(boolean alsoAdmin, boolean gardener) {
+		String username = StringGenerator.username();
+		String password = StringGenerator.password();
+		Set<GrantedAuthority> permissions = new java.util.HashSet<>(Set.of(Permission.USER));
+		if (alsoAdmin) {
+			permissions.add(Permission.ADMIN);
+		} else if (gardener) {
+			permissions.add(Permission.GARDENER);
+		}
+		Person person = new Person(username, StringGenerator.email(), password, permissions);
+		assertTrue(personService.create(person), "Unable to create user");
+		return (Person
+		) MockAuthContext.setLoggedInUser(personService.login(username, password).orElse(null));
+	}
+
 	@Test
 	public void login() throws Exception {
 		// given: user created in database
@@ -48,10 +65,7 @@ class TestLoginControllerGeneral {
 		personService.create(new Person(username, StringGenerator.email(), password, permissions));
 
 		// when: logging in as that user
-		mockMvc.perform(MockMvcRequestBuilders
-								.post(endpointMatcherUtil.toApiEndpoint(
-										endpointMatcherUtil.getApiLoginEndpoint()
-								))
+		mockMvc.perform(MockMvcRequestBuilders.get(endpointMatcherUtil.LOGIN_ENDPOINT)
 								.header(USER_AGENT, "MockTests")
 								.param("username", username)
 								.param("password", password)
@@ -77,7 +91,7 @@ class TestLoginControllerGeneral {
 		personService.create(new Person(username, StringGenerator.email(), password, permissions));
 
 		// when: trying to log in as that user with wrong password
-		mockMvc.perform(MockMvcRequestBuilders.post(endpointMatcherUtil.getApiLoginEndpoint())
+		mockMvc.perform(MockMvcRequestBuilders.get(endpointMatcherUtil.LOGIN_ENDPOINT)
 								.header(USER_AGENT, "MockTests")
 								.param("username", username)
 								.param("password", "wrong-password")
@@ -92,7 +106,7 @@ class TestLoginControllerGeneral {
 		// given: default setup
 
 		// when: trying to log in as that user with wrong password
-		mockMvc.perform(MockMvcRequestBuilders.post(endpointMatcherUtil.getApiLoginEndpoint())
+		mockMvc.perform(MockMvcRequestBuilders.get(endpointMatcherUtil.LOGIN_ENDPOINT)
 								.header(USER_AGENT, "MockTests")
 								.param("username", StringGenerator.username())
 								.param("password", StringGenerator.password())
@@ -114,10 +128,7 @@ class TestLoginControllerGeneral {
 		assertTrue(maybePerson.isPresent(), "Unable to login");
 
 		// when: logging out that user
-		mockMvc.perform(MockMvcRequestBuilders
-								.post(endpointMatcherUtil.toApiEndpoint(
-										endpointMatcherUtil.getApiLogoutEndpoint()
-								))
+		mockMvc.perform(MockMvcRequestBuilders.post(endpointMatcherUtil.LOGOUT_ENDPOINT)
 								.header(USER_AGENT, "MockTests")
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(maybePerson.get()))
@@ -131,9 +142,10 @@ class TestLoginControllerGeneral {
 		// given: default setting
 
 		// when: logging out with random token
-		mockMvc.perform(MockMvcRequestBuilders.post(endpointMatcherUtil.getApiLogoutEndpoint())
+		mockMvc.perform(MockMvcRequestBuilders.post(endpointMatcherUtil.LOGOUT_ENDPOINT)
 								.header(USER_AGENT, "MockTests")
-								.header(HttpHeaders.AUTHORIZATION, UUID.randomUUID())
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken("", UUID.randomUUID()))
 								.contentType(MediaType.APPLICATION_JSON))
 				// then: status code 401 must be returned
 				.andExpectAll(status().isUnauthorized());
@@ -144,10 +156,33 @@ class TestLoginControllerGeneral {
 		// given: default setting
 
 		// when: logging out without token
-		mockMvc.perform(MockMvcRequestBuilders.post(endpointMatcherUtil.getApiLogoutEndpoint())
+		mockMvc.perform(MockMvcRequestBuilders.post(endpointMatcherUtil.LOGOUT_ENDPOINT)
 								.header(USER_AGENT, "MockTests")
 								.contentType(MediaType.APPLICATION_JSON))
 				// then: status code 401 must be returned
 				.andExpectAll(status().isUnauthorized());
+	}
+
+	@Order(1)
+	@DirtiesContext
+	public void getAllGardener() throws Exception {
+		Person admin = createUserAndLogin(true, false);
+		List<Person> gardener = new ArrayList<>();
+		for (int i = 0; i < 10; i++) {
+			Person person = createUserAndLogin(false, true);
+			personService.save(person);
+			gardener.add(person);
+		}
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/get-all-gardener")
+								.header(USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(admin))
+								.contentType(MediaType.APPLICATION_JSON))
+				.andExpectAll(
+						status().isOk(), jsonPath("$.items").exists(),
+						jsonPath("$.items").isArray(),
+						jsonPath("$.items").value(Matchers.hasSize(gardener.size()))
+				);
 	}
 }

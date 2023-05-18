@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import at.ac.uibk.plant_health.models.Person;
+import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.repositories.PersonRepository;
 import at.ac.uibk.plant_health.service.PersonService;
 import at.ac.uibk.plant_health.util.MockAuthContext;
@@ -122,7 +122,7 @@ public class TestPersonServiceSecurity {
 		MockAuthContext.setLoggedInUser(loggedInPerson);
 
 		// when: logging out
-		assertTrue(personService.logout(), "Could not log out");
+		assertTrue(personService.logout(person), "Could not log out");
 
 		// then: retrieving user by token should not be possible anymore
 		Optional<Person> maybeLoggedOutPerson =
@@ -143,7 +143,7 @@ public class TestPersonServiceSecurity {
 		MockAuthContext.setLoggedInUser(maybePerson.get());
 
 		// when: logging out with token directly
-		assertTrue(personService.logout(), "Could not log out");
+		assertTrue(personService.logout(person), "Could not log out");
 
 		// then: retrieving user by token should not be possible anymore
 		Optional<Person> maybeLoggedOutPerson =
@@ -163,7 +163,7 @@ public class TestPersonServiceSecurity {
 		// when: saving user again using old Password
 		String hashedPassword = person.getPassword();
 		assertTrue(
-				personService.update(person, null, null, null), "Unable to create user for test"
+				personService.update(person, null, null, null, null), "Unable to create user for test"
 		);
 
 		// then: password is not hashed again
@@ -185,7 +185,7 @@ public class TestPersonServiceSecurity {
 		// when: saving user again using new Password
 		String hashedPassword = person.getPassword();
 		assertTrue(
-				personService.update(person, null, password, null), "Unable to create user for test"
+				personService.update(person, null, null, password, null), "Unable to create user for test"
 		);
 
 		// then: password is hashed again

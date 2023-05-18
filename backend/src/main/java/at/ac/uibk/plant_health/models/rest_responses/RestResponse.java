@@ -1,7 +1,6 @@
 package at.ac.uibk.plant_health.models.rest_responses;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -28,42 +27,18 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor(access = AccessLevel.MODULE)
 public abstract class RestResponse implements Serializable {
 	// region Constructors
-	protected RestResponse(boolean success) {
-		this(success, success ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+	protected RestResponse(int status) {
+		this(HttpStatusCode.valueOf(status));
 	}
-
-	protected RestResponse(boolean success, int statusCode) {
-		this(success, HttpStatusCode.valueOf(statusCode));
-	}
-
-	protected RestResponse(boolean success, HttpStatus status) {
-		this(success, status.value());
+	protected RestResponse(HttpStatus status) {
+		this(status.value());
 	}
 	// endregion
-
-	/**
-	 * Indicates the Success-State of an Operation to the Front-End.
-	 */
-	@Setter(AccessLevel.PROTECTED)
-	@Builder.Default
-	private boolean success = false;
-
-	/**
-	 * Indicate the Type of the Response.
-	 *
-	 * @return The Type of the Response.
-	 */
-	@JsonInclude
-	public abstract String getType();
 
 	// region Status Code
 	@JsonIgnore
 	@Builder.Default
-	private HttpStatusCode statusCode = HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value());
-
-	public static HttpStatusCode successToStatusCode(boolean success) {
-		return HttpStatusCode.valueOf((success ? HttpStatus.OK : HttpStatus.NO_CONTENT).value());
-	}
+	private HttpStatusCode statusCode = HttpStatusCode.valueOf(HttpStatus.OK.value());
 	// endregion
 
 	// region Response Conversions
@@ -82,37 +57,23 @@ public abstract class RestResponse implements Serializable {
 															 extends RestResponseBuilder<C, B>> {
 		/**
 		 * Indicate that the Operation succeeded.
-		 * Synonymous with {@link RestResponseBuilder#success}(true)
 		 */
 		public B ok() {
-			return this.success(true);
+			return this.statusCode(200);
 		}
 
 		/**
-		 * Indicate that the Operation failed.
-		 * Synonymous with {@link RestResponseBuilder#success}(false)
+		 * Indicate that an Internal Server Error occured.
 		 */
-		public B error() {
-			return this.success(false);
+		public B notFound() {
+			return this.statusCode(404);
 		}
 
 		/**
-		 * Set the {@link RestResponse#success}-Flag of the {@link
-		 * RestResponse} that is being built. If the {@link
-		 * RestResponse#statusCode} was not already set, it is set
-		 * according to the success-Parameter.
-		 *
-		 * @param success The Result of the Operation.
+		 * Indicate that an Internal Server Error occured.
 		 */
-		public B success(boolean success) {
-			this.success$value = success;
-			this.success$set = true;
-
-			// If the Status Code was not set yet, set it using the
-			// success-Flag.
-			if (!this.statusCode$set) this.statusCode(successToStatusCode(success));
-
-			return (B) this;
+		public B internalError() {
+			return this.statusCode(501);
 		}
 
 		/**

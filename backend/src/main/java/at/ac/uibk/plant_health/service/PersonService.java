@@ -1,18 +1,21 @@
 package at.ac.uibk.plant_health.service;
 
+import at.ac.uibk.plant_health.repositories.SensorLimitsRepository;
+import at.ac.uibk.plant_health.repositories.SensorStationPersonReferenceRepository;
+import at.ac.uibk.plant_health.repositories.SensorStationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import at.ac.uibk.plant_health.config.jwt_authentication.AuthContext;
-import at.ac.uibk.plant_health.config.jwt_authentication.JwtToken;
-import at.ac.uibk.plant_health.models.Permission;
-import at.ac.uibk.plant_health.models.Person;
+import at.ac.uibk.plant_health.config.jwt_authentication.authentication_types.UserAuthentication;
+import at.ac.uibk.plant_health.models.SensorStationPersonReference;
+import at.ac.uibk.plant_health.models.device.SensorStation;
+import at.ac.uibk.plant_health.models.user.Permission;
+import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.repositories.PersonRepository;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,6 +24,15 @@ import lombok.extern.slf4j.Slf4j;
 public class PersonService {
 	@Autowired
 	private PersonRepository personRepository;
+
+	@Autowired
+	private SensorStationRepository sensorStationRepository;
+
+	@Autowired
+	private SensorLimitsRepository sensorLimitsRepository;
+
+	@Autowired
+	private SensorStationPersonReferenceRepository sensorStationPersonReferenceRepository;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -32,6 +44,10 @@ public class PersonService {
 	 */
 	public List<Person> getPersons() {
 		return personRepository.findAll();
+	}
+
+	public List<Person> getGardener() {
+		return personRepository.findAllByPermissionsIsContaining(Permission.GARDENER);
 	}
 
 	// region Login/Logout
@@ -66,15 +82,9 @@ public class PersonService {
 	 *
 	 * @return true if user has been logged out, false otherwise
 	 */
-	public boolean logout() {
-		Optional<Person> maybePerson = AuthContext.getCurrentPerson();
-		if (maybePerson.isPresent()) {
-			Person person = maybePerson.get();
-			person.setToken(null);
-			return updateToken(person);
-		} else {
-			return false;
-		}
+	public boolean logout(Person person) {
+		person.setToken(null);
+		return updateToken(person);
 	}
 	// endregion
 
@@ -85,7 +95,7 @@ public class PersonService {
 	 * @param token jwt token of the person to be found
 	 * @return person if found, otherwise nothing
 	 */
-	public Optional<Person> findByUsernameAndToken(JwtToken token) {
+	public Optional<Person> findByUsernameAndToken(UserAuthentication token) {
 		return findByUsernameAndToken(token.getUsername(), token.getToken());
 	}
 
@@ -158,14 +168,17 @@ public class PersonService {
 	 *     otherwise.
 	 */
 	public boolean update(
-			Person person, String username, String password, Set<Permission> permissions
+			Person person, String username, String email, String password,
+			Set<Permission> permissions
 	) {
 		if (person != null && person.getPersonId() != null) {
 			if (username != null) person.setUsername(username);
+			if (email != null) person.setEmail(email);
 			if (permissions != null) person.setPermissions(permissions);
 			if (password != null) person.setPassword(password);
 
-			return save(person) != null;
+			save(person);
+			return true;
 		}
 
 		return false;
@@ -184,10 +197,11 @@ public class PersonService {
 	 * @return true if user was successfully update, false otherwise
 	 */
 	public boolean update(
-			UUID personId, String username, Set<Permission> permissions, String password
+			UUID personId, String username, String email, Set<Permission> permissions,
+			String password
 	) {
 		Optional<Person> maybePerson = findById(personId);
-		return maybePerson.filter(person -> update(person, username, password, permissions))
+		return maybePerson.filter(person -> update(person, username, email, password, permissions))
 				.isPresent();
 	}
 
@@ -207,6 +221,23 @@ public class PersonService {
 	 */
 	public boolean delete(UUID personId) {
 		try {
+			Optional<Person> maybePerson = personRepository.findById(personId);
+			if (maybePerson.isEmpty()) {
+				return false;
+			}
+			Person person = maybePerson.get();
+
+			sensorStationRepository.findAll().stream()
+							.filter(st -> st.getGardener() != null)
+							.filter(st -> st.getGardener().equals(person))
+							.forEach(st -> {st.setGardener(null); sensorStationRepository.save(st);});
+
+			sensorLimitsRepository.findAll().stream()
+							.filter(sl -> sl.getGardener() != null)
+							.filter(sl -> sl.getGardener().equals(person))
+							.forEach(sl -> {sl.setGardener(null); sensorLimitsRepository.save(sl);});
+
+			sensorStationPersonReferenceRepository.deleteAll(person.getSensorStationPersonReferences());
 			this.personRepository.deleteById(personId);
 			return true;
 		} catch (Exception e) {

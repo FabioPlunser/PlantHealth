@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <import class="ch.qos.logback.core.ConsoleAppender"/>
+    <import class="ch.qos.logback.core.rolling.RollingFileAppender"/>
+    <import class="ch.qos.logback.classic.encoder.PatternLayoutEncoder"/>
+
+    <import class="ch.qos.logback.core.db.DriverManagerConnectionSource"/>
+    <import class="at.ac.uibk.plant_health.config.CustomDBAppender"/>
+    <import class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy"/>
+
+    <import class="ch.qos.logback.classic.filter.ThresholdFilter"/>
+
+    <springProperty name="db_driver" source="spring.datasource.driver-class-name"/>
+    <springProperty name="db_url" source="spring.datasource.url"/>
+    <springProperty name="db_log_url" source="logging.datasource.url" defaultValue="${db_url}" />
+    <springProperty name="db_user" source="spring.datasource.username"/>
+    <springProperty name="db_password" source="spring.datasource.password"/>
+
+    <!-- Appenders -->
+    <appender name="CONSOLE" class="ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <encoder class="PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-4relative [%thread] %-5level %logger{35} -%kvp- %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="INFO_FILE" class="RollingFileAppender">
+        <file>spring.info.log</file>
+        <rollingPolicy class="SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>spring-%d{yyyy-MM-dd}.%i.info.log</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>60</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <encoder class="PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-4relative [%thread] %-5level %logger{35} -%kvp- %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="WARNING_FILE" class="RollingFileAppender">
+        <file>spring.warn.log</file>
+        <rollingPolicy class="SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>spring-%d{yyyy-MM-dd}.%i.warn.log</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>60</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <encoder class="PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-4relative [%thread] %-5level %logger{35} -%kvp- %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="DB" class="CustomDBAppender">
+        <connectionSource class="DriverManagerConnectionSource">
+            <driverClass>${db_driver}</driverClass>
+            <url>${db_log_url}</url>
+            <user>${db_user}</user>
+            <password>${db_password}</password>
+        </connectionSource>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+    </appender>
+
+    <springProfile name="!prod">
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <root level="DEBUG">
+        <appender-ref ref="INFO_FILE"/>
+        <appender-ref ref="WARNING_FILE"/>
+    </root>
+</configuration>

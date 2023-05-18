@@ -9,8 +9,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.*;
 
-import at.ac.uibk.plant_health.models.Permission;
-import at.ac.uibk.plant_health.models.Person;
+import at.ac.uibk.plant_health.models.user.Permission;
+import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.service.PersonService;
 import at.ac.uibk.plant_health.util.StringGenerator;
 
@@ -108,7 +108,7 @@ public class TestPersonServiceGeneral {
 		String newPassword = StringGenerator.password();
 		Set<Permission> newPermissions = Set.of(Permission.ADMIN, Permission.USER);
 		assertTrue(
-				personService.update(person, newUsername, newPassword, newPermissions),
+				personService.update(person, newUsername, null, newPassword, newPermissions),
 				"Could not update user"
 		);
 

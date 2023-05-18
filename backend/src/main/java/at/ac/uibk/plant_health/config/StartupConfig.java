@@ -5,12 +5,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 
 import java.util.UUID;
 
-import at.ac.uibk.plant_health.models.Permission;
-import at.ac.uibk.plant_health.models.Person;
+import at.ac.uibk.plant_health.models.user.Permission;
+import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.service.PersonService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,43 +51,43 @@ public class StartupConfig {
 	@EventListener(ApplicationReadyEvent.class)
 	public void createBaseAdminUser() {
 		Profile activeProfile = getActiveProfile();
-		switch (activeProfile) {
-						case DEBUG -> {
-                String unhashedPassword = "password";
-                Person person = new Person(
-                        "Admin", "admin@noreply.com", unhashedPassword,
-                        UUID.fromString("62b3e09e-c529-40c6-85c6-1afc53e17408"),
-                        Permission.adminAuthorities()
-                );
-                if (this.personService.create(person)) {
-                    log.info(String.format("Created User \"%s\" with Password \"%s\" and Token \"%s\"",
-                            person.getUsername(), unhashedPassword, person.getToken()
-                    ));
-                }
-            }
-            default -> { /* Do nothing by default */ }
-        }
-    }
 
-    /**
-     * Helper Class for easier Handling of the possible Profiles.
-     */
-    public enum Profile {
-        DEBUG,
-        PROD,
-        TEST,
-        OTHER;
+		if (activeProfile == Profile.DEBUG) {
+			String unhashedPassword = "password";
+			Person person = new Person(
+					"Admin", "admin@noreply.com", unhashedPassword,
+					UUID.fromString("62b3e09e-c529-40c6-85c6-1afc53e17408"),
+					Permission.adminAuthorities()
+			);
+			if (this.personService.create(person)) {
+				log.info(String.format(
+						"Created User \"%s\" with Password \"%s\" and Token \"%s\"",
+						person.getUsername(), unhashedPassword, person.getToken()
+				));
+			}
+		}
+	}
 
-        public static Profile fromString(String string) {
-            try {
-                return Profile.valueOf(string.toUpperCase());
-            } catch (Exception e) {
-                return Profile.OTHER;
-            }
-        }
+	/**
+	 * Helper Class for easier Handling of the possible Profiles.
+	 */
+	public enum Profile {
+		DEBUG,
+		PROD,
+		TEST,
+		DOCKER,
+		OTHER;
 
-        public boolean isUnknown() {
-            return this == OTHER;
-        }
-    }
+		public static Profile fromString(String string) {
+			try {
+				return Profile.valueOf(string.toUpperCase());
+			} catch (Exception e) {
+				return Profile.OTHER;
+			}
+		}
+
+		public boolean isUnknown() {
+			return this == OTHER;
+		}
+	}
 }

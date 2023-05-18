@@ -1,0 +1,160 @@
+#!/bin/bash
+# Initializes the access point and starts program execution
+
+# Setup conf.yaml
+echo "############ Configuration setup #############"
+echo "# Default values can be confirmed with enter #"
+echo "##############################################"
+echo ""
+
+# backend_address
+ip_regex='^(https?)://(0*(1?[0-9]{1,2}|2([0-4][0-9]|5[0-5]))\.){3}0*(1?[0-9]{1,2}|2([0-4][0-9]|5[0-5]))(:[0-9]{1,5})?$'
+url_regex='^(https?)://[-[:alnum:]\+&@#/%?=~_|!:,.;]*[-[:alnum:]\+&@#/%=~_|]$'
+while [[ 1 ]] ; do
+    read -p "IP or URL of server backend: " backend_address
+    if [[ "$backend_address" =~ $ip_regex ]] ; then
+        break
+    elif [[ "$backend_address" =~ $url_regex ]] ; then
+        break
+    elif [[ "$backend_address" == "" ]] ; then
+        echo "  No default value available"
+    else
+        echo "  Not a valid IP or URL (don't forget the leading http/https)"
+    fi
+done
+echo ""
+
+# room_name
+read -p "Name of room in which access point is placed: " room_name
+if [[ "$room_name" =~ ^$ ]] ; then
+    room_name="room"
+    echo "  Set to default: $room_name"
+fi
+echo ""
+
+# get_config_interval
+while [[ 1 ]] ; do
+    read -p "Seconds between checking the backend for configuration updates: " get_config_interval
+    if [[ "$get_config_interval" == "" ]] ; then
+        get_config_interval=5
+        echo "  Set to default: $get_config_interval"
+        break
+    elif [[ "$get_config_interval" =~ ^[0-9]+$ ]] ; then
+        if [[ $get_config_interval < 1 ]] || [[ $get_config_interval > 10 ]]; then
+            echo "  Value must be between 1 and 10"
+        else
+            break
+        fi
+    else
+        echo "  Only integers allowed"
+    fi
+done
+echo ""
+
+# collect_data_interval
+while [[ 1 ]] ; do
+    read -p "Seconds between collecting data from sensor stations: " collect_data_interval
+    if [[ "$collect_data_interval" == "" ]] ; then
+        collect_data_interval=30
+        echo "  Set to default: $collect_data_interval"
+        break
+    elif [[ "$collect_data_interval" =~ ^[0-9]+$ ]] ; then
+        if [[ $collect_data_interval < 1 ]] || [[ $collect_data_interval > 3600 ]]; then
+            echo "  Value must be between 1 and 3600"
+        else
+            break
+        fi
+    else
+        echo "  Only integers allowed"
+    fi
+done
+echo ""
+
+# transfer_data_interval
+while [[ 1 ]] ; do
+    read -p "Seconds between transferring data to server backend: " transfer_data_interval
+    if [[ "$transfer_data_interval" == "" ]] ; then
+        transfer_data_interval=60
+        echo "  Set to default: $transfer_data_interval"
+        break
+    elif [[ "$transfer_data_interval" =~ ^[0-9]+$ ]] ; then
+        if [[ $transfer_data_interval < $collect_data_interval ]] ; then
+            echo "  Value must be greater than $collect_data_interval"
+        elif [[ $transfer_data_interval > 3600 ]] ; then
+            echo "  Value must be less than or equal to 3600"
+        else
+            break
+        fi
+    else
+        echo "  Only integers allowed"
+    fi
+done
+echo ""
+
+# debug flag
+while [[ 1 ]] ; do
+    read -p "Enable debugging output to logfile [y/n]: " debug
+    if [[ "$debug" == "y" ]] ; then
+        debug="true"
+        break
+    elif [[ "$debug" == "n" ]] ; then
+        debug="false"
+        break
+    elif [[ "$debug" == "" ]] ; then
+        echo "  Set to default: No"
+        debug=false
+        break
+    else
+        echo "  Enter either y(es) or n(o)"
+    fi
+done
+echo ""
+
+# scheduler
+while [[ 1 ]] ; do
+    read -p "Automatically (re)start access point [y/n]: " set_cronjob
+    if [[ "$set_cronjob" == "y" ]] ; then
+        set_cronjob=true
+        break
+    elif [[ "$set_cronjob" == "n" ]] ; then
+        set_cronjob=false
+        break
+    elif [[ "$set_cronjob" == "" ]] ; then
+        echo "  Set to default: No"
+        set_cronjob=false
+        break
+    else
+        echo "  Enter either y(es) or n(o)"
+    fi
+done
+echo ""
+
+# Create yaml file
+conf_filename=conf.yaml
+echo "backend_address: $backend_address" > $conf_filename
+echo "room_name: $room_name" >> $conf_filename
+echo "get_config_interval: $get_config_interval" >> $conf_filename
+echo "collect_data_interval: $collect_data_interval" >> $conf_filename
+echo "transfer_data_interval: $transfer_data_interval" >> $conf_filename
+echo "debug: $debug" >> $conf_filename
+
+# Create python venv
+if [ ! -d venv ] ; then
+    echo "Creating python virtual environment"
+    python3 -m venv venv
+    source venv/bin/activate
+    python3 -m pip install --upgrade pip
+    pip install wheel
+    pip install -r requirements.txt
+    deactivate
+fi
+
+# Cronjob
+if [[ "$set_cronjob" = true ]] ; then
+    current_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+    target="$current_dir/start"
+    # Remove previous cronjob
+    crontab -l 2>/dev/null | grep -v "$target"  | crontab -
+    # Create new cronjob
+    (crontab -l 2>/dev/null ; echo "*/1 * * * * $target") | crontab -
+fi

@@ -5,6 +5,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,12 +16,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import at.ac.uibk.plant_health.models.Authenticable;
-import at.ac.uibk.plant_health.models.Permission;
 import at.ac.uibk.plant_health.models.annotations.AnyPermission;
+import at.ac.uibk.plant_health.models.user.Authenticable;
+import at.ac.uibk.plant_health.models.user.Permission;
+import at.ac.uibk.plant_health.util.Constants;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Aspect
+@Order(Constants.PERMISSION_CHECKING_ASPECT_ORDER)
 @Component
 public class AnyPermissionAspect {
 	@Autowired
