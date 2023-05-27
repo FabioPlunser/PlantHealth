@@ -29,7 +29,7 @@
         timeStamp: new Date(value.timeStamp),
         type: element.sensorType,
         value: value.value,
-        unit: element.unit,
+        unit: element.sensorUnit,
         alarm: value.alarm,
       };
       tableData.push(values);
