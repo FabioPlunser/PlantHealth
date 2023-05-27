@@ -13,10 +13,7 @@ const nameSchema = z.object({
     .trim(),
 });
 
-export async function updateSensorStation(
-  event: any,
-  formData: any | undefined
-) {
+export async function updateSensorStation(event: any, formData?: any) {
   const { request, fetch } = event;
   if (!formData) {
     formData = await request.formData();

@@ -59,6 +59,13 @@ declare interface Typed {
  * If a column is present and set to false, it should not be visible.
  *
  * @typedef {Object.<string, boolean>} ColumnVisibility
+ * @example
+ * ```javascript
+      let mobileColumnVisibility: ColumnVisibility = {
+        email: false,
+        permissions: false,
+      };
+ * ```
  */
 declare interface ColumnVisibility {
   [column: string]: boolean;

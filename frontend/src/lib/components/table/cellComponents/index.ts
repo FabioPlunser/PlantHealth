@@ -5,6 +5,7 @@ import FormActionButtonConfirm from "./FormActionButtonConfirm.svelte";
 import LocaleDateCell from "./LocaleDateCell.svelte";
 import SensorTypeBadgeCell from "./SensorTypeBadgeCell.svelte";
 import SensorValueCell from "./SensorValueCell.svelte";
+import AlarmCell from "./AlarmCell.svelte";
 
 export {
   RoleBadges,
@@ -14,4 +15,5 @@ export {
   LocaleDateCell,
   SensorTypeBadgeCell,
   SensorValueCell,
+  AlarmCell,
 };
