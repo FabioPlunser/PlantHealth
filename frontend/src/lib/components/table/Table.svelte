@@ -48,14 +48,16 @@
     }
   }
 
+  type T = $$Generic;
+
   /**
    * Array\<T\> where T is the datatype of the object to be displayed
    */
-  export let data: any;
+  export let data: T[];
   /**
    * Array\<ColumnDef\<T\>\> where T is the datatype of the object to be displayed
    */
-  export let columns: ColumnDef<any>[];
+  export let columns: ColumnDef<T>[];
   /**
    * column visibility if media is not mobile
    * @default {}

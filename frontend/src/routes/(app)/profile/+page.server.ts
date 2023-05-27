@@ -5,7 +5,7 @@ import { z } from "zod";
 import { logger } from "$helper/logger";
 import { toasts } from "$lib/stores/toastStore";
 
-let personId: string;
+let personId: string | undefined;
 let source: string | null;
 
 /**
@@ -165,7 +165,7 @@ export const actions = {
       personId !== event.locals.user?.personId;
 
     let params = new URLSearchParams();
-    params.set("personId", personId);
+    params.set("personId", personId ?? ""); // NOTE: if personId is not present pass empty string to fail fetch
     params.set("username", username);
 
     if (canActiveUserChangeRoles) {

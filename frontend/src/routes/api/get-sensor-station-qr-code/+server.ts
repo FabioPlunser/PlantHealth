@@ -1,4 +1,4 @@
-import type { RequestEvent } from "./$types";
+import type { RequestEvent } from "@sveltejs/kit";
 import { jsPDF } from "jspdf";
 import qrcode from "qrcode-generator";
 import fs from "fs";
