@@ -14,7 +14,7 @@
 <div>
   <!-- svelte-ignore a11y-label-has-associated-control -->
   <label class="label">
-    <span class="label-text font-bold">{label}</span>
+    <span class="label-text text-xl font-bold">{label}</span>
   </label>
   <!-- it seems like the focus properties of input input-bordered do not translate to a div... therefore I had to imitate the behaviour-->
   <div
