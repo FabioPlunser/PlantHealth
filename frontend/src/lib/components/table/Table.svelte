@@ -1,3 +1,51 @@
+<!--
+  @component
+  This component displays the given data in a table.
+
+  @template T - The type of data in the table.
+  @param data \{Array\<T\>} - The data for the table
+  @param columns \{Array\<ColumnDef\<T\>\>} - The format for the columns you want to display
+  @param defaultColumnVisibility \{ColumnVisibility} - default: {} An array containing the columns that should not be displayed on desktop
+  @param mobileColumnVisibility \{ColumnVisibility} - An array containing the columns that should not be displayed on mobile or tablet based on the following media query: `(min-width: 580px)`
+  @param paginationOptions \{Array\<number\>} - default: [5, 10, 20, 40] An array containing the number of rows that should be choosable for the table
+  @example
+  ``` html
+    <script lang="ts">
+      export let data : {
+        users: User[],
+      };
+      let columns: ColumnDef<User>[] = [
+        {
+          id: "username",
+          accessorKey: "username",
+          header: () => flexRender(TextCell, { text: "Username" }),
+          cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+        },
+        {
+          id: "delete",
+          accessorKey: "_", // NOTE: blanc accessor so we get the row
+          header: () => flexRender(TextCell, { text: "Delete" }),
+          cell: ({ row }) =>
+            flexRender(FormActionButtonConfirm, {
+              method: "POST",
+              action: "?/deleteUser",
+              formActionValue: row.original.personId,
+              confirmMessage: `You will delete this user ${row.original.username.toUpperCase()} permanently!`,
+              iconClass: "bi bi-trash text-3xl hover:text-red-500",
+            }
+          ),
+        },  
+      ];
+      let mobileColumnVisibility: ColumnVisibility = {
+        email: false,
+        permissions: false,
+      };
+    </script>
+    <Table data={data.users} {columns} {mobileColumnVisibility}/>
+  ```
+  
+-->
+
 <script lang="ts">
   import type { ColumnDef, TableOptions } from "@tanstack/svelte-table";
   import {
@@ -60,6 +108,39 @@
    * An array of column definitions for the table.
    * @template T - The type of data in the columns.
    * @type {Array\<ColumnDef\<T\>\>}
+   * @example 
+   * ```javascript
+      interface User {
+        personId: string;
+        username: string;
+        token: string;
+        permissions: string[];
+        email: string;
+      }
+      
+      let columns: ColumnDef<User>[] = [
+        {
+          id: "username",
+          accessorKey: "username",
+          header: () => flexRender(TextCell, { text: "Username" }),
+          cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+        },
+        {
+          id: "delete",
+          accessorKey: "_", // NOTE: blanc accessor so we get the row
+          header: () => flexRender(TextCell, { text: "Delete" }),
+          cell: ({ row }) =>
+            flexRender(FormActionButtonConfirm, {
+              method: "POST",
+              action: "?/deleteUser",
+              formActionValue: row.original.personId,
+              confirmMessage: `You will delete this user ${row.original.username.toUpperCase()} permanently!`,
+              iconClass: "bi bi-trash text-3xl hover:text-red-500",
+            }
+          ),
+        },  
+      ];
+   *  ```
    */
   export let columns: ColumnDef<T>[];
   /**
@@ -77,13 +158,14 @@
   /**
    * An array of selectable row sizes for the table.
    * @type {Array\<number\>}
+   * @default [5, 10, 20, 40]
    * @example
    *```javascript
    *  let rowSize: number[] = [5, 10, 20]
    *```
-   *Allows the user to choose between 5, 10, or 20 rows to be displayed per page.
+   * Allows the user to choose between 5, 10, or 20 rows to be displayed per page.
    */
-  export let rowSizes: number[] = [5, 10, 20, 40];
+  export let paginationOptions: number[] = [5, 10, 20, 40];
 
   $: columnVisibility = isMediaNotMobile
     ? defaultColumnVisibility
@@ -275,7 +357,7 @@
           on:change={setPageSize}
           class="btn"
         >
-          {#each rowSizes as pageSize}
+          {#each paginationOptions as pageSize}
             <option value={pageSize}>
               Show {pageSize}
             </option>
