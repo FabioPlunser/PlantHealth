@@ -51,11 +51,15 @@
   type T = $$Generic;
 
   /**
-   * Array\<T\> where T is the datatype of the object to be displayed
+   * The array containing the data to be displayed in the table.
+   * @template T - The type of data in the array.
+   * @type {Array\<T\>}
    */
   export let data: T[];
   /**
-   * Array\<ColumnDef\<T\>\> where T is the datatype of the object to be displayed
+   * An array of column definitions for the table.
+   * @template T - The type of data in the columns.
+   * @type {Array\<ColumnDef\<T\>\>}
    */
   export let columns: ColumnDef<T>[];
   /**
@@ -71,9 +75,15 @@
   export let mobileColumnVisibility: ColumnVisibility;
 
   /**
-   * Array\<number\> where each number is a page size option
+   * An array of selectable row sizes for the table.
+   * @type {Array\<number\>}
+   * @example
+   *```javascript
+   *  let rowSize: number[] = [5, 10, 20]
+   *```
+   *Allows the user to choose between 5, 10, or 20 rows to be displayed per page.
    */
-  export let maxRowSize: number = 100;
+  export let rowSizes: number[] = [5, 10, 20, 40];
 
   $: columnVisibility = isMediaNotMobile
     ? defaultColumnVisibility
@@ -265,7 +275,7 @@
           on:change={setPageSize}
           class="btn"
         >
-          {#each [5, 10, 20, 40, 80, maxRowSize] as pageSize}
+          {#each rowSizes as pageSize}
             <option value={pageSize}>
               Show {pageSize}
             </option>
