@@ -7,56 +7,64 @@
     SensorValueCell,
     LocaleDateCell,
   } from "$components/table/cellComponents";
+  import AlarmCell from "../../table/cellComponents/AlarmCell.svelte";
   //-------------------------------------------------------------------
   //-------------------------------------------------------------------
   export let data: any;
   data = data?.data;
   //-------------------------------------------------------------------
   //-------------------------------------------------------------------
-  interface Columns {
+  interface SensorData {
     timeStamp: Date;
     type: string;
     value: number;
+    unit: string;
     alarm: string;
   }
 
-  let tableData: Columns[] = [];
+  let tableData: SensorData[] = [];
   data.forEach((element: any) => {
     element.values.forEach((value: any) => {
-      let values: Columns = {
+      let values: SensorData = {
         timeStamp: new Date(value.timeStamp),
         type: element.sensorType,
         value: value.value,
+        unit: element.unit,
         alarm: value.alarm,
       };
       tableData.push(values);
     });
   });
 
-  let columns: ColumnDef<Columns>[] = [
-    {
-      id: "timeStamp",
-      accessorKey: "timeStamp",
-      header: () => flexRender(TextCell, { text: "Time" }),
-      cell: (info) => flexRender(LocaleDateCell, { date: info.getValue() }),
-    },
+  let columns: ColumnDef<SensorData>[] = [
     {
       id: "type",
       accessorKey: "type",
       header: () => flexRender(TextCell, { text: "Type" }),
-      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+      cell: (info) =>
+        flexRender(SensorTypeBadgeCell, { type: info.getValue() }),
     },
     {
       id: "value",
       accessorKey: "value",
       header: () => flexRender(TextCell, { text: "Value" }),
-      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+      cell: ({ row }) =>
+        flexRender(SensorValueCell, {
+          value: row.original.value,
+          unit: row.original.unit,
+        }),
     },
     {
       id: "alarm",
       accessorKey: "alarm",
-      header: () => flexRender(TextCell, { text: "Alarm" }),
-      cell: (info) => flexRender(TextCell, { text: info.getValue() }),
+      header: () => flexRender(TextCell, { text: "Within Limits" }),
+      cell: (info) => flexRender(AlarmCell, { alarm: info.getValue() }),
+    },
+    {
+      id: "timeStamp",
+      accessorKey: "timeStamp",
+      header: () => flexRender(TextCell, { text: "Time" }),
+      cell: (info) => flexRender(LocaleDateCell, { date: info.getValue() }),
     },
   ];
   //-------------------------------------------------------------------

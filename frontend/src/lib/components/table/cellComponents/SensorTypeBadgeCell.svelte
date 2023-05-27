@@ -4,19 +4,20 @@
   // These colors should be in accordance to the colors specified in wiki/alarm-description/Alarm-Description-of-Sensor-Station.md
 
   const getTypeClass = (type: string) => {
-    if (type === "LIGHTINTENSITY") {
+    let typeUpperCase = type.toUpperCase();
+    if (typeUpperCase === "LIGHT INTENSITY") {
       return "bg-yellow-500";
-    } else if (type === "TEMPERATURE") {
+    } else if (typeUpperCase === "TEMPERATURE") {
       return "bg-red-600";
-    } else if (type === "SOILHUMIDITY") {
+    } else if (typeUpperCase === "EARTH HUMIDITY") {
       return "bg-green-600";
-    } else if (type === "AIRQUALITY") {
+    } else if (typeUpperCase === "AIR QUALITY") {
       return "bg-purple-700";
-    } else if (type === "HUMIDITY") {
+    } else if (typeUpperCase === "AIR HUMIDITY") {
       return "bg-gray-500"; // white is not really visible so gray was chosen
-    } else if (type === "PRESSURE") {
+    } else if (typeUpperCase === "AIR PRESSURE") {
       return "bg-cyan-500";
-    } else if (type === "BATTERYLEVEL") {
+    } else if (typeUpperCase === "BATTERY LEVEL") {
       return "bg-orange-600";
     } else {
       return "bg-black";

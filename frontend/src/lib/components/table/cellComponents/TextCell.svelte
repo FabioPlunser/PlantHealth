@@ -2,4 +2,4 @@
   export let text: string;
 </script>
 
-<span>{text}</span>
+<span class="flex justify-center">{text}</span>
