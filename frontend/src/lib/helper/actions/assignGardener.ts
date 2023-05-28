@@ -15,7 +15,12 @@ export async function assignGardener(event: any, formData?: any) {
   let sensorStationId = String(formData.get("sensorStationId"));
   let unassign = Boolean(formData.get("unassign"));
   let gardenerId = String(formData.get("gardener"));
-
+  /* HACK: we somehow need to be able to update a sensor station that is not yet assigned
+   * so we return early from this function as the update action always calls updateSensorStation() and assignGardener()
+   */
+  if (gardenerId === "No gardener assigned") {
+    return;
+  }
   let params = new URLSearchParams();
   params.set("sensorStationId", sensorStationId);
   params.set("gardenerId", gardenerId);
