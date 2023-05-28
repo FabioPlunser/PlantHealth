@@ -29,11 +29,15 @@ export async function unlockSensorStation(event: any) {
           await res.json()
         );
       } else {
-        logger.info(`Sensor station unlocked id = ${sensorStationId}`);
+        logger.info(
+          `Sensor station unlocked set to '${unlocked}' for id = ${sensorStationId}`
+        );
         toasts.addToast(
           event.locals.user?.personId,
           "success",
-          `Sensor station unlocked`
+          unlocked === "true"
+            ? "sensor station unlocked"
+            : "sensor station locked"
         );
       }
     })
