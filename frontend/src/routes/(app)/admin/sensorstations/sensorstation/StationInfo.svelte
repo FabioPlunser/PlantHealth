@@ -3,6 +3,7 @@
   import Input from "$components/ui/Input.svelte";
   import FormError from "$lib/helper/formError.svelte";
   import { redirect } from "@sveltejs/kit";
+  import LockUnlockButton from "./LockUnlockButton.svelte";
   //---------------------------------------------------------------
   //---------------------------------------------------------------
   export let sensorStation: SensorStation;
@@ -140,13 +141,7 @@
       <div class="flex justify-center mx-auto gap-2 mt-6">
         <button formaction="?/update" class="btn btn-primary">Update</button>
 
-        {#if sensorStation.unlocked}
-          <button class="btn btn-info" formaction="?/unlock">Unlocked</button>
-          <input type="hidden" name="unlocked" value="false" />
-        {:else}
-          <button class="btn btn-error" formaction="?/unlock">Locked</button>
-          <input type="hidden" name="unlocked" value="true" />
-        {/if}
+        <LockUnlockButton bind:sensorStation />
       </div>
     </div>
   </div>
