@@ -4,6 +4,8 @@
   import FormError from "$lib/helper/formError.svelte";
   import { redirect } from "@sveltejs/kit";
   import LockUnlockButton from "./LockUnlockButton.svelte";
+  import ConnectedDisconnectedBadge from "./ConnectedDisconnectedBadge.svelte";
+  import DownloadQrCode from "./DownloadQrCode.svelte";
   //---------------------------------------------------------------
   //---------------------------------------------------------------
   export let sensorStation: SensorStation;
@@ -12,21 +14,6 @@
   export let form: any;
   function setCookie(id: any) {
     document.cookie = `sensorStationId=${id}; path=/;`;
-  }
-  //---------------------------------------------------------------
-  //---------------------------------------------------------------
-  async function downloadQRCode() {
-    let response = await fetch(
-      `/api/get-sensor-station-qr-code?sensorStationId=${sensorStation.sensorStationId}&roomName=${sensorStation.roomName}&plantName=${sensorStation.name}`
-    );
-    let data = await response.blob();
-    let url = URL.createObjectURL(data);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = sensorStation.sensorStationId;
-    document.body.appendChild(link);
-    link.click();
   }
   //---------------------------------------------------------------
   //---------------------------------------------------------------
@@ -121,23 +108,10 @@
     </div>
 
     <div class="">
-      <div class="flex mx-auto justify-center m-4">
-        {#if sensorStation.connected}
-          <div class="badge badge-success">Connected</div>
-        {:else}
-          <div class="badge badge-error">Disconnected</div>
-        {/if}
-      </div>
+      <ConnectedDisconnectedBadge bind:sensorStation />
       <div class="flex justify-center">
-        <div class="flex">
-          <div class="mx-auto">
-            <button type="button" on:click={downloadQRCode}>
-              <i class="bi bi-qr-code-scan text-4xl" />
-            </button>
-          </div>
-        </div>
+        <DownloadQrCode bind:sensorStation />
       </div>
-
       <div class="flex justify-center mx-auto gap-2 mt-6">
         <button formaction="?/update" class="btn btn-primary">Update</button>
 
