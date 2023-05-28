@@ -1,3 +1,13 @@
+<!--
+  @component
+  A button that will lock or unlock the sensor station based on `SensorStation.unlocked`.
+
+  This component calls the `?/unlock` form action so make sure it is present in `+page.server.ts`.
+  The internal input field has the `name="unlocked"` and will set the `value` to `true` or `false`. 
+
+  @param sensorStation \{SensorStation} - the sensor station that should be locked or unlocked
+
+-->
 <script lang="ts">
   import { enhance } from "$app/forms";
   export let sensorStation: SensorStation;
