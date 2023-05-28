@@ -6,6 +6,7 @@
   import LockUnlockButton from "./LockUnlockButton.svelte";
   import ConnectedDisconnectedBadge from "./ConnectedDisconnectedBadge.svelte";
   import DownloadQrCode from "./DownloadQrCode.svelte";
+  import GardenerSelect from "./GardenerSelect.svelte";
   //---------------------------------------------------------------
   //---------------------------------------------------------------
   export let sensorStation: SensorStation;
@@ -17,6 +18,9 @@
   }
   //---------------------------------------------------------------
   //---------------------------------------------------------------
+  $: {
+    sensorStation.gardener.personId = sensorStation.gardener.personId;
+  }
 </script>
 
 <form method="post" use:enhance>
@@ -83,28 +87,7 @@
     </div>
     <div class="xl:flex gap-4">
       <span class="font-bold flex items-center">Gardener: </span>
-      <div>
-        <select
-          name="gardener"
-          class="flex items-center justify-center text-sm select dark:bg-gray-700 bg-base-100 w-fit h-2 max-w-xs border-2 border-base-200 dark:border-none"
-        >
-          {#each gardener as person, i}
-            {#if sensorStation.gardener?.username === person.username}
-              <!-- <option hidden class="hidden">{person.personId}</option> -->
-              <option selected value={person.personId}>{person.username}</option
-              >
-              <input type="hidden" name="delete" value="true" />
-              <option value={person.personId}>Unassign</option>
-            {:else}
-              {#if i == 0}
-                <option>No gardener assigned</option>
-              {/if}
-              <!-- <option hidden class="hidden">{person.personId}</option> -->
-              <option value={person.personId}>{person.username}</option>
-            {/if}
-          {/each}
-        </select>
-      </div>
+      <GardenerSelect {gardener} bind:sensorStation />
     </div>
 
     <div class="">
@@ -113,6 +96,11 @@
         <DownloadQrCode bind:sensorStation />
       </div>
       <div class="flex justify-center mx-auto gap-2 mt-6">
+        <input
+          type="hidden"
+          name="gardener"
+          bind:value={sensorStation.gardener.personId}
+        />
         <button formaction="?/update" class="btn btn-primary">Update</button>
 
         <LockUnlockButton bind:sensorStation />

@@ -19,6 +19,11 @@ export async function assignGardener(event: any, formData?: any) {
    * so we return early from this function as the update action always calls updateSensorStation() and assignGardener()
    */
   if (gardenerId === "No gardener assigned") {
+    toasts.addToast(
+      event.locals.user?.personId,
+      "error",
+      "No gardener assigned"
+    );
     return;
   }
   let params = new URLSearchParams();
