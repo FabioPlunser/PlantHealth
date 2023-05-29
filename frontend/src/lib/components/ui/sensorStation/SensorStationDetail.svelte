@@ -124,6 +124,10 @@
                   name="sensorStationId"
                   value={sensorStation.sensorStationId}
                 />
+                <!--
+                  TODO: find a way fro the page not to fail on delete clicked.
+                  <SensorStationDeleteButton sensorStationId={sensorStation.sensorStationId}/>
+                -->
                 <h1 class="text-xl font-bold">
                   Room: {sensorStation.roomName}
                 </h1>

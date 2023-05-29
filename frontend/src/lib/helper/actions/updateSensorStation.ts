@@ -29,6 +29,7 @@ export async function updateSensorStation(event: any, formData?: any) {
   if (!zodData.success) {
     // Loop through the errors array and create a custom errors array
     const errors = zodData.error.errors.map((error) => {
+      toasts.addToast(event.locals.user?.personId, "error", error.message);
       return {
         field: error.path[0],
         message: error.message,
