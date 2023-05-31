@@ -22,6 +22,11 @@ import at.ac.uibk.plant_health.models.user.Authenticable;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.service.PersonService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 /**
  * Controller handling {@link Person} related Information (e.g. creating,
@@ -202,20 +207,48 @@ public class PersonController {
 	 *
 	 * @return A RestReponse containing a List of all users.
 	 */
+	@Operation(summary = "Get all users")
+	@ApiResponse(
+			responseCode = "200", description = "Successfully retrieved all users",
+			content =
+			{
+				@Content(
+						mediaType = "application/json",
+						schema = @Schema(implementation = ListResponse.class)
+				)
+			}
+	)
 	@ReadOperation
 	@PrincipalRequired(Person.class)
 	@AnyPermission(Permission.ADMIN)
 	@GetMapping("/get-all-users")
-	public RestResponse getAllUsers(Person person) {
-		return new ListResponse<>(personService.getPersons().stream()
-				.filter(p -> !p.equals(person))
-				.toList());
+	public RestResponse
+	getAllUsers(Person person) {
+		return new ListResponse<>(
+				personService.getPersons().stream().filter(p -> !p.equals(person)).toList()
+		);
 	}
 
+	/**
+	 * Endpoint for Admins to get all gardeners
+	 * @return A list of all gardeners
+	 */
+	@Operation(summary = "Get all gardeners")
+	@ApiResponse(
+			responseCode = "200", description = "Successfully retrieved all gardeners",
+			content =
+			{
+				@Content(
+						mediaType = "application/json",
+						schema = @Schema(implementation = ListResponse.class)
+				)
+			}
+	)
 	@ReadOperation
 	@AnyPermission(Permission.ADMIN)
 	@GetMapping("/get-all-gardener")
-	public RestResponse getAllGardener() {
+	public RestResponse
+	getAllGardener() {
 		return new ListResponse<>(personService.getGardener());
 	}
 	/**
@@ -224,17 +257,35 @@ public class PersonController {
 	 *
 	 * @return A List of all possible Permissions.
 	 */
+	@Operation(summary = "Get all permissions")
+	@ApiResponse(
+			responseCode = "200", description = "Successfully retrieved all permissions",
+			content =
+			{
+				@Content(
+						mediaType = "application/json",
+						schema = @Schema(implementation = ListResponse.class)
+				)
+			}
+	)
 	@ReadOperation
 	@AnyPermission(Permission.ADMIN)
 	@GetMapping("/get-all-permissions")
-	public RestResponse getAllPermissions() {
+	public RestResponse
+	getAllPermissions() {
 		return new ListResponse<>(Stream.of(Permission.values()).map(Enum::name).toList());
 	}
 
+	@Operation(summary = "Get all permissions of a user")
+	@ApiResponse(
+			responseCode = "200", description = "Returns all permissions of a user",
+			content = @Content(schema = @Schema(implementation = PermissionResponse.class))
+	)
 	@ReadOperation
 	@PrincipalRequired(Authenticable.class)
 	@GetMapping("/get-user-permissions")
-	public RestResponseEntity getUserPermissions(Person person) {
+	public RestResponseEntity
+	getUserPermissions(Person person) {
 		return PermissionResponse.builder()
 				.ok()
 				.permissions(person.getPermissions().toArray(GrantedAuthority[] ::new))
