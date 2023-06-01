@@ -9,7 +9,7 @@ export async function load(event) {
   const { fetch, depends } = event;
   depends("app:getAccessPoints");
 
-  async function getAccessPoints(): Promise<any> {
+  async function getAccessPoints(): Promise<Responses.AccessPointListResponse> {
     return new Promise(async (resolve, reject) => {
       await fetch(`${BACKEND_URL}/get-access-points`)
         .then(async (res) => {
@@ -22,8 +22,7 @@ export async function load(event) {
             );
             reject(res);
           }
-          let data = await res.json();
-          resolve(data.accessPoints);
+          resolve(await res.json());
         })
         .catch((err) => {
           errorHandler(

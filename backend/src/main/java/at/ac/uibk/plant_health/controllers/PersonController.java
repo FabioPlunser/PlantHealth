@@ -53,6 +53,14 @@ public class PersonController {
 	 * @return A RestResponse indicating whether the user could be created
 	 *     or not.
 	 */
+	@Operation(
+			summary = "Register a new User",
+			description = "Register a new User with the given credentials."
+	)
+	@ApiResponse(
+			responseCode = "200", description = "User successfully registered.",
+			content = @Content(schema = @Schema(implementation = CreatedUserResponse.class))
+	)
 	@WriteOperation
 	@PublicEndpoint
 	@PostMapping(REGISTER_ENDPOINT)
@@ -78,15 +86,22 @@ public class PersonController {
 	 * @return A RestResponse indicating whether the user could be created
 	 *     or not.
 	 */
+	@Operation(
+			summary = "Create a new User",
+			description = "Create a new User with the given credentials and permissions."
+	)
+	@ApiResponse(
+			responseCode = "200", description = "User successfully created.",
+			content = @Content(schema = @Schema(implementation = CreatedUserResponse.class))
+	)
 	@WriteOperation
 	@AnyPermission(Permission.ADMIN)
 	@PostMapping("/create-user")
-	public RestResponseEntity create(
-			@RequestParam("username") final String username,
-			@RequestParam("password") final String password,
-			@RequestParam("email") final String email,
-			@RequestParam("permissions") final Set<Permission> permissions
-	) {
+	public RestResponseEntity
+	create(@RequestParam("username") final String username,
+		   @RequestParam("password") final String password,
+		   @RequestParam("email") final String email,
+		   @RequestParam("permissions") final Set<Permission> permissions) {
 		Person person = new Person(username, email, password, (Set) permissions);
 
 		return createUser(person);
