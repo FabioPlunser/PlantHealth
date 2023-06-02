@@ -24,7 +24,7 @@ public class LogRepositoryAspect {
     @Autowired
     private HttpServletRequest request;
 
-    @Around("execution(* (@org.springframework.web.bind.annotation.RestController *).*(..))")
+    @Around("execution(* (@org.springframework.web.bind.annotation.LogRepositoryAnnotation *).*(..))")
     public Object logRepositories(ProceedingJoinPoint jp) throws Throwable {
         Optional<IdentifiedEntity> principle = AuthContext.getIdentifiedPrincipal();
 
