@@ -3,14 +3,12 @@ package at.ac.uibk.plant_health.models.annotations.aspects;
 import at.ac.uibk.plant_health.config.jwt_authentication.AuthContext;
 import at.ac.uibk.plant_health.models.IdentifiedEntity;
 import at.ac.uibk.plant_health.models.Log;
-import at.ac.uibk.plant_health.models.rest_responses.RestResponseEntity;
 import at.ac.uibk.plant_health.service.LogService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -24,7 +22,7 @@ public class LogRepositoryAspect {
     @Autowired
     private HttpServletRequest request;
 
-    @Around("execution(* (@org.springframework.web.bind.annotation.LogRepositoryAnnotation *).*(..))")
+    @Around("execution(* (@at.ac.uibk.plant_health.models.annotations.LogRepositoryAnnotation *).*(..))")
     public Object logRepositories(ProceedingJoinPoint jp) throws Throwable {
         Optional<IdentifiedEntity> principle = AuthContext.getIdentifiedPrincipal();
 
