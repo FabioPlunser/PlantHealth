@@ -2,10 +2,10 @@ import { BACKEND_URL } from "$env/static/private";
 import { logger } from "$helper/logger";
 import { redirect, error } from "@sveltejs/kit";
 
-export async function load({ url, locals }) {
-  if (locals.user) {
+export async function load(event) {
+  if (event.locals.user) {
     return {
-      permission: locals.user.permissions[0],
+      permission: event.locals.user.permissions[0],
     };
   }
   try {

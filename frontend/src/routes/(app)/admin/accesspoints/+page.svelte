@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { goto } from "$app/navigation";
   import { invalidate } from "$app/navigation";
   import { fly } from "svelte/transition";
   import { apSensorStations } from "$stores/apSensorStations";
@@ -14,22 +15,31 @@
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   export let data;
+  export let form;
+
   let accessPoints: Responses.InnerAccessPoint[] = [];
 
   $: {
     data.streamed.accessPoints.then((res) => {
-      accessPoints = res.accessPoints;
-      console.log(res);
-      loading = false;
+      if (res) {
+        console.log("promise");
+        accessPoints = res.accessPoints;
+        console.log(res);
+        loading = false;
+      } else {
+        if (browser) {
+          goto("/logout");
+        }
+      }
     });
   }
+
   $: $apSensorStations = [];
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   import FormError from "$helper/formError.svelte";
   import { browser } from "$app/environment";
   import { redirect } from "@sveltejs/kit";
-  export let form;
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   async function invalidateAccessPoints() {

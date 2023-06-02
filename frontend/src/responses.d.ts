@@ -4,17 +4,15 @@ declare namespace Responses {
   }
 
   export interface Person {
-    Person: {
-      username: string;
-      password: string;
-      /** Format: uuid */
-      token: string;
-      permissions: GrantedAuthority[];
-      email: string;
-      sensorStationPersonReferences: SensorStationPersonReference[];
-      /** Format: uuid */
-      personId: string;
-    };
+    username: string;
+    password: string;
+    /** Format: uuid */
+    token: string;
+    permissions: GrantedAuthority[];
+    email: string;
+    sensorStationPersonReferences: SensorStationPersonReference[];
+    /** Format: uuid */
+    personId: string;
   }
 
   export interface SensorStationPersonReference {
@@ -23,6 +21,10 @@ declare namespace Responses {
     inDashboard: boolean;
     assigned: boolean;
     deleted: boolean;
+  }
+
+  export interface MessageResponse {
+    message: string;
   }
 
   export interface Sensor {
@@ -39,17 +41,10 @@ declare namespace Responses {
     upperLimit: number;
     /** Format: float */
     lowerLimit: number;
-    /**
-     * Format: int32
-     * @description in seconds
-     */
+    /** Format: int32 */
     thresholdDuration: number;
     sensor: Sensor;
     deleted: boolean;
-  }
-
-  export interface MessageResponse {
-    message: string;
   }
 
   export interface AccessPoint {
@@ -113,9 +108,35 @@ declare namespace Responses {
     timeStamp: string;
   }
 
+  export interface AuthenticationException {
+    cause: object;
+    stackTrace: any[];
+    message: string;
+    suppressed: any[];
+    localizedMessage: string;
+  }
+
+  export interface TokenExpiredException {
+    cause: object;
+    stackTrace: any[];
+    message: string;
+    suppressed: any[];
+    localizedMessage: string;
+  }
+
+  export interface AccessDeniedException {
+    cause: object;
+    stackTrace: any[];
+    message: string;
+    suppressed: any[];
+    localizedMessage: string;
+  }
+
   export interface CreatedUserResponse {
+    /** Format: uuid */
     id: string;
     username: string;
+    /** Format: uuid */
     token: string;
     permissions: GrantedAuthority[];
   }
@@ -126,7 +147,9 @@ declare namespace Responses {
   }
 
   export interface LoginResponse {
+    /** Format: uuid */
     token: string;
+    /** Format: uuid */
     personId: string;
     permissions: GrantedAuthority[];
   }
@@ -160,7 +183,9 @@ declare namespace Responses {
   }
 
   export interface InnerPlantPicture {
+    /** Format: uuid */
     pictureId: string;
+    /** Format: date-time */
     timeStamp: string;
   }
 
@@ -175,14 +200,6 @@ declare namespace Responses {
     roomName: string;
   }
 
-  export interface TimeStampedSensorData {
-    timeStamp: string;
-    value: number;
-    alarm: string;
-    aboveLimit: boolean;
-    belowLimit: boolean;
-  }
-
   export interface InnerSensors {
     sensorType: string;
     sensorUnit: string;
@@ -192,66 +209,85 @@ declare namespace Responses {
 
   export interface SensorStationDataResponse {
     data: InnerSensors[];
+    /** Format: uuid */
     sensorStationId: string;
   }
 
-  export interface DashboardSensorStation {
-    name: string;
-    roomName: string;
-    sensorStationId: string;
-    pictureIds: string[];
-    connected: boolean;
-    unlocked: boolean;
-    deleted: boolean;
+  export interface TimeStampedSensorData {
+    /** Format: date-time */
+    timeStamp: string;
+    /** Format: double */
+    value: number;
+    alarm: string;
+    aboveLimit: boolean;
+    belowLimit: boolean;
   }
 
   export interface DashBoardDataResponse {
     sensorStations: DashboardSensorStation[];
   }
 
+  export interface DashboardSensorStation {
+    name: string;
+    roomName: string;
+    /** Format: uuid */
+    sensorStationId: string;
+    pictureIds: any[];
+    connected: boolean;
+    unlocked: boolean;
+    deleted: boolean;
+  }
+
   export interface ListResponse {
     items: any[];
   }
 
-  export interface AdminSensorStationResponse {
+  export interface AdminSensorStationsResponse {
     sensorStations: InnerResponse[];
-  }
-
-  export interface InnerAccessPoint {
-    accessPointId: string;
-    selfAssignedId: string;
-    roomName: string;
-    unlocked: boolean;
-    scanActive: boolean;
-    connected: boolean;
-    transferInterval: number;
-    sensorStations: AdminSensorStationResponse;
   }
 
   export interface AccessPointListResponse {
     accessPoints: InnerAccessPoint[];
   }
 
+  export interface InnerAccessPoint {
+    /** Format: uuid */
+    accessPointId: string;
+    /** Format: uuid */
+    selfAssignedId: string;
+    roomName: string;
+    unlocked: boolean;
+    scanActive: boolean;
+    connected: boolean;
+    /** Format: int32 */
+    transferInterval: number;
+    sensorStations: AdminSensorStationsResponse;
+  }
+
+  export interface AccessPointConfigResponse {
+    roomName: string;
+    pairingMode: boolean;
+    /** Format: int32 */
+    transferInterval: number;
+    sensorStations: SensorStationInfo[];
+  }
+
   export interface Limits {
+    /** Format: double */
     lowerLimit: number;
+    /** Format: double */
     upperLimit: number;
   }
 
   export interface SensorInfo {
     sensorName: string;
     limits: Limits;
+    /** Format: int32 */
     alarmThresholdTime: number;
   }
 
   export interface SensorStationInfo {
     bdAddress: string;
-    sensor: SensorInfo[];
-  }
-
-  export interface AccessPointConfigResponse {
-    roomName: string;
-    pairingMode: boolean;
-    transferInterval: number;
-    sensorStations: SensorStationInfo;
+    sensors: SensorInfo[];
   }
 }

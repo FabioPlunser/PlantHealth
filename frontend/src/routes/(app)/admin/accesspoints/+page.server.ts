@@ -9,7 +9,7 @@ export async function load(event) {
   const { fetch, depends } = event;
   depends("app:getAccessPoints");
 
-  async function getAccessPoints(): Promise<Responses.AccessPointListResponse> {
+  async function getAccessPoints(): Promise<Responses.AccessPointListResponse | null> {
     return new Promise(async (resolve, reject) => {
       await fetch(`${BACKEND_URL}/get-access-points`)
         .then(async (res) => {
@@ -20,7 +20,6 @@ export async function load(event) {
               "Error while getting access points",
               res
             );
-            reject(res);
           }
           resolve(await res.json());
         })
@@ -30,8 +29,7 @@ export async function load(event) {
             "Error while getting access points",
             err
           );
-          reject(err);
-          throw error(500, "Error while getting access points");
+          resolve(null);
         });
     });
   }
