@@ -27,7 +27,11 @@
     </p>
     <div class="flex justify-center mt-9 ">
       <ul>
-        <li><a href="/" class="btn btn-primary w-full"> back to home</a></li>
+        <li>
+          <a href="/" data-sveltekit-reload class="btn btn-primary w-full">
+            back to home</a
+          >
+        </li>
         <li>
           <a href={$page.url.origin} class="btn btn-primary w-full mt-2">
             back to origin
