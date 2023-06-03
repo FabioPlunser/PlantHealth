@@ -1,7 +1,7 @@
 <script lang="ts">
   import { SensorStationsModal } from "$components/ui/sensorStation";
   import { fly } from "svelte/transition";
-  import { enhance, type SubmitFunction } from "$app/forms";
+  import { enhance } from "$app/forms";
   // ---------------------------------------------------
   // ---------------------------------------------------
   import Spinner from "$components/ui/Spinner.svelte";
@@ -66,7 +66,7 @@
   let selectedPicture = "";
   // ---------------------------------------------------
   // ---------------------------------------------------
-  const customEnhance: SubmitFunction = () => {
+  const customEnhance = () => {
     loading = true;
     return async ({ update }) => {
       await update({ reset: false });

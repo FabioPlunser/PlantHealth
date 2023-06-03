@@ -29,7 +29,6 @@ export async function load(event) {
             "Error while getting access points",
             err
           );
-          resolve(null);
         });
     });
   }

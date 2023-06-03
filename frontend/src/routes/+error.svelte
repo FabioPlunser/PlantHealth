@@ -17,11 +17,11 @@
     </p>
     <br />
     <p class="text-4xl flex justify-center text-center">
-      {#if $page.status === 404 && $page.error?.message}
+      {#if $page.error?.message}
         {$page.error.message}
       {:else}
         Oops... {$page.status === 404
-          ? "It's not here anymore. Maybe Snoop Dog smoked it."
+          ? "It's not here anymore."
           : "Something went wrong!"}
       {/if}
     </p>

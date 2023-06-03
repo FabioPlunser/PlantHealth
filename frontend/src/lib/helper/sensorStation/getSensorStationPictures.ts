@@ -10,7 +10,7 @@ type Dates = {
 export async function getSensorStationPictures(
   event: any,
   sensorStation: SensorStation
-) {
+): Promise<Promise<Picture>[]> {
   let possiblePictures = await fetch(
     `${BACKEND_URL}/get-sensor-station-pictures?sensorStationId=${sensorStation.sensorStationId}`
   )

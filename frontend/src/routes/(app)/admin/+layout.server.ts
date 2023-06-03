@@ -9,7 +9,7 @@ export async function load(event) {
   } catch (err: any) {
     logger.error("Backend is down", { payload: err });
     if (err.cause.code === "ECONNREFUSED") {
-      throw redirect(307, "/logout");
+      throw error(503, { message: "Backend not reachable" });
     }
   }
 

@@ -19,7 +19,6 @@
   // ----------------------------------
   export let data;
   export let form;
-  $: console.log(data);
   // ----------------------------------
   // ----------------------------------
   let searchTerm = "";
@@ -73,5 +72,7 @@
         </h1>
       </section>
     {/if}
+  {:catch}
+    <p>Something went wrong</p>
   {/await}
 {/if}
