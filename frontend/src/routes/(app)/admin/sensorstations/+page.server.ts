@@ -13,7 +13,26 @@ export async function load(event) {
           if (!res.ok) {
             logger.error("Could not get all sensor stations");
           }
-          resolve(await res.json());
+          let data = await res.json();
+          /* HACK: we have to set a default value for our gardener.personId
+           * to be able to communicate the selected id from the GardenerSelect.svelte component
+           */
+          data.sensorStations.forEach((station: any) => {
+            try {
+              if (!station.gardener) {
+                Object.defineProperty(station, "gardener", {
+                  value: { personId: "No gardener assigned" },
+                  writable: true,
+                  enumerable: true,
+                  configurable: true,
+                });
+              }
+            } catch (e) {
+              console.log(e);
+            }
+          });
+
+          resolve(data.sensorStations);
         })
         .catch((err) => {
           logger.error("Catch Could not get all sensor stations", {
