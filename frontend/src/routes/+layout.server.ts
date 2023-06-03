@@ -23,6 +23,9 @@ export async function load(event) {
   } catch (err: any) {
     logger.error("Backend is down", { payload: err });
     if (err.cause.code === "ECONNREFUSED") {
+      event.cookies.getAll().forEach((cookie) => {
+        event.cookies.set(cookie.name, "", { secure: false, maxAge: 0 });
+      });
       return {
         error: "Backend is not reachable",
       };

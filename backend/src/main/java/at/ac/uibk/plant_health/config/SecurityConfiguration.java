@@ -155,14 +155,7 @@ public class SecurityConfiguration {
 
 	private RequestMatcher getSwaggerEndpointMatcher() {
 		// Enable the Swagger Endpoints in the Development Environment
-		if (this.profile == StartupConfig.Profile.DEBUG) {
-			return new OrRequestMatcher(getSwaggerEndpointStream().toArray(RequestMatcher[] ::new));
-		} else {
-			// NOTE: Creating an OrRequest using no Values results in a
-			// Runtime Error
-			//       WORKAROUND: Create a negated AnyRequestMatcher
-			return new NegatedRequestMatcher(AnyRequestMatcher.INSTANCE);
-		}
+		return new OrRequestMatcher(getSwaggerEndpointStream().toArray(RequestMatcher[] ::new));
 	}
 
 	private Stream<RequestMatcher> getSwaggerEndpointStream() {
@@ -171,11 +164,10 @@ public class SecurityConfiguration {
 
 	private Stream<String> getSwaggerEndpointStrings() {
 		// Enable the Swagger Endpoints in the Development Environment
-		if (this.profile == StartupConfig.Profile.DEBUG) {
-			return Stream.of(swaggerDocPath, swaggerApiPath, "/swagger-ui/index.html");
-		} else {
-			return Stream.of();
-		}
+		return Stream.of(
+				swaggerDocPath, swaggerApiPath, swaggerDocPath + "/**", "/api-docs.yaml",
+				swaggerApiPath + "/**"
+		);
 	}
 	// endregion
 

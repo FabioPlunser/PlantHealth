@@ -1,0 +1,3626 @@
+openapi: 3.0.1
+info:
+  title: Tutorial Management API
+  description: This API exposes endpoints to be implemented in the frontend
+  version: "3.0"
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+security:
+  - bearer-key: []
+tags:
+  - name: person-controller
+    description: |-
+      Controller handling {@link Person Person} related Information (e.g. creating,
+       updating, deleting {@link Person Person})
+  - name: swa-error-controller
+    description: Controller for sending Error Responses.
+  - name: login-controller
+    description: "Controller handling the login-, and logout-process."
+paths:
+  /add-to-dashboard:
+    put:
+      tags:
+        - dash-board-controller
+      summary: Add sensor station to dashboard
+      operationId: addPlantToDashboard_1
+      parameters:
+        - name: person
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Person"
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully added sensor station to dashboard
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+    post:
+      tags:
+        - dash-board-controller
+      summary: Add sensor station to dashboard
+      operationId: addPlantToDashboard
+      parameters:
+        - name: person
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Person"
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully added sensor station to dashboard
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /upload-sensor-station-picture:
+    put:
+      tags:
+        - sensor-station-controller
+      summary: Upload sensor station picture
+      operationId: uploadPicture_1
+      parameters:
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - picture
+              type: object
+              properties:
+                picture:
+                  type: string
+                  format: binary
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully uploaded sensor station picture
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+    post:
+      tags:
+        - sensor-station-controller
+      summary: Upload sensor station picture
+      operationId: uploadPicture
+      parameters:
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - picture
+              type: object
+              properties:
+                picture:
+                  type: string
+                  format: binary
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully uploaded sensor station picture
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /update-user:
+    put:
+      tags:
+        - person-controller
+      summary: Endpoint for Admins to change/update a user
+      description: Endpoint for Admins to change/update a user
+      operationId: updateUser_1
+      parameters:
+        - name: personId
+          in: query
+          description: The ID of the User to update
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: username
+          in: query
+          description: The new username
+          required: false
+          schema:
+            type: string
+        - name: email
+          in: query
+          description: The new email
+          required: false
+          schema:
+            type: string
+        - name: permissions
+          in: query
+          description: The new Permissions
+          required: false
+          schema:
+            uniqueItems: true
+            type: array
+            items:
+              type: string
+              enum:
+                - USER
+                - GARDENER
+                - ADMIN
+        - name: password
+          in: query
+          description: The new Password
+          required: false
+          schema:
+            type: string
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: A RESTResponse indicating Success
+          content:
+            "*/*":
+              schema:
+                type: string
+    post:
+      tags:
+        - person-controller
+      summary: Endpoint for Admins to change/update a user
+      description: Endpoint for Admins to change/update a user
+      operationId: updateUser
+      parameters:
+        - name: personId
+          in: query
+          description: The ID of the User to update
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: username
+          in: query
+          description: The new username
+          required: false
+          schema:
+            type: string
+        - name: email
+          in: query
+          description: The new email
+          required: false
+          schema:
+            type: string
+        - name: permissions
+          in: query
+          description: The new Permissions
+          required: false
+          schema:
+            uniqueItems: true
+            type: array
+            items:
+              type: string
+              enum:
+                - USER
+                - GARDENER
+                - ADMIN
+        - name: password
+          in: query
+          description: The new Password
+          required: false
+          schema:
+            type: string
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: A RESTResponse indicating Success
+          content:
+            "*/*":
+              schema:
+                type: string
+  /update-sensor-station:
+    put:
+      tags:
+        - sensor-station-controller
+      summary: Update sensor station name and trasnfer interval
+      operationId: setSensorLimits_1
+      parameters:
+        - name: person
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Person"
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: sensorStationName
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: transferInterval
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/SensorLimits"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully updated sensor station
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+    post:
+      tags:
+        - sensor-station-controller
+      summary: Update sensor station name and trasnfer interval
+      operationId: setSensorLimits
+      parameters:
+        - name: person
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Person"
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: sensorStationName
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: transferInterval
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/SensorLimits"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully updated sensor station
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /set-unlocked-sensor-station:
+    put:
+      tags:
+        - sensor-station-controller
+      summary: Set unlock status of sensor station
+      operationId: setLockSensorStation_1
+      parameters:
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: unlocked
+          in: query
+          required: true
+          schema:
+            type: boolean
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully set unlock status of sensor station
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+    post:
+      tags:
+        - sensor-station-controller
+      summary: Set unlock status of sensor station
+      operationId: setLockSensorStation
+      parameters:
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: unlocked
+          in: query
+          required: true
+          schema:
+            type: boolean
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully set unlock status of sensor station
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /set-unlocked-access-point:
+    put:
+      tags:
+        - access-point-controller
+      summary: Set the lock state of an Access Point
+      operationId: setLockAccessPoint_1
+      parameters:
+        - name: accessPointId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: unlocked
+          in: query
+          required: true
+          schema:
+            type: boolean
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "400":
+          description: Access Point lock state could not be set
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "200":
+          description: Access Point lock state successfully set
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+    post:
+      tags:
+        - access-point-controller
+      summary: Set the lock state of an Access Point
+      operationId: setLockAccessPoint
+      parameters:
+        - name: accessPointId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: unlocked
+          in: query
+          required: true
+          schema:
+            type: boolean
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "400":
+          description: Access Point lock state could not be set
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "200":
+          description: Access Point lock state successfully set
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /found-sensor-stations:
+    put:
+      tags:
+        - access-point-controller
+      summary: Send found sensor stations to Access Point
+      operationId: foundSensorStations_1
+      parameters:
+        - name: accessPoint
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/AccessPoint"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/SensorStation"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "400":
+          description: Sensor Stations could not be added
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "200":
+          description: Sensor Stations successfully added
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+    post:
+      tags:
+        - access-point-controller
+      summary: Send found sensor stations to Access Point
+      operationId: foundSensorStations
+      parameters:
+        - name: accessPoint
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/AccessPoint"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/SensorStation"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "400":
+          description: Sensor Stations could not be added
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "200":
+          description: Sensor Stations successfully added
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /unauthorized:
+    get:
+      tags:
+        - swa-error-controller
+      operationId: handleAuthenticationError
+      parameters:
+        - name: accessDeniedException
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/AuthenticationException"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+          content:
+            "*/*":
+              schema:
+                type: string
+        "403":
+          description: Forbidden
+    put:
+      tags:
+        - swa-error-controller
+      operationId: handleAuthenticationError_2
+      parameters:
+        - name: accessDeniedException
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/AuthenticationException"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+          content:
+            "*/*":
+              schema:
+                type: string
+        "403":
+          description: Forbidden
+    post:
+      tags:
+        - swa-error-controller
+      operationId: handleAuthenticationError_1
+      parameters:
+        - name: accessDeniedException
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/AuthenticationException"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+          content:
+            "*/*":
+              schema:
+                type: string
+        "403":
+          description: Forbidden
+    delete:
+      tags:
+        - swa-error-controller
+      operationId: handleAuthenticationError_4
+      parameters:
+        - name: accessDeniedException
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/AuthenticationException"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+          content:
+            "*/*":
+              schema:
+                type: string
+        "403":
+          description: Forbidden
+    patch:
+      tags:
+        - swa-error-controller
+      operationId: handleAuthenticationError_3
+      parameters:
+        - name: accessDeniedException
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/AuthenticationException"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+          content:
+            "*/*":
+              schema:
+                type: string
+        "403":
+          description: Forbidden
+  /token-expired:
+    get:
+      tags:
+        - swa-error-controller
+      operationId: handleTokenExpiredError
+      parameters:
+        - name: tokenExpiredException
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/TokenExpiredException"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+          content:
+            "*/*":
+              schema:
+                type: string
+        "403":
+          description: Forbidden
+    put:
+      tags:
+        - swa-error-controller
+      operationId: handleTokenExpiredError_2
+      parameters:
+        - name: tokenExpiredException
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/TokenExpiredException"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+          content:
+            "*/*":
+              schema:
+                type: string
+        "403":
+          description: Forbidden
+    post:
+      tags:
+        - swa-error-controller
+      operationId: handleTokenExpiredError_1
+      parameters:
+        - name: tokenExpiredException
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/TokenExpiredException"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+          content:
+            "*/*":
+              schema:
+                type: string
+        "403":
+          description: Forbidden
+    delete:
+      tags:
+        - swa-error-controller
+      operationId: handleTokenExpiredError_4
+      parameters:
+        - name: tokenExpiredException
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/TokenExpiredException"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+          content:
+            "*/*":
+              schema:
+                type: string
+        "403":
+          description: Forbidden
+    patch:
+      tags:
+        - swa-error-controller
+      operationId: handleTokenExpiredError_3
+      parameters:
+        - name: tokenExpiredException
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/TokenExpiredException"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+          content:
+            "*/*":
+              schema:
+                type: string
+        "403":
+          description: Forbidden
+  /notFound:
+    get:
+      tags:
+        - swa-error-controller
+      operationId: handleNotFoundError
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+          content:
+            "*/*":
+              schema:
+                type: string
+    put:
+      tags:
+        - swa-error-controller
+      operationId: handleNotFoundError_2
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+          content:
+            "*/*":
+              schema:
+                type: string
+    post:
+      tags:
+        - swa-error-controller
+      operationId: handleNotFoundError_1
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+          content:
+            "*/*":
+              schema:
+                type: string
+    delete:
+      tags:
+        - swa-error-controller
+      operationId: handleNotFoundError_4
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+          content:
+            "*/*":
+              schema:
+                type: string
+    patch:
+      tags:
+        - swa-error-controller
+      operationId: handleNotFoundError_3
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+          content:
+            "*/*":
+              schema:
+                type: string
+  /forbidden:
+    get:
+      tags:
+        - swa-error-controller
+      operationId: handleAuthorizationError
+      parameters:
+        - name: accessDeniedException
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/AccessDeniedException"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            "*/*":
+              schema:
+                type: string
+    put:
+      tags:
+        - swa-error-controller
+      operationId: handleAuthorizationError_2
+      parameters:
+        - name: accessDeniedException
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/AccessDeniedException"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            "*/*":
+              schema:
+                type: string
+    post:
+      tags:
+        - swa-error-controller
+      operationId: handleAuthorizationError_1
+      parameters:
+        - name: accessDeniedException
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/AccessDeniedException"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            "*/*":
+              schema:
+                type: string
+    delete:
+      tags:
+        - swa-error-controller
+      operationId: handleAuthorizationError_4
+      parameters:
+        - name: accessDeniedException
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/AccessDeniedException"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            "*/*":
+              schema:
+                type: string
+    patch:
+      tags:
+        - swa-error-controller
+      operationId: handleAuthorizationError_3
+      parameters:
+        - name: accessDeniedException
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/AccessDeniedException"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            "*/*":
+              schema:
+                type: string
+  /error:
+    get:
+      tags:
+        - swa-error-controller
+      operationId: handleError
+      parameters:
+        - name: exception
+          in: query
+          required: true
+          schema:
+            type: object
+            properties:
+              cause:
+                type: object
+                properties:
+                  stackTrace:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        classLoaderName:
+                          type: string
+                        moduleName:
+                          type: string
+                        moduleVersion:
+                          type: string
+                        methodName:
+                          type: string
+                        fileName:
+                          type: string
+                        lineNumber:
+                          type: integer
+                          format: int32
+                        nativeMethod:
+                          type: boolean
+                        className:
+                          type: string
+                  message:
+                    type: string
+                  suppressed:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        stackTrace:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              classLoaderName:
+                                type: string
+                              moduleName:
+                                type: string
+                              moduleVersion:
+                                type: string
+                              methodName:
+                                type: string
+                              fileName:
+                                type: string
+                              lineNumber:
+                                type: integer
+                                format: int32
+                              nativeMethod:
+                                type: boolean
+                              className:
+                                type: string
+                        message:
+                          type: string
+                        localizedMessage:
+                          type: string
+                  localizedMessage:
+                    type: string
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    classLoaderName:
+                      type: string
+                    moduleName:
+                      type: string
+                    moduleVersion:
+                      type: string
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    nativeMethod:
+                      type: boolean
+                    className:
+                      type: string
+              message:
+                type: string
+              suppressed:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    stackTrace:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          classLoaderName:
+                            type: string
+                          moduleName:
+                            type: string
+                          moduleVersion:
+                            type: string
+                          methodName:
+                            type: string
+                          fileName:
+                            type: string
+                          lineNumber:
+                            type: integer
+                            format: int32
+                          nativeMethod:
+                            type: boolean
+                          className:
+                            type: string
+                    message:
+                      type: string
+                    localizedMessage:
+                      type: string
+              localizedMessage:
+                type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            "*/*":
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+    put:
+      tags:
+        - swa-error-controller
+      operationId: handleError_2
+      parameters:
+        - name: exception
+          in: query
+          required: true
+          schema:
+            type: object
+            properties:
+              cause:
+                type: object
+                properties:
+                  stackTrace:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        classLoaderName:
+                          type: string
+                        moduleName:
+                          type: string
+                        moduleVersion:
+                          type: string
+                        methodName:
+                          type: string
+                        fileName:
+                          type: string
+                        lineNumber:
+                          type: integer
+                          format: int32
+                        nativeMethod:
+                          type: boolean
+                        className:
+                          type: string
+                  message:
+                    type: string
+                  suppressed:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        stackTrace:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              classLoaderName:
+                                type: string
+                              moduleName:
+                                type: string
+                              moduleVersion:
+                                type: string
+                              methodName:
+                                type: string
+                              fileName:
+                                type: string
+                              lineNumber:
+                                type: integer
+                                format: int32
+                              nativeMethod:
+                                type: boolean
+                              className:
+                                type: string
+                        message:
+                          type: string
+                        localizedMessage:
+                          type: string
+                  localizedMessage:
+                    type: string
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    classLoaderName:
+                      type: string
+                    moduleName:
+                      type: string
+                    moduleVersion:
+                      type: string
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    nativeMethod:
+                      type: boolean
+                    className:
+                      type: string
+              message:
+                type: string
+              suppressed:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    stackTrace:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          classLoaderName:
+                            type: string
+                          moduleName:
+                            type: string
+                          moduleVersion:
+                            type: string
+                          methodName:
+                            type: string
+                          fileName:
+                            type: string
+                          lineNumber:
+                            type: integer
+                            format: int32
+                          nativeMethod:
+                            type: boolean
+                          className:
+                            type: string
+                    message:
+                      type: string
+                    localizedMessage:
+                      type: string
+              localizedMessage:
+                type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            "*/*":
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+    post:
+      tags:
+        - swa-error-controller
+      operationId: handleError_1
+      parameters:
+        - name: exception
+          in: query
+          required: true
+          schema:
+            type: object
+            properties:
+              cause:
+                type: object
+                properties:
+                  stackTrace:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        classLoaderName:
+                          type: string
+                        moduleName:
+                          type: string
+                        moduleVersion:
+                          type: string
+                        methodName:
+                          type: string
+                        fileName:
+                          type: string
+                        lineNumber:
+                          type: integer
+                          format: int32
+                        nativeMethod:
+                          type: boolean
+                        className:
+                          type: string
+                  message:
+                    type: string
+                  suppressed:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        stackTrace:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              classLoaderName:
+                                type: string
+                              moduleName:
+                                type: string
+                              moduleVersion:
+                                type: string
+                              methodName:
+                                type: string
+                              fileName:
+                                type: string
+                              lineNumber:
+                                type: integer
+                                format: int32
+                              nativeMethod:
+                                type: boolean
+                              className:
+                                type: string
+                        message:
+                          type: string
+                        localizedMessage:
+                          type: string
+                  localizedMessage:
+                    type: string
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    classLoaderName:
+                      type: string
+                    moduleName:
+                      type: string
+                    moduleVersion:
+                      type: string
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    nativeMethod:
+                      type: boolean
+                    className:
+                      type: string
+              message:
+                type: string
+              suppressed:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    stackTrace:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          classLoaderName:
+                            type: string
+                          moduleName:
+                            type: string
+                          moduleVersion:
+                            type: string
+                          methodName:
+                            type: string
+                          fileName:
+                            type: string
+                          lineNumber:
+                            type: integer
+                            format: int32
+                          nativeMethod:
+                            type: boolean
+                          className:
+                            type: string
+                    message:
+                      type: string
+                    localizedMessage:
+                      type: string
+              localizedMessage:
+                type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            "*/*":
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+    delete:
+      tags:
+        - swa-error-controller
+      operationId: handleError_4
+      parameters:
+        - name: exception
+          in: query
+          required: true
+          schema:
+            type: object
+            properties:
+              cause:
+                type: object
+                properties:
+                  stackTrace:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        classLoaderName:
+                          type: string
+                        moduleName:
+                          type: string
+                        moduleVersion:
+                          type: string
+                        methodName:
+                          type: string
+                        fileName:
+                          type: string
+                        lineNumber:
+                          type: integer
+                          format: int32
+                        nativeMethod:
+                          type: boolean
+                        className:
+                          type: string
+                  message:
+                    type: string
+                  suppressed:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        stackTrace:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              classLoaderName:
+                                type: string
+                              moduleName:
+                                type: string
+                              moduleVersion:
+                                type: string
+                              methodName:
+                                type: string
+                              fileName:
+                                type: string
+                              lineNumber:
+                                type: integer
+                                format: int32
+                              nativeMethod:
+                                type: boolean
+                              className:
+                                type: string
+                        message:
+                          type: string
+                        localizedMessage:
+                          type: string
+                  localizedMessage:
+                    type: string
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    classLoaderName:
+                      type: string
+                    moduleName:
+                      type: string
+                    moduleVersion:
+                      type: string
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    nativeMethod:
+                      type: boolean
+                    className:
+                      type: string
+              message:
+                type: string
+              suppressed:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    stackTrace:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          classLoaderName:
+                            type: string
+                          moduleName:
+                            type: string
+                          moduleVersion:
+                            type: string
+                          methodName:
+                            type: string
+                          fileName:
+                            type: string
+                          lineNumber:
+                            type: integer
+                            format: int32
+                          nativeMethod:
+                            type: boolean
+                          className:
+                            type: string
+                    message:
+                      type: string
+                    localizedMessage:
+                      type: string
+              localizedMessage:
+                type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            "*/*":
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+    patch:
+      tags:
+        - swa-error-controller
+      operationId: handleError_3
+      parameters:
+        - name: exception
+          in: query
+          required: true
+          schema:
+            type: object
+            properties:
+              cause:
+                type: object
+                properties:
+                  stackTrace:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        classLoaderName:
+                          type: string
+                        moduleName:
+                          type: string
+                        moduleVersion:
+                          type: string
+                        methodName:
+                          type: string
+                        fileName:
+                          type: string
+                        lineNumber:
+                          type: integer
+                          format: int32
+                        nativeMethod:
+                          type: boolean
+                        className:
+                          type: string
+                  message:
+                    type: string
+                  suppressed:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        stackTrace:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              classLoaderName:
+                                type: string
+                              moduleName:
+                                type: string
+                              moduleVersion:
+                                type: string
+                              methodName:
+                                type: string
+                              fileName:
+                                type: string
+                              lineNumber:
+                                type: integer
+                                format: int32
+                              nativeMethod:
+                                type: boolean
+                              className:
+                                type: string
+                        message:
+                          type: string
+                        localizedMessage:
+                          type: string
+                  localizedMessage:
+                    type: string
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    classLoaderName:
+                      type: string
+                    moduleName:
+                      type: string
+                    moduleVersion:
+                      type: string
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    nativeMethod:
+                      type: boolean
+                    className:
+                      type: string
+              message:
+                type: string
+              suppressed:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    stackTrace:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          classLoaderName:
+                            type: string
+                          moduleName:
+                            type: string
+                          moduleVersion:
+                            type: string
+                          methodName:
+                            type: string
+                          fileName:
+                            type: string
+                          lineNumber:
+                            type: integer
+                            format: int32
+                          nativeMethod:
+                            type: boolean
+                          className:
+                            type: string
+                    message:
+                      type: string
+                    localizedMessage:
+                      type: string
+              localizedMessage:
+                type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            "*/*":
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+  /remove-from-dashboard:
+    post:
+      tags:
+        - dash-board-controller
+      summary: Remove sensor station from dashboard
+      operationId: removeFromDashboard
+      parameters:
+        - name: person
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Person"
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully removed sensor station from dashboard
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+    delete:
+      tags:
+        - dash-board-controller
+      summary: Remove sensor station from dashboard
+      operationId: removeFromDashboard_1
+      parameters:
+        - name: person
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Person"
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully removed sensor station from dashboard
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /update-settings:
+    post:
+      tags:
+        - person-controller
+      summary: Endpoint for a User to change his Account Settings.
+      description: Endpoint for a User to change his Account Settings.
+      operationId: updateSettings
+      parameters:
+        - name: person
+          in: query
+          description: Auto-injected Instance of the currently logged-in Person.
+          required: true
+          schema:
+            $ref: "#/components/schemas/Person"
+        - name: username
+          in: query
+          description: The new username
+          required: false
+          schema:
+            type: string
+        - name: email
+          in: query
+          description: The new email
+          required: false
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The new Password
+          required: false
+          schema:
+            type: string
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: A RESTResponse indicating Success
+          content:
+            "*/*":
+              schema:
+                type: string
+  /update-access-point:
+    post:
+      tags:
+        - access-point-controller
+      summary: Update the information of an Access Point
+      operationId: updateAccessPoint
+      parameters:
+        - name: accessPointId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: roomName
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: transferInterval
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Access Point info successfully updated
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          description: Access Point info could not be updated
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /transfer-data:
+    post:
+      tags:
+        - access-point-controller
+      summary: Transfer data from Access Point to Server
+      operationId: transferData
+      parameters:
+        - name: accessPoint
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/AccessPoint"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/SensorStation"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Data successfully transfered
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          description: Data could not be transfered
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /set-access-point-transfer-interval:
+    post:
+      tags:
+        - access-point-controller
+      summary: Set the transfer interval of an Access Point
+      operationId: setAPTransferInterval
+      parameters:
+        - name: accessPointId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: transferInterval
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "400":
+          description: Transfer interval could not be set
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "200":
+          description: Transfer interval successfully set
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /scan-for-sensor-stations:
+    post:
+      tags:
+        - access-point-controller
+      summary: Activate scan of Access Point
+      operationId: scanForSensorStations
+      parameters:
+        - name: accessPointId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "400":
+          description: Scan could not be started
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "200":
+          description: Scan successfully started
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /register:
+    post:
+      tags:
+        - person-controller
+      summary: Register a new User
+      description: Register a new User with the given credentials.
+      operationId: register
+      parameters:
+        - name: username
+          in: query
+          description: The new Users username.
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The new Users password (needs to be already hashed).
+          required: true
+          schema:
+            type: string
+        - name: email
+          in: query
+          description: The new Users email.
+          required: true
+          schema:
+            type: string
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: User successfully registered.
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/CreatedUserResponse"
+  /register-access-point:
+    post:
+      tags:
+        - access-point-controller
+      summary: Register an Access Point
+      operationId: register_1
+      parameters:
+        - name: selfAssignedId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: roomName
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "400":
+          description: Access Point could not be registered
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "200":
+          description: Access Point successfully registered
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+  /logout:
+    post:
+      tags:
+        - login-controller
+      summary: Endpoint for the Front-End to logout.
+      description: |-
+        Endpoint for the Front-End to logout.
+         This deletes the Authentication Token stored in the database.
+      operationId: deleteToken
+      parameters:
+        - name: person
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Person"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: A Message saying whether the Logout was successful or not.
+          content:
+            "*/*":
+              schema:
+                type: string
+  /login:
+    get:
+      tags:
+        - login-controller
+      summary: Endpoint for the Front-End to request an Authentication Token.
+      description: Endpoint for the Front-End to request an Authentication Token.
+      operationId: getToken
+      parameters:
+        - name: username
+          in: query
+          description: The username of the User to create the Token for.
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password of the User to create the Token for.
+          required: true
+          schema:
+            type: string
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: |-
+            A Token if the user credentials are correct, otherwise an
+                 error.
+          content:
+            "*/*":
+              schema:
+                type: string
+    post:
+      tags:
+        - login-controller
+      summary: Login
+      description: Endpoint for the Front-End to request an Authentication Token.
+      operationId: loginPost
+      parameters:
+        - name: username
+          in: query
+          description: The username of the User to create the Token for.
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password of the User to create the Token for.
+          required: true
+          schema:
+            type: string
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Login successful
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+  /delete-sensor-station-picture:
+    post:
+      tags:
+        - sensor-station-controller
+      summary: Delete sensor station picture
+      operationId: deleteSensorStationPicture
+      parameters:
+        - name: pictureId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully deleted sensor station picture
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /delete-all-sensor-station-pictures:
+    post:
+      tags:
+        - sensor-station-controller
+      summary: Delete all sensor station pictures
+      operationId: deleteAllSensorStationPictures
+      parameters:
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully deleted all sensor station pictures
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /create-user:
+    post:
+      tags:
+        - person-controller
+      summary: Create a new User
+      description: Create a new User with the given credentials and permissions.
+      operationId: create
+      parameters:
+        - name: username
+          in: query
+          description: The new Users username.
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The new Users password (needs to be already hashed).
+          required: true
+          schema:
+            type: string
+        - name: email
+          in: query
+          description: The new Users email.
+          required: true
+          schema:
+            type: string
+        - name: permissions
+          in: query
+          description: The Permissions the new User should have.
+          required: true
+          schema:
+            uniqueItems: true
+            type: array
+            items:
+              type: string
+              enum:
+                - USER
+                - GARDENER
+                - ADMIN
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: User successfully created.
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/CreatedUserResponse"
+  /assign-gardener-to-sensor-station:
+    post:
+      tags:
+        - sensor-station-controller
+      summary: Assign gardener to sensor station
+      operationId: assignGardenerToSensorStation
+      parameters:
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: gardenerId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: delete
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully assigned gardener to sensor station
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /get-user-permissions:
+    get:
+      tags:
+        - person-controller
+      summary: Get all permissions of a user
+      operationId: getUserPermissions
+      parameters:
+        - name: person
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Person"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Returns all permissions of a user
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/PermissionResponse"
+  /get-sensor-stations:
+    get:
+      tags:
+        - sensor-station-controller
+      summary: Get all available sensor stations to be added to dashboard
+      operationId: getSensorStations
+      parameters:
+        - name: person
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Person"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully retrieved sensor station data
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/SensorStationsResponse"
+  /get-sensor-station:
+    get:
+      tags:
+        - sensor-station-controller
+      summary: Get sensor station by id
+      operationId: getSensorStation
+      parameters:
+        - name: person
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Person"
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully retrieved sensor station data
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/SensorStationResponse"
+  /get-sensor-station-pictures:
+    get:
+      tags:
+        - sensor-station-controller
+      summary: Get sensor station pictures
+      operationId: getSensorStationPictures
+      parameters:
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully retrieved sensor station pictures
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/PlantPicturesResponse"
+  /get-sensor-station-picture:
+    get:
+      tags:
+        - sensor-station-controller
+      summary: Get sensor station picture
+      operationId: getSensorStationPicture
+      parameters:
+        - name: pictureId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully retrieved sensor station picture
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+  /get-sensor-station-info:
+    get:
+      tags:
+        - sensor-station-controller
+      summary: Get sensor station by id
+      operationId: getSensorStationInfo
+      parameters:
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully retrieved sensor station data
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/SensorStationPublicInfo"
+  /get-sensor-station-data:
+    get:
+      tags:
+        - sensor-station-controller
+      summary: Get sensor station data
+      operationId: getSensorStationData
+      parameters:
+        - name: person
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Person"
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully retrieved sensor station data
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/SensorStationDataResponse"
+  /get-newest-sensor-station-picture:
+    get:
+      tags:
+        - sensor-station-controller
+      summary: Get newest sensor station picture
+      operationId: getNewestSensorStationPicture
+      parameters:
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully retrieved newest sensor station picture
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+  /get-logs:
+    get:
+      tags:
+        - log-controller
+      operationId: getLogs
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: string
+  /get-logs-between:
+    get:
+      tags:
+        - log-controller
+      operationId: getLogs_1
+      parameters:
+        - name: start
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: end
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: string
+  /get-dashboard:
+    get:
+      tags:
+        - dash-board-controller
+      summary: Get dashboard data
+      operationId: getDashboard
+      parameters:
+        - name: person
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Person"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully retrieved dashboard data
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/DashBoardDataResponse"
+  /get-all-users:
+    get:
+      tags:
+        - person-controller
+      summary: Get all users
+      description:
+        "Endpoint for Admins to get all users, except the calling user\
+        \ himself."
+      operationId: getAllUsers
+      parameters:
+        - name: person
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Person"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully retrieved all users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListResponse"
+  /get-all-sensor-stations:
+    get:
+      tags:
+        - sensor-station-controller
+      summary: Get all sensor stations
+      operationId: getAllSensorStations
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully retrieved sensor station data
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/AdminSensorStationsResponse"
+  /get-all-permissions:
+    get:
+      tags:
+        - person-controller
+      summary: Get all permissions
+      description: |-
+        Endpoint for Admins to get all possible Permission so that they don't
+         need to be changed manually on frontend.
+      operationId: getAllPermissions
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully retrieved all permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListResponse"
+  /get-all-gardener:
+    get:
+      tags:
+        - person-controller
+      summary: Get all gardeners
+      description: Endpoint for Admins to get all gardeners
+      operationId: getAllGardener
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully retrieved all gardeners
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListResponse"
+  /get-access-points:
+    get:
+      tags:
+        - access-point-controller
+      summary: Get all Access Points
+      operationId: getAccessPoints
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "400":
+          description: Access Points could not be retrieved
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "200":
+          description: Access Points successfully retrieved
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/AccessPointListResponse"
+  /get-access-point-config:
+    get:
+      tags:
+        - access-point-controller
+      summary: Get the configuration of an Access Point
+      operationId: getAccessPointConfig
+      parameters:
+        - name: accessPoint
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/AccessPoint"
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "400":
+          description: Access Point configuration could not be retrieved
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "200":
+          description: Access Point configuration successfully retrieved
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/AccessPointConfigResponse"
+  /delete-user:
+    delete:
+      tags:
+        - person-controller
+      summary: Endpoint for Admins to delete a user.
+      description: Endpoint for Admins to delete a user.
+      operationId: deleteUser
+      parameters:
+        - name: personId
+          in: query
+          description: The ID of the User to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: |-
+            A RestResponse indicating whether the operation was
+                 successful or not.
+          content:
+            "*/*":
+              schema:
+                type: string
+  /delete-sensor-station:
+    delete:
+      tags:
+        - sensor-station-controller
+      summary: Delete sensor station
+      operationId: deleteSensorStation
+      parameters:
+        - name: sensorStationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Successfully deleted sensor station
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /delete-access-point:
+    delete:
+      tags:
+        - access-point-controller
+      summary: Delete an Access Point
+      operationId: deleteAccessPoint
+      parameters:
+        - name: accessPointId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "200":
+          description: Access Point successfully deleted
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          description: Access Point could not be deleted
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+components:
+  schemas:
+    GrantedAuthority:
+      type: object
+      properties:
+        authority:
+          type: string
+    Person:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+        token:
+          type: string
+          format: uuid
+          readOnly: true
+        permissions:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: "#/components/schemas/GrantedAuthority"
+        email:
+          type: string
+        sensorStationPersonReferences:
+          type: array
+          items:
+            $ref: "#/components/schemas/SensorStationPersonReference"
+        personId:
+          type: string
+          format: uuid
+    SensorStationPersonReference:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        inDashboard:
+          type: boolean
+        assigned:
+          type: boolean
+        deleted:
+          type: boolean
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      description: ""
+    Sensor:
+      type: object
+      properties:
+        sensorId:
+          type: string
+          format: uuid
+        type:
+          type: string
+        unit:
+          type: string
+    SensorLimits:
+      type: object
+      properties:
+        timeStamp:
+          type: string
+          format: date-time
+        upperLimit:
+          type: number
+          format: float
+        lowerLimit:
+          type: number
+          format: float
+        thresholdDuration:
+          type: integer
+          format: int32
+        sensor:
+          $ref: "#/components/schemas/Sensor"
+        deleted:
+          type: boolean
+    AccessPoint:
+      type: object
+      properties:
+        deviceId:
+          type: string
+          format: uuid
+        selfAssignedId:
+          type: string
+          format: uuid
+        roomName:
+          type: string
+        transferInterval:
+          type: integer
+          format: int32
+        scanActive:
+          type: boolean
+        accessToken:
+          type: string
+          format: uuid
+        sensorStations:
+          type: array
+          items:
+            $ref: "#/components/schemas/SensorStation"
+        lastConnection:
+          type: string
+          format: date-time
+        username:
+          type: string
+        authorities:
+          type: array
+          items:
+            $ref: "#/components/schemas/GrantedAuthority"
+        password:
+          type: string
+        connected:
+          type: boolean
+        unlocked:
+          type: boolean
+        deleted:
+          type: boolean
+      description: ""
+    SensorData:
+      type: object
+      properties:
+        timeStamp:
+          type: string
+          format: date-time
+        value:
+          type: number
+          format: float
+        alarm:
+          type: string
+        aboveLimit:
+          type: boolean
+        belowLimit:
+          type: boolean
+        sensor:
+          $ref: "#/components/schemas/Sensor"
+        deleted:
+          type: boolean
+      description: ""
+    SensorStation:
+      type: object
+      properties:
+        deviceId:
+          type: string
+          format: uuid
+        bdAddress:
+          type: string
+        name:
+          type: string
+        dipSwitchId:
+          type: integer
+          format: int32
+        sensorData:
+          type: array
+          items:
+            $ref: "#/components/schemas/SensorData"
+        sensorLimits:
+          type: array
+          items:
+            $ref: "#/components/schemas/SensorLimits"
+        sensorStationPersonReferences:
+          type: array
+          items:
+            $ref: "#/components/schemas/SensorStationPersonReference"
+        sensorStationPictures:
+          type: array
+          items:
+            $ref: "#/components/schemas/SensorStationPicture"
+        authorities:
+          type: array
+          items:
+            $ref: "#/components/schemas/GrantedAuthority"
+        password:
+          type: string
+        connected:
+          type: boolean
+        username:
+          type: string
+        unlocked:
+          type: boolean
+        deleted:
+          type: boolean
+      description: ""
+    SensorStationPicture:
+      type: object
+      properties:
+        pictureId:
+          type: string
+          format: uuid
+        picturePath:
+          type: string
+        timeStamp:
+          type: string
+          format: date-time
+    AuthenticationException:
+      type: object
+      properties:
+        cause:
+          type: object
+          properties:
+            stackTrace:
+              type: array
+              items:
+                type: object
+                properties:
+                  classLoaderName:
+                    type: string
+                  moduleName:
+                    type: string
+                  moduleVersion:
+                    type: string
+                  methodName:
+                    type: string
+                  fileName:
+                    type: string
+                  lineNumber:
+                    type: integer
+                    format: int32
+                  nativeMethod:
+                    type: boolean
+                  className:
+                    type: string
+            message:
+              type: string
+            suppressed:
+              type: array
+              items:
+                type: object
+                properties:
+                  stackTrace:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        classLoaderName:
+                          type: string
+                        moduleName:
+                          type: string
+                        moduleVersion:
+                          type: string
+                        methodName:
+                          type: string
+                        fileName:
+                          type: string
+                        lineNumber:
+                          type: integer
+                          format: int32
+                        nativeMethod:
+                          type: boolean
+                        className:
+                          type: string
+                  message:
+                    type: string
+                  localizedMessage:
+                    type: string
+            localizedMessage:
+              type: string
+        stackTrace:
+          type: array
+          items:
+            type: object
+            properties:
+              classLoaderName:
+                type: string
+              moduleName:
+                type: string
+              moduleVersion:
+                type: string
+              methodName:
+                type: string
+              fileName:
+                type: string
+              lineNumber:
+                type: integer
+                format: int32
+              nativeMethod:
+                type: boolean
+              className:
+                type: string
+        message:
+          type: string
+        suppressed:
+          type: array
+          items:
+            type: object
+            properties:
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    classLoaderName:
+                      type: string
+                    moduleName:
+                      type: string
+                    moduleVersion:
+                      type: string
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    nativeMethod:
+                      type: boolean
+                    className:
+                      type: string
+              message:
+                type: string
+              localizedMessage:
+                type: string
+        localizedMessage:
+          type: string
+      description: ""
+    TokenExpiredException:
+      type: object
+      properties:
+        cause:
+          type: object
+          properties:
+            stackTrace:
+              type: array
+              items:
+                type: object
+                properties:
+                  classLoaderName:
+                    type: string
+                  moduleName:
+                    type: string
+                  moduleVersion:
+                    type: string
+                  methodName:
+                    type: string
+                  fileName:
+                    type: string
+                  lineNumber:
+                    type: integer
+                    format: int32
+                  nativeMethod:
+                    type: boolean
+                  className:
+                    type: string
+            message:
+              type: string
+            suppressed:
+              type: array
+              items:
+                type: object
+                properties:
+                  stackTrace:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        classLoaderName:
+                          type: string
+                        moduleName:
+                          type: string
+                        moduleVersion:
+                          type: string
+                        methodName:
+                          type: string
+                        fileName:
+                          type: string
+                        lineNumber:
+                          type: integer
+                          format: int32
+                        nativeMethod:
+                          type: boolean
+                        className:
+                          type: string
+                  message:
+                    type: string
+                  localizedMessage:
+                    type: string
+            localizedMessage:
+              type: string
+        stackTrace:
+          type: array
+          items:
+            type: object
+            properties:
+              classLoaderName:
+                type: string
+              moduleName:
+                type: string
+              moduleVersion:
+                type: string
+              methodName:
+                type: string
+              fileName:
+                type: string
+              lineNumber:
+                type: integer
+                format: int32
+              nativeMethod:
+                type: boolean
+              className:
+                type: string
+        message:
+          type: string
+        suppressed:
+          type: array
+          items:
+            type: object
+            properties:
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    classLoaderName:
+                      type: string
+                    moduleName:
+                      type: string
+                    moduleVersion:
+                      type: string
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    nativeMethod:
+                      type: boolean
+                    className:
+                      type: string
+              message:
+                type: string
+              localizedMessage:
+                type: string
+        localizedMessage:
+          type: string
+      description: ""
+    AccessDeniedException:
+      type: object
+      properties:
+        cause:
+          type: object
+          properties:
+            stackTrace:
+              type: array
+              items:
+                type: object
+                properties:
+                  classLoaderName:
+                    type: string
+                  moduleName:
+                    type: string
+                  moduleVersion:
+                    type: string
+                  methodName:
+                    type: string
+                  fileName:
+                    type: string
+                  lineNumber:
+                    type: integer
+                    format: int32
+                  nativeMethod:
+                    type: boolean
+                  className:
+                    type: string
+            message:
+              type: string
+            suppressed:
+              type: array
+              items:
+                type: object
+                properties:
+                  stackTrace:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        classLoaderName:
+                          type: string
+                        moduleName:
+                          type: string
+                        moduleVersion:
+                          type: string
+                        methodName:
+                          type: string
+                        fileName:
+                          type: string
+                        lineNumber:
+                          type: integer
+                          format: int32
+                        nativeMethod:
+                          type: boolean
+                        className:
+                          type: string
+                  message:
+                    type: string
+                  localizedMessage:
+                    type: string
+            localizedMessage:
+              type: string
+        stackTrace:
+          type: array
+          items:
+            type: object
+            properties:
+              classLoaderName:
+                type: string
+              moduleName:
+                type: string
+              moduleVersion:
+                type: string
+              methodName:
+                type: string
+              fileName:
+                type: string
+              lineNumber:
+                type: integer
+                format: int32
+              nativeMethod:
+                type: boolean
+              className:
+                type: string
+        message:
+          type: string
+        suppressed:
+          type: array
+          items:
+            type: object
+            properties:
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    classLoaderName:
+                      type: string
+                    moduleName:
+                      type: string
+                    moduleVersion:
+                      type: string
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    nativeMethod:
+                      type: boolean
+                    className:
+                      type: string
+              message:
+                type: string
+              localizedMessage:
+                type: string
+        localizedMessage:
+          type: string
+      description: ""
+    CreatedUserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        token:
+          type: string
+          format: uuid
+        permissions:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: "#/components/schemas/GrantedAuthority"
+      description: ""
+    TokenResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          format: uuid
+      description: ""
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          format: uuid
+        personId:
+          type: string
+          format: uuid
+        permissions:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: "#/components/schemas/GrantedAuthority"
+      description: ""
+    PermissionResponse:
+      type: object
+      properties:
+        permissions:
+          type: array
+          items:
+            $ref: "#/components/schemas/GrantedAuthority"
+      description: ""
+    InnerResponse:
+      type: object
+      properties:
+        sensorStationId:
+          type: string
+          format: uuid
+        bdAddress:
+          type: string
+        roomName:
+          type: string
+        name:
+          type: string
+        transferInterval:
+          type: integer
+          format: int32
+        gardener:
+          $ref: "#/components/schemas/Person"
+        dipSwitchId:
+          type: integer
+          format: int32
+        unlocked:
+          type: boolean
+        connected:
+          type: boolean
+        deleted:
+          type: boolean
+    SensorStationsResponse:
+      type: object
+      properties:
+        sensorStations:
+          type: array
+          items:
+            $ref: "#/components/schemas/InnerResponse"
+      description: ""
+    SensorStationResponse:
+      type: object
+      properties:
+        sensorStation:
+          $ref: "#/components/schemas/InnerResponse"
+      description: ""
+    InnerPlantPicture:
+      type: object
+      properties:
+        pictureId:
+          type: string
+          format: uuid
+        timeStamp:
+          type: string
+          format: date-time
+    PlantPicturesResponse:
+      type: object
+      properties:
+        pictures:
+          type: array
+          items:
+            $ref: "#/components/schemas/InnerPlantPicture"
+        roomName:
+          type: string
+        plantName:
+          type: string
+      description: ""
+    SensorStationPublicInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        roomName:
+          type: string
+      description: ""
+    InnerSensors:
+      type: object
+      properties:
+        sensorType:
+          type: string
+        sensorUnit:
+          type: string
+        values:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimeStampedSensorData"
+        sensorLimits:
+          type: array
+          items:
+            $ref: "#/components/schemas/SensorLimits"
+    SensorStationDataResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/InnerSensors"
+        sensorStationId:
+          type: string
+          format: uuid
+      description: ""
+    TimeStampedSensorData:
+      type: object
+      properties:
+        timeStamp:
+          type: string
+          format: date-time
+        value:
+          type: number
+          format: double
+        alarm:
+          type: string
+        aboveLimit:
+          type: boolean
+        belowLimit:
+          type: boolean
+    DashBoardDataResponse:
+      type: object
+      properties:
+        sensorStations:
+          type: array
+          items:
+            $ref: "#/components/schemas/DashboardSensorStation"
+      description: ""
+    DashboardSensorStation:
+      type: object
+      properties:
+        name:
+          type: string
+        roomName:
+          type: string
+        sensorStationId:
+          type: string
+          format: uuid
+        pictureIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        connected:
+          type: boolean
+        unlocked:
+          type: boolean
+        deleted:
+          type: boolean
+    ListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+      description: |-
+        A Response Container for sending a List of items fetched on the server side.
+         Only if the success-Field is set to true then a List is sent.
+    AdminSensorStationsResponse:
+      type: object
+      properties:
+        sensorStations:
+          type: array
+          items:
+            $ref: "#/components/schemas/InnerResponse"
+    AccessPointListResponse:
+      type: object
+      properties:
+        accessPoints:
+          type: array
+          items:
+            $ref: "#/components/schemas/InnerAccessPoint"
+      description: ""
+    InnerAccessPoint:
+      type: object
+      properties:
+        accessPointId:
+          type: string
+          format: uuid
+        selfAssignedId:
+          type: string
+          format: uuid
+        roomName:
+          type: string
+        unlocked:
+          type: boolean
+        scanActive:
+          type: boolean
+        connected:
+          type: boolean
+        transferInterval:
+          type: integer
+          format: int32
+        sensorStations:
+          $ref: "#/components/schemas/AdminSensorStationsResponse"
+    AccessPointConfigResponse:
+      type: object
+      properties:
+        roomName:
+          type: string
+        pairingMode:
+          type: boolean
+        transferInterval:
+          type: integer
+          format: int32
+        sensorStations:
+          type: array
+          items:
+            $ref: "#/components/schemas/SensorStationInfo"
+      description: ""
+    Limits:
+      type: object
+      properties:
+        lowerLimit:
+          type: number
+          format: double
+        upperLimit:
+          type: number
+          format: double
+    SensorInfo:
+      type: object
+      properties:
+        sensorName:
+          type: string
+        limits:
+          $ref: "#/components/schemas/Limits"
+        alarmThresholdTime:
+          type: integer
+          format: int32
+    SensorStationInfo:
+      type: object
+      properties:
+        bdAddress:
+          type: string
+        sensors:
+          type: array
+          items:
+            $ref: "#/components/schemas/SensorInfo"
+  securitySchemes:
+    bearer-key:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

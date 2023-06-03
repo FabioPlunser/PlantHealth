@@ -24,6 +24,9 @@ devDependencies:
   svelte-chartjs:
     specifier: ^3.1.2
     version: 3.1.2(chart.js@4.3.0)(svelte@3.59.1)
+  typescript:
+    specifier: 5.2.0-dev.20230531
+    version: 5.2.0-dev.20230531
   zod:
     specifier: ^3.21.4
     version: 3.21.4
@@ -605,6 +608,15 @@ packages:
       css-tree: 2.3.1
       csso: 5.0.5
       picocolors: 1.0.0
+    dev: true
+
+  /typescript@5.2.0-dev.20230531:
+    resolution:
+      {
+        integrity: sha512-srFqtcpU2ZMiHj6PXzT4MHXVgASaQmOk0n6gj0T/zt7IW2o4FdKJCnnf/u7tGisG5m/Wk5qjhT++Vij5Cj+GRA==,
+      }
+    engines: { node: ">=14.17" }
+    hasBin: true
     dev: true
 
   /vite@4.3.5:

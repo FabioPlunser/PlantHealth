@@ -36,8 +36,12 @@ dependencies {
 	implementation 'ch.qos.logback.db:logback-classic-db:1.2.11.1'
 
 	// Swagger UI
-	implementation 'org.springdoc:springdoc-openapi-starter-common:2.0.2'
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
+	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.1.0'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.1.0'
+
+	implementation 'org.springdoc:springdoc-openapi-webmvc-core:1.7.0'
+
 	// User Input Validator (needed for OpenAPI/Swagger)
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	// Therapi (Runtime JavaDoc Reader)

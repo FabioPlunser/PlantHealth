@@ -20,14 +20,6 @@
   // ----------------------------------
   export let data;
   export let form;
-
-  let sensorStations: any[] = [];
-  $: promise = data.streamed.sensorStations;
-  $: {
-    if (data.fromAccessPoints && $apSensorStations.length > 0) {
-      sensorStations = $apSensorStations;
-    }
-  }
   // ----------------------------------
   // ----------------------------------
   let searchTerm = "";
@@ -55,9 +47,10 @@
 </script>
 
 {#if rendered}
-  {#await promise}
+  {#await data.streamed.sensorStations}
     <Spinner />
-  {:then sensorStations}
+  {:then promiseData}
+    {@const sensorStations = promiseData.sensorStations}
     {#if sensorStations.length > 0}
       <div class="btn-group bg-bgase-100 flex justify-center mb-4 mt-4">
         {#each buttonGroup as button (button.description)}
@@ -138,5 +131,7 @@
         </h1>
       </section>
     {/if}
+  {:catch}
+    <p>Something went wrong</p>
   {/await}
 {/if}
