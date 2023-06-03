@@ -19,39 +19,18 @@
   // ----------------------------------
   export let data;
   export let form;
-
-  let sensorStations: any[] = [];
-  $: promise = data.streamed.sensorStations;
-  $: {
-    if (data.fromAccessPoints && $apSensorStations.length > 0) {
-      sensorStations = $apSensorStations;
-    }
-  }
   // ----------------------------------
   // ----------------------------------
   let searchTerm = "";
 </script>
 
 {#if rendered}
-  {#await promise}
+  {#await data.streamed.sensorStations}
     <Spinner />
-  {:then sensorStations}
+  {:then promiseData}
+    {@const sensorStations = promiseData.sensorStations}
     {#if sensorStations.length > 0}
       <section>
-        <div class="mb-2 flex justify-center text-center">
-          {#if data.fromAccessPoints && $apSensorStations.length > 0}
-            <div class="text-xl font-bold">
-              <h1 class="">Sensorstations of AccessPoint:</h1>
-              <h1 class="">{sensorStations[0].roomName}</h1>
-              <button
-                on:click={() => invalidate("app:getSensorStations")}
-                class="btn btn-primary">Get all SensorStations</button
-              >
-            </div>
-          {:else}
-            <h1 class="text-xl font-bold">All SensorStations</h1>
-          {/if}
-        </div>
         <div class="mb-4 flex justify-ceter">
           <input
             bind:value={searchTerm}
@@ -77,7 +56,7 @@
                       {sensorStation}
                       {form}
                       showDetailLink={true}
-                      gardener={data.gardener}
+                      gardener={data.gardener.items}
                     />
                   </div>
                 </div>
@@ -93,5 +72,7 @@
         </h1>
       </section>
     {/if}
+  {:catch}
+    <p>Something went wrong</p>
   {/await}
 {/if}

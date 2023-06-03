@@ -37,7 +37,7 @@
         <FormError field="username" {form} />
         <PasswordInput
           field="password"
-          label="New Password"
+          label="Password"
           placeholder="Password"
         />
         <FormError field="password" {form} />

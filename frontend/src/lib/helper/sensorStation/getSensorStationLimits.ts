@@ -5,7 +5,7 @@ import { error } from "@sveltejs/kit";
 export async function getSensorStationLimits(
   event: any,
   sensorStation: SensorStation
-) {
+): Promise<Responses.SensorStationResponse> {
   return new Promise(async (resolve, reject) => {
     await event
       .fetch(
@@ -26,12 +26,5 @@ export async function getSensorStationLimits(
         );
         reject(e);
       });
-  }).catch((e: any) => {
-    errorHandler(
-      event.locals.user?.personId,
-      "Error while fetching sensor station limits",
-      e
-    );
-    throw error(500, "Error while fetching sensor station limits");
   });
 }

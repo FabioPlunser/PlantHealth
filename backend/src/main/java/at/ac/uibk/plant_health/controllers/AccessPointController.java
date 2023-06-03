@@ -19,6 +19,11 @@ import at.ac.uibk.plant_health.models.exceptions.ServiceException;
 import at.ac.uibk.plant_health.models.rest_responses.*;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.service.AccessPointService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.With;
 
 @RestController
@@ -26,6 +31,18 @@ public class AccessPointController {
 	@Autowired
 	private AccessPointService accessPointService;
 
+	@Operation(summary = "Register an Access Point")
+	@ApiResponses({
+		@ApiResponse(
+				responseCode = "200", description = "Access Point successfully registered",
+				content = @Content(schema = @Schema(implementation = TokenResponse.class))
+		)
+		,
+				@ApiResponse(
+						responseCode = "400", description = "Access Point could not be registered",
+						content = @Content(schema = @Schema(implementation = MessageResponse.class))
+				)
+	})
 	@PublicEndpoint
 	@WriteOperation
 	@PostMapping("/register-access-point")
@@ -49,13 +66,41 @@ public class AccessPointController {
 				.toEntity();
 	}
 
+	@Operation(summary = "Get all Access Points")
+	@ApiResponses({
+		@ApiResponse(
+				responseCode = "200", description = "Access Points successfully retrieved",
+				content = @Content(schema = @Schema(implementation = AccessPointListResponse.class))
+		)
+		,
+				@ApiResponse(
+						responseCode = "400", description = "Access Points could not be retrieved",
+						content = @Content(schema = @Schema(implementation = MessageResponse.class))
+				)
+	})
 	@AnyPermission(Permission.ADMIN)
 	@ReadOperation
 	@GetMapping("/get-access-points")
-	public RestResponseEntity getAccessPoints() {
+	public RestResponseEntity
+	getAccessPoints() {
 		return new AccessPointListResponse(accessPointService.findAllAccessPoints()).toEntity();
 	}
 
+	@Operation(summary = "Set the lock state of an Access Point")
+	@ApiResponses({
+		@ApiResponse(
+				responseCode = "200", description = "Access Point lock state successfully set",
+				content = @Content(schema = @Schema(implementation = MessageResponse.class))
+		)
+		,
+				@ApiResponse(
+						responseCode = "400",
+						description = "Access Point lock state could not be set",
+						content = @Content(schema = @Schema(implementation = MessageResponse.class))
+				)
+	})
+
+	@WriteOperation
 	@AnyPermission(Permission.ADMIN)
 	@RequestMapping(
 			value = "/set-unlocked-access-point", method = {RequestMethod.POST, RequestMethod.PUT}
@@ -81,16 +126,44 @@ public class AccessPointController {
 				.toEntity();
 	}
 
+	@Operation(summary = "Get the configuration of an Access Point")
+	@ApiResponses({
+		@ApiResponse(
+				responseCode = "200",
+				description = "Access Point configuration successfully retrieved",
+				content =
+						@Content(schema = @Schema(implementation = AccessPointConfigResponse.class))
+		)
+		,
+				@ApiResponse(
+						responseCode = "400",
+						description = "Access Point configuration could not be retrieved",
+						content = @Content(schema = @Schema(implementation = MessageResponse.class))
+				)
+	})
 	@ReadOperation
 	@GetMapping("/get-access-point-config")
 	@PrincipalRequired(AccessPoint.class)
-	public RestResponseEntity getAccessPointConfig(AccessPoint accessPoint) {
+	public RestResponseEntity
+	getAccessPointConfig(AccessPoint accessPoint) {
 		accessPointService.setLastConnection(accessPoint);
 		// This cannot fail because the AccessPoint has to exist and be unlocked.
 		// If that were not the case the Security Chain would not have authenticated the request.
 		return new AccessPointConfigResponse(accessPoint).toEntity();
 	}
 
+	@Operation(summary = "Send found sensor stations to Access Point")
+	@ApiResponses({
+		@ApiResponse(
+				responseCode = "200", description = "Sensor Stations successfully added",
+				content = @Content(schema = @Schema(implementation = MessageResponse.class))
+		)
+		,
+				@ApiResponse(
+						responseCode = "400", description = "Sensor Stations could not be added",
+						content = @Content(schema = @Schema(implementation = MessageResponse.class))
+				)
+	})
 	@WriteOperation
 	@RequestMapping(
 			value = "/found-sensor-stations", method = {RequestMethod.POST, RequestMethod.PUT}
@@ -114,10 +187,23 @@ public class AccessPointController {
 				.toEntity();
 	}
 
+	@Operation(summary = "Activate scan of Access Point")
+	@ApiResponses({
+		@ApiResponse(
+				responseCode = "200", description = "Scan successfully started",
+				content = @Content(schema = @Schema(implementation = MessageResponse.class))
+		)
+		,
+				@ApiResponse(
+						responseCode = "400", description = "Scan could not be started",
+						content = @Content(schema = @Schema(implementation = MessageResponse.class))
+				)
+	})
+
 	@AnyPermission(Permission.ADMIN)
 	@PostMapping("/scan-for-sensor-stations")
-	public RestResponseEntity scanForSensorStations(@RequestParam(name = "accessPointId")
-													final UUID accessPointId) {
+	public RestResponseEntity
+	scanForSensorStations(@RequestParam(name = "accessPointId") final UUID accessPointId) {
 		try {
 			accessPointService.findById(accessPointId);
 			accessPointService.isUnlockedByDeviceId(accessPointId);
@@ -135,9 +221,22 @@ public class AccessPointController {
 				.toEntity();
 	}
 
+	@Operation(summary = "Set the transfer interval of an Access Point")
+	@ApiResponses({
+		@ApiResponse(
+				responseCode = "200", description = "Transfer interval successfully set",
+				content = @Content(schema = @Schema(implementation = MessageResponse.class))
+		)
+		,
+				@ApiResponse(
+						responseCode = "400", description = "Transfer interval could not be set",
+						content = @Content(schema = @Schema(implementation = MessageResponse.class))
+				)
+	})
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
 	@PostMapping("/set-access-point-transfer-interval")
-	public RestResponseEntity setAPTransferInterval(
+	public RestResponseEntity
+	setAPTransferInterval(
 			@RequestParam(name = "accessPointId") final UUID accessPointId,
 			@RequestParam(name = "transferInterval") final int transferInterval
 	) {
@@ -157,9 +256,23 @@ public class AccessPointController {
 				.toEntity();
 	}
 
+	@Operation(summary = "Update the information of an Access Point")
+	@ApiResponses({
+		@ApiResponse(
+				responseCode = "200", description = "Access Point info successfully updated",
+				content = @Content(schema = @Schema(implementation = MessageResponse.class))
+		)
+		,
+				@ApiResponse(
+						responseCode = "400",
+						description = "Access Point info could not be updated",
+						content = @Content(schema = @Schema(implementation = MessageResponse.class))
+				)
+	})
 	@AnyPermission({Permission.ADMIN})
 	@PostMapping("/update-access-point")
-	public RestResponseEntity updateAccessPoint(
+	public RestResponseEntity
+	updateAccessPoint(
 			@RequestParam(name = "accessPointId") final UUID accessPointId,
 			@RequestParam(name = "roomName") final String roomName,
 			@RequestParam(name = "transferInterval") final int transferInterval
@@ -180,9 +293,22 @@ public class AccessPointController {
 				.toEntity();
 	}
 
+	@Operation(summary = "Transfer data from Access Point to Server")
+	@ApiResponses({
+		@ApiResponse(
+				responseCode = "200", description = "Data successfully transfered",
+				content = @Content(schema = @Schema(implementation = MessageResponse.class))
+		)
+		,
+				@ApiResponse(
+						responseCode = "400", description = "Data could not be transfered",
+						content = @Content(schema = @Schema(implementation = MessageResponse.class))
+				)
+	})
 	@PostMapping("/transfer-data")
 	@PrincipalRequired(AccessPoint.class)
-	public RestResponseEntity transferData(
+	public RestResponseEntity
+	transferData(
 			final AccessPoint accessPoint, @RequestBody final List<SensorStation> sensorStationList
 	) {
 		try {
@@ -201,11 +327,23 @@ public class AccessPointController {
 				.toEntity();
 	}
 
+	@Operation(summary = "Delete an Access Point")
+	@ApiResponses({
+		@ApiResponse(
+				responseCode = "200", description = "Access Point successfully deleted",
+				content = @Content(schema = @Schema(implementation = MessageResponse.class))
+		)
+		,
+				@ApiResponse(
+						responseCode = "400", description = "Access Point could not be deleted",
+						content = @Content(schema = @Schema(implementation = MessageResponse.class))
+				)
+	})
 	@AnyPermission({Permission.ADMIN})
 	@DeleteMapping("/delete-access-point")
 	@WriteOperation
-	public RestResponseEntity deleteAccessPoint(@RequestParam("accessPointId"
-	) final UUID accessPointId) {
+	public RestResponseEntity
+	deleteAccessPoint(@RequestParam("accessPointId") final UUID accessPointId) {
 		try {
 			accessPointService.deleteAccessPoint(accessPointId);
 		} catch (ServiceException e) {

@@ -8,7 +8,7 @@ import { errorHandler } from "$helper/errorHandler";
 export async function load(event) {
   const { fetch } = event;
 
-  async function getUsers(): Promise<any> {
+  async function getUsers(): Promise<Responses.ListResponse> {
     return new Promise(async (resolve, reject) => {
       await fetch(`${BACKEND_URL}/get-all-users`)
         .then(async (res) => {
@@ -19,10 +19,8 @@ export async function load(event) {
               "Error while getting users",
               res
             );
-            reject(res);
           }
-          let data = await res.json();
-          resolve(data.items);
+          resolve(await res.json());
         })
         .catch((err) => {
           errorHandler(
@@ -30,8 +28,6 @@ export async function load(event) {
             "Error while getting users",
             err
           );
-          reject(err);
-          throw error(500, "Error while getting users");
         });
     });
   }

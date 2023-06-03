@@ -82,22 +82,21 @@ export async function load(event) {
   async function getAssignedSensorStations(): Promise<any> {
     return new Promise(async (resolve, reject) => {
       if (assignedSensorStations.length == 0)
-        reject("No assigned sensor stations found");
-      for (let assignedSensorStation of assignedSensorStations) {
-        assignedSensorStation.data = getSensorStationData(
-          event,
-          assignedSensorStation,
-          dates
-        );
-        assignedSensorStation.pictures = await getSensorStationPictures(
-          event,
-          assignedSensorStation
-        );
-        assignedSensorStation.limits = getSensorStationLimits(
-          event,
-          assignedSensorStation
-        );
-      }
+        for (let assignedSensorStation of assignedSensorStations) {
+          assignedSensorStation.data = getSensorStationData(
+            event,
+            assignedSensorStation,
+            dates
+          );
+          assignedSensorStation.pictures = await getSensorStationPictures(
+            event,
+            assignedSensorStation
+          );
+          assignedSensorStation.limits = getSensorStationLimits(
+            event,
+            assignedSensorStation
+          );
+        }
       resolve(assignedSensorStations);
     }).catch((e) => {
       errorHandler(
@@ -105,7 +104,6 @@ export async function load(event) {
         "Error while fetching dashboard sensor stations",
         e
       );
-      throw error(500, "Error while fetching dashboard sensor stations");
     });
   }
 
