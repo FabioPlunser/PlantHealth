@@ -4,6 +4,8 @@
 #include "../../include/Defines.h"
 
 #include <Arduino.h>
+#include <tuple>
+#include <vector>
 
 class PiezoBuzzerController {
 	private:
@@ -33,6 +35,18 @@ class PiezoBuzzerController {
 #endif
 		}
 		void stopBuzzer() { noTone(this->buzzerPin); }
+
+		void playMelody(
+			std::vector<std::tuple<uint16_t, uint16_t>> noteAndDurationList
+		) {
+			for (auto noteAndDuration : noteAndDurationList) {
+				uint16_t note	  = std::get<0>(noteAndDuration);
+				uint16_t duration = std::get<1>(noteAndDuration);
+				this->startBuzzer(note, duration);
+				delay(50);
+			}
+			stopBuzzer();
+		}
 };
 
 #endif

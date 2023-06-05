@@ -8,6 +8,9 @@
 #include "SensorError.hpp"
 #include "SensorErrors.h"
 
+#include <tuple>
+#include <vector>
+
 #define CHECK_IF_CASTABLE_TO_SENSOR_ERROR(notification)             \
 	(notification != NULL && notification->getNotificationType() == \
 								 Notification::NotificationType::SENSOR_ERROR)
@@ -471,6 +474,16 @@ class NotificationHandler {
 				value == ERROR_VALUE_HIGH ? SensorErrors::Status::High
 										  : SensorErrors::Status::Low
 			);
+		}
+
+		void playMelodyOnPiezoBuzzer(
+			std::vector<std::tuple<uint16_t, uint16_t>> noteAndDurationList
+		) {
+			DEBUG_PRINT_POS(4, "\n");
+			if (this->inSilentMode) {
+				return;
+			}
+			piezoBuzzerController->playMelody(noteAndDurationList);
 		}
 };
 
