@@ -480,9 +480,6 @@ class NotificationHandler {
 			std::vector<std::tuple<uint16_t, uint16_t>> noteAndDurationList
 		) {
 			DEBUG_PRINT_POS(4, "\n");
-			if (this->inSilentMode) {
-				return;
-			}
 			piezoBuzzerController->playMelody(noteAndDurationList);
 		}
 };
