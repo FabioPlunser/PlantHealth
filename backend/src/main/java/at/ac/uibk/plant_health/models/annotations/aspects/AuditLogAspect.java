@@ -14,6 +14,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import at.ac.uibk.plant_health.config.jwt_authentication.AuthContext;
 import at.ac.uibk.plant_health.models.IdentifiedEntity;
@@ -58,9 +59,11 @@ public class AuditLogAspect {
 			String[] parameterNames = sig.getParameterNames();
 			Object[] parameters = jp.getArgs();
 
-			List<Pair<String, Optional<Object>>> paramMap = IntStream.range(0, parameters.length)
-					.mapToObj(i -> Pair.of(parameterNames[i], Optional.ofNullable(parameters[i])))
-					.toList();
+			List<Pair<String, Optional<Object>>> paramMap = Stream.concat(
+					IntStream.range(0, parameters.length)
+						.mapToObj(i -> Pair.of(parameterNames[i], Optional.ofNullable(parameters[i]))),
+						Stream.of(Pair.of("!", Optional.ofNullable(ret)))
+					).toList();
 
 			var message = formatMessage(formatMessage, paramMap);
 
