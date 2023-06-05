@@ -56,16 +56,15 @@ public class DumpConfig {
 		final String defaultPassword = "password";
 		final String emailSuffix = "@planthealth.at";
 
-		List<Person> admins =
-				IntStream.range(0, numAdmins)
-						.mapToObj(
-								i
-								-> new Person(
-										"Admin_" + i, "admin" + i + emailSuffix,
-										defaultPassword, Set.of(Permission.ADMIN)
-								)
-						)
-						.toList();
+		List<Person> admins = IntStream.range(0, numAdmins)
+									  .mapToObj(
+											  i
+											  -> new Person(
+													  "Admin_" + i, "admin" + i + emailSuffix,
+													  defaultPassword, Set.of(Permission.ADMIN)
+											  )
+									  )
+									  .toList();
 		List<Person> gardeners =
 				IntStream.range(0, numGardeners)
 						.mapToObj(
@@ -76,16 +75,15 @@ public class DumpConfig {
 								)
 						)
 						.toList();
-		List<Person> users =
-				IntStream.range(0, numUsers)
-						.mapToObj(
-								i
-								-> new Person(
-										"User_" + i, "user" + i + emailSuffix, defaultPassword,
-										Set.of(Permission.USER)
-								)
-						)
-						.toList();
+		List<Person> users = IntStream.range(0, numUsers)
+									 .mapToObj(
+											 i
+											 -> new Person(
+													 "User_" + i, "user" + i + emailSuffix,
+													 defaultPassword, Set.of(Permission.USER)
+											 )
+									 )
+									 .toList();
 		admins.forEach(personService::save);
 		gardeners.forEach(personService::save);
 		users.forEach(personService::save);
@@ -110,9 +108,8 @@ public class DumpConfig {
 						Pair.of("Air Pressure", "hPa"), Pair.of("Earth Humidity", "%"),
 						Pair.of("Light Intensity", "lm"), Pair.of("Air Quality", "%"),
 						Pair.of("Battery Level", "%"));
-		var sensors = sensorKeyValues.stream()
-							  .map(p -> new Sensor(p.getFirst(), p.getSecond()))
-							  .toList();
+		var sensors =
+				sensorKeyValues.stream().map(p -> new Sensor(p.getFirst(), p.getSecond())).toList();
 		sensorRepository.saveAll(sensors);
 
 		var sensorStations =
@@ -128,8 +125,8 @@ public class DumpConfig {
 														  .mapToObj(
 																  j
 																  -> new SensorStationPersonReference(
-																		  s, users.get(j),
-																		  false, true
+																		  s, users.get(j), false,
+																		  true
 																  )
 														  ),
 												  IntStream.range(0, gardeners.size())
@@ -137,8 +134,8 @@ public class DumpConfig {
 														  .mapToObj(
 																  j
 																  -> new SensorStationPersonReference(
-																		  s, gardeners.get(j),
-																		  true, (j & 0x1) > 0
+																		  s, gardeners.get(j), true,
+																		  (j & 0x1) > 0
 																  )
 														  ))
 											.toList();
@@ -149,10 +146,10 @@ public class DumpConfig {
 											.map(sensor -> {
 												var sl = new SensorLimits(
 														LocalDateTime.now(),
-														(float)(0.9 * numSensorData) + 100,
-														(float)(0.1 * numSensorData) + 100,
-														60, sensor,
-														gardeners.get(i % gardeners.size()), s
+														(float) (0.9 * numSensorData) + 100,
+														(float) (0.1 * numSensorData) + 100, 60,
+														sensor, gardeners.get(i % gardeners.size()),
+														s
 												);
 												sl.setDeleted(false);
 												return sl;
@@ -168,13 +165,13 @@ public class DumpConfig {
 												String alarm;
 												if (above) {
 													alarm = "h";
-												} else if(below) {
+												} else if (below) {
 													alarm = "l";
-												} else{
+												} else {
 													alarm = "n";
 												}
 												return Stream.of(new SensorData(
-														LocalDateTime.now(), (float)100 + j, alarm,
+														LocalDateTime.now(), (float) 100 + j, alarm,
 														sensors.get(j % sensors.size()), s
 												));
 											})
@@ -197,7 +194,9 @@ public class DumpConfig {
 		sensorStations.forEach(s -> sensorDataRepository.saveAll(s.getSensorData()));
 		sensorStations.forEach(
 				s
-				-> sensorStationPersonReferenceRepository.saveAll(s.getSensorStationPersonReferences())
+				-> sensorStationPersonReferenceRepository.saveAll(
+						s.getSensorStationPersonReferences()
+				)
 		);
 	}
 

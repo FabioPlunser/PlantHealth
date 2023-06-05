@@ -1,7 +1,5 @@
 package at.ac.uibk.plant_health.repositories;
 
-import at.ac.uibk.plant_health.models.Log;
-import at.ac.uibk.plant_health.models.annotations.AuditLogAnnotation;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -12,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import at.ac.uibk.plant_health.models.Log;
+import at.ac.uibk.plant_health.models.annotations.AuditLogAnnotation;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
 

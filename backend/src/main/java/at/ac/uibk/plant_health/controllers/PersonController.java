@@ -207,9 +207,9 @@ public class PersonController {
 	@AnyPermission(Permission.ADMIN)
 	@GetMapping("/get-all-users")
 	public RestResponse getAllUsers(Person person) {
-		return new ListResponse<>(personService.getPersons().stream()
-				.filter(p -> !p.equals(person))
-				.toList());
+		return new ListResponse<>(
+				personService.getPersons().stream().filter(p -> !p.equals(person)).toList()
+		);
 	}
 
 	@ReadOperation

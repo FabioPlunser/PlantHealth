@@ -1,6 +1,5 @@
 package at.ac.uibk.plant_health.models.annotations.aspects;
 
-import at.ac.uibk.plant_health.models.annotations.AuditLogAnnotation;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -19,6 +18,7 @@ import java.util.stream.Stream;
 import at.ac.uibk.plant_health.config.jwt_authentication.AuthContext;
 import at.ac.uibk.plant_health.models.IdentifiedEntity;
 import at.ac.uibk.plant_health.models.Log;
+import at.ac.uibk.plant_health.models.annotations.AuditLogAnnotation;
 import at.ac.uibk.plant_health.service.LogService;
 import at.ac.uibk.plant_health.util.Constants;
 
@@ -36,9 +36,7 @@ public class AuditLogAspect {
 		Object ret;
 		String formatMessage;
 		Log.LogLevel logLevel;
-		AuditLogAnnotation annotation = sig
-				.getMethod()
-				.getAnnotation(AuditLogAnnotation.class);
+		AuditLogAnnotation annotation = sig.getMethod().getAnnotation(AuditLogAnnotation.class);
 
 		try {
 			ret = jp.proceed();
@@ -59,11 +57,17 @@ public class AuditLogAspect {
 			String[] parameterNames = sig.getParameterNames();
 			Object[] parameters = jp.getArgs();
 
-			List<Pair<String, Optional<Object>>> paramMap = Stream.concat(
-					IntStream.range(0, parameters.length)
-						.mapToObj(i -> Pair.of(parameterNames[i], Optional.ofNullable(parameters[i]))),
-						Stream.of(Pair.of("!", Optional.ofNullable(ret)))
-					).toList();
+			List<Pair<String, Optional<Object>>> paramMap =
+					Stream.concat(IntStream.range(0, parameters.length)
+										  .mapToObj(
+												  i
+												  -> Pair.of(
+														  parameterNames[i],
+														  Optional.ofNullable(parameters[i])
+												  )
+										  ),
+								  Stream.of(Pair.of("!", Optional.ofNullable(ret))))
+							.toList();
 
 			var message = formatMessage(formatMessage, paramMap);
 
@@ -74,13 +78,16 @@ public class AuditLogAspect {
 		return ret;
 	}
 
-	private String formatMessage(String formatMessage, List<Pair<String, Optional<Object>>> parameters) {
+	private String formatMessage(
+			String formatMessage, List<Pair<String, Optional<Object>>> parameters
+	) {
 		StringBuilder builder = new StringBuilder();
 
 		boolean inFormatString = false;
 		int i = 0, l = i;
 		while (i < formatMessage.length()) {
-			if (formatMessage.charAt(i) == '{' && !inFormatString && !(formatMessage.charAt(i - 1) == '\\')) {
+			if (formatMessage.charAt(i) == '{' && !inFormatString
+				&& !(formatMessage.charAt(i - 1) == '\\')) {
 				builder.append(formatMessage, l, i);
 				l = i + 1;
 				inFormatString = true;
@@ -89,7 +96,7 @@ public class AuditLogAspect {
 				l = i + 1;
 				inFormatString = false;
 			}
-			i ++;
+			i++;
 		}
 
 		if (!inFormatString) {
@@ -99,12 +106,14 @@ public class AuditLogAspect {
 		return builder.toString();
 	}
 
-	private String getSubstitution(String formatString, List<Pair<String, Optional<Object>>> parameters) {
+	private String getSubstitution(
+			String formatString, List<Pair<String, Optional<Object>>> parameters
+	) {
 		List<String> props = Arrays.stream(formatString.split("\\.")).toList();
 		Optional<Object> val = parameters.stream()
-				.filter(p -> p.getFirst().equals(props.get(0)))
-				.findFirst()
-				.map(Pair::getSecond);
+									   .filter(p -> p.getFirst().equals(props.get(0)))
+									   .findFirst()
+									   .map(Pair::getSecond);
 
 		if (val.isPresent()) {
 			Object obj = val.get();

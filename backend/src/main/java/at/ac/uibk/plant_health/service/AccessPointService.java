@@ -272,7 +272,7 @@ public class AccessPointService {
 	 * @param accessPointId
 	 * @throws ServiceException
 	 */
-	public void deleteAccessPoint(UUID accessPointId) throws ServiceException{
+	public void deleteAccessPoint(UUID accessPointId) throws ServiceException {
 		Optional<AccessPoint> maybeAccessPoint = accessPointRepository.findById(accessPointId);
 		if (maybeAccessPoint.isEmpty()) {
 			throw new ServiceException("AccessPoint not found", 404);

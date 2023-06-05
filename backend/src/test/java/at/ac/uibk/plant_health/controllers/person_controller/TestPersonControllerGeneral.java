@@ -1,18 +1,12 @@
 package at.ac.uibk.plant_health.controllers.person_controller;
 
-import at.ac.uibk.plant_health.models.device.AccessPoint;
-import at.ac.uibk.plant_health.models.device.SensorStation;
-import at.ac.uibk.plant_health.models.user.Permission;
-import at.ac.uibk.plant_health.models.user.Person;
-import at.ac.uibk.plant_health.repositories.PersonRepository;
-import at.ac.uibk.plant_health.service.AccessPointService;
-import at.ac.uibk.plant_health.service.PersonService;
-import at.ac.uibk.plant_health.service.SensorStationPersonReferenceService;
-import at.ac.uibk.plant_health.service.SensorStationService;
-import at.ac.uibk.plant_health.util.AuthGenerator;
-import at.ac.uibk.plant_health.util.EndpointMatcherUtil;
-import at.ac.uibk.plant_health.util.MockAuthContext;
-import at.ac.uibk.plant_health.util.StringGenerator;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.http.HttpHeaders.USER_AGENT;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import static at.ac.uibk.plant_health.util.EndpointMatcherUtil.REGISTER_ENDPOINT;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,11 +26,19 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static at.ac.uibk.plant_health.util.EndpointMatcherUtil.REGISTER_ENDPOINT;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.http.HttpHeaders.USER_AGENT;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import at.ac.uibk.plant_health.models.device.AccessPoint;
+import at.ac.uibk.plant_health.models.device.SensorStation;
+import at.ac.uibk.plant_health.models.user.Permission;
+import at.ac.uibk.plant_health.models.user.Person;
+import at.ac.uibk.plant_health.repositories.PersonRepository;
+import at.ac.uibk.plant_health.service.AccessPointService;
+import at.ac.uibk.plant_health.service.PersonService;
+import at.ac.uibk.plant_health.service.SensorStationPersonReferenceService;
+import at.ac.uibk.plant_health.service.SensorStationService;
+import at.ac.uibk.plant_health.util.AuthGenerator;
+import at.ac.uibk.plant_health.util.EndpointMatcherUtil;
+import at.ac.uibk.plant_health.util.MockAuthContext;
+import at.ac.uibk.plant_health.util.StringGenerator;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -73,7 +75,7 @@ class TestPersonControllerGeneral {
 		Person person = new Person(username, StringGenerator.email(), password, permissions);
 		assertTrue(personService.create(person), "Unable to create user");
 		return (Person
-				) MockAuthContext.setLoggedInUser(personService.login(username, password).orElse(null));
+		) MockAuthContext.setLoggedInUser(personService.login(username, password).orElse(null));
 	}
 
 	@Test
@@ -84,17 +86,20 @@ class TestPersonControllerGeneral {
 
 		// run request
 		mockMvc.perform(MockMvcRequestBuilders.post(REGISTER_ENDPOINT)
-						.header(HttpHeaders.USER_AGENT, "MockTests")
-						.param("username", username)
-						.param("password", password)
-						.param("email", email)
-						.contentType(MediaType.APPLICATION_JSON))
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.param("username", username)
+								.param("password", password)
+								.param("email", email)
+								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
 		Person person = personRepository.findByUsername(username).orElseThrow();
 
 		Assertions.assertAll(
-				() -> Assertions.assertTrue(passwordEncoder.matches(password, person.getPassword())),
+				()
+						-> Assertions.assertTrue(
+								passwordEncoder.matches(password, person.getPassword())
+						),
 				() -> Assertions.assertEquals(email, person.getEmail())
 		);
 	}
@@ -111,21 +116,30 @@ class TestPersonControllerGeneral {
 
 		// run request
 		mockMvc.perform(MockMvcRequestBuilders.post("/create-user")
-						.header(HttpHeaders.USER_AGENT, "MockTests")
-						.header(HttpHeaders.AUTHORIZATION,
-								AuthGenerator.generateToken(admin))
-						.param("username", username)
-						.param("password", password)
-						.param("email", email)
-						.param("permissions", String.join(",", permissions.stream().map(Permission::toString).toList()))
-				)
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(admin))
+								.param("username", username)
+								.param("password", password)
+								.param("email", email)
+								.param("permissions",
+									   String.join(
+											   ",",
+											   permissions.stream()
+													   .map(Permission::toString)
+													   .toList()
+									   )))
 				.andExpectAll(status().isOk());
 
 		Person person = personRepository.findByUsername(username).orElseThrow();
 
 		Assertions.assertAll(
-				() -> Assertions.assertTrue(passwordEncoder.matches(password, person.getPassword())),
-				() -> Assertions.assertEquals(email, person.getEmail()),
+				()
+						-> Assertions.assertTrue(
+								passwordEncoder.matches(password, person.getPassword())
+						),
+				()
+						-> Assertions.assertEquals(email, person.getEmail()),
 				() -> Assertions.assertEquals(permissions, person.getPermissions())
 		);
 	}
@@ -140,19 +154,22 @@ class TestPersonControllerGeneral {
 
 		// run request
 		mockMvc.perform(MockMvcRequestBuilders.post("/update-settings")
-						.header(HttpHeaders.USER_AGENT, "MockTests")
-						.header(HttpHeaders.AUTHORIZATION,
-								AuthGenerator.generateToken(user))
-						.param("username", username)
-						.param("password", password)
-						.param("email", email)
-						.contentType(MediaType.APPLICATION_JSON))
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(user))
+								.param("username", username)
+								.param("password", password)
+								.param("email", email)
+								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
 		Person person = personRepository.findByUsername(username).orElseThrow();
 
 		Assertions.assertAll(
-				() -> Assertions.assertTrue(passwordEncoder.matches(password, person.getPassword())),
+				()
+						-> Assertions.assertTrue(
+								passwordEncoder.matches(password, person.getPassword())
+						),
 				() -> Assertions.assertEquals(email, person.getEmail())
 		);
 	}
@@ -169,22 +186,32 @@ class TestPersonControllerGeneral {
 
 		// run request
 		mockMvc.perform(MockMvcRequestBuilders.post("/update-user")
-						.header(HttpHeaders.USER_AGENT, "MockTests")
-						.header(HttpHeaders.AUTHORIZATION,
-								AuthGenerator.generateToken(admin))
-						.param("personId", String.valueOf(user.getId()))
-						.param("username", username)
-						.param("password", password)
-						.param("email", email)
-						.param("permissions", String.join(",", permissions.stream().map(Permission::toString).toList()))
-						.contentType(MediaType.APPLICATION_JSON))
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(admin))
+								.param("personId", String.valueOf(user.getId()))
+								.param("username", username)
+								.param("password", password)
+								.param("email", email)
+								.param("permissions",
+									   String.join(
+											   ",",
+											   permissions.stream()
+													   .map(Permission::toString)
+													   .toList()
+									   ))
+								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
 		Person person = personRepository.findByUsername(username).orElseThrow();
 
 		Assertions.assertAll(
-				() -> Assertions.assertTrue(passwordEncoder.matches(password, person.getPassword())),
-				() -> Assertions.assertEquals(email, person.getEmail()),
+				()
+						-> Assertions.assertTrue(
+								passwordEncoder.matches(password, person.getPassword())
+						),
+				()
+						-> Assertions.assertEquals(email, person.getEmail()),
 				() -> Assertions.assertEquals(permissions, person.getPermissions())
 		);
 	}
@@ -197,11 +224,11 @@ class TestPersonControllerGeneral {
 
 		// run request
 		mockMvc.perform(MockMvcRequestBuilders.delete("/delete-user")
-						.header(HttpHeaders.USER_AGENT, "MockTests")
-						.header(HttpHeaders.AUTHORIZATION,
-								AuthGenerator.generateToken(admin))
-						.param("personId", String.valueOf(personToDelete.getPersonId()))
-						.contentType(MediaType.APPLICATION_JSON))
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(admin))
+								.param("personId", String.valueOf(personToDelete.getPersonId()))
+								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
 		// check if person is deleted
@@ -229,17 +256,18 @@ class TestPersonControllerGeneral {
 
 		// run request
 		mockMvc.perform(MockMvcRequestBuilders.delete("/delete-user")
-						.header(HttpHeaders.USER_AGENT, "MockTests")
-						.header(HttpHeaders.AUTHORIZATION,
-								AuthGenerator.generateToken(admin))
-						.param("personId", String.valueOf(personToDelete.getPersonId()))
-						.contentType(MediaType.APPLICATION_JSON))
+								.header(HttpHeaders.USER_AGENT, "MockTests")
+								.header(HttpHeaders.AUTHORIZATION,
+										AuthGenerator.generateToken(admin))
+								.param("personId", String.valueOf(personToDelete.getPersonId()))
+								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
 		// check if person is deleted
 		assertTrue(personService.findById(personToDelete.getId()).isEmpty());
 
-		// check if sensor station and access point still exist - exception would be thrown otherwise
+		// check if sensor station and access point still exist - exception would be thrown
+		// otherwise
 		accessPointService.findBySelfAssignedId(selfAssignedId);
 		sensorStationService.findByBdAddress(macAddress);
 	}

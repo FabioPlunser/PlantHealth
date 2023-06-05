@@ -37,37 +37,38 @@ public class TestSensorDataModel {
 	@Autowired
 	private SensorStationRepository sensorStationRepository;
 
-		@Test
-		void testCreateAndSaveSensorData() {
-			Random rand = new SecureRandom();
+	@Test
+	void testCreateAndSaveSensorData() {
+		Random rand = new SecureRandom();
 
-			SensorStation station = new SensorStation(StringGenerator.macAddress(), 1);
-			sensorStationRepository.save(station);
+		SensorStation station = new SensorStation(StringGenerator.macAddress(), 1);
+		sensorStationRepository.save(station);
 
-			List<SensorData> sensorDataList = new ArrayList<>();
+		List<SensorData> sensorDataList = new ArrayList<>();
 
-			Sensor sensor;
-			Optional<Sensor> maybeSensor;
-			if ((maybeSensor = sensorRepository.findByType("TEMPERATURE")).isPresent()) {
-				sensor = maybeSensor.get();
-			} else {
-				sensor = new Sensor("TEMPERATURE", "°C");
-				sensorRepository.save(sensor);
-			}
-
-			SensorData sensorD = new SensorData(
-					LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS), rand.nextFloat(), "n", sensor, station
-			);
-			sensorDataRepository.save(sensorD);
-
-			sensorDataList.add(sensorD);
-
-			station.setSensorData(sensorDataList);
-			sensorStationRepository.save(station);
-
-			assertEquals(
-					sensorDataList,
-					sensorStationRepository.findById(station.getDeviceId()).get().getSensorData()
-			);
+		Sensor sensor;
+		Optional<Sensor> maybeSensor;
+		if ((maybeSensor = sensorRepository.findByType("TEMPERATURE")).isPresent()) {
+			sensor = maybeSensor.get();
+		} else {
+			sensor = new Sensor("TEMPERATURE", "°C");
+			sensorRepository.save(sensor);
 		}
+
+		SensorData sensorD = new SensorData(
+				LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS), rand.nextFloat(), "n", sensor,
+				station
+		);
+		sensorDataRepository.save(sensorD);
+
+		sensorDataList.add(sensorD);
+
+		station.setSensorData(sensorDataList);
+		sensorStationRepository.save(station);
+
+		assertEquals(
+				sensorDataList,
+				sensorStationRepository.findById(station.getDeviceId()).get().getSensorData()
+		);
+	}
 }

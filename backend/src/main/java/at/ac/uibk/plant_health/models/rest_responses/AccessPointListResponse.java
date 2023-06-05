@@ -15,9 +15,9 @@ public class AccessPointListResponse extends RestResponse {
 
 	public AccessPointListResponse(List<AccessPoint> accessPoints) {
 		this.accessPoints = accessPoints.stream()
-				.filter(ap -> !ap.isDeleted())
-				.map(InnerAccessPoint::new)
-				.toList();
+									.filter(ap -> !ap.isDeleted())
+									.map(InnerAccessPoint::new)
+									.toList();
 	}
 
 	@Getter
