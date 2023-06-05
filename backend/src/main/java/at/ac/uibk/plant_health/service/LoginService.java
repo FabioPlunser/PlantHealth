@@ -1,5 +1,7 @@
 package at.ac.uibk.plant_health.service;
 
+import at.ac.uibk.plant_health.models.Log;
+import at.ac.uibk.plant_health.models.annotations.AuditLogAnnotation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
