@@ -17,6 +17,8 @@
 #include <NotificationHandler.hpp>
 #include <cmath>
 #include <modules/communication.h>
+#include <tuple>
+#include <vector>
 
 // ----- Prototypes ----- //
 
@@ -39,6 +41,7 @@ double sensorValueWeightCalculationFunction(
 	unsigned long timeLastReset
 );
 void checkResetButtonPressed();
+void playPairingMelody();
 
 // ----- Global Variables ----- //
 
@@ -265,6 +268,7 @@ void handleCentralDeviceIfPresent(
 				DEBUG_PRINTF(
 					1, "New device is: \"%s\".\n", pairedDevice.c_str()
 				);
+				playPairingMelody();
 				inPairingMode = false;
 			} else {
 				DEBUG_PRINT(
@@ -346,6 +350,19 @@ void setArduinoPowerStatus() {
 	set_battery_level_status(
 		BATTERY_LEVEL_FLAGS_FIELD, BATTERY_POWER_STATE_FIELD, 100
 	);
+}
+
+void playPairingMelody() {
+	DEBUG_PRINT_POS(4, "\n");
+
+	uint16_t melody[][2] = MELODY_PAIRING_SUCCESSFUL;
+	uint8_t melodyLength = sizeof(melody) / sizeof(uint16_t *);
+	std::vector<std::tuple<uint16_t, uint16_t>> melodyVector;
+	for (uint8_t i = 0; i < melodyLength; i++) {
+		melodyVector.push_back(std::make_tuple(melody[i][0], melody[i][1]));
+	}
+
+	notificationHandler->playMelodyOnPiezoBuzzer(melodyVector);
 }
 
 #endif
