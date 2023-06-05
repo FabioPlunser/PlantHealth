@@ -1,5 +1,6 @@
 package at.ac.uibk.plant_health.service;
 
+import at.ac.uibk.plant_health.models.annotations.AuditLogAnnotation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -127,6 +128,7 @@ public class PersonService {
 	 * @param person person to be created
 	 * @return true if person has been created, false otherwise
 	 */
+	@AuditLogAnnotation(successMessage = "Created Person {person.id}")
 	public boolean create(Person person) {
 		if (person != null && person.getPersonId() == null) {
 			return save(person) != null;
@@ -167,6 +169,7 @@ public class PersonService {
 	 * @return true if the user could be found and could be updated, false
 	 *     otherwise.
 	 */
+	@AuditLogAnnotation(successMessage = "Updated Person {person.id}")
 	public boolean update(
 			Person person, String username, String email, String password,
 			Set<Permission> permissions
@@ -219,6 +222,7 @@ public class PersonService {
 	 * @param personId The ID of the Person to delete.
 	 * @return true if the person was deleted, false otherwise.
 	 */
+	@AuditLogAnnotation(successMessage = "Deleted Person {personId}")
 	public boolean delete(UUID personId) {
 		try {
 			Optional<Person> maybePerson = personRepository.findById(personId);

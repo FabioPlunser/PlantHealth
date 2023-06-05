@@ -1,5 +1,6 @@
 package at.ac.uibk.plant_health.service;
 
+import at.ac.uibk.plant_health.models.annotations.AuditLogAnnotation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ public class LogService {
 		return logRepository.findAll();
 	}
 
+	/* DO NOT ADD "@AuditLogAnnotation" HERE => RESULTS IN RECURSIVE CALL */
 	public boolean log(Log log) {
 		try {
 			log.setTimeStamp(LocalDateTime.now());

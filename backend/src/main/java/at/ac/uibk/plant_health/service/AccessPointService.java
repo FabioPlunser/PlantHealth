@@ -1,5 +1,6 @@
 package at.ac.uibk.plant_health.service;
 
+import at.ac.uibk.plant_health.models.annotations.AuditLogAnnotation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +57,7 @@ public class AccessPointService {
 	 * @param roomName The roomName of the AccessPoint to register.
 	 * @throws ServiceException if the AccessPoint could not be registered.
 	 */
+	@AuditLogAnnotation(successMessage = "Registered AccessPoint {deviceId} {roomName}")
 	public void register(UUID selfAssignedId, String roomName) throws ServiceException {
 		if (selfAssignedId == null || roomName == null) {
 			throw new ServiceException("Could not register AccessPoint", 400);
@@ -145,6 +147,7 @@ public class AccessPointService {
 	 * @param deviceId
 	 * @return true if the AccessPoint was unlocked, false otherwise
 	 */
+	@AuditLogAnnotation(successMessage = "Unlocked AccessPoint {deviceId}")
 	public void setUnlocked(boolean unlocked, UUID deviceId) throws ServiceException {
 		AccessPoint accessPoint = null;
 		accessPoint = findById(deviceId);
@@ -272,6 +275,7 @@ public class AccessPointService {
 	 * @param accessPointId
 	 * @throws ServiceException
 	 */
+	@AuditLogAnnotation(successMessage = "Deleted AccessPoint {accessPointId}")
 	public void deleteAccessPoint(UUID accessPointId) throws ServiceException {
 		Optional<AccessPoint> maybeAccessPoint = accessPointRepository.findById(accessPointId);
 		if (maybeAccessPoint.isEmpty()) {

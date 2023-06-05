@@ -1,5 +1,6 @@
 package at.ac.uibk.plant_health.service;
 
+import at.ac.uibk.plant_health.models.annotations.AuditLogAnnotation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -96,6 +97,7 @@ public class SensorStationService {
 	 * @return
 	 * @throws ServiceException
 	 */
+	@AuditLogAnnotation(successMessage = "Set Lock on Sensor Station {sensorStationId} to {unlocked}")
 	public void setUnlocked(boolean unlocked, UUID sensorStationId) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
 		sensorStation.setUnlocked(unlocked);
@@ -109,6 +111,7 @@ public class SensorStationService {
 	 * @return
 	 */
 	@Transactional
+	@AuditLogAnnotation(successMessage = "Set Sensor Limits on Sensor Station {sensorStation.deviceId}")
 	public void setSensorLimits(
 			List<SensorLimits> sensorLimits, SensorStation sensorStation, Person person
 	) throws ServiceException {
@@ -138,6 +141,7 @@ public class SensorStationService {
 	 * @param sensorStation
 	 * @param name
 	 */
+	@AuditLogAnnotation(successMessage = "Updated Sensor Station {sensorStation.deviceId}: {name} {transferInterval}")
 	public void updateSensorStation(
 			SensorStation sensorStation, String name, Integer transferInterval
 	) {
@@ -150,6 +154,7 @@ public class SensorStationService {
 		save(sensorStation);
 	}
 
+	@AuditLogAnnotation(successMessage = "Assigned Gardener {personId} to Sensor Station {sensorStation.deviceId}")
 	public void assignGardenerToSensorStation(
 			SensorStation sensorStation, UUID personId, boolean delete
 	) throws ServiceException {
@@ -332,6 +337,7 @@ public class SensorStationService {
 	 * @param sensorStationId
 	 * @throws ServiceException
 	 */
+	@AuditLogAnnotation(successMessage = "Deleted Sensor Station {sensorStationId}")
 	public void deleteSensorStation(UUID sensorStationId) throws ServiceException {
 		Optional<SensorStation> maybeSensorStation =
 				sensorStationRepository.findById(sensorStationId);
