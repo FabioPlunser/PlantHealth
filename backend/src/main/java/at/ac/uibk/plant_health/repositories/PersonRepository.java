@@ -1,5 +1,6 @@
 package at.ac.uibk.plant_health.repositories;
 
+import at.ac.uibk.plant_health.models.annotations.AuditLogAnnotation;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
