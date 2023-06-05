@@ -32,13 +32,14 @@ class PiezoBuzzerController {
 		void startBuzzer(unsigned int frequency, unsigned int duration = 1000) {
 #if USE_PIEZO_BUZZER
 			tone(this->buzzerPin, frequency, duration);
-#endif
+#endif // USE_PIEZO_BUZZER
 		}
 		void stopBuzzer() { noTone(this->buzzerPin); }
 
 		void playMelody(
 			std::vector<std::tuple<uint16_t, uint16_t>> noteAndDurationList
 		) {
+#if USE_PIEZO_BUZZER
 			for (auto noteAndDuration : noteAndDurationList) {
 				uint16_t note	  = std::get<0>(noteAndDuration);
 				uint16_t duration = std::get<1>(noteAndDuration);
@@ -46,6 +47,7 @@ class PiezoBuzzerController {
 				delay(50);
 			}
 			stopBuzzer();
+#endif // USE_PIEZO_BUZZER
 		}
 };
 
