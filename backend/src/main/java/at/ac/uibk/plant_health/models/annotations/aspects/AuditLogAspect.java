@@ -113,7 +113,7 @@ public class AuditLogAspect {
 		Optional<Object> val = parameters.stream()
 									   .filter(p -> p.getFirst().equals(props.get(0)))
 									   .findFirst()
-									   .map(Pair::getSecond);
+									   .flatMap(Pair::getSecond);
 
 		if (val.isPresent()) {
 			Object obj = val.get();
