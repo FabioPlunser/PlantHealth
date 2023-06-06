@@ -255,6 +255,10 @@ class NotificationHandler {
 		int32_t update() {
 			DEBUG_PRINT_POS(4, "\n");
 			static unsigned long previousTone = 0;
+			DEBUG_PRINTF(
+				3, "Currently there are %u notifications.\n",
+				notificationQueue->size()
+			);
 			if (notificationQueue->isEmpty()) {
 				DEBUG_PRINT_POS(3, "Queue is empty.\n");
 				ledConstroller->disable();

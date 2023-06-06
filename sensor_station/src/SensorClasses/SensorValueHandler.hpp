@@ -91,6 +91,13 @@ class SensorValueHandlerClass {
 				airSensor->getMeasuredValues(
 					&pressure, &gas_resistance, &temperature, &humidity
 				);
+			DEBUG_PRINTF(3, "Sensor Values are:\n");
+			DEBUG_PRINTF(3, "\tPressure: %f\n", pressure);
+			DEBUG_PRINTF(3, "\tGas Resistance: %u\n", gas_resistance);
+			DEBUG_PRINTF(3, "\tTemperature: %f\n", temperature);
+			DEBUG_PRINTF(3, "\tAir Humidity: %f\n", humidity);
+			DEBUG_PRINTF(3, "\tEarth Humidity: %u\n", earth_humidity);
+			DEBUG_PRINTF(3, "\tLight Intensity: %u\n", light_intensity);
 
 			if (updateError == AirSensorClass::UPDATE_ERROR::NOTHING) {
 				str->air_humidity = convertToGATT_airHumidity(humidity);
