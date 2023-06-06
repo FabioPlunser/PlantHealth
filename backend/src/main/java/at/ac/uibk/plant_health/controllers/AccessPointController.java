@@ -83,7 +83,18 @@ public class AccessPointController {
 	@GetMapping("/get-access-points")
 	public RestResponseEntity
 	getAccessPoints() {
-		return new AccessPointListResponse(accessPointService.findAllAccessPoints()).toEntity();
+		try {
+			var response = new AccessPointListResponse(accessPointService.findAllAccessPoints());
+			accessPointService.setAccessPointSensorStationsReported(
+					accessPointService.findAllAccessPoints()
+			);
+			return response.toEntity();
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
 	}
 
 	@Operation(summary = "Set the lock state of an Access Point")

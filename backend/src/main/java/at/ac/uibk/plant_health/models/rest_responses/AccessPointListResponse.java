@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.device.AccessPoint;
+import at.ac.uibk.plant_health.models.rest_responses.GardenerDashBoardResponse.InnerResponse;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -15,9 +16,9 @@ public class AccessPointListResponse extends RestResponse {
 
 	public AccessPointListResponse(List<AccessPoint> accessPoints) {
 		this.accessPoints = accessPoints.stream()
-				.filter(ap -> !ap.isDeleted())
-				.map(InnerAccessPoint::new)
-				.toList();
+									.filter(ap -> !ap.isDeleted())
+									.map(InnerAccessPoint::new)
+									.toList();
 	}
 
 	@Getter
@@ -29,7 +30,7 @@ public class AccessPointListResponse extends RestResponse {
 		private final boolean scanActive;
 		private final boolean connected;
 		private final int transferInterval;
-		private final AdminSensorStationsResponse sensorStations;
+		private final List<InnerResponse> sensorStations;
 
 		public InnerAccessPoint(AccessPoint accessPoint) {
 			this.accessPointId = accessPoint.getDeviceId();
@@ -39,7 +40,11 @@ public class AccessPointListResponse extends RestResponse {
 			this.scanActive = accessPoint.getScanActive();
 			this.connected = accessPoint.isConnected();
 			this.transferInterval = accessPoint.getTransferInterval();
-			this.sensorStations = new AdminSensorStationsResponse(accessPoint.getSensorStations());
+			this.sensorStations = accessPoint.getSensorStations()
+										  .stream()
+										  .filter(s -> !s.isDeleted())
+										  .map(InnerResponse::new)
+										  .toList();
 		}
 	}
 }

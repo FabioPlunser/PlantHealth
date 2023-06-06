@@ -48,6 +48,7 @@ public class GardenerDashBoardResponse extends RestResponse implements Serializa
 		private final boolean accessPointUnlocked;
 		private final boolean connected;
 		private final boolean deleted;
+		private final boolean reported;
 		public InnerResponse(SensorStation sensorstation) {
 			this.sensorStationId = sensorstation.getDeviceId();
 			this.bdAddress = sensorstation.getBdAddress();
@@ -67,6 +68,7 @@ public class GardenerDashBoardResponse extends RestResponse implements Serializa
 			this.unlocked = sensorstation.isUnlocked();
 			this.connected = sensorstation.isConnected();
 			this.deleted = sensorstation.isDeleted();
+			this.reported = sensorstation.isReported();
 		}
 	}
 }
