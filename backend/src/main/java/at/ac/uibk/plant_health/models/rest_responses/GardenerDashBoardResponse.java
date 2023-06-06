@@ -54,10 +54,13 @@ public class GardenerDashBoardResponse extends RestResponse implements Serializa
 			this.transferInterval = sensorstation.getAccessPoint().getTransferInterval();
 			this.gardener = sensorstation.getGardener();
 			this.dipSwitchId = sensorstation.getDipSwitchId();
-			this.alarm = sensorstation.getSensorData()
-					.stream().min(Comparator.comparing(SensorData::getTimeStamp))
-					.orElseThrow(NoSuchElementException::new)
-					.getAlarm();
+			var alarm = sensorstation.getSensorData().stream().min(
+					Comparator.comparing(SensorData::getTimeStamp)
+			);
+			if (alarm.isPresent())
+				this.alarm = alarm.get().getAlarm();
+			else
+				this.alarm = "n";
 			this.unlocked = sensorstation.isUnlocked();
 			this.connected = sensorstation.isConnected();
 			this.deleted = sensorstation.isDeleted();
