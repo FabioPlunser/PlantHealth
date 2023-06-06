@@ -4,6 +4,7 @@
 #ifdef DO_MAIN
 
 #include "../lib/NotificationHandler/SensorErrors.h"
+#include "FlashStorage.hpp"
 #include "SensorClasses/AirSensor.cpp"
 #include "SensorClasses/DipSwitch.cpp"
 #include "SensorClasses/Hydrometer.cpp"
@@ -42,6 +43,8 @@ double sensorValueWeightCalculationFunction(
 );
 void checkResetButtonPressed();
 void playPairingMelody();
+arduino::String readPairedDeviceFromFlash();
+void writePairedDeviceToFlash(arduino::String & pairedDevice);
 
 // ----- Global Variables ----- //
 
@@ -52,6 +55,7 @@ DipSwitchClass * dipSwitch;
 NotificationHandler * notificationHandler;
 Adafruit_BME680 bme680;
 SensorValueHandlerClass * sensorValueHandler;
+FlashStorage * flashStorage;
 
 // ----- Setup ----- //
 
@@ -69,6 +73,8 @@ void setup() {
 	sensorValueHandler = SensorValueHandlerClass::getInstance(
 		airSensor, hydrometer, phototransistor
 	);
+	flashStorage = FlashStorage::getInstance();
+
 	sensorValueHandler->setWeightCalculatorFunction(
 		sensorValueWeightCalculationFunction
 	);
@@ -87,10 +93,10 @@ void setup() {
 // ----- Loop ----- //
 
 void loop() {
-	static arduino::String pairedDevice			   = "";
-	static bool inPairingMode					   = true;
-	static unsigned long timeBetweenMeasures	   = 0;
-	static unsigned long previousDataTransmission  = millis();
+	static arduino::String pairedDevice			  = readPairedDeviceFromFlash();
+	static bool inPairingMode					  = true;
+	static unsigned long timeBetweenMeasures	  = 0;
+	static unsigned long previousDataTransmission = millis();
 	static unsigned long previousSensorMeasurement = millis();
 
 	checkResetButtonPressed();
@@ -149,6 +155,42 @@ void loop() {
 }
 
 // ----- Functions ----- //
+
+/**
+ * Reads the previous paired device from the flash storage.
+ * If no device was paired previously it will return an empty string.
+ */
+arduino::String readPairedDeviceFromFlash() {
+	arduino::String pairedDevice = flashStorage->readPairedDevice();
+	// Check if it matches the format "AB:CD:EF:12:34:56". If not it will count
+	// as not set.
+	if (pairedDevice.length() != 17) {
+		DEBUG_PRINTF_POS(
+			1, "Stored string was not a valied Mac address! \"%s\"",
+			pairedDevice.c_str()
+		);
+		pairedDevice = "";
+	}
+	return pairedDevice;
+}
+
+/**
+ * Writes the paired device to the flash storage.
+ * Asserts that the provided string matches the format "AB:CD:EF:12:34:56".
+ */
+void writePairedDeviceToFlash(arduino::String & pairedDevice) {
+	// Check if it matches the format "AB:CD:EF:12:34:56". If not it will count
+	// as not set.
+	if (pairedDevice.length() != 17) {
+		DEBUG_PRINTF_POS(
+			1, "String \"%s\" did not match the format \"AB:CD:EF:12:34:56\"!",
+			pairedDevice.c_str()
+		);
+		return;
+	}
+	DEBUG_PRINTF_POS(1, "Paired device set to \"%s\"", pairedDevice.c_str());
+	flashStorage->writePairedDevice(pairedDevice);
+}
 
 void checkResetButtonPressed() {
 	static unsigned long timePressedStart = 0;
@@ -265,6 +307,7 @@ void handleCentralDeviceIfPresent(
 			if (get_sensorstation_locked_status() ==
 				SENSOR_STATION_UNLOCKED_VALUE) {
 				pairedDevice = central.address();
+				writePairedDeviceToFlash(pairedDevice);
 				DEBUG_PRINTF(
 					1, "New device is: \"%s\".\n", pairedDevice.c_str()
 				);

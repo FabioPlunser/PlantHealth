@@ -170,6 +170,7 @@
 // ----------------------------
 // Expected in the shape of a 2D array, where the first dimension is the
 // frequenzy in Hz and the second the duration in ms.
+
 #define MELODY_PAIRING_SUCCESSFUL        \
 	{                                    \
 		{NOTE_C4, 250}, { NOTE_G4, 250 } \
