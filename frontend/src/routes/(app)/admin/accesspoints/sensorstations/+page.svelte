@@ -53,7 +53,6 @@
   $: data.streamed.sensorStations.then((data) => {
     sensorStations = data.sensorStations;
   });
-  $: console.log(sensorStations);
 </script>
 
 {#if rendered}
@@ -61,6 +60,9 @@
     {#if sensorStations.length === 0}
       <Spinner />
     {:else if sensorStations.length > 0}
+      <h1 class="flex justify-center font-bold text-2xl">
+        Sensorstations from AP: {sensorStations[0].roomName}
+      </h1>
       <div class="btn-group bg-bgase-100 flex justify-center mb-4 mt-4">
         {#each buttonGroup as button (button.description)}
           <button

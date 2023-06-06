@@ -355,4 +355,37 @@ public class AccessPointController {
 
 		return MessageResponse.builder().statusCode(200).message("Deleted AccessPoint").toEntity();
 	}
+
+	@Operation(summary = "Get all sensor stations of an access point")
+	@ApiResponses({
+		@ApiResponse(
+				responseCode = "200", description = "Sensor stations successfully retrieved",
+				content = @Content(
+						schema = @Schema(implementation = AdminSensorStationsResponse.class)
+				)
+		)
+		,
+				@ApiResponse(
+						responseCode = "400",
+						description = "Sensor stations could not be retrieved",
+						content = @Content(schema = @Schema(implementation = MessageResponse.class))
+				)
+	})
+	@ReadOperation
+	@AnyPermission({Permission.ADMIN})
+	@GetMapping("/get-access-point-sensor-stations")
+	public RestResponseEntity
+	getAccessPointSensorStations(@RequestParam("accessPointId") final UUID accessPointId) {
+		try {
+			return new AdminSensorStationsResponse(
+						   accessPointService.getAccessPointSensorStations(accessPointId)
+			)
+					.toEntity();
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
+	}
 }
