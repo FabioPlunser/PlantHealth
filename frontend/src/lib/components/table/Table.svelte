@@ -45,7 +45,6 @@
   ```
   
 -->
-
 <script lang="ts">
   import type { ColumnDef, TableOptions } from "@tanstack/svelte-table";
   import {
@@ -247,7 +246,7 @@
 </script>
 
 {#if isRendered}
-  <div>
+  <div class="rounded-2xl">
     <div class="mb-3" in:slide={{ duration: 400, axis: "y" }}>
       <input
         type="search"
@@ -258,11 +257,11 @@
         class="input dark:input-bordered w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
       />
     </div>
-    <div in:slide={{ duration: 400, axis: "y" }}>
-      <table class="table table-auto w-full">
+    <div in:slide={{ duration: 400, axis: "y" }} class="rounded-2xl">
+      <table class="_table w-full rounded-2xl [&>*:nth-child(odd)]:bg-base-200">
         <thead class="">
           {#each $table.getHeaderGroups() as headerGroup}
-            <tr>
+            <tr class="">
               {#each headerGroup.headers as header}
                 <th colspan={header.colSpan}>
                   {#if !header.isPlaceholder}
@@ -288,9 +287,9 @@
         </thead>
         <tbody>
           {#each $table.getRowModel().rows as row}
-            <tr class="table-row">
+            <tr class="">
               {#each row.getVisibleCells() as cell}
-                <td class="table-cell">
+                <td class="">
                   <div class="flex justify-center">
                     <svelte:component
                       this={flexRender(
@@ -370,3 +369,90 @@
     </div>
   </div>
 {/if}
+
+<style>
+  ._table {
+    display: _table;
+  }
+  @media (hover: hover) {
+    ._table tr.hover:hover,
+    ._table tr.hover:nth-child(even):hover {
+      --tw-bg-opacity: 1;
+      background-color: hsl(var(--b2) / var(--tw-bg-opacity));
+    }
+  }
+  @media (hover: hover) {
+    ._table tr.hover:hover,
+    ._table tr.hover:nth-child(even):hover {
+      --tw-bg-opacity: 1;
+      background-color: hsl(var(--b2) / var(--tw-bg-opacity));
+    }
+  }
+  ._table {
+    position: relative;
+    width: 100%;
+    text-align: left;
+    font-size: 0.875rem /* 14px */;
+    line-height: 1.25rem /* 20px */;
+    /* border-radius: var(--rounded-box, 1rem); */
+  }
+  ._table :where(.table-pin-rows thead tr) {
+    position: sticky;
+    top: 0px;
+    z-index: 1;
+    --tw-bg-opacity: 1;
+    background-color: hsl(var(--b1) / var(--tw-bg-opacity));
+  }
+  ._table :where(.table-pin-rows tfoot tr) {
+    position: sticky;
+    bottom: 0px;
+    z-index: 1;
+    --tw-bg-opacity: 1;
+    background-color: hsl(var(--b1) / var(--tw-bg-opacity));
+  }
+  ._table :where(.table-pin-cols tr th) {
+    position: sticky;
+    left: 0px;
+    right: 0px;
+    --tw-bg-opacity: 1;
+    background-color: hsl(var(--b1) / var(--tw-bg-opacity));
+  }
+  ._table :where(th, td) {
+    padding-left: 1rem /* 16px */;
+    padding-right: 1rem /* 16px */;
+    padding-top: 0.75rem /* 12px */;
+    padding-bottom: 0.75rem /* 12px */;
+    vertical-align: middle;
+  }
+  ._table tr.active,
+  ._table tr.active:nth-child(even),
+  ._table-zebra tbody tr:nth-child(even) {
+    --tw-bg-opacity: 1;
+    background-color: hsl(var(--b2) / var(--tw-bg-opacity));
+  }
+  ._table tr.active,
+  ._table tr.active:nth-child(even),
+  ._table-zebra tbody tr:nth-child(even) {
+    --tw-bg-opacity: 1;
+    background-color: hsl(var(--b2) / var(--tw-bg-opacity));
+  }
+  ._table :where(thead, tbody) :where(tr:not(:last-child)),
+  ._table :where(thead, tbody) :where(tr:first-child:last-child) {
+    border-bottom-width: 1px;
+    --tw-border-opacity: 1;
+    border-bottom-color: hsl(var(--b2) / var(--tw-border-opacity));
+  }
+  ._table :where(thead, tbody) :where(tr:not(:last-child)),
+  ._table :where(thead, tbody) :where(tr:first-child:last-child) {
+    border-bottom-width: 1px;
+    --tw-border-opacity: 1;
+    border-bottom-color: hsl(var(--b2) / var(--tw-border-opacity));
+  }
+  ._table :where(thead, tfoot) {
+    white-space: nowrap;
+    font-size: 0.75rem /* 12px */;
+    line-height: 1rem /* 16px */;
+    font-weight: 700;
+    color: hsl(var(--bc) / 0.6);
+  }
+</style>

@@ -4,6 +4,7 @@
   import { invalidate } from "$app/navigation";
   import { fly } from "svelte/transition";
   import { apSensorStations } from "$stores/apSensorStations";
+  import toast, { Toaster } from "$components/toast";
   import Spinner from "$components/ui/Spinner.svelte";
   // ---------------------------------------------------------
   import { onMount } from "svelte";
@@ -31,7 +32,24 @@
       }
     });
   }
+  // ---------------------------------------------------------
+  // Set notification for newly found sensor stations
+  // ---------------------------------------------------------
+  let position: string = "top-right";
+  let foundCounter = 0;
+  $: {
+    for (let accessPoint of accessPoints) {
+      accessPoint.sensorStations.forEach((sensorStation) => {
+        if (!sensorStation.reported) {
+          foundCounter++;
+        }
+      });
+    }
 
+    if (foundCounter > 0) {
+      toast.success(`${foundCounter} new sensor stations found`, { position });
+    }
+  }
   $: $apSensorStations = [];
   // ---------------------------------------------------------
   // ---------------------------------------------------------
@@ -59,7 +77,7 @@
   function setSensorStations(accessPoint: Responses.InnerAccessPoint) {
     $apSensorStations = accessPoint.sensorStations;
   }
-
+  $: console.log(data);
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   let searchTerm = "";
@@ -158,7 +176,7 @@
                       {:else}
                         <div class="badge badge-error">Disconnected</div>
                       {/if}
-                      {#if accessPoint.sensorStations.sensorStations.length > 0}
+                      {#if accessPoint.sensorStations.length > 0}
                         <div class="tooltip" data-tip="Go to Sensorstations">
                           <a
                             href="/admin/accesspoints/sensorstations?accessPointId={accessPoint.accessPointId}"
@@ -167,15 +185,14 @@
                               class="badge badge-success hover:scale-110 active:scale-125"
                             >
                               SensorStations: {accessPoint.sensorStations
-                                .sensorStations.length}
+                                .length}
                             </button>
                             <!-- </a> -->
                           </a>
                         </div>
                       {:else}
                         <div class="badge badge-success">
-                          SensorStations: {accessPoint.sensorStations
-                            .sensorStations.length}
+                          SensorStations: {accessPoint.sensorStations.length}
                         </div>
                       {/if}
                     </div>

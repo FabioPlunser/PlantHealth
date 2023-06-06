@@ -63,10 +63,10 @@ declare namespace Responses {
     lastConnection: string;
     authorities: GrantedAuthority[];
     username: string;
-    password: string;
-    connected: boolean;
     unlocked: boolean;
     deleted: boolean;
+    connected: boolean;
+    password: string;
   }
 
   export interface SensorData {
@@ -88,16 +88,17 @@ declare namespace Responses {
     name: string;
     /** Format: int32 */
     dipSwitchId: number;
+    reported: boolean;
     sensorData: SensorData[];
     sensorLimits: SensorLimits[];
     sensorStationPersonReferences: SensorStationPersonReference[];
     sensorStationPictures: SensorStationPicture[];
     authorities: GrantedAuthority[];
-    password: string;
-    connected: boolean;
     unlocked: boolean;
-    username: string;
     deleted: boolean;
+    connected: boolean;
+    username: string;
+    password: string;
   }
 
   export interface SensorStationPicture {
@@ -174,6 +175,7 @@ declare namespace Responses {
     accessPointUnlocked: boolean;
     connected: boolean;
     deleted: boolean;
+    reported: boolean;
   }
 
   export interface SensorStationsResponse {
@@ -263,7 +265,7 @@ declare namespace Responses {
     connected: boolean;
     /** Format: int32 */
     transferInterval: number;
-    sensorStations: AdminSensorStationsResponse;
+    sensorStations: InnerResponse[];
   }
 
   export interface AccessPointConfigResponse {

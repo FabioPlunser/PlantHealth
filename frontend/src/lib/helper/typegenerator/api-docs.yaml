@@ -454,14 +454,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "200":
-          description: Access Point lock state successfully set
+        "400":
+          description: Access Point lock state could not be set
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "400":
-          description: Access Point lock state could not be set
+        "200":
+          description: Access Point lock state successfully set
           content:
             "*/*":
               schema:
@@ -490,14 +490,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "200":
-          description: Access Point lock state successfully set
+        "400":
+          description: Access Point lock state could not be set
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "400":
-          description: Access Point lock state could not be set
+        "200":
+          description: Access Point lock state successfully set
           content:
             "*/*":
               schema:
@@ -1816,14 +1816,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "400":
-          description: Access Point info could not be updated
+        "200":
+          description: Access Point info successfully updated
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "200":
-          description: Access Point info successfully updated
+        "400":
+          description: Access Point info could not be updated
           content:
             "*/*":
               schema:
@@ -1893,14 +1893,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "400":
-          description: Transfer interval could not be set
+        "200":
+          description: Transfer interval successfully set
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "200":
-          description: Transfer interval successfully set
+        "400":
+          description: Transfer interval could not be set
           content:
             "*/*":
               schema:
@@ -2716,18 +2716,18 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "400":
-          description: Access Point configuration could not be retrieved
-          content:
-            "*/*":
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
         "200":
           description: Access Point configuration successfully retrieved
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/AccessPointConfigResponse"
+        "400":
+          description: Access Point configuration could not be retrieved
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
   /delete-user:
     delete:
       tags:
@@ -2804,14 +2804,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "200":
-          description: Access Point successfully deleted
+        "400":
+          description: Access Point could not be deleted
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "400":
-          description: Access Point could not be deleted
+        "200":
+          description: Access Point successfully deleted
           content:
             "*/*":
               schema:
@@ -2928,14 +2928,14 @@ components:
             $ref: "#/components/schemas/GrantedAuthority"
         username:
           type: string
-        password:
-          type: string
-        connected:
-          type: boolean
         unlocked:
           type: boolean
         deleted:
           type: boolean
+        connected:
+          type: boolean
+        password:
+          type: string
       description: ""
     SensorData:
       type: object
@@ -2970,6 +2970,8 @@ components:
         dipSwitchId:
           type: integer
           format: int32
+        reported:
+          type: boolean
         sensorData:
           type: array
           items:
@@ -2990,16 +2992,16 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GrantedAuthority"
-        password:
-          type: string
-        connected:
-          type: boolean
         unlocked:
+          type: boolean
+        deleted:
+          type: boolean
+        connected:
           type: boolean
         username:
           type: string
-        deleted:
-          type: boolean
+        password:
+          type: string
       description: ""
     SensorStationPicture:
       type: object
@@ -3452,6 +3454,8 @@ components:
           type: boolean
         deleted:
           type: boolean
+        reported:
+          type: boolean
     SensorStationsResponse:
       type: object
       properties:
@@ -3612,7 +3616,9 @@ components:
           type: integer
           format: int32
         sensorStations:
-          $ref: "#/components/schemas/AdminSensorStationsResponse"
+          type: array
+          items:
+            $ref: "#/components/schemas/InnerResponse"
     AccessPointConfigResponse:
       type: object
       properties:
