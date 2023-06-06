@@ -15,7 +15,9 @@ public class SensorStationsResponse extends RestResponse implements Serializable
 	public SensorStationsResponse(List<SensorStation> sensorStations, Person person) {
 		this.sensorStations =
 				sensorStations.stream()
-						.filter(s -> !s.isDeleted() && s.isUnlocked())
+						.filter(s
+								-> !s.isDeleted() && s.isUnlocked()
+										&& s.getAccessPoint().isUnlocked())
 						.filter(s
 								-> person.getSensorStationPersonReferences().stream().noneMatch(
 										r -> r.getSensorStation().equals(s)

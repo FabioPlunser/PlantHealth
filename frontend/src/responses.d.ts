@@ -61,8 +61,8 @@ declare namespace Responses {
     sensorStations: SensorStation[];
     /** Format: date-time */
     lastConnection: string;
-    username: string;
     authorities: GrantedAuthority[];
+    username: string;
     password: string;
     connected: boolean;
     unlocked: boolean;
@@ -95,8 +95,8 @@ declare namespace Responses {
     authorities: GrantedAuthority[];
     password: string;
     connected: boolean;
-    username: string;
     unlocked: boolean;
+    username: string;
     deleted: boolean;
   }
 
@@ -169,10 +169,11 @@ declare namespace Responses {
     gardener: Person;
     /** Format: int32 */
     dipSwitchId: number;
+    alarm: string;
     unlocked: boolean;
+    accessPointUnlocked: boolean;
     connected: boolean;
     deleted: boolean;
-    [key:string]: any;
   }
 
   export interface SensorStationsResponse {

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.SensorStationPersonReference;
+import at.ac.uibk.plant_health.models.device.AccessPoint;
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.user.Person;
@@ -44,6 +45,7 @@ public class GardenerDashBoardResponse extends RestResponse implements Serializa
 		private final int dipSwitchId;
 		private final String alarm;
 		private final boolean unlocked;
+		private final boolean accessPointUnlocked;
 		private final boolean connected;
 		private final boolean deleted;
 		public InnerResponse(SensorStation sensorstation) {
@@ -61,6 +63,7 @@ public class GardenerDashBoardResponse extends RestResponse implements Serializa
 				this.alarm = alarm.get().getAlarm();
 			else
 				this.alarm = "n";
+			this.accessPointUnlocked = sensorstation.getAccessPoint().isUnlocked();
 			this.unlocked = sensorstation.isUnlocked();
 			this.connected = sensorstation.isConnected();
 			this.deleted = sensorstation.isDeleted();

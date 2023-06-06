@@ -64,7 +64,7 @@ public class SensorStationController {
 	@AnyPermission({Permission.ADMIN})
 	@GetMapping("/get-all-sensor-stations")
 	public RestResponseEntity
-	getAllSensorStations() {
+	gewtAllSensorStations() {
 		try {
 			return new AdminSensorStationsResponse(sensorStationService.findAll()).toEntity();
 		} catch (ServiceException e) {

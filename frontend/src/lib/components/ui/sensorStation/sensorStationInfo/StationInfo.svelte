@@ -22,44 +22,50 @@
 </script>
 
 <div class="float margin-right text-2xl">
-  <div>
-    <SensorStationDeleteButton
-      sensorStationId={sensorStation.sensorStationId}
-    />
-  </div>
-  {#if showDetailLink}
-    <SensorStationSettingsButton
-      sensorStationId={sensorStation.sensorStationId}
-    />
-  {/if}
-  <div>
-    <SensorStationNameInput bind:sensorStation label="Name" />
-  </div>
-  <div>
-    <span class="font-bold">Room: </span>
-    <span>{sensorStation.roomName}</span>
-  </div>
-  <div>
-    <span class="font-bold">MAC: </span>
-    <span>{sensorStation.bdAddress}</span>
-  </div>
-  <div>
-    <span class="font-bold">DIP: </span>
-    <span>{sensorStation.dipSwitchId}</span>
-  </div>
-  <div class="xl:flex gap-4">
-    <span class="font-bold flex items-center">Gardener: </span>
-    <GardenerSelect {gardener} bind:sensorStation />
-  </div>
+  {#if !sensorStation.accessPointUnlocked}
+    <div class="font-bold text-2xl flex justify-center">
+      <h1>AccessPoint {sensorStation.roomName} is locked</h1>
+    </div>
+  {:else}
+    <div>
+      <SensorStationDeleteButton
+        sensorStationId={sensorStation.sensorStationId}
+      />
+    </div>
+    {#if showDetailLink}
+      <SensorStationSettingsButton
+        sensorStationId={sensorStation.sensorStationId}
+      />
+    {/if}
+    <div>
+      <SensorStationNameInput bind:sensorStation label="Name" />
+    </div>
+    <div>
+      <span class="font-bold">Room: </span>
+      <span>{sensorStation.roomName}</span>
+    </div>
+    <div>
+      <span class="font-bold">MAC: </span>
+      <span>{sensorStation.bdAddress}</span>
+    </div>
+    <div>
+      <span class="font-bold">DIP: </span>
+      <span>{sensorStation.dipSwitchId}</span>
+    </div>
+    <div class="xl:flex gap-4">
+      <span class="font-bold flex items-center">Gardener: </span>
+      <GardenerSelect {gardener} bind:sensorStation />
+    </div>
 
-  <div class="">
-    <ConnectedDisconnectedBadge bind:sensorStation />
-    <div class="flex justify-center">
-      <DownloadQrCode bind:sensorStation />
+    <div class="">
+      <ConnectedDisconnectedBadge bind:sensorStation />
+      <div class="flex justify-center">
+        <DownloadQrCode bind:sensorStation />
+      </div>
+      <div class="flex justify-center mx-auto gap-2 mt-6">
+        <SensorStationUpdateButton bind:sensorStation />
+        <LockUnlockButton bind:sensorStation />
+      </div>
     </div>
-    <div class="flex justify-center mx-auto gap-2 mt-6">
-      <SensorStationUpdateButton bind:sensorStation />
-      <LockUnlockButton bind:sensorStation />
-    </div>
-  </div>
+  {/if}
 </div>

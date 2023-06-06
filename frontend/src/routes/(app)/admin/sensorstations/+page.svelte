@@ -49,7 +49,7 @@
     },
   ];
 
-  let sensorStations: Responses.InnerResponse[] = [];
+  let sensorStations: Responses.InnerResponse[] | null = null;
   $: data.streamed.sensorStations.then((data) => {
     sensorStations = data.sensorStations;
   });
@@ -58,7 +58,7 @@
 
 {#if rendered}
   <section>
-    {#if sensorStations.length === 0}
+    {#if !sensorStations}
       <Spinner />
     {:else if sensorStations.length > 0}
       <div class="btn-group bg-bgase-100 flex justify-center mb-4 mt-4">
