@@ -53,7 +53,6 @@
   $: data.streamed.sensorStations.then((data) => {
     sensorStations = data.sensorStations;
   });
-  $: console.log(sensorStations);
 </script>
 
 {#if rendered}
@@ -94,11 +93,7 @@
               {#if sensorStation.roomName.includes(searchTerm) || sensorStation.bdAddress.includes(searchTerm) || sensorStation.dipSwitchId
                   .toString()
                   .includes(searchTerm)}
-                <div
-                  class:blinking-border-blue={sensorStation.alarm === "l"}
-                  class:blinking-border-red={sensorStation.alarm === "h"}
-                  class="relative"
-                >
+                <div class="blinking-border">
                   <div
                     class="card w-full h-fit bg-base-100 dark:border-none shadow-2xl"
                     in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
@@ -137,7 +132,7 @@
     position: relative;
   }
 
-  .blinking-border-red::before {
+  .blinking-border::before {
     content: "";
     position: absolute;
     top: -2px;
@@ -147,18 +142,6 @@
     border: 8px solid transparent;
     border-radius: 1rem;
     box-shadow: 0px 0px 0px 4px red;
-    animation: blink-animation 1s ease-in-out infinite;
-  }
-  .blinking-border-blue::before {
-    content: "";
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    border: 8px solid transparent;
-    border-radius: 1rem;
-    box-shadow: 0px 0px 0px 4px blue;
     animation: blink-animation 1s ease-in-out infinite;
   }
 
