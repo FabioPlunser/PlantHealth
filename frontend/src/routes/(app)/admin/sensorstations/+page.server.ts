@@ -4,7 +4,6 @@ import { logger } from "$helper/logger";
 
 export async function load(event) {
   const { fetch, request, url, depends } = event;
-  depends("app:getSensorStations");
 
   async function getAllSensorStations(): Promise<Responses.AdminSensorStationsResponse> {
     return new Promise(async (resolve) => {
@@ -20,7 +19,7 @@ export async function load(event) {
           logger.error("Catch Could not get all sensor stations", {
             payload: err,
           });
-          resolve({sensorStations: []});
+          resolve({ sensorStations: [] });
         });
     });
   }
@@ -36,7 +35,7 @@ export async function load(event) {
         })
         .catch((err) => {
           logger.error("Could not get gardener");
-          resolve({items: []})
+          resolve({ items: [] });
         });
     });
   }

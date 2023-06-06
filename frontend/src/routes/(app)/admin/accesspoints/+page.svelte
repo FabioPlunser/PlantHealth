@@ -160,9 +160,10 @@
                       {/if}
                       {#if accessPoint.sensorStations.sensorStations.length > 0}
                         <div class="tooltip" data-tip="Go to Sensorstations">
-                          <a href="/admin/accesspoints/sensorstations">
+                          <a
+                            href="/admin/accesspoints/sensorstations?accessPointId={accessPoint.accessPointId}"
+                          >
                             <button
-                              on:click={() => setSensorStations(accessPoint)}
                               class="badge badge-success hover:scale-110 active:scale-125"
                             >
                               SensorStations: {accessPoint.sensorStations

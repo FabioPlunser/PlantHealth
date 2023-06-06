@@ -7,7 +7,6 @@
   import StationInfo from "$lib/components/ui/sensorStation/sensorStationInfo/StationInfo.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
   import SensorStationsTable from "$lib/components/ui/sensorStation/sensorStationsTable/SensorStationsTable.svelte";
-  import { apSensorStations } from "$lib/stores/apSensorStations.js";
   // ----------------------------------
   // ----------------------------------
   let rendered = false;
@@ -51,9 +50,10 @@
   ];
 
   let sensorStations: Responses.InnerResponse[] = [];
-  $: sensorStations = $apSensorStations.sensorStations;
-
-  $: console.log($apSensorStations);
+  $: data.streamed.sensorStations.then((data) => {
+    sensorStations = data.sensorStations;
+  });
+  $: console.log(sensorStations);
 </script>
 
 {#if rendered}
@@ -61,9 +61,6 @@
     {#if sensorStations.length === 0}
       <Spinner />
     {:else if sensorStations.length > 0}
-      <h1 class="text-2xl font-bold flex justify-center">
-        SensorStation from Ap: {sensorStations[0].roomName}
-      </h1>
       <div class="btn-group bg-bgase-100 flex justify-center mb-4 mt-4">
         {#each buttonGroup as button (button.description)}
           <button

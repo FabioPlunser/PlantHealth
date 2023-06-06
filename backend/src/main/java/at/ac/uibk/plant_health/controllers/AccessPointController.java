@@ -355,4 +355,22 @@ public class AccessPointController {
 
 		return MessageResponse.builder().statusCode(200).message("Deleted AccessPoint").toEntity();
 	}
+
+	@ReadOperation
+	@AnyPermission({Permission.ADMIN})
+	@GetMapping("/get-access-point-sensor-stations")
+	public RestResponseEntity getAccessPointSensorStations(@RequestParam("accessPointId"
+	) final UUID accessPointId) {
+		try {
+			return new AdminSensorStationsResponse(
+						   accessPointService.getAccessPointSensorStations(accessPointId)
+			)
+					.toEntity();
+		} catch (ServiceException e) {
+			return MessageResponse.builder()
+					.statusCode(e.getStatusCode())
+					.message(e.getMessage())
+					.toEntity();
+		}
+	}
 }
