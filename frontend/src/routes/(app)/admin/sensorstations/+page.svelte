@@ -2,19 +2,23 @@
   import { enhance } from "$app/forms";
   import { fly } from "svelte/transition";
   import { invalidate } from "$app/navigation";
-  import { apSensorStations } from "$stores/apSensorStations";
   import { onMount } from "svelte";
   import Input from "$lib/components/ui/Input.svelte";
-  import StationInfo from "./sensorstation/StationInfo.svelte";
+  import StationInfo from "$lib/components/ui/sensorStation/sensorStationInfo/StationInfo.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
-  import SensorStationsTable from "./SensorStationsTable.svelte";
+  import SensorStationsTable from "$lib/components/ui/sensorStation/sensorStationsTable/SensorStationsTable.svelte";
   // ----------------------------------
   // ----------------------------------
   let rendered = false;
+  let blinking = false;
+
   onMount(() => {
     if (!rendered) {
       rendered = true;
     }
+    setInterval(() => {
+      blinking = !blinking;
+    }, 5);
   });
   // ----------------------------------
   // ----------------------------------
@@ -44,53 +48,44 @@
       },
     },
   ];
+
+  $: console.log(data);
+  // $: data.streamed.sensorStations.then((sensorStations) => {
+  //   console.log(sensorStations.sensorStations);
+  // });
 </script>
 
 {#if rendered}
-  {#await data.streamed.sensorStations}
-    <Spinner />
-  {:then promiseData}
-    {@const sensorStations = promiseData.sensorStations}
-    {#if sensorStations.length > 0}
-      <div class="btn-group bg-bgase-100 flex justify-center mb-4 mt-4">
-        {#each buttonGroup as button (button.description)}
-          <button
-            data-tip={button.description}
-            class="btn tooltip bg-base-200 dark:bg-gray-500 border border-base-300 hover:bg-primary {state ===
-            button.name
-              ? 'btn-active dark:btn-active'
-              : ''}"
-            on:click={button.action}
-          >
-            <i
-              class="material-symbols-outlined text-4xl text-black dark:text-white"
-              >{button.icon}</i
+  <section>
+    {#await data.streamed.sensorStations}
+      <Spinner />
+    {:then promiseData}
+      {@const sensorStations = promiseData.sensorStations}
+      {#if sensorStations.length > 0}
+        <div class="btn-group bg-bgase-100 flex justify-center mb-4 mt-4">
+          {#each buttonGroup as button (button.description)}
+            <button
+              data-tip={button.description}
+              class="btn tooltip bg-base-200 dark:bg-gray-500 border border-base-300 hover:bg-primary {state ===
+              button.name
+                ? 'btn-active dark:btn-active'
+                : ''}"
+              on:click={button.action}
             >
-          </button>
-        {/each}
-      </div>
-      {#if state === "cards"}
-        <section>
-          <div class="mb-2 flex justify-center text-center">
-            {#if data.fromAccessPoints && $apSensorStations.length > 0}
-              <div class="text-xl font-bold">
-                <h1 class="">Sensorstations of AccessPoint:</h1>
-                <h1 class="">{sensorStations[0].roomName}</h1>
-                <button
-                  on:click={() => invalidate("app:getSensorStations")}
-                  class="btn btn-primary">Get all SensorStations</button
-                >
-              </div>
-            {:else}
-              <h1 class="text-xl font-bold">All SensorStations</h1>
-            {/if}
-          </div>
-          <div class="mb-4 flex justify-ceter">
+              <i
+                class="material-symbols-outlined text-4xl text-black dark:text-white"
+                >{button.icon}</i
+              >
+            </button>
+          {/each}
+        </div>
+        {#if state === "cards"}
+          <div class="mb-4 flex justify-center">
             <input
               bind:value={searchTerm}
               type="search"
               name="searchRoom"
-              placeholder="Global Search"
+              placeholder="GloabSearch"
               class="input dark:input-bordered w-fit min-w-64 mx-auto dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
             />
           </div>
@@ -100,38 +95,75 @@
                 {#if sensorStation.roomName.includes(searchTerm) || sensorStation.bdAddress.includes(searchTerm) || sensorStation.dipSwitchId
                     .toString()
                     .includes(searchTerm)}
-                  <div
-                    class="card w-full border h-fit bg-base-100 dark:border-none shadow-2xl"
-                    in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
-                    out:fly|local|self={{ y: 200, duration: 200 }}
-                  >
-                    <div class="card-body">
-                      <StationInfo
-                        {sensorStation}
-                        {form}
-                        showDetailLink={true}
-                        gardener={data.gardener}
-                      />
+                  <div class="blinking-border">
+                    <div
+                      class="card w-full h-fit bg-base-100 dark:border-none shadow-2xl"
+                      in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
+                      out:fly|local|self={{ y: 200, duration: 200 }}
+                    >
+                      <div class="card-body">
+                        <StationInfo
+                          {sensorStation}
+                          {form}
+                          showDetailLink={true}
+                          gardener={data.gardener.items}
+                        />
+                      </div>
                     </div>
                   </div>
                 {/if}
               {/each}
             </div>
           </div>
-        </section>
-      {:else if state === "table"}
-        <div class="flex justify-center">
-          <SensorStationsTable gardener={data.gardener} {sensorStations} />
-        </div>
-      {/if}
-    {:else}
-      <section class="h-screen">
+        {:else}
+          <div class="flex justify-center">
+            <SensorStationsTable
+              gardener={data.gardener.items}
+              {sensorStations}
+            />
+          </div>
+        {/if}
+      {:else}
         <h1 class="text-2xl font-bold flex justify-center">
           No SensorStations
         </h1>
-      </section>
-    {/if}
-  {:catch}
-    <p>Something went wrong</p>
-  {/await}
+      {/if}
+    {:catch}
+      <p>Something went wrong</p>
+    {/await}
+  </section>
 {/if}
+
+<style>
+  .blinking-border {
+    position: relative;
+  }
+
+  .blinking-border::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 8px solid transparent;
+    border-radius: 1rem;
+    box-shadow: 0px 0px 0px 4px red;
+    animation: blink-animation 1s ease-in-out infinite;
+  }
+
+  @keyframes blink-animation {
+    0% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.3;
+      transform: scale(1.03);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+</style>

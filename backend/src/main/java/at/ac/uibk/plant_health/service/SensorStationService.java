@@ -158,6 +158,7 @@ public class SensorStationService {
 			save(sensorStation);
 			return;
 		}
+		if(personId == null) throw new ServiceException("No personId was given", 404);
 		Optional<Person> maybePerson = personService.findById(personId);
 		if (maybePerson.isEmpty()) throw new ServiceException("Person does not exist", 404);
 		Person person = maybePerson.get();

@@ -7,7 +7,7 @@
   export let iconClass: string = "absolute top-0 right-0 m-4";
 </script>
 
-<form action="POST" use:enhance>
+<form method="POST" use:enhance>
   <input type="hidden" name="sensorStationId" bind:value={sensorStationId} />
   <button
     type="submit"
