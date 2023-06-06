@@ -8,10 +8,13 @@
   @param sensorStation \{SensorStation} - The sensor station that should be updated.
 -->
 <script lang="ts">
-  export let sensorStation: SensorStation;
+	import { enhance } from '$app/forms';
+  export let sensorStation: Responses.InnerResponse;
+  $: gardener = sensorStation.gardener ? sensorStation.gardener.personId : '';
 </script>
 
-<form method="post">
+
+<form method="post" use:enhance>
   <input
     type="hidden"
     name="sensorStationId"
@@ -20,8 +23,10 @@
   <input
     type="hidden"
     name="gardener"
-    bind:value={sensorStation.gardener.personId}
+    bind:value={gardener}
   />
+
+  <input type="hidden" name="unassign" bind:value={sensorStation.unassign} />
   <input type="hidden" name="name" bind:value={sensorStation.name} />
   <button formaction="?/update" class="btn btn-primary">Update</button>
 </form>

@@ -13,7 +13,7 @@
   import SensorStationSettingsButton from "./SensorStationSettingsButton.svelte";
   //---------------------------------------------------------------
   //---------------------------------------------------------------
-  export let sensorStation: SensorStation;
+  export let sensorStation: Responses.InnerResponse;
   export let showDetailLink: boolean = false;
   export let gardener: any;
   export let form: any;

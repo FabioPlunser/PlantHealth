@@ -193,7 +193,7 @@ public class SensorStationController {
 	public RestResponseEntity
 	assignGardenerToSensorStation(
 			@RequestParam("sensorStationId") final UUID sensorStationId,
-			@RequestParam("gardenerId") final UUID gardenerId,
+			@RequestParam(value = "gardenerId", required = false) final UUID gardenerId,
 			@RequestParam(value = "delete", required = false) final boolean delete
 	) {
 		try {

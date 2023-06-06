@@ -63,7 +63,7 @@ public abstract class Authenticable implements UserDetails, IdentifiedEntity, Cr
 
 	@JdbcTypeCode(SqlTypes.NVARCHAR)
 	@Column(name = "username", nullable = false, unique = true)
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+//	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	private String username;
 
 	@Setter(AccessLevel.NONE)

@@ -67,7 +67,6 @@ export async function updateSensorStation(event: any, formData?: any) {
         message = data.message;
       }
       let data = await res.json();
-      console.log(data);
       toasts.addToast(
         event.locals.user?.personId,
         "success",
