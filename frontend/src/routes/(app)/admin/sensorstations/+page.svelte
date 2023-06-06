@@ -49,18 +49,17 @@
     },
   ];
 
-  $: console.log(data);
-  // $: data.streamed.sensorStations.then((sensorStations) => {
-  //   console.log(sensorStations.sensorStations);
-  // });
+  let sensorStations: Responses.InnerResponse[] = [];
+  $: data.streamed.sensorStations.then((data) => {
+    sensorStations = data.sensorStations;
+  });
 </script>
 
 {#if rendered}
   <section>
-    {#await data.streamed.sensorStations}
+    {#if sensorStations.length === 0}
       <Spinner />
-    {:then promiseData}
-      {@const sensorStations = promiseData.sensorStations}
+    {:else}
       {#if sensorStations.length > 0}
         <div class="btn-group bg-bgase-100 flex justify-center mb-4 mt-4">
           {#each buttonGroup as button (button.description)}
@@ -128,9 +127,7 @@
           No SensorStations
         </h1>
       {/if}
-    {:catch}
-      <p>Something went wrong</p>
-    {/await}
+    {/if}
   </section>
 {/if}
 

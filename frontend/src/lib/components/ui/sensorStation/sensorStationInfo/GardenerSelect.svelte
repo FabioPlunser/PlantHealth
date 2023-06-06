@@ -7,38 +7,50 @@
 -->
 <script lang="ts">
   export let gardener: any;
-  export let sensorStation: any;
+  export let sensorStation: Responses.InnerResponse;
   let value: any = undefined; 
-  
-  $: {
+
+  function handleSelect(){
     if(value === true){
       sensorStation.unassign = true;
     }else{
       sensorStation.unassign = false; 
-      sensorStation.gardener = {personId: value};
+      if (sensorStation.gardener){
+        sensorStation.gardener.personId = value;
+        return;
+      }else{
+        let gardener: Responses.Person = {
+          personId: value,
+          username: "",
+          password: "",
+          token: "",
+          permissions: [],
+          sensorStationPersonReferences: [],
+          email: "",
+        }
+        sensorStation.gardener = gardener;
+        sensorStation.gardener.personId = value;
+      }
     }
-  }  
-  $: console.log("value", value);
-  $: console.log("sensorStation", sensorStation);
+  }
 </script>
 
 <div>
   <select
     class="flex items-center justify-center text-sm select dark:bg-gray-700 bg-base-100 w-fit h-2 max-w-xs border-2 border-base-200 dark:border-none"
     bind:value
+    on:change={handleSelect}
   >
     {#each gardener as person, i}
-      {#if sensorStation.gardener === null && i === 0}
-        <option selected value={undefined}>No gardener assigned</option>
+      {#if sensorStation.gardener && sensorStation.gardener.username === person.username}
+        <option selected value={person.personId}>{person.username}</option>
+        <option value={true}>
+          Unassign
+        </option>
+      {:else if !sensorStation.gardner && i==0}
+        <option value={"No gardener assigned"}>No gardener assigned</option>
       {:else}
-        {#if sensorStation.gardener?.username === person.username}
-          <option selected value={person.personId}>{person.username}</option>
-          <option value={true}>
-            Unassign
-          </option>
-        {:else}
-          <option value={person.personId}>{person.username}</option>
-        {/if}
+        <option value={person.personId}>{person.username}</option>
       {/if}
     {/each}
   </select>

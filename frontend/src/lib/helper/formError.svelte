@@ -1,7 +1,6 @@
 <script lang="ts">
   export let field: string;
   export let form: any;
-  $: console.log(form);
 </script>
 
 {#if form?.error}

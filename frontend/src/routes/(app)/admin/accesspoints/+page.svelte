@@ -22,9 +22,7 @@
   $: {
     data.streamed.accessPoints.then((res) => {
       if (res) {
-        console.log("promise");
         accessPoints = res.accessPoints;
-        console.log(res);
         loading = false;
       } else {
         if (browser) {

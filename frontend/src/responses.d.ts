@@ -172,6 +172,7 @@ declare namespace Responses {
     unlocked: boolean;
     connected: boolean;
     deleted: boolean;
+    [key:string]: any;
   }
 
   export interface SensorStationsResponse {

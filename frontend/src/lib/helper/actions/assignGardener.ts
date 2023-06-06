@@ -11,14 +11,13 @@ export async function assignGardener(event: any, formData?: any) {
     formData = await request.formData();
   }
 
-  console.log(formData);
   let sensorStationId = String(formData.get("sensorStationId"));
   let unassign = String(formData.get("unassign"));
   let gardenerId = String(formData.get("gardener"));
   /* HACK: we somehow need to be able to update a sensor station that is not yet assigned
    * so we return early from this function as the update action always calls updateSensorStation() and assignGardener()
    */
-  if (gardenerId === "No gardener assigned") {
+  if (gardenerId === '') {
     toasts.addToast(
       event.locals.user?.personId,
       "error",
@@ -34,13 +33,11 @@ export async function assignGardener(event: any, formData?: any) {
     params.set("delete", true.toString());
   }
 
-  console.log(params);
   await fetch(
     `${BACKEND_URL}/assign-gardener-to-sensor-station?${params.toString()}`,
     { method: "POST" }
   )
     .then(async (res: any) => {
-      console.log("assign-gardener-to-sensor-station", res);
       if (!res.ok) {
         res = await res.json();
         errorHandler(

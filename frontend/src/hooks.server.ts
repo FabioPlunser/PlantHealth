@@ -85,7 +85,6 @@ export async function handleFetch({ request, fetch, event }) {
   };
 
   request.headers.set("Authorization", JSON.stringify(token));
-  console.log(request);
   return fetch(request);
 }
 

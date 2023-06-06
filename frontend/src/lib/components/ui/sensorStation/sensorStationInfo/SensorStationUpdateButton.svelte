@@ -9,8 +9,8 @@
 -->
 <script lang="ts">
 	import { enhance } from '$app/forms';
-  export let sensorStation: SensorStation;
-  $: console.log("SensorStationUpdateButton", sensorStation);
+  export let sensorStation: Responses.InnerResponse;
+  $: gardener = sensorStation.gardener ? sensorStation.gardener.personId : '';
 </script>
 
 
@@ -20,15 +20,12 @@
     name="sensorStationId"
     bind:value={sensorStation.sensorStationId}
   />
-  {#key sensorStation}
-    {#if sensorStation.gardner !== null}
-      <input
-        type="hidden"
-        name="gardener"
-        bind:value={sensorStation.gardener.personId}
-      />
-    {/if}
-  {/key}
+  <input
+    type="hidden"
+    name="gardener"
+    bind:value={gardener}
+  />
+
   <input type="hidden" name="unassign" bind:value={sensorStation.unassign} />
   <input type="hidden" name="name" bind:value={sensorStation.name} />
   <button formaction="?/update" class="btn btn-primary">Update</button>
