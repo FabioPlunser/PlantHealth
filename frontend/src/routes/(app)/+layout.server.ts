@@ -14,7 +14,8 @@ export async function load(event) {
 
   if (event.locals.user) {
     return {
-      permission: event.locals.user.permissions[0],
+      permission:
+        event.locals.user.permissions[event.locals.user.permissions.length - 1],
     };
   }
 
