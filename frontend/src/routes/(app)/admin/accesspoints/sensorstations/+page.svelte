@@ -7,6 +7,7 @@
   import StationInfo from "$lib/components/ui/sensorStation/sensorStationInfo/StationInfo.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
   import SensorStationsTable from "$lib/components/ui/sensorStation/sensorStationsTable/SensorStationsTable.svelte";
+  import { apSensorStations } from "$lib/stores/apSensorStations.js";
   // ----------------------------------
   // ----------------------------------
   let rendered = false;
@@ -50,9 +51,9 @@
   ];
 
   let sensorStations: Responses.InnerResponse[] = [];
-  $: data.streamed.sensorStations.then((data) => {
-    sensorStations = data.sensorStations;
-  });
+  $: sensorStations = $apSensorStations.sensorStations;
+
+  $: console.log($apSensorStations);
 </script>
 
 {#if rendered}
@@ -60,6 +61,9 @@
     {#if sensorStations.length === 0}
       <Spinner />
     {:else if sensorStations.length > 0}
+      <h1 class="text-2xl font-bold flex justify-center">
+        SensorStation from Ap: {sensorStations[0].roomName}
+      </h1>
       <div class="btn-group bg-bgase-100 flex justify-center mb-4 mt-4">
         {#each buttonGroup as button (button.description)}
           <button
@@ -93,7 +97,11 @@
               {#if sensorStation.roomName.includes(searchTerm) || sensorStation.bdAddress.includes(searchTerm) || sensorStation.dipSwitchId
                   .toString()
                   .includes(searchTerm)}
-                <div class="blinking-border">
+                <div
+                  class:blinking-border-blue={sensorStation.alarm === "l"}
+                  class:blinking-border-red={sensorStation.alarm === "h"}
+                  class="relative"
+                >
                   <div
                     class="card w-full h-fit bg-base-100 dark:border-none shadow-2xl"
                     in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
@@ -132,7 +140,7 @@
     position: relative;
   }
 
-  .blinking-border::before {
+  .blinking-border-red::before {
     content: "";
     position: absolute;
     top: -2px;
@@ -142,6 +150,18 @@
     border: 8px solid transparent;
     border-radius: 1rem;
     box-shadow: 0px 0px 0px 4px red;
+    animation: blink-animation 1s ease-in-out infinite;
+  }
+  .blinking-border-blue::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 8px solid transparent;
+    border-radius: 1rem;
+    box-shadow: 0px 0px 0px 4px blue;
     animation: blink-animation 1s ease-in-out infinite;
   }
 

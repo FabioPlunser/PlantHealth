@@ -1,3 +1,5 @@
-import { writable } from "svelte/store";
+import { type Writable, writable } from "svelte/store";
 
-export const apSensorStations = writable([]);
+export const apSensorStations: Writable<
+  Responses.AdminSensorStationsResponse | any
+> = writable([]);
