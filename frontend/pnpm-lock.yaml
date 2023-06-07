@@ -6,13 +6,13 @@ devDependencies:
     version: 3.0.1(svelte@3.59.1)(vite@4.3.9)
   "@sveltejs/adapter-auto":
     specifier: 2.1.0
-    version: 2.1.0(@sveltejs/kit@1.20.1)
+    version: 2.1.0(@sveltejs/kit@1.20.2)
   "@sveltejs/adapter-node":
     specifier: ^1.2.4
-    version: 1.2.4(@sveltejs/kit@1.20.1)
+    version: 1.2.4(@sveltejs/kit@1.20.2)
   "@sveltejs/kit":
-    specifier: 1.20.1
-    version: 1.20.1(svelte@3.59.1)(vite@4.3.9)
+    specifier: 1.20.2
+    version: 1.20.2(svelte@3.59.1)(vite@4.3.9)
   "@tailwindcss/typography":
     specifier: ^0.5.9
     version: 0.5.9(tailwindcss@3.3.2)
@@ -32,8 +32,8 @@ devDependencies:
     specifier: ^4.3.0
     version: 4.3.0
   daisyui:
-    specifier: ^3.0.1
-    version: 3.0.1(postcss@8.4.24)
+    specifier: ^3.0.4
+    version: 3.0.4(postcss@8.4.24)
   html5-qrcode:
     specifier: ^2.3.8
     version: 2.3.8
@@ -635,7 +635,7 @@ packages:
       rollup: 3.20.2
     dev: true
 
-  /@sveltejs/adapter-auto@2.1.0(@sveltejs/kit@1.20.1):
+  /@sveltejs/adapter-auto@2.1.0(@sveltejs/kit@1.20.2):
     resolution:
       {
         integrity: sha512-o2pZCfATFtA/Gw/BB0Xm7k4EYaekXxaPGER3xGSY3FvzFJGTlJlZjBseaXwYSM94lZ0HniOjTokN3cWaLX6fow==,
@@ -643,11 +643,11 @@ packages:
     peerDependencies:
       "@sveltejs/kit": ^1.0.0
     dependencies:
-      "@sveltejs/kit": 1.20.1(svelte@3.59.1)(vite@4.3.9)
+      "@sveltejs/kit": 1.20.2(svelte@3.59.1)(vite@4.3.9)
       import-meta-resolve: 3.0.0
     dev: true
 
-  /@sveltejs/adapter-node@1.2.4(@sveltejs/kit@1.20.1):
+  /@sveltejs/adapter-node@1.2.4(@sveltejs/kit@1.20.2):
     resolution:
       {
         integrity: sha512-TNnhS+OKRZ9RKnC+ho5mlE2FJquI61i0v7yOXxBUSU3LAoYH2kwVVL8P8ecjefmZ8BOfM1V54pBnDODBU5CEaA==,
@@ -658,14 +658,14 @@ packages:
       "@rollup/plugin-commonjs": 24.1.0(rollup@3.20.2)
       "@rollup/plugin-json": 6.0.0(rollup@3.20.2)
       "@rollup/plugin-node-resolve": 15.0.2(rollup@3.20.2)
-      "@sveltejs/kit": 1.20.1(svelte@3.59.1)(vite@4.3.9)
+      "@sveltejs/kit": 1.20.2(svelte@3.59.1)(vite@4.3.9)
       rollup: 3.20.2
     dev: true
 
-  /@sveltejs/kit@1.20.1(svelte@3.59.1)(vite@4.3.9):
+  /@sveltejs/kit@1.20.2(svelte@3.59.1)(vite@4.3.9):
     resolution:
       {
-        integrity: sha512-iZ7PvbM45sdLR3KIXFTbwIwP4PmeO/7JdNdpKRc/T9xMgDabNlPhL1gnJ/Hi1w00g4nc3Zpo/HNrzbRmuOnUjQ==,
+        integrity: sha512-MtR1i+HtmYWcRgtubw1GQqT/+CWXL/z24PegE0xYAdObbhdr7YtEfmoe705D/JZMtMmoPXrmSk4W0MfL5A3lYw==,
       }
     engines: { node: ^16.14 || >=18 }
     hasBin: true
@@ -1462,10 +1462,10 @@ packages:
       css-tree: 2.2.1
     dev: true
 
-  /daisyui@3.0.1(postcss@8.4.24):
+  /daisyui@3.0.4(postcss@8.4.24):
     resolution:
       {
-        integrity: sha512-UJQ90ffDRgIEsDYdYpsFuEwc1fDXejm64oK2JFNNgmUyxbOgYveM1EphCLhxPj85nNGybBoHWx87Kua+24iT8w==,
+        integrity: sha512-KfQXj1WD0U0qA+9olKqZRgqu/D6udA3+DjsT5PIdk3dOAFFbyzYzUiadiAbZ/QHe98IDBWHmVjjB51Hxg8TydQ==,
       }
     peerDependencies:
       postcss: ^8
