@@ -39,6 +39,7 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 		private final List<SensorLimitsResponse> sensorLimits;
 		private final List<SensorStationPersonReference> sensorStationPersonReferences;
 		private final List<SensorStationPicture> sensorStationPictures;
+		private final List<AlarmResponse> alarms;
 
 		public InnerResponse(SensorStation sensorStation, Person person) {
 			this.bdAddress = sensorStation.getBdAddress();
@@ -54,6 +55,13 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 			this.unlocked = sensorStation.isUnlocked();
 			this.connected = sensorStation.isConnected();
 			this.deleted = sensorStation.isDeleted();
+			this.alarms = sensorStation.getSensorData()
+								  .stream()
+								  .map(SensorData::getSensor)
+								  .distinct()
+								  .map(sensor -> new AlarmResponse(sensor, sensorStation))
+								  .toList();
+
 			if (sensorStation.getAccessPoint() != null) {
 				this.transferInterval = sensorStation.getAccessPoint().getTransferInterval();
 			} else {
@@ -108,6 +116,22 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 				this.sensor = sensorLimit.getSensor();
 				this.gardener = sensorLimit.getGardener();
 				this.deleted = sensorLimit.isDeleted();
+			}
+		}
+
+		@Getter
+		public static class AlarmResponse implements Serializable {
+			private final Sensor sensor;
+			private final String alarm;
+
+			public AlarmResponse(Sensor sensor, SensorStation sensorStation) {
+				this.sensor = sensor;
+				this.alarm = sensorStation.getSensorData()
+									 .stream()
+									 .filter(d -> d.getSensor().equals(sensor))
+									 .max(Comparator.comparing(SensorData::getTimeStamp))
+									 .map(SensorData::getAlarm)
+									 .orElse("n");
 			}
 		}
 	}

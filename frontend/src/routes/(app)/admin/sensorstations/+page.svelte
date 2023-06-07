@@ -95,8 +95,9 @@
                   .toString()
                   .includes(searchTerm)}
                 <div
-                  class:blinking-border-blue={sensorStation.alarm === "l"}
-                  class:blinking-border-red={sensorStation.alarm === "h"}
+                  class:blinking-border={sensorStation.alarms.some(
+                    (a) => a.alarm !== "n"
+                  )}
                   class="relative"
                 >
                   <div

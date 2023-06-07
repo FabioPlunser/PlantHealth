@@ -529,14 +529,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "200":
-          description: Sensor Stations successfully added
+        "400":
+          description: Sensor Stations could not be added
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "400":
-          description: Sensor Stations could not be added
+        "200":
+          description: Sensor Stations successfully added
           content:
             "*/*":
               schema:
@@ -567,14 +567,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "200":
-          description: Sensor Stations successfully added
+        "400":
+          description: Sensor Stations could not be added
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "400":
-          description: Sensor Stations could not be added
+        "200":
+          description: Sensor Stations successfully added
           content:
             "*/*":
               schema:
@@ -1816,14 +1816,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "200":
-          description: Access Point info successfully updated
+        "400":
+          description: Access Point info could not be updated
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "400":
-          description: Access Point info could not be updated
+        "200":
+          description: Access Point info successfully updated
           content:
             "*/*":
               schema:
@@ -1925,14 +1925,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "200":
-          description: Scan successfully started
+        "400":
+          description: Scan could not be started
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "400":
-          description: Scan could not be started
+        "200":
+          description: Scan successfully started
           content:
             "*/*":
               schema:
@@ -2804,14 +2804,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "400":
-          description: Access Point could not be deleted
+        "200":
+          description: Access Point successfully deleted
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "200":
-          description: Access Point successfully deleted
+        "400":
+          description: Access Point could not be deleted
           content:
             "*/*":
               schema:
@@ -2857,9 +2857,9 @@ components:
           format: uuid
         inDashboard:
           type: boolean
-        assigned:
-          type: boolean
         deleted:
+          type: boolean
+        assigned:
           type: boolean
     MessageResponse:
       type: object
@@ -2928,14 +2928,14 @@ components:
             $ref: "#/components/schemas/GrantedAuthority"
         username:
           type: string
-        unlocked:
-          type: boolean
         deleted:
           type: boolean
-        connected:
+        unlocked:
           type: boolean
         password:
           type: string
+        connected:
+          type: boolean
       description: ""
     SensorData:
       type: object
@@ -2992,15 +2992,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GrantedAuthority"
-        unlocked:
-          type: boolean
         deleted:
           type: boolean
+        unlocked:
+          type: boolean
+        password:
+          type: string
         connected:
           type: boolean
         username:
-          type: string
-        password:
           type: string
       description: ""
     SensorStationPicture:
@@ -3444,8 +3444,10 @@ components:
         dipSwitchId:
           type: integer
           format: int32
-        alarm:
-          type: string
+        alarms:
+          type: array
+          items:
+            $ref: "#/components/schemas/AlarmResponse"
         unlocked:
           type: boolean
         accessPointUnlocked:
@@ -3464,6 +3466,13 @@ components:
           items:
             $ref: "#/components/schemas/InnerResponse"
       description: ""
+    AlarmResponse:
+      type: object
+      properties:
+        sensor:
+          $ref: "#/components/schemas/Sensor"
+        alarm:
+          type: string
     SensorStationResponse:
       type: object
       properties:

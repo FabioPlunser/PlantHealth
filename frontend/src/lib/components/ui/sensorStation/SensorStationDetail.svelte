@@ -252,7 +252,7 @@
                       </div>
                     </div>
                   </form>
-                  <Graphs data={sensorStation.data} />
+                  <Graphs data={sensorStation.data} {sensorStation} />
                 {:else if state === "table"}
                   <form
                     method="POST"

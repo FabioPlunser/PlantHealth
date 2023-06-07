@@ -51,7 +51,7 @@
           <button
             type="button"
             disabled={data?.error != null}
-            class="btn text-white"
+            class="btn btn-neutral text-white"
           >
             <a href="/register">Register</a>
           </button>

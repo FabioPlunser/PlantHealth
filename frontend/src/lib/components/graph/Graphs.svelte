@@ -9,7 +9,8 @@
   import Spinner from "$components/ui/Spinner.svelte";
   // ---------------------------------------------------
   // ---------------------------------------------------
-  export let data: any;
+  export let data: Responses.SensorStationDataResponse;
+  export let sensorStation: Responses.InnerResponse;
   export let loading = false;
   export let options = {};
   // ---------------------------------------------------
@@ -50,6 +51,7 @@
     for (let sensor of dynamicSensors) {
       if (!sensors.some((s) => s.sensorType === sensor.sensorType)) {
         let newSensor = {
+          sensorId: sensor.sensorId,
           sensorType: sensor.sensorType,
           sensorUnit: sensor.sensorUnit,
           bootstrap: "",
@@ -74,6 +76,15 @@
   }
   // ---------------------------------------------------
   // ---------------------------------------------------
+  $: console.log(sensorStation.alarms);
+  $: {
+    sensorStation.alarms.some((a) => {
+      if (a.sensor.type === currentSensor) {
+        console.log(a);
+      }
+    });
+  }
+  $: console.log(sensors);
 </script>
 
 <!-- @component
@@ -112,12 +123,18 @@ Usage example:
           class="tooltip"
           data-tip={sensor.sensorType}
         >
+          <!-- {#if sensorStation.alarms.some((a) => a.sensor.type === sensor.sensorType && a.alarm !== 'n')}
+           {sensor.sensorType}
+          {/if} -->
           <button on:click={() => (currentSensor = sensor.sensorType)}>
             <i
               class="bi {sensor.bootstrap} transform transition-transform active:scale-110 material-symbols-outlined text-2xl sm:text-3xl md:text-4xl xl:text-5xl hover:text-blue-400 hover:scale-105 hover:dark:text-black
               {sensor.sensorType === currentSensor
                 ? 'text-black'
                 : 'text-white'}"
+              class:alarm={sensorStation.alarms.some(
+                (a) => a.sensor.type === sensor.sensorType && a.alarm !== "n"
+              )}
             >
               {sensor?.google}
             </i>
