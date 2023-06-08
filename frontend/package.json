@@ -23,7 +23,7 @@
     "@types/node": "^20.2.5",
     "autoprefixer": "^10.4.14",
     "chart.js": "^4.3.0",
-    "daisyui": "^3.0.3",
+    "daisyui": "^3.0.4",
     "html5-qrcode": "^2.3.8",
     "js-yaml": "^4.1.0",
     "jspdf": "^2.5.1",

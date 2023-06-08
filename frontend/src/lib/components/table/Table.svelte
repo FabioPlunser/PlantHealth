@@ -11,6 +11,7 @@
   @example
   ``` html
     <script lang="ts">
+	import { tailwind } from 'tailwindcss';
       export let data : {
         users: User[],
       };
@@ -246,7 +247,7 @@
 </script>
 
 {#if isRendered}
-  <div class="rounded-2xl">
+  <div>
     <div class="mb-3" in:slide={{ duration: 400, axis: "y" }}>
       <input
         type="search"
@@ -257,8 +258,8 @@
         class="input dark:input-bordered w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
       />
     </div>
-    <div in:slide={{ duration: 400, axis: "y" }} class="rounded-2xl">
-      <table class="_table w-full rounded-2xl [&>*:nth-child(odd)]:bg-base-200">
+    <div in:slide={{ duration: 400, axis: "y" }}>
+      <table class="myTable">
         <thead class="">
           {#each $table.getHeaderGroups() as headerGroup}
             <tr class="">
@@ -371,88 +372,43 @@
 {/if}
 
 <style>
-  ._table {
-    display: _table;
-  }
-  @media (hover: hover) {
-    ._table tr.hover:hover,
-    ._table tr.hover:nth-child(even):hover {
-      --tw-bg-opacity: 1;
-      background-color: hsl(var(--b2) / var(--tw-bg-opacity));
-    }
-  }
-  @media (hover: hover) {
-    ._table tr.hover:hover,
-    ._table tr.hover:nth-child(even):hover {
-      --tw-bg-opacity: 1;
-      background-color: hsl(var(--b2) / var(--tw-bg-opacity));
-    }
-  }
-  ._table {
+  .myTable {
     position: relative;
     width: 100%;
     text-align: left;
-    font-size: 0.875rem /* 14px */;
-    line-height: 1.25rem /* 20px */;
-    /* border-radius: var(--rounded-box, 1rem); */
-  }
-  ._table :where(.table-pin-rows thead tr) {
-    position: sticky;
-    top: 0px;
-    z-index: 1;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
     --tw-bg-opacity: 1;
-    background-color: hsl(var(--b1) / var(--tw-bg-opacity));
+    background-color: hsl(var(--b3) / var(--tw-bg-opacity));
+    border-radius: 1rem !important;
   }
-  ._table :where(.table-pin-rows tfoot tr) {
-    position: sticky;
-    bottom: 0px;
-    z-index: 1;
-    --tw-bg-opacity: 1;
-    background-color: hsl(var(--b1) / var(--tw-bg-opacity));
-  }
-  ._table :where(.table-pin-cols tr th) {
-    position: sticky;
-    left: 0px;
-    right: 0px;
-    --tw-bg-opacity: 1;
-    background-color: hsl(var(--b1) / var(--tw-bg-opacity));
-  }
-  ._table :where(th, td) {
-    padding-left: 1rem /* 16px */;
-    padding-right: 1rem /* 16px */;
-    padding-top: 0.75rem /* 12px */;
-    padding-bottom: 0.75rem /* 12px */;
+
+  .myTable td,
+  th {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
     vertical-align: middle;
   }
-  ._table tr.active,
-  ._table tr.active:nth-child(even),
-  ._table-zebra tbody tr:nth-child(even) {
-    --tw-bg-opacity: 1;
-    background-color: hsl(var(--b2) / var(--tw-bg-opacity));
+  .myTable tbody tr:hover {
+    background-color: hsl(var(--p) / var(--tw-bg-opacity)) !important;
+    border-radius: 10rem !important;
   }
-  ._table tr.active,
-  ._table tr.active:nth-child(even),
-  ._table-zebra tbody tr:nth-child(even) {
-    --tw-bg-opacity: 1;
-    background-color: hsl(var(--b2) / var(--tw-bg-opacity));
+  .myTable thead th:first-child {
+    border-radius: 1rem 0rem 0rem 0rem !important;
   }
-  ._table :where(thead, tbody) :where(tr:not(:last-child)),
-  ._table :where(thead, tbody) :where(tr:first-child:last-child) {
-    border-bottom-width: 1px;
-    --tw-border-opacity: 1;
-    border-bottom-color: hsl(var(--b2) / var(--tw-border-opacity));
+  .myTable thead th:last-child {
+    border-radius: 0rem 1rem 0rem 0rem !important;
   }
-  ._table :where(thead, tbody) :where(tr:not(:last-child)),
-  ._table :where(thead, tbody) :where(tr:first-child:last-child) {
-    border-bottom-width: 1px;
-    --tw-border-opacity: 1;
-    border-bottom-color: hsl(var(--b2) / var(--tw-border-opacity));
+
+  .myTable tbody tr:last-child td:first-child {
+    border-radius: 0rem 0rem 0rem 1rem !important;
   }
-  ._table :where(thead, tfoot) {
-    white-space: nowrap;
-    font-size: 0.75rem /* 12px */;
-    line-height: 1rem /* 16px */;
-    font-weight: 700;
-    color: hsl(var(--bc) / 0.6);
+  .myTable tbody tr:last-child td:last-child {
+    border-radius: 0rem 0rem 1rem 0rem !important;
+  }
+  .myTable tbody tr:nth-child(odd) {
+    background-color: hsl(var(--b1));
   }
 </style>
