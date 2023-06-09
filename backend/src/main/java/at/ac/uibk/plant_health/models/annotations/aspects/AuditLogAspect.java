@@ -36,13 +36,15 @@ public class AuditLogAspect {
 		Object ret;
 		String formatMessage;
 		Log.LogLevel logLevel;
+		Throwable exception = null;
 		AuditLogAnnotation annotation = sig.getMethod().getAnnotation(AuditLogAnnotation.class);
 
 		try {
 			ret = jp.proceed();
 			formatMessage = annotation.successMessage();
 			logLevel = annotation.successLogLevel();
-		} catch (Exception e) {
+		} catch (Throwable e) {
+			exception = e;
 			formatMessage = annotation.errorMessage();
 			logLevel = annotation.errorLogLevel();
 			ret = null;
@@ -57,17 +59,20 @@ public class AuditLogAspect {
 			String[] parameterNames = sig.getParameterNames();
 			Object[] parameters = jp.getArgs();
 
-			List<Pair<String, Optional<Object>>> paramMap =
-					Stream.concat(IntStream.range(0, parameters.length)
-										  .mapToObj(
-												  i
-												  -> Pair.of(
-														  parameterNames[i],
-														  Optional.ofNullable(parameters[i])
-												  )
-										  ),
-								  Stream.of(Pair.of("!", Optional.ofNullable(ret))))
-							.toList();
+			Stream<Pair<String, Optional<Object>>> obj = Stream.of(Pair.of("this", Optional.ofNullable(jp.getThis())));
+			Stream<Pair<String, Optional<Object>>> params = IntStream.range(0, parameters.length)
+								  .mapToObj(
+										  i
+										  -> Pair.of(
+												  parameterNames[i],
+												  Optional.ofNullable(parameters[i])
+										  )
+								  );
+			Stream<Pair<String, Optional<Object>>> return_value = Stream.of(Pair.of("!", Optional.ofNullable(ret)));
+
+			List<Pair<String, Optional<Object>>> paramMap = Stream.concat(
+				Stream.concat(obj, params), return_value
+			).toList();
 
 			var message = formatMessage(formatMessage, paramMap);
 
@@ -75,6 +80,7 @@ public class AuditLogAspect {
 			logService.log(log);
 		}
 
+		if (exception != null) throw exception;
 		return ret;
 	}
 
