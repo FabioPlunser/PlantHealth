@@ -257,7 +257,7 @@ class NotificationHandler {
 			static unsigned long previousTone = 0;
 			DEBUG_PRINTF(
 				3, "Currently there are %u notifications.\n",
-				notificationQueue->size()
+				notificationQueue->getSize()
 			);
 			if (notificationQueue->isEmpty()) {
 				DEBUG_PRINT_POS(3, "Queue is empty.\n");
@@ -279,7 +279,10 @@ class NotificationHandler {
 					return this->timeOfSilenceEnd - millis();
 				}
 			} else {
-				if (millis() - previousTone > PIEZO_BUZZER_TONE_INTERVALL_MS) {
+				const Notification * topNotification =
+					notificationQueue->getPrioritisedNotification();
+					// Only play a tone if an error has the highest priority
+				if (millis() - previousTone > PIEZO_BUZZER_TONE_INTERVALL_MS && topNotification->getNotificationType() == Notification::NotificationType::SENSOR_ERROR) {
 					DEBUG_PRINT_POS(3, "Buzzer tone.\n");
 					previousTone = millis();
 					piezoBuzzerController->startBuzzer(
@@ -287,8 +290,6 @@ class NotificationHandler {
 						PIEZO_BUZZER_TONE_DURATION_MS
 					);
 				}
-				const Notification * topNotification =
-					notificationQueue->getPrioritisedNotification();
 				int16_t timeToWait;
 				if (CHECK_IF_CASTABLE_TO_SENSOR_ERROR(topNotification)) {
 					const SensorError * error;
