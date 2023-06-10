@@ -44,7 +44,7 @@ class PiezoBuzzerController {
 				uint16_t note	  = std::get<0>(noteAndDuration);
 				uint16_t duration = std::get<1>(noteAndDuration);
 				this->startBuzzer(note, duration);
-				delay(50);
+				delay(100);
 			}
 			stopBuzzer();
 #endif // USE_PIEZO_BUZZER

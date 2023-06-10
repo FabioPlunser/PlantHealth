@@ -99,11 +99,15 @@ void loop() {
 	checkPairingButtonAndStatus(inPairingMode);
 	updateNotificationHandler_PairingMode(inPairingMode);
 	enable_pairing_mode();
-#else
+#else 
 	inPairingMode = true;
 #endif
 	checkNotificationSilenceButtonPressed();
 	handleCentralDeviceIfPresent(pairedDevice, inPairingMode);
+
+#if PAIRING_BUTTON_REQUIRED
+	updateNotificationHandler_PairingMode(inPairingMode);
+#endif 
 	// If sensor data got transmitted we want to measure new values directly.
 	if (get_sensor_data_read_flag() == SENSOR_DATA_READ_VALUE) {
 		timeBetweenMeasures		 = 0;
@@ -127,16 +131,18 @@ void loop() {
 	}
 	// If the time between sensor measurements passed the next measurement will
 	// done, but only if the sensor station is unlocked.
-	if (get_sensorstation_locked_status() == true &&
+	if (get_sensorstation_locked_status() == SENSOR_STATION_UNLOCKED_VALUE &&
 		millis() - previousSensorMeasurement > timeBetweenMeasures) {
 		unsigned long sensorReadStart = millis();
 		timeBetweenMeasures			  = calculateTimeBetweenMeasures(
 			  sensorReadStart, previousDataTransmission,
-			  TIME_BETWEEN_SENSOR_MEASUREMENTS_MIN_S,
-			  TIME_BETWEEN_SENSOR_MEASUREMENTS_MAX_S,
-			  TIME_IT_TAKES_TO_REACH_MAX_MEASUREMENT
+			  TIME_BETWEEN_SENSOR_MEASUREMENTS_MIN_S * 1000,
+			  TIME_BETWEEN_SENSOR_MEASUREMENTS_MAX_S * 1000,
+			  TIME_IT_TAKES_TO_REACH_MAX_MEASUREMENT * 1000
 		  );
+		DEBUG_PRINTF(3, "Time between measures: %lu\n", timeBetweenMeasures);
 		sensorValueHandler->addSensorValuesToAccumulator();
+		clear_sensor_data_read_flag();
 		previousSensorMeasurement = millis();
 		// Substract time it took to measur sensor values from remaining sleep
 		// time
@@ -186,7 +192,9 @@ unsigned long calculateTimeBetweenMeasures(
 		return timeMax;
 	}
 	float waitFactor = pow((std::sin(PI / 2 * normedValue)), 2);
-	return (unsigned long) (waitFactor * (timeMax - timeMin) + timeMin);
+	DEBUG_PRINTF(3, "Wait factor: %f\n", waitFactor);
+	DEBUG_PRINTF(3, "Time between measures: %f\n", ((waitFactor * (timeMax - timeMin) + timeMin)));
+	return (unsigned long) ((waitFactor * (timeMax - timeMin) + timeMin));
 }
 
 void checkNotificationSilenceButtonPressed() {
@@ -365,4 +373,4 @@ void playPairingMelody() {
 	notificationHandler->playMelodyOnPiezoBuzzer(melodyVector);
 }
 
-#endif
+#endif 
