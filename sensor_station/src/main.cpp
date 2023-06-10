@@ -98,6 +98,11 @@ void loop() {
 	static unsigned long timeBetweenMeasures	  = 0;
 	static unsigned long previousDataTransmission = millis();
 	static unsigned long previousSensorMeasurement = millis();
+	static bool firstRun						   = true;
+	if (firstRun) {
+		DEBUG_PRINTF(2, "Paired device is: %s\n", pairedDevice.c_str());
+		firstRun = false;
+	}
 
 	checkResetButtonPressed();
 
@@ -105,7 +110,7 @@ void loop() {
 	checkPairingButtonAndStatus(inPairingMode);
 	updateNotificationHandler_PairingMode(inPairingMode);
 	enable_pairing_mode();
-#else 
+#else
 	inPairingMode = true;
 #endif
 	checkNotificationSilenceButtonPressed();
@@ -113,7 +118,7 @@ void loop() {
 
 #if PAIRING_BUTTON_REQUIRED
 	updateNotificationHandler_PairingMode(inPairingMode);
-#endif 
+#endif
 	// If sensor data got transmitted we want to measure new values directly.
 	if (get_sensor_data_read_flag() == SENSOR_DATA_READ_VALUE) {
 		timeBetweenMeasures		 = 0;
@@ -235,7 +240,10 @@ unsigned long calculateTimeBetweenMeasures(
 	}
 	float waitFactor = pow((std::sin(PI / 2 * normedValue)), 2);
 	DEBUG_PRINTF(3, "Wait factor: %f\n", waitFactor);
-	DEBUG_PRINTF(3, "Time between measures: %f\n", ((waitFactor * (timeMax - timeMin) + timeMin)));
+	DEBUG_PRINTF(
+		3, "Time between measures: %f\n",
+		((waitFactor * (timeMax - timeMin) + timeMin))
+	);
 	return (unsigned long) ((waitFactor * (timeMax - timeMin) + timeMin));
 }
 
@@ -416,4 +424,4 @@ void playPairingMelody() {
 	notificationHandler->playMelodyOnPiezoBuzzer(melodyVector);
 }
 
-#endif 
+#endif
