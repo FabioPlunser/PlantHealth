@@ -53,9 +53,10 @@ class SensorValueHandlerClass {
 		}
 
 	public:
-		void setWeightCalculatorFunction(double (*weightFunction
-		)(unsigned long timeNow, unsigned long timeLastUpdate,
-		  unsigned long timeLastReset)) {
+		void setWeightCalculatorFunction(double (*weightFunction)(
+			unsigned long timeNow, unsigned long timeLastUpdate,
+			unsigned long timeLastReset
+		)) {
 			DEBUG_PRINT_POS(4, "\n");
 			airTemperatureAccumulator->setWeightFunction(weightFunction);
 			airHumidityAccumulator->setWeightFunction(weightFunction);
@@ -91,6 +92,13 @@ class SensorValueHandlerClass {
 				airSensor->getMeasuredValues(
 					&pressure, &gas_resistance, &temperature, &humidity
 				);
+			DEBUG_PRINT(3, "Sensor Values are:\n");
+			DEBUG_PRINTF(3, "\tPressure: %f\n", pressure);
+			DEBUG_PRINTF(3, "\tGas Resistance: %lu\n", gas_resistance);
+			DEBUG_PRINTF(3, "\tTemperature: %f\n", temperature);
+			DEBUG_PRINTF(3, "\tAir Humidity: %f\n", humidity);
+			DEBUG_PRINTF(3, "\tEarth Humidity: %u\n", earth_humidity);
+			DEBUG_PRINTF(3, "\tLight Intensity: %u\n", light_intensity);
 
 			if (updateError == AirSensorClass::UPDATE_ERROR::NOTHING) {
 				str->air_humidity = convertToGATT_airHumidity(humidity);
@@ -216,17 +224,24 @@ class SensorValueHandlerClass {
 					&airHumidity
 				);
 
+			DEBUG_PRINT(3, "Sensor Values are:\n");
 			if (updateError != AirSensorClass::UPDATE_ERROR::LOST_CONNECTION &&
 				updateError != AirSensorClass::UPDATE_ERROR::NOT_INIT) {
 				airTemperatureAccumulator->addValue(airTemperature);
 				airHumidityAccumulator->addValue(airHumidity);
 				airPressureAccumulator->addValue(airPressure);
 				airQualityAccumulator->addValue(airGasResistance);
+				DEBUG_PRINTF(3, "\tPressure: %f\n", airPressure);
+				DEBUG_PRINTF(3, "\tGas Resistance: %lu\n", airGasResistance);
+				DEBUG_PRINTF(3, "\tTemperature: %f\n", airTemperature);
+				DEBUG_PRINTF(3, "\tAir Humidity: %f\n", airHumidity);
 			} else {
 				DEBUG_PRINTF_POS(
 					1, "Encountered Update Error. Error was %d\n", updateError
 				);
 			}
+			DEBUG_PRINTF(3, "\tEarth Humidity: %u\n", soilhHumidity);
+			DEBUG_PRINTF(3, "\tLight Intensity: %u\n", lightIntensity);
 			soilHumidityAccumulator->addValue(soilhHumidity);
 			luminosityAccumulator->addValue(lightIntensity);
 			clear_sensor_data_read_flag();

@@ -171,13 +171,13 @@ module.exports = {
       },
       {
         forestLight: {
-          ...require("daisyui/src/colors/themes")["[data-theme=forest]"],
+          ...require("daisyui/src/theming/themes")["[data-theme=forest]"],
           "base-100": "#ffffff",
           "--rounded-btn": "1rem",
         },
 
         forestDark: {
-          ...require("daisyui/src/colors/themes")["[data-theme=forest]"],
+          ...require("daisyui/src/theming/themes")["[data-theme=forest]"],
           "--rounded-btn": "1rem",
           "base-100": "#1a202c",
         },

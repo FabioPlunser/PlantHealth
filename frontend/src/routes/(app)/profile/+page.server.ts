@@ -212,7 +212,6 @@ export const actions = {
           logger.info("Updated user: " + JSON.stringify(data.message));
         });
     } else {
-      console.log("FETCH USER" + parametersString);
       await fetch(`${BACKEND_URL}/update-settings` + parametersString, {
         method: "POST",
       })

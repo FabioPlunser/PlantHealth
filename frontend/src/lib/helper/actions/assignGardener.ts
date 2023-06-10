@@ -6,19 +6,18 @@ import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 
 export async function assignGardener(event: any, formData?: any) {
-  console.log(event, formData);
   const { request, fetch } = event;
   if (!formData) {
     formData = await request.formData();
   }
 
   let sensorStationId = String(formData.get("sensorStationId"));
-  let unassign = Boolean(formData.get("unassign"));
+  let unassign = String(formData.get("unassign"));
   let gardenerId = String(formData.get("gardener"));
   /* HACK: we somehow need to be able to update a sensor station that is not yet assigned
    * so we return early from this function as the update action always calls updateSensorStation() and assignGardener()
    */
-  if (gardenerId === "No gardener assigned") {
+  if (gardenerId === '') {
     toasts.addToast(
       event.locals.user?.personId,
       "error",
@@ -30,7 +29,7 @@ export async function assignGardener(event: any, formData?: any) {
   params.set("sensorStationId", sensorStationId);
   params.set("gardenerId", gardenerId);
 
-  if (unassign) {
+  if (unassign === "true") {
     params.set("delete", true.toString());
   }
 

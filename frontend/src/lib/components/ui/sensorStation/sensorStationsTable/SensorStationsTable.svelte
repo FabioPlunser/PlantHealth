@@ -1,15 +1,15 @@
 <script lang="ts">
   import { flexRender, type ColumnDef } from "@tanstack/svelte-table";
-  import SensorStationNameInput from "./sensorstation/SensorStationNameInput.svelte";
+  import SensorStationNameInput from "../sensorStationInfo/SensorStationNameInput.svelte";
   import { TextCell } from "$components/table/cellComponents";
   import Table from "$lib/components/table/Table.svelte";
-  import GardenerSelect from "./sensorstation/GardenerSelect.svelte";
-  import ConnectedDisconnectedBadge from "./sensorstation/ConnectedDisconnectedBadge.svelte";
-  import DownloadQrCode from "./sensorstation/DownloadQrCode.svelte";
-  import LockUnlockButton from "./sensorstation/LockUnlockButton.svelte";
-  import SensorStationUpdateButton from "./sensorstation/SensorStationUpdateButton.svelte";
-  import SensorStationSettingsButton from "./sensorstation/SensorStationSettingsButton.svelte";
-  import SensorStationDeleteButton from "./sensorstation/SensorStationDeleteButton.svelte";
+  import GardenerSelect from "../sensorStationInfo/GardenerSelect.svelte";
+  import ConnectedDisconnectedBadge from "../sensorStationInfo/ConnectedDisconnectedBadge.svelte";
+  import DownloadQrCode from "../sensorStationInfo/DownloadQrCode.svelte";
+  import LockUnlockButton from "../sensorStationInfo/LockUnlockButton.svelte";
+  import SensorStationUpdateButton from "../sensorStationInfo/SensorStationUpdateButton.svelte";
+  import SensorStationSettingsButton from "../sensorStationInfo/SensorStationSettingsButton.svelte";
+  import SensorStationDeleteButton from "../sensorStationInfo/SensorStationDeleteButton.svelte";
   import SensorStationNameGardenerComposition from "./SensorStationNameGardenerComposition.svelte";
 
   export let sensorStations: SensorStation[];

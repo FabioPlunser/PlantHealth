@@ -11,6 +11,7 @@
   @example
   ``` html
     <script lang="ts">
+	import { tailwind } from 'tailwindcss';
       export let data : {
         users: User[],
       };
@@ -247,7 +248,7 @@
 </script>
 
 {#if isRendered}
-  <div>
+  <div class="fe">
     <div class="mb-3" in:slide={{ duration: 400, axis: "y" }}>
       <input
         type="search"
@@ -259,7 +260,7 @@
       />
     </div>
     <div in:slide={{ duration: 400, axis: "y" }}>
-      <table class="table table-auto w-full">
+      <table class="myTable">
         <thead class="">
           {#each $table.getHeaderGroups() as headerGroup}
             <tr>
@@ -370,3 +371,46 @@
     </div>
   </div>
 {/if}
+
+<style>
+  .myTable {
+    position: relative;
+    width: 100%;
+    text-align: left;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    --tw-bg-opacity: 1;
+    background-color: hsl(var(--b3) / var(--tw-bg-opacity));
+    border-radius: 1rem !important;
+  }
+ 
+
+  .myTable td, th {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    vertical-align: middle;
+
+  }
+  .myTable tbody tr:hover  {
+    background-color: hsl(var(--p) / var(--tw-bg-opacity)) !important; 
+    border-radius: 10rem !important;
+  }
+  .myTable thead th:first-child{
+    border-radius: 1rem 0rem 0rem 0rem !important;
+  }
+  .myTable thead th:last-child{
+    border-radius: 0rem 1rem 0rem 0rem !important;
+  }
+
+  .myTable tbody tr:last-child td:first-child {
+    border-radius: 0rem 0rem 0rem 1rem !important;
+  }
+  .myTable tbody tr:last-child td:last-child {
+    border-radius: 0rem 0rem 1rem 0rem !important;
+  }
+  .myTable tbody tr:nth-child(odd) {
+    background-color: hsl(var(--b1));
+  }
+</style>

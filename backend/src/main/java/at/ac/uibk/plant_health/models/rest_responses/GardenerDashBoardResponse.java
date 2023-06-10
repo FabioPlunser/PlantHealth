@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.SensorStationPersonReference;
+import at.ac.uibk.plant_health.models.device.AccessPoint;
 import at.ac.uibk.plant_health.models.device.SensorStation;
+import at.ac.uibk.plant_health.models.plant.SensorData;
 import at.ac.uibk.plant_health.models.user.Person;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -41,7 +43,9 @@ public class GardenerDashBoardResponse extends RestResponse implements Serializa
 		private final int transferInterval;
 		private final Person gardener;
 		private final int dipSwitchId;
+		private final String alarm;
 		private final boolean unlocked;
+		private final boolean accessPointUnlocked;
 		private final boolean connected;
 		private final boolean deleted;
 		public InnerResponse(SensorStation sensorstation) {
@@ -52,6 +56,14 @@ public class GardenerDashBoardResponse extends RestResponse implements Serializa
 			this.transferInterval = sensorstation.getAccessPoint().getTransferInterval();
 			this.gardener = sensorstation.getGardener();
 			this.dipSwitchId = sensorstation.getDipSwitchId();
+			var alarm = sensorstation.getSensorData().stream().min(
+					Comparator.comparing(SensorData::getTimeStamp)
+			);
+			if (alarm.isPresent())
+				this.alarm = alarm.get().getAlarm();
+			else
+				this.alarm = "n";
+			this.accessPointUnlocked = sensorstation.getAccessPoint().isUnlocked();
 			this.unlocked = sensorstation.isUnlocked();
 			this.connected = sensorstation.isConnected();
 			this.deleted = sensorstation.isDeleted();

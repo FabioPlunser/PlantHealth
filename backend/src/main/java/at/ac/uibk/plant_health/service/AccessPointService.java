@@ -272,7 +272,7 @@ public class AccessPointService {
 	 * @param accessPointId
 	 * @throws ServiceException
 	 */
-	public void deleteAccessPoint(UUID accessPointId) throws ServiceException{
+	public void deleteAccessPoint(UUID accessPointId) throws ServiceException {
 		Optional<AccessPoint> maybeAccessPoint = accessPointRepository.findById(accessPointId);
 		if (maybeAccessPoint.isEmpty()) {
 			throw new ServiceException("AccessPoint not found", 404);
@@ -289,5 +289,16 @@ public class AccessPointService {
 			sensorStationService.deleteSensorStation(sensorStation.getDeviceId());
 		}
 		accessPointRepository.save(accessPoint);
+	}
+
+	/**
+	 * Get all SensorStations of an AccessPoint
+	 * @param accessPointId
+	 * @throws ServiceException
+	 */
+	public List<SensorStation> getAccessPointSensorStations(UUID accessPointId)
+			throws ServiceException {
+		AccessPoint accessPoint = findById(accessPointId);
+		return accessPoint.getSensorStations();
 	}
 }

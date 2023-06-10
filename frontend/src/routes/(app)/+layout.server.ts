@@ -5,7 +5,6 @@ import { redirect, error } from "@sveltejs/kit";
 export async function load(event) {
   try {
     await fetch(`${BACKEND_URL}/get-sensor-station-info`);
-    console.log("checking backend availability");
   } catch (err: any) {
     logger.error("Backend is down", { payload: err });
     if (err.cause.code === "ECONNREFUSED") {
@@ -15,7 +14,8 @@ export async function load(event) {
 
   if (event.locals.user) {
     return {
-      permission: event.locals.user.permissions[0],
+      permission:
+        event.locals.user.permissions[event.locals.user.permissions.length - 1],
     };
   }
 

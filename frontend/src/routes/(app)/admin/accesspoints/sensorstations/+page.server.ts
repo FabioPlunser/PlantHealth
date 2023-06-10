@@ -5,9 +5,12 @@ import { logger } from "$helper/logger";
 export async function load(event) {
   const { fetch, request, url, depends } = event;
 
-  async function getAllSensorStations(): Promise<Responses.AdminSensorStationsResponse> {
+  let accessPointId = url.searchParams.get("accessPointId");
+  async function getSensorStations(): Promise<Responses.AdminSensorStationsResponse> {
     return new Promise(async (resolve) => {
-      await fetch(`${BACKEND_URL}/get-all-sensor-stations`)
+      await fetch(
+        `${BACKEND_URL}/get-access-point-sensor-stations?accessPointId=${accessPointId}`
+      )
         .then(async (res: any) => {
           if (!res.ok) {
             logger.error("Could not get all sensor stations");
@@ -23,7 +26,6 @@ export async function load(event) {
         });
     });
   }
-
   async function getGardener(): Promise<Responses.ListResponse> {
     return new Promise(async (resolve, reject) => {
       await fetch(`${BACKEND_URL}/get-all-gardener`)
@@ -43,7 +45,7 @@ export async function load(event) {
   return {
     gardener: getGardener(),
     streamed: {
-      sensorStations: getAllSensorStations(),
+      sensorStations: getSensorStations(),
     },
   };
 }

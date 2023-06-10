@@ -467,7 +467,7 @@ void set_limit_violation_event_handler(void (*handler)()) {
 // ----- Set Event Handler -----
 
 void clear_sensor_data_read_flag() {
-	sensor_values_read_characteristic.writeValue((uint8_t) false);
+	sensor_values_read_characteristic.writeValue((uint8_t) SENSOR_DATA_NOT_READ_VALUE);
 }
 
 void set_sensor_data(sensor_data_t sensor_data) {
