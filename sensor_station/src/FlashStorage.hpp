@@ -2,6 +2,8 @@
 #define FLASH_STORAGE_CLASS
 
 #include <Arduino.h>
+#include <CompilerFunctions.hpp>
+#include <Defines.h>
 #include <FlashIAPBlockDevice.h>
 #include <cassert>
 #include <string>
@@ -40,7 +42,6 @@ class FlashStorage {
 		FlashStorage() {
 			this->flash =
 				new FlashIAPBlockDevice(FLASH_BLOCK_START, FLASH_BLOCK_SIZE);
-			this->flash->init();
 		}
 
 		~FlashStorage() { delete this->flash; }
@@ -63,9 +64,6 @@ class FlashStorage {
 		 */
 		void writePairedDevice(const arduino::String & deviceName) {
 			assert(deviceName.length() < PAIRED_DEVICE_BLOCK.sizeBytes);
-			this->flash->erase(
-				PAIRED_DEVICE_BLOCK.startAdress, PAIRED_DEVICE_BLOCK.sizeBytes
-			);
 			uint8_t * ramBuffer = new uint8_t[PAIRED_DEVICE_BLOCK.sizeBytes];
 			uint32_t lastI		= 0;
 			for (uint32_t i = 0; i < deviceName.length(); i++) {
@@ -75,10 +73,20 @@ class FlashStorage {
 			arduino::String emptyString = "";
 			emptyString.c_str();
 			ramBuffer[lastI + 1] = '\0';
+			DEBUG_PRINTF(2, "Will write %s to flash.\n", (char *) ramBuffer);
+			DEBUG_PRINTF(
+				2, "Write will start at %lu with size %lu.\n",
+				PAIRED_DEVICE_BLOCK.startAdress, PAIRED_DEVICE_BLOCK.sizeBytes
+			);
+			this->flash->init();
+			this->flash->erase(
+				PAIRED_DEVICE_BLOCK.startAdress, PAIRED_DEVICE_BLOCK.sizeBytes
+			);
 			this->flash->program(
 				ramBuffer, PAIRED_DEVICE_BLOCK.startAdress,
 				PAIRED_DEVICE_BLOCK.sizeBytes
 			);
+			this->flash->deinit();
 			delete[] ramBuffer;
 		}
 
@@ -88,10 +96,21 @@ class FlashStorage {
 		 */
 		arduino::String readPairedDevice() {
 			uint8_t * ramBuffer = new uint8_t[PAIRED_DEVICE_BLOCK.sizeBytes];
+			DEBUG_PRINTF(
+				2, "Will read from flash at %lu with size %lu.\n",
+				PAIRED_DEVICE_BLOCK.startAdress, PAIRED_DEVICE_BLOCK.sizeBytes
+			);
+			this->flash->init();
 			this->flash->read(
 				ramBuffer, PAIRED_DEVICE_BLOCK.startAdress,
 				PAIRED_DEVICE_BLOCK.sizeBytes
 			);
+			this->flash->deinit();
+			// for(int i = 0; i < 128; i++){
+			// 	Serial.print(ramBuffer[i]);
+			// 	Serial.print(" ");
+			// }
+			DEBUG_PRINTF(2, "Read %s from flash.\n", (char *) ramBuffer);
 			arduino::String pairedDevice;
 			for (uint32_t i = 0; i < PAIRED_DEVICE_BLOCK.sizeBytes; i++) {
 				if (ramBuffer[i] == 0) {
