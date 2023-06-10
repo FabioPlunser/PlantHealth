@@ -1,7 +1,7 @@
 <script lang="ts">
-  import GardenerSelect from "../sensorstationInfo/GardenerSelect.svelte";
-  import SensorStationNameInput from "../sensorstationInfo/SensorStationNameInput.svelte";
-  import SensorStationUpdateButton from "../sensorstationInfo/SensorStationUpdateButton.svelte";
+  import GardenerSelect from "../sensorStationInfo/GardenerSelect.svelte";
+  import SensorStationNameInput from "../sensorStationInfo/SensorStationNameInput.svelte";
+  import SensorStationUpdateButton from "../sensorStationInfo/SensorStationUpdateButton.svelte";
 
   export let sensorStation: SensorStation;
   export let gardener: any;
