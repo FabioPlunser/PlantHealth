@@ -17,14 +17,14 @@ devDependencies:
     specifier: ^0.5.9
     version: 0.5.9(tailwindcss@3.3.2)
   "@tanstack/svelte-table":
-    specifier: ^8.9.1
-    version: 8.9.1(svelte@3.59.1)
+    specifier: ^8.9.2
+    version: 8.9.2(svelte@3.59.1)
   "@types/chart.js":
     specifier: ^2.9.37
     version: 2.9.37
   "@types/node":
-    specifier: ^20.2.5
-    version: 20.2.5
+    specifier: ^20.3.0
+    version: 20.3.0
   autoprefixer:
     specifier: ^10.4.14
     version: 10.4.14(postcss@8.4.24)
@@ -32,8 +32,8 @@ devDependencies:
     specifier: ^4.3.0
     version: 4.3.0
   daisyui:
-    specifier: ^3.0.4
-    version: 3.0.4(postcss@8.4.24)
+    specifier: ^3.0.25
+    version: 3.0.25(postcss@8.4.24)
   html5-qrcode:
     specifier: ^2.3.8
     version: 2.3.8
@@ -44,8 +44,8 @@ devDependencies:
     specifier: ^2.5.1
     version: 2.5.1
   npm:
-    specifier: ^9.6.7
-    version: 9.6.7
+    specifier: ^9.7.1
+    version: 9.7.1
   postcss:
     specifier: ^8.4.24
     version: 8.4.24
@@ -84,7 +84,7 @@ devDependencies:
     version: 5.1.3
   vite:
     specifier: ^4.3.9
-    version: 4.3.9(@types/node@20.2.5)
+    version: 4.3.9(@types/node@20.3.0)
   vite-svg-loader:
     specifier: ^4.0.0
     version: 4.0.0
@@ -543,7 +543,7 @@ packages:
     dependencies:
       svelte: 3.59.1
       svgo: 3.0.2
-      vite: 4.3.9(@types/node@20.2.5)
+      vite: 4.3.9(@types/node@20.3.0)
     dev: true
 
   /@rollup/plugin-commonjs@24.1.0(rollup@3.20.2):
@@ -675,7 +675,7 @@ packages:
       svelte: 3.59.1
       tiny-glob: 0.2.9
       undici: 5.22.1
-      vite: 4.3.9(@types/node@20.2.5)
+      vite: 4.3.9(@types/node@20.3.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -694,7 +694,7 @@ packages:
       "@sveltejs/vite-plugin-svelte": 2.4.1(svelte@3.59.1)(vite@4.3.9)
       debug: 4.3.4
       svelte: 3.59.1
-      vite: 4.3.9(@types/node@20.2.5)
+      vite: 4.3.9(@types/node@20.3.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -716,7 +716,7 @@ packages:
       magic-string: 0.30.0
       svelte: 3.59.1
       svelte-hmr: 0.15.1(svelte@3.59.1)
-      vite: 4.3.9(@types/node@20.2.5)
+      vite: 4.3.9(@types/node@20.3.0)
       vitefu: 0.2.4(vite@4.3.9)
     transitivePeerDependencies:
       - supports-color
@@ -737,23 +737,23 @@ packages:
       tailwindcss: 3.3.2
     dev: true
 
-  /@tanstack/svelte-table@8.9.1(svelte@3.59.1):
+  /@tanstack/svelte-table@8.9.2(svelte@3.59.1):
     resolution:
       {
-        integrity: sha512-c84SBP2rRbloBcA3/WFsfm0a4vJCeztbRxox4MHAPCwfLW955tmCYbIF6ihcDUZg5fsDvu992qdDEhKKLLxmEg==,
+        integrity: sha512-BzkeCL1+XfM8q8mwtBei/vgnI9V1J/NCaJIcJw7CyZi7YirKxOrmKA5IVDhAA3sBmNO1DT7Wq48FAYFNpsaUtg==,
       }
     engines: { node: ">=12" }
     peerDependencies:
       svelte: ^3.49.0
     dependencies:
-      "@tanstack/table-core": 8.9.1
+      "@tanstack/table-core": 8.9.2
       svelte: 3.59.1
     dev: true
 
-  /@tanstack/table-core@8.9.1:
+  /@tanstack/table-core@8.9.2:
     resolution:
       {
-        integrity: sha512-2+R83n8vMZND0q3W1lSiF7co9nFbeWbjAErFf27xwbeA9E0wtUu5ZDfgj+TZ6JzdAEQAgfxkk/QNFAKiS8E4MA==,
+        integrity: sha512-ajc0OF+karBAdaSz7OK09rCoAHB1XI1+wEhu+tDNMPc+XcO+dTlXXN/Vc0a8vym4kElvEjXEDd9c8Zfgt4bekA==,
       }
     engines: { node: ">=12" }
     dev: true
@@ -789,10 +789,10 @@ packages:
       }
     dev: true
 
-  /@types/node@20.2.5:
+  /@types/node@20.3.0:
     resolution:
       {
-        integrity: sha512-JJulVEQXmiY9Px5axXHeYGLSjhkZEnD+MDPDGbCbIAbMslkKwmygtZFy1X6s/075Yo94sf8GuSlFfPzysQrWZQ==,
+        integrity: sha512-cumHmIAf6On83X7yP+LrsEyUOf/YlociZelmpRYaGFydoaPdxdt80MAbu6vWerQT2COCp2nPvHdsbD7tHn/YlQ==,
       }
     dev: true
 
@@ -1329,11 +1329,12 @@ packages:
       css-tree: 2.2.1
     dev: true
 
-  /daisyui@3.0.4(postcss@8.4.24):
+  /daisyui@3.0.25(postcss@8.4.24):
     resolution:
       {
-        integrity: sha512-KfQXj1WD0U0qA+9olKqZRgqu/D6udA3+DjsT5PIdk3dOAFFbyzYzUiadiAbZ/QHe98IDBWHmVjjB51Hxg8TydQ==,
+        integrity: sha512-VaX84OpujV8tEpl2IoUzDElbw/xwMZ+jXXGRY7V0SMyC+CYcXjAsLMi4M4VU4ulAPtlGHsZRgzrIrOPQvBtxRg==,
       }
+    engines: { node: ">=16.9.0" }
     peerDependencies:
       postcss: ^8
     dependencies:
@@ -2145,10 +2146,10 @@ packages:
     engines: { node: ">=0.10.0" }
     dev: true
 
-  /npm@9.6.7:
+  /npm@9.7.1:
     resolution:
       {
-        integrity: sha512-xwkU1hSZl6Qrkfw3fhxVmMfNWu0A67+aZZs5gz/LoehCeAPkVhQDB90Z2NFoPSI1KpfBWCJ6Bp28wXzv5U5/2g==,
+        integrity: sha512-kxMviaiLX4Lfnjy2dt7EWB87v5QdLiGpy04S2ORdKLmPqFhgy8g4cgJjQfnWob4mJIaNHjBO+hk45CvLlsZZ8g==,
       }
     engines: { node: ^14.17.0 || ^16.13.0 || >=18.0.0 }
     hasBin: true
@@ -2209,9 +2210,8 @@ packages:
       - proc-log
       - qrcode-terminal
       - read
-      - read-package-json
-      - read-package-json-fast
       - semver
+      - sigstore
       - ssri
       - tar
       - text-table
@@ -3092,7 +3092,7 @@ packages:
       svgo: 3.0.2
     dev: true
 
-  /vite@4.3.9(@types/node@20.2.5):
+  /vite@4.3.9(@types/node@20.3.0):
     resolution:
       {
         integrity: sha512-qsTNZjO9NoJNW7KnOrgYwczm0WctJ8m/yqYAMAK9Lxt4SoySUfS5S8ia9K7JHpa3KEeMfyF8LoJ3c5NeBJy6pg==,
@@ -3120,7 +3120,7 @@ packages:
       terser:
         optional: true
     dependencies:
-      "@types/node": 20.2.5
+      "@types/node": 20.3.0
       esbuild: 0.17.16
       postcss: 8.4.24
       rollup: 3.21.7
@@ -3139,7 +3139,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.3.9(@types/node@20.2.5)
+      vite: 4.3.9(@types/node@20.3.0)
     dev: true
 
   /winston-transport@4.5.0:

@@ -1,9 +1,9 @@
 declare namespace Responses {
-  export interface GrantedAuthority {
+  declare interface GrantedAuthority {
     authority: string;
   }
 
-  export interface Person {
+  declare interface Person {
     username: string;
     password: string;
     /** Format: uuid */
@@ -15,26 +15,26 @@ declare namespace Responses {
     personId: string;
   }
 
-  export interface SensorStationPersonReference {
+  declare interface SensorStationPersonReference {
     /** Format: uuid */
     id: string;
     inDashboard: boolean;
-    deleted: boolean;
     assigned: boolean;
+    deleted: boolean;
   }
 
-  export interface MessageResponse {
+  declare interface MessageResponse {
     message: string;
   }
 
-  export interface Sensor {
+  declare interface Sensor {
     /** Format: uuid */
     sensorId: string;
     type: string;
     unit: string;
   }
 
-  export interface SensorLimits {
+  declare interface SensorLimits {
     /** Format: date-time */
     timeStamp: string;
     /** Format: float */
@@ -47,7 +47,7 @@ declare namespace Responses {
     deleted: boolean;
   }
 
-  export interface AccessPoint {
+  declare interface AccessPoint {
     /** Format: uuid */
     deviceId: string;
     /** Format: uuid */
@@ -61,15 +61,15 @@ declare namespace Responses {
     sensorStations: SensorStation[];
     /** Format: date-time */
     lastConnection: string;
-    authorities: GrantedAuthority[];
     username: string;
-    deleted: boolean;
+    authorities: GrantedAuthority[];
     unlocked: boolean;
     password: string;
     connected: boolean;
+    deleted: boolean;
   }
 
-  export interface SensorData {
+  declare interface SensorData {
     /** Format: date-time */
     timeStamp: string;
     /** Format: float */
@@ -81,7 +81,7 @@ declare namespace Responses {
     deleted: boolean;
   }
 
-  export interface SensorStation {
+  declare interface SensorStation {
     /** Format: uuid */
     deviceId: string;
     bdAddress: string;
@@ -94,14 +94,14 @@ declare namespace Responses {
     sensorStationPersonReferences: SensorStationPersonReference[];
     sensorStationPictures: SensorStationPicture[];
     authorities: GrantedAuthority[];
-    deleted: boolean;
     unlocked: boolean;
     password: string;
     connected: boolean;
     username: string;
+    deleted: boolean;
   }
 
-  export interface SensorStationPicture {
+  declare interface SensorStationPicture {
     /** Format: uuid */
     pictureId: string;
     picturePath: string;
@@ -109,7 +109,7 @@ declare namespace Responses {
     timeStamp: string;
   }
 
-  export interface AuthenticationException {
+  declare interface AuthenticationException {
     cause: object;
     stackTrace: any[];
     message: string;
@@ -117,7 +117,7 @@ declare namespace Responses {
     localizedMessage: string;
   }
 
-  export interface TokenExpiredException {
+  declare interface TokenExpiredException {
     cause: object;
     stackTrace: any[];
     message: string;
@@ -125,7 +125,7 @@ declare namespace Responses {
     localizedMessage: string;
   }
 
-  export interface AccessDeniedException {
+  declare interface AccessDeniedException {
     cause: object;
     stackTrace: any[];
     message: string;
@@ -133,7 +133,7 @@ declare namespace Responses {
     localizedMessage: string;
   }
 
-  export interface CreatedUserResponse {
+  declare interface CreatedUserResponse {
     /** Format: uuid */
     id: string;
     username: string;
@@ -142,12 +142,12 @@ declare namespace Responses {
     permissions: GrantedAuthority[];
   }
 
-  export interface TokenResponse {
+  declare interface TokenResponse {
     /** Format: uuid */
     token: string;
   }
 
-  export interface LoginResponse {
+  declare interface LoginResponse {
     /** Format: uuid */
     token: string;
     /** Format: uuid */
@@ -155,74 +155,98 @@ declare namespace Responses {
     permissions: GrantedAuthority[];
   }
 
-  export interface PermissionResponse {
+  declare interface PermissionResponse {
     permissions: GrantedAuthority[];
   }
 
-  export interface InnerResponse {
+  declare interface SensorStationsInnerResponse {
+    /** Format: uuid */
+    sensorStationId: string;
+    roomName: string;
+    name: string;
+  }
+
+  declare interface SensorStationsResponse {
+    sensorStations: SensorStationsInnerResponse[];
+  }
+
+  declare interface AlarmResponse {
+    sensor: Sensor;
+    alarm: string;
+  }
+
+  declare interface SensorLimitsResponse {
+    /** Format: date-time */
+    timeStamp: string;
+    /** Format: float */
+    upperLimit: number;
+    /** Format: float */
+    lowerLimit: number;
+    /** Format: int32 */
+    thresholdDuration: number;
+    sensor: Sensor;
+    gardener: Person;
+    deleted: boolean;
+  }
+
+  declare interface SensorStationDetailResponse {
+    sensorStation: SensorStationInnerResponse;
+  }
+
+  declare interface SensorStationInnerResponse {
     /** Format: uuid */
     sensorStationId: string;
     bdAddress: string;
+    /** Format: int32 */
+    dipSwitchId: number;
     roomName: string;
     name: string;
     /** Format: int32 */
     transferInterval: number;
-    gardener: Person;
-    /** Format: int32 */
-    dipSwitchId: number;
     alarms: AlarmResponse[];
     unlocked: boolean;
     accessPointUnlocked: boolean;
     connected: boolean;
     deleted: boolean;
-    reported: boolean;
+    sensorLimits: SensorLimitsResponse[];
+    sensorStationPersonReferences: SensorStationPersonReference[];
+    sensorStationPictures: SensorStationPicture[];
   }
 
-  export interface SensorStationsResponse {
-    sensorStations: InnerResponse[];
-  }
-
-  export interface AlarmResponse {
-    sensor: Sensor;
-    alarm: string;
-  }
-
-  export interface SensorStationResponse {
-    sensorStation: InnerResponse;
-  }
-
-  export interface InnerPlantPicture {
+  declare interface InnerPlantPicture {
     /** Format: uuid */
     pictureId: string;
     /** Format: date-time */
     timeStamp: string;
   }
 
-  export interface PlantPicturesResponse {
+  declare interface PlantPicturesResponse {
     pictures: InnerPlantPicture[];
     roomName: string;
     plantName: string;
   }
 
-  export interface SensorStationPublicInfo {
+  declare interface SensorStationPublicInfo {
     name: string;
     roomName: string;
   }
 
-  export interface InnerSensors {
+  declare interface InnerSensors {
+    /** Format: uuid */
+    sensorId: string;
     sensorType: string;
     sensorUnit: string;
     values: TimeStampedSensorData[];
     sensorLimits: SensorLimits[];
   }
 
-  export interface SensorStationDataResponse {
+  declare interface SensorStationDataResponse {
     data: InnerSensors[];
     /** Format: uuid */
     sensorStationId: string;
   }
 
-  export interface TimeStampedSensorData {
+  declare interface TimeStampedSensorData {
     /** Format: date-time */
     timeStamp: string;
     /** Format: double */
@@ -232,34 +256,73 @@ declare namespace Responses {
     belowLimit: boolean;
   }
 
-  export interface DashBoardDataResponse {
-    sensorStations: DashboardSensorStation[];
-  }
-
-  export interface DashboardSensorStation {
-    name: string;
-    roomName: string;
+  declare interface SensorStationBaseResponse {
     /** Format: uuid */
     sensorStationId: string;
-    pictureIds: any[];
-    connected: boolean;
+    bdAddress: string;
+    /** Format: int32 */
+    dipSwitchId: number;
+    roomName: string;
+    name: string;
+    /** Format: int32 */
+    transferInterval: number;
+    alarms: AlarmResponse[];
     unlocked: boolean;
+    accessPointUnlocked: boolean;
+    connected: boolean;
     deleted: boolean;
   }
 
-  export interface ListResponse {
+  declare interface UserDashBoardResponse {
+    sensorStations: SensorStationBaseResponse[];
+  }
+
+  declare interface GardenerDashBoardResponse {
+    assignedSensorStations: SensorStationBaseResponse[];
+    addedSensorStations: SensorStationBaseResponse[];
+  }
+
+  declare interface AdminDashBoardResponse {
+    /** Format: int32 */
+    numOfUsers: number;
+    /** Format: int32 */
+    numOfConnectedSensorStations: number;
+    /** Format: int32 */
+    numOfConnectedAccessPoints: number;
+    sensorStations: SensorStationBaseResponse[];
+  }
+
+  declare interface ListResponse {
     items: any[];
   }
 
-  export interface AdminSensorStationsResponse {
-    sensorStations: InnerResponse[];
+  declare interface AdminSensorStationsResponse {
+    sensorStations: SensorStationBaseResponse[];
   }
 
-  export interface AccessPointListResponse {
+  declare interface AccessPointListResponse {
     accessPoints: InnerAccessPoint[];
   }
 
-  export interface InnerAccessPoint {
+  declare interface AccessPointListResponseSensorStation {
+    /** Format: uuid */
+    sensorStationId: string;
+    bdAddress: string;
+    /** Format: int32 */
+    dipSwitchId: number;
+    roomName: string;
+    name: string;
+    /** Format: int32 */
+    transferInterval: number;
+    alarms: AlarmResponse[];
+    unlocked: boolean;
+    accessPointUnlocked: boolean;
+    connected: boolean;
+    deleted: boolean;
+    reported: boolean;
+  }
+
+  declare interface InnerAccessPoint {
     /** Format: uuid */
     accessPointId: string;
     /** Format: uuid */
@@ -270,10 +333,10 @@ declare namespace Responses {
     connected: boolean;
     /** Format: int32 */
     transferInterval: number;
-    sensorStations: InnerResponse[];
+    sensorStations: AccessPointListResponseSensorStation[];
   }
 
-  export interface AccessPointConfigResponse {
+  declare interface AccessPointConfigResponse {
     roomName: string;
     pairingMode: boolean;
     /** Format: int32 */
@@ -281,21 +344,21 @@ declare namespace Responses {
     sensorStations: SensorStationInfo[];
   }
 
-  export interface Limits {
+  declare interface Limits {
     /** Format: double */
     lowerLimit: number;
     /** Format: double */
     upperLimit: number;
   }
 
-  export interface SensorInfo {
+  declare interface SensorInfo {
     sensorName: string;
     limits: Limits;
     /** Format: int32 */
     alarmThresholdTime: number;
   }
 
-  export interface SensorStationInfo {
+  declare interface SensorStationInfo {
     bdAddress: string;
     sensors: SensorInfo[];
   }
