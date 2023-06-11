@@ -47,7 +47,7 @@ public class SensorStation extends Device implements Serializable {
 	@JsonIgnore
 	@Fetch(FetchMode.SELECT)
 	@OneToOne()
-	@JoinColumn(name = "gardener_id", nullable = true)
+	@JoinColumn(name = "gardener_id")
 	private Person gardener = null;
 
 	@JsonIgnore

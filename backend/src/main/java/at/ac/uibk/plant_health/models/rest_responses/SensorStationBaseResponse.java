@@ -21,6 +21,7 @@ public class SensorStationBaseResponse extends RestResponse implements Serializa
 	private final String roomName;
 	private final String name;
 	private final int transferInterval;
+	private final Person gardener;
 	private final List<AlarmResponse> alarms;
 	private final boolean unlocked;
 	private final boolean accessPointUnlocked;
@@ -50,6 +51,7 @@ public class SensorStationBaseResponse extends RestResponse implements Serializa
 							  .distinct()
 							  .map(sensor -> new AlarmResponse(sensor, sensorStation))
 							  .toList();
+		this.gardener = sensorStation.getGardener();
 		this.unlocked = sensorStation.isUnlocked();
 		this.connected = sensorStation.isConnected();
 		this.deleted = sensorStation.isDeleted();

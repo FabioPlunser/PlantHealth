@@ -7,7 +7,7 @@
 -->
 <script lang="ts">
   export let gardener: any;
-  export let sensorStation: Responses.InnerResponse;
+  export let sensorStation: any;
   let value: any = undefined;
 
   function handleSelect() {
@@ -33,7 +33,8 @@
       }
     }
   }
-  $: console.log(gardener.length === 0);
+  $: console.log(gardener);
+  $: console.log(sensorStation);
 </script>
 
 <div>
@@ -49,8 +50,11 @@
         {#if sensorStation.gardener && sensorStation.gardener.username === person.username}
           <option selected value={person.personId}>{person.username}</option>
           <option value={true}> Unassign </option>
-        {:else if !sensorStation.gardener && i == 0}
-          <option value={"No gardener assigned"}>No gardener assigned</option>
+        {:else if !sensorStation.gardener || i == 0}
+          <option selected value={"No gardener assigned"}
+            >No gardener assigned</option
+          >
+          <option value={person.personId}>{person.username}</option>
         {:else}
           <option value={person.personId}>{person.username}</option>
         {/if}

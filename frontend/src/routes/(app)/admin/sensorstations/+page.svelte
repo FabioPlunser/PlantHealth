@@ -49,10 +49,11 @@
     },
   ];
 
-  let sensorStations: Responses.InnerResponse[] | null = null;
+  let sensorStations: any = null;
   $: data.streamed.sensorStations.then((data) => {
     sensorStations = data.sensorStations;
   });
+  $: console.log(data);
 </script>
 
 {#if rendered}
