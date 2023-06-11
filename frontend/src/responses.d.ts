@@ -19,8 +19,8 @@ declare namespace Responses {
     /** Format: uuid */
     id: string;
     inDashboard: boolean;
-    assigned: boolean;
     deleted: boolean;
+    assigned: boolean;
   }
 
   export interface MessageResponse {
@@ -63,10 +63,10 @@ declare namespace Responses {
     lastConnection: string;
     authorities: GrantedAuthority[];
     username: string;
+    deleted: boolean;
+    unlocked: boolean;
     password: string;
     connected: boolean;
-    unlocked: boolean;
-    deleted: boolean;
   }
 
   export interface SensorData {
@@ -88,16 +88,17 @@ declare namespace Responses {
     name: string;
     /** Format: int32 */
     dipSwitchId: number;
+    reported: boolean;
     sensorData: SensorData[];
     sensorLimits: SensorLimits[];
     sensorStationPersonReferences: SensorStationPersonReference[];
     sensorStationPictures: SensorStationPicture[];
     authorities: GrantedAuthority[];
+    deleted: boolean;
+    unlocked: boolean;
     password: string;
     connected: boolean;
-    unlocked: boolean;
     username: string;
-    deleted: boolean;
   }
 
   export interface SensorStationPicture {
@@ -169,15 +170,21 @@ declare namespace Responses {
     gardener: Person;
     /** Format: int32 */
     dipSwitchId: number;
-    alarm: string;
+    alarms: AlarmResponse[];
     unlocked: boolean;
     accessPointUnlocked: boolean;
     connected: boolean;
     deleted: boolean;
+    reported: boolean;
   }
 
   export interface SensorStationsResponse {
     sensorStations: InnerResponse[];
+  }
+
+  export interface AlarmResponse {
+    sensor: Sensor;
+    alarm: string;
   }
 
   export interface SensorStationResponse {
@@ -263,7 +270,7 @@ declare namespace Responses {
     connected: boolean;
     /** Format: int32 */
     transferInterval: number;
-    sensorStations: AdminSensorStationsResponse;
+    sensorStations: InnerResponse[];
   }
 
   export interface AccessPointConfigResponse {

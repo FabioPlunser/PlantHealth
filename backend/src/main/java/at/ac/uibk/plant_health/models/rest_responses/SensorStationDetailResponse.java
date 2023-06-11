@@ -1,10 +1,8 @@
 package at.ac.uibk.plant_health.models.rest_responses;
 
-import java.awt.image.ImageProducer;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Stream;
 
 import at.ac.uibk.plant_health.models.SensorStationPersonReference;
 import at.ac.uibk.plant_health.models.device.SensorStation;
@@ -14,52 +12,26 @@ import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
 import at.ac.uibk.plant_health.models.user.Person;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-public class SensorStationResponse extends RestResponse implements Serializable {
-	private final InnerResponse sensorStation;
+@SuperBuilder
+public class SensorStationDetailResponse extends RestResponse implements Serializable {
+	private final SensorStationInnerResponse sensorStation;
 
-	public SensorStationResponse(SensorStation sensorStation, Person person) {
-		super();
-		this.sensorStation = new InnerResponse(sensorStation, person);
+	public SensorStationDetailResponse(SensorStation sensorStation, Person person) {
+		this.sensorStation = new SensorStationInnerResponse(sensorStation, person);
 	}
 
 	@Getter
-	private static class InnerResponse implements Serializable {
-		private final String bdAddress;
-		private final int dipSwitchId;
-		private final String name;
-		private final String roomName;
-		private final UUID sensorStationId;
-		private final Person gardener;
-		private final boolean unlocked;
-		private final boolean connected;
-		private final boolean deleted;
-		private final int transferInterval;
+	private static class SensorStationInnerResponse
+			extends SensorStationBaseResponse implements Serializable {
 		private final List<SensorLimitsResponse> sensorLimits;
 		private final List<SensorStationPersonReference> sensorStationPersonReferences;
 		private final List<SensorStationPicture> sensorStationPictures;
 
-		public InnerResponse(SensorStation sensorStation, Person person) {
-			this.bdAddress = sensorStation.getBdAddress();
-			this.dipSwitchId = sensorStation.getDipSwitchId();
-			this.name = sensorStation.getName();
-			var accessPoint = sensorStation.getAccessPoint();
-			if (accessPoint != null)
-				this.roomName = accessPoint.getRoomName();
-			else
-				this.roomName = null;
-			this.sensorStationId = sensorStation.getDeviceId();
-			this.gardener = sensorStation.getGardener();
-			this.unlocked = sensorStation.isUnlocked();
-			this.connected = sensorStation.isConnected();
-			this.deleted = sensorStation.isDeleted();
-			if (sensorStation.getAccessPoint() != null) {
-				this.transferInterval = sensorStation.getAccessPoint().getTransferInterval();
-			} else {
-				this.transferInterval = 0;
-			}
-
+		public SensorStationInnerResponse(SensorStation sensorStation, Person person) {
+			super(sensorStation);
 			this.sensorLimits =
 					sensorStation.getSensorData()
 							.stream()
@@ -108,6 +80,22 @@ public class SensorStationResponse extends RestResponse implements Serializable 
 				this.sensor = sensorLimit.getSensor();
 				this.gardener = sensorLimit.getGardener();
 				this.deleted = sensorLimit.isDeleted();
+			}
+		}
+
+		@Getter
+		public static class AlarmResponse implements Serializable {
+			private final Sensor sensor;
+			private final String alarm;
+
+			public AlarmResponse(Sensor sensor, SensorStation sensorStation) {
+				this.sensor = sensor;
+				this.alarm = sensorStation.getSensorData()
+									 .stream()
+									 .filter(d -> d.getSensor().equals(sensor))
+									 .max(Comparator.comparing(SensorData::getTimeStamp))
+									 .map(SensorData::getAlarm)
+									 .orElse("n");
 			}
 		}
 	}

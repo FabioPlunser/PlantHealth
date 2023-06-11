@@ -301,4 +301,19 @@ public class AccessPointService {
 		AccessPoint accessPoint = findById(accessPointId);
 		return accessPoint.getSensorStations();
 	}
+
+	/**
+	 * Set all new sensor stations of an access point to reported
+	 * @param accessPoints
+	 * @throws ServiceException
+	 */
+	public void setAccessPointSensorStationsReported(List<AccessPoint> accessPoints)
+			throws ServiceException {
+		for (AccessPoint accessPoint : accessPoints) {
+			for (SensorStation sensorStation : accessPoint.getSensorStations()) {
+				sensorStation.setReported(true);
+				sensorStationService.save(sensorStation);
+			}
+		}
+	}
 }

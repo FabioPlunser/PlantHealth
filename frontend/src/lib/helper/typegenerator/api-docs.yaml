@@ -454,14 +454,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "200":
-          description: Access Point lock state successfully set
+        "400":
+          description: Access Point lock state could not be set
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "400":
-          description: Access Point lock state could not be set
+        "200":
+          description: Access Point lock state successfully set
           content:
             "*/*":
               schema:
@@ -490,14 +490,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "200":
-          description: Access Point lock state successfully set
+        "400":
+          description: Access Point lock state could not be set
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "400":
-          description: Access Point lock state could not be set
+        "200":
+          description: Access Point lock state successfully set
           content:
             "*/*":
               schema:
@@ -529,14 +529,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "200":
-          description: Sensor Stations successfully added
+        "400":
+          description: Sensor Stations could not be added
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "400":
-          description: Sensor Stations could not be added
+        "200":
+          description: Sensor Stations successfully added
           content:
             "*/*":
               schema:
@@ -567,14 +567,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "200":
-          description: Sensor Stations successfully added
+        "400":
+          description: Sensor Stations could not be added
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "400":
-          description: Sensor Stations could not be added
+        "200":
+          description: Sensor Stations successfully added
           content:
             "*/*":
               schema:
@@ -1893,14 +1893,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "400":
-          description: Transfer interval could not be set
+        "200":
+          description: Transfer interval successfully set
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "200":
-          description: Transfer interval successfully set
+        "400":
+          description: Transfer interval could not be set
           content:
             "*/*":
               schema:
@@ -1925,14 +1925,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "200":
-          description: Scan successfully started
+        "400":
+          description: Scan could not be started
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "400":
-          description: Scan could not be started
+        "200":
+          description: Scan successfully started
           content:
             "*/*":
               schema:
@@ -2716,18 +2716,18 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "400":
-          description: Access Point configuration could not be retrieved
-          content:
-            "*/*":
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
         "200":
           description: Access Point configuration successfully retrieved
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/AccessPointConfigResponse"
+        "400":
+          description: Access Point configuration could not be retrieved
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
   /delete-user:
     delete:
       tags:
@@ -2857,9 +2857,9 @@ components:
           format: uuid
         inDashboard:
           type: boolean
-        assigned:
-          type: boolean
         deleted:
+          type: boolean
+        assigned:
           type: boolean
     MessageResponse:
       type: object
@@ -2928,13 +2928,13 @@ components:
             $ref: "#/components/schemas/GrantedAuthority"
         username:
           type: string
-        password:
-          type: string
-        connected:
+        deleted:
           type: boolean
         unlocked:
           type: boolean
-        deleted:
+        password:
+          type: string
+        connected:
           type: boolean
       description: ""
     SensorData:
@@ -2970,6 +2970,8 @@ components:
         dipSwitchId:
           type: integer
           format: int32
+        reported:
+          type: boolean
         sensorData:
           type: array
           items:
@@ -2990,16 +2992,16 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GrantedAuthority"
+        deleted:
+          type: boolean
+        unlocked:
+          type: boolean
         password:
           type: string
         connected:
           type: boolean
-        unlocked:
-          type: boolean
         username:
           type: string
-        deleted:
-          type: boolean
       description: ""
     SensorStationPicture:
       type: object
@@ -3442,8 +3444,10 @@ components:
         dipSwitchId:
           type: integer
           format: int32
-        alarm:
-          type: string
+        alarms:
+          type: array
+          items:
+            $ref: "#/components/schemas/AlarmResponse"
         unlocked:
           type: boolean
         accessPointUnlocked:
@@ -3451,6 +3455,8 @@ components:
         connected:
           type: boolean
         deleted:
+          type: boolean
+        reported:
           type: boolean
     SensorStationsResponse:
       type: object
@@ -3460,6 +3466,13 @@ components:
           items:
             $ref: "#/components/schemas/InnerResponse"
       description: ""
+    AlarmResponse:
+      type: object
+      properties:
+        sensor:
+          $ref: "#/components/schemas/Sensor"
+        alarm:
+          type: string
     SensorStationResponse:
       type: object
       properties:
@@ -3612,7 +3625,9 @@ components:
           type: integer
           format: int32
         sensorStations:
-          $ref: "#/components/schemas/AdminSensorStationsResponse"
+          type: array
+          items:
+            $ref: "#/components/schemas/InnerResponse"
     AccessPointConfigResponse:
       type: object
       properties:

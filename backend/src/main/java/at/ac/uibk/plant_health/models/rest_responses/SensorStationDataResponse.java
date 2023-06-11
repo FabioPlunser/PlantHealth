@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
+
 @Getter
 public class SensorStationDataResponse extends RestResponse implements Serializable {
 	private final List<InnerSensors> data;
@@ -32,7 +33,7 @@ public class SensorStationDataResponse extends RestResponse implements Serializa
 								.collect(groupingBy(SensorData::getSensor))
 								.entrySet()
 								.stream()
-								.map(entry -> new InnerSensors(entry, sensorStation))
+								.map(entry -> new InnerSensors(entry, sensorStation, from, to))
 								.toList();
 
 		} else {
@@ -42,19 +43,25 @@ public class SensorStationDataResponse extends RestResponse implements Serializa
 
 	@Getter
 	private static class InnerSensors implements Serializable {
+		private final UUID sensorId;
 		private final String sensorType;
 		private final String sensorUnit;
 		private final List<TimeStampedSensorData> values;
 		private final List<SensorLimits> sensorLimits;
 		public InnerSensors(
-				Map.Entry<Sensor, List<SensorData>> sensorData, SensorStation sensorStation
+				Map.Entry<Sensor, List<SensorData>> sensorData, SensorStation sensorStation,
+				LocalDateTime from, LocalDateTime to
 		) {
+			this.sensorId = sensorData.getKey().getSensorId();
 			this.sensorType = sensorData.getKey().getType();
 			this.sensorUnit = sensorData.getKey().getUnit();
 
 			this.sensorLimits =
 					sensorStation.getSensorLimits()
 							.stream()
+							.filter(limit
+									-> limit.getTimeStamp().isAfter(from)
+											&& limit.getTimeStamp().isBefore(to))
 							.filter(limit -> limit.getSensor().equals(sensorData.getKey()))
 							.sorted(Comparator.comparing(SensorLimits::getTimeStamp))
 							.toList();

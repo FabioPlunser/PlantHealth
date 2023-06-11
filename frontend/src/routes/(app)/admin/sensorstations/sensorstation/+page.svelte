@@ -23,6 +23,7 @@
     dates: data.dates,
     sensorStations: Array.of(data.streamed.sensorStation),
   };
+  $: console.log(data);
 </script>
 
 {#if rendered}

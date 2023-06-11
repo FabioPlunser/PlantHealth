@@ -1,6 +1,5 @@
 package at.ac.uibk.plant_health.controllers;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.annotation.DeleteOperation;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
@@ -9,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-import at.ac.uibk.plant_health.models.annotations.AnyPermission;
 import at.ac.uibk.plant_health.models.annotations.PrincipalRequired;
 import at.ac.uibk.plant_health.models.exceptions.ServiceException;
 import at.ac.uibk.plant_health.models.rest_responses.*;
@@ -20,9 +18,11 @@ import at.ac.uibk.plant_health.service.PersonService;
 import at.ac.uibk.plant_health.service.SensorStationPersonReferenceService;
 import at.ac.uibk.plant_health.service.SensorStationService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
 public class DashBoardController {
@@ -36,9 +36,53 @@ public class DashBoardController {
 	private AccessPointService accessPointService;
 
 	@Operation(summary = "Get dashboard data")
-	@ApiResponse(
-			responseCode = "200", description = "Successfully retrieved dashboard data",
-			content = @Content(schema = @Schema(implementation = DashBoardDataResponse.class))
+	@ApiResponses(
+			value =
+			{
+				@ApiResponse(
+
+						responseCode = "403",
+						description = "User is not allowed to access this resource",
+						content = @Content(schema = @Schema(implementation = MessageResponse.class))
+				)
+				,
+						@ApiResponse(
+								responseCode = "404", description = "User not found",
+								content = @Content(
+										schema = @Schema(implementation = MessageResponse.class)
+								)
+						),
+						@ApiResponse(
+								responseCode = "200",
+								description = "Successfully retrieved dashboard data",
+								content = @Content(
+										schema =
+												@Schema(implementation =
+																UserDashBoardResponse.class)
+								)
+						),
+						// Hack to get all schemas into the swagger documentation
+						// Should be all 200 but according to OpenApi you can't have multiple 200
+						// responses
+						@ApiResponse(
+								responseCode = "209",
+								description = "Successfully retrieved dashboard data",
+								content = @Content(
+										schema =
+												@Schema(implementation =
+																AdminDashBoardResponse.class)
+								)
+						),
+						@ApiResponse(
+								responseCode = "210",
+								description = "Successfully retrieved dashboard data",
+								content = @Content(
+										schema =
+												@Schema(implementation =
+																GardenerDashBoardResponse.class)
+								)
+						),
+			}
 	)
 	@ReadOperation
 	@PrincipalRequired(Person.class)
@@ -46,6 +90,7 @@ public class DashBoardController {
 	public RestResponseEntity
 	getDashboard(Person person) {
 		try {
+			System.out.println(person);
 			if (person.getPermissions().contains(Permission.ADMIN))
 				return new AdminDashBoardResponse(
 							   sensorStationService.findAll(),
@@ -58,7 +103,7 @@ public class DashBoardController {
 						.toEntity();
 			}
 
-			return new DashBoardDataResponse(person).toEntity();
+			return new UserDashBoardResponse(person).toEntity();
 		} catch (ServiceException e) {
 			return MessageResponse.builder()
 					.statusCode(e.getStatusCode())

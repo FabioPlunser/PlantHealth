@@ -140,11 +140,7 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    require("@tailwindcss/typography"),
-    require("daisyui"),
-    require("tailwindcss-textshadow"),
-  ],
+  plugins: [require("daisyui")],
   daisyui: {
     themes: [
       "light",
