@@ -77,7 +77,7 @@ public class SensorStationController {
 	@Operation(summary = "Get sensor station by id")
 	@ApiResponse(
 			responseCode = "200", description = "Successfully retrieved sensor station data",
-			content = @Content(schema = @Schema(implementation = SensorStationResponse.class))
+			content = @Content(schema = @Schema(implementation = SensorStationDetailResponse.class))
 	)
 	@ReadOperation
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
@@ -86,7 +86,9 @@ public class SensorStationController {
 	public RestResponseEntity
 	getSensorStation(Person person, @RequestParam("sensorStationId") final UUID sensorStationId) {
 		try {
-			return new SensorStationResponse(sensorStationService.findById(sensorStationId), person)
+			return new SensorStationDetailResponse(
+						   sensorStationService.findById(sensorStationId), person
+			)
 					.toEntity();
 		} catch (ServiceException e) {
 			return MessageResponse.builder()

@@ -31,7 +31,7 @@ def generate_ts_definition(yaml_file):
         file.write("declare namespace Responses {\n")
 
         for schema_name, schema_properties in schemas.items():
-            file.write(f"  export interface {schema_name} " + "{\n")
+            file.write(f"  declare interface {schema_name} " + "{\n")
 
             for prop_name, prop_details in schema_properties.get(
                 "properties", {}

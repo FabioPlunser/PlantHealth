@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.device.SensorStation;
+import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
 import at.ac.uibk.plant_health.models.user.Person;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -11,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 public class SensorStationsResponse extends RestResponse implements Serializable {
-	private final List<InnerResponse> sensorStations;
+	private final List<SensorStationsInnerResponse> sensorStations;
 	public SensorStationsResponse(List<SensorStation> sensorStations, Person person) {
 		this.sensorStations =
 				sensorStations.stream()
@@ -22,19 +23,19 @@ public class SensorStationsResponse extends RestResponse implements Serializable
 								-> person.getSensorStationPersonReferences().stream().noneMatch(
 										r -> r.getSensorStation().equals(s)
 								))
-						.map(InnerResponse::new)
+						.map(SensorStationsInnerResponse::new)
 						.toList();
 	}
 
 	@Getter
-	private static class InnerResponse implements Serializable {
+	private static class SensorStationsInnerResponse implements Serializable {
 		private final UUID sensorStationId;
 		private final String roomName;
-		private final String sensorStationName;
-		public InnerResponse(SensorStation sensorStation) {
+		private final String name;
+		public SensorStationsInnerResponse(SensorStation sensorStation) {
 			this.sensorStationId = sensorStation.getDeviceId();
 			this.roomName = sensorStation.getAccessPoint().getRoomName();
-			this.sensorStationName = sensorStation.getName();
+			this.name = sensorStation.getName();
 		}
 	}
 }
