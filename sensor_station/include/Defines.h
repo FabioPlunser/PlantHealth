@@ -18,7 +18,7 @@
  * 3 -> Even more notifications. (Not used so far)
  * 4 -> Full call stack of every function call. (Not implemented so far)
  */
-#define DEBUG_PRINT_LEVEL 3
+#define DEBUG_PRINT_LEVEL 2
 
 /* If DO_HARDWARE_TEST is defined the hardware tests will be executet to test
  all the connected devices of the Arduino. Otherwise the main programm will be
@@ -51,7 +51,7 @@
  * If set to TRUE the arduino will wait in the setup till a serial connection
  * for debug prints is present.
  */
-#define WAIT_FOR_SERIAL_CONNECTION			   FALSE
+#define WAIT_FOR_SERIAL_CONNECTION			   TRUE
 
 /**
  * If this is set to true the led and piezo buzzer will never output anything.

@@ -6,6 +6,8 @@
 #include <cassert>
 #include <string>
 #include <vector>
+#include <Defines.h>
+#include <CompilerFunctions.hpp>
 
 // The arduino requires the flash buffer to be aligned to the block size
 #define FLASH_BLOCK_SIZE 4096
@@ -75,6 +77,10 @@ class FlashStorage {
 			arduino::String emptyString = "";
 			emptyString.c_str();
 			ramBuffer[lastI + 1] = '\0';
+			DEBUG_PRINTF(2, "Will write %s to flash.\n", (char*)ramBuffer);
+			DEBUG_PRINTF(2, "Write will start at %lu with size %lu.\n",
+						 PAIRED_DEVICE_BLOCK.startAdress,
+						 PAIRED_DEVICE_BLOCK.sizeBytes);
 			this->flash->program(
 				ramBuffer, PAIRED_DEVICE_BLOCK.startAdress,
 				PAIRED_DEVICE_BLOCK.sizeBytes
@@ -88,10 +94,18 @@ class FlashStorage {
 		 */
 		arduino::String readPairedDevice() {
 			uint8_t * ramBuffer = new uint8_t[PAIRED_DEVICE_BLOCK.sizeBytes];
+			DEBUG_PRINTF(2, "Will read from flash at %lu with size %lu.\n",
+						 PAIRED_DEVICE_BLOCK.startAdress,
+						 PAIRED_DEVICE_BLOCK.sizeBytes);
 			this->flash->read(
 				ramBuffer, PAIRED_DEVICE_BLOCK.startAdress,
 				PAIRED_DEVICE_BLOCK.sizeBytes
 			);
+			for(int i = 0; i < 128; i++){
+				Serial.print(ramBuffer[i]);
+				Serial.print(" ");
+			}
+			DEBUG_PRINTF(2, "Read %s from flash.\n", (char*)ramBuffer);
 			arduino::String pairedDevice;
 			for (uint32_t i = 0; i < PAIRED_DEVICE_BLOCK.sizeBytes; i++) {
 				if (ramBuffer[i] == 0) {
