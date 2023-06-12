@@ -159,11 +159,7 @@ public class AccessPointService {
 	 * @param deviceId
 	 * @return true if the AccessPoint was unlocked, false otherwise
 	 */
-<<<<<<< HEAD
 	@AuditLogAnnotation(successMessage = "Unlocked AccessPoint {deviceId}")
-=======
-	@Transactional
->>>>>>> e40719a0d1bb19068ed1fcad76d1b10fa2772b94
 	public void setUnlocked(boolean unlocked, UUID deviceId) throws ServiceException {
 		AccessPoint accessPoint = null;
 		accessPoint = findById(deviceId);
@@ -308,11 +304,7 @@ public class AccessPointService {
 	 * @param accessPointId
 	 * @throws ServiceException
 	 */
-<<<<<<< HEAD
 	@AuditLogAnnotation(successMessage = "Deleted AccessPoint {accessPointId}")
-=======
-	@Transactional
->>>>>>> e40719a0d1bb19068ed1fcad76d1b10fa2772b94
 	public void deleteAccessPoint(UUID accessPointId) throws ServiceException {
 		Optional<AccessPoint> maybeAccessPoint = accessPointRepository.findById(accessPointId);
 		if (maybeAccessPoint.isEmpty()) {
