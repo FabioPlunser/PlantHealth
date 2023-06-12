@@ -101,6 +101,10 @@ declare interface SensorStationComponent
   pictures: SensorStationPicture[];
 }
 
+declare interface Dashboard {
+  sensorStations: SensorStationComponent[];
+}
+
 declare interface SensorStationDetailComponentInner
   extends Responses.SensorStationInnerResponse {
   data: Promise<Responses.SensorStationDataResponse>;

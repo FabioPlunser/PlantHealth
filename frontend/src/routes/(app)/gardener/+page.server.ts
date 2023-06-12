@@ -11,27 +11,11 @@ import {
   getSensorStationData,
   getSensorStationPictures,
   getSensorStationLimits,
+  setDates,
 } from "$helper/sensorStation";
 
 export async function load(event) {
   const { cookies, fetch } = event;
-
-  let cookieFrom = cookies.get("from") || "";
-  let cookieTo = cookies.get("to") || "";
-
-  let from: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  let to: Date = new Date(Date.now());
-
-  if (cookieFrom !== "" && cookieTo !== "") {
-    from = new Date(cookieFrom);
-    to = new Date(cookieTo);
-  }
-
-  let dates = {
-    from: from,
-    to: to,
-  };
-
   //---------------------------------------------------------------------
   // get all sensor stations available to add to dashboard
   //---------------------------------------------------------------------
@@ -107,6 +91,7 @@ export async function load(event) {
     });
   }
 
+  let dates = setDates(event);
   return {
     dates,
     streamed: {

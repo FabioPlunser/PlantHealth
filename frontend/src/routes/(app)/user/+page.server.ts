@@ -11,28 +11,13 @@ import {
   getSensorStationData,
   getSensorStationPictures,
   getSensorStationLimits,
+  setDates,
 } from "$helper/sensorStation";
 
 export async function load(event) {
   const { cookies, fetch } = event;
 
-  let cookieFrom = cookies.get("from") || "";
-  let cookieTo = cookies.get("to") || "";
-
-  let from: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  let to: Date = new Date(Date.now());
-
-  if (cookieFrom !== "" && cookieTo !== "") {
-    from = new Date(cookieFrom);
-    to = new Date(cookieTo);
-  }
-
-  let dates = {
-    from: from,
-    to: to,
-  };
-
-  async function getDashBoardSensorStations(): Promise<Responses.UserDashBoardResponse> {
+  async function getDashBoardSensorStations(): Promise<Dashboard> {
     return new Promise(async (resolve, reject) => {
       let res = await fetch(`${BACKEND_URL}/get-dashboard`);
       if (!res.ok) {
@@ -43,7 +28,6 @@ export async function load(event) {
         );
       }
       let data = await res.json();
-      console.log(data);
       let dashBoardSensorStations = data.sensorStations;
       if (dashBoardSensorStations.length == 0) resolve({ sensorStations: [] });
       for (let sensorStation of dashBoardSensorStations) {
@@ -58,6 +42,7 @@ export async function load(event) {
     });
   }
 
+  let dates = setDates(event);
   return {
     dates,
     streamed: {

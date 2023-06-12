@@ -11,24 +11,12 @@ import {
   getSensorStationData,
   getSensorStationPictures,
   getSensorStationLimits,
+  setDates,
 } from "$helper/sensorStation";
 
 export async function load(event) {
   const { cookies, fetch } = event;
-  let cookieFrom = cookies.get("from") || "";
-  let cookieTo = cookies.get("to") || "";
 
-  let from: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  let to: Date = new Date(Date.now());
-  // if cookies are set overwrite the dates
-  if (cookieFrom !== "" || cookieTo !== "") {
-    from = new Date(cookieFrom);
-    to = new Date(cookieTo);
-  }
-  let dates = {
-    from: from,
-    to: to,
-  };
   //-------------------------------------------------------------------------------------------------------------------------
   // get sensor station
   //-------------------------------------------------------------------------------------------------------------------------
@@ -72,6 +60,7 @@ export async function load(event) {
   }
   //-------------------------------------------------------------------------------------------------------------------------
   //-------------------------------------------------------------------------------------------------------------------------
+  let dates = setDates(event);
   return {
     streamed: {
       sensorStation: getSensorStation(),

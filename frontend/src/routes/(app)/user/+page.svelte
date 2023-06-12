@@ -25,8 +25,7 @@
   //---------------------------------------------------
   let searchTerm = "";
   let allSensorStations: Responses.SensorStationsInnerResponse[] | null = null;
-  let dashBoardSensorStations: Responses.SensorStationBaseResponse[] | null =
-    null;
+  let dashBoardSensorStations: SensorStationComponent[] | null = null;
   $: {
     data.streamed.dashBoardSensorStations.then((res) => {
       dashBoardSensorStations = res.sensorStations;
