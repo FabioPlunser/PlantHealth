@@ -27,22 +27,22 @@
 @keyframes blink-animation {
   0% {
     opacity: 1;
-    transform: scale(1);
+    /* transform: scale(1); */
   }
   50% {
     opacity: 0.3;
-    transform: scale(1.03);
+    /* transform: scale(1.001); */
   }
   100% {
     opacity: 1;
-    transform: scale(1);
+    /* transform: scale(1); */
   }
 }
 /* ------------------------------------------------- */
 /* ------------------------------------------------- */
 /* ------------------------------------------------- */
 .alarm {
-  animation: blink 1s infinite;
+  animation: blink 1.5s infinite;
 }
 
 @keyframes blink {
