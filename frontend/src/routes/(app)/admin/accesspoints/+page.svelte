@@ -202,8 +202,20 @@
                         <button class="btn btn-primary" formaction="?/update"
                           >Update</button
                         >
+                        <input
+                          type="hidden"
+                          name="scanActive"
+                          value={!accessPoint.scanActive}
+                        />
                         {#if accessPoint.scanActive}
-                          <div
+                          <button
+                            class="btn hover:bg-purple-700 bg-purple-700 text-white"
+                            formaction="?/scan"
+                          >
+                            <h1>Scanning</h1>
+                            <Spinner />
+                          </button>
+                          <!-- <div
                             class="flex disable justify-center text-white items-center gap-1 btn hover:bg-purple-700 bg-purple-700 border-none"
                           >
                             <h1>Scanning:</h1>
@@ -213,17 +225,22 @@
                               fill="dark:fill-white fill-info"
                               background="text-black"
                             />
-                          </div>
+                          </div> -->
                         {:else if !accessPoint.connected || !accessPoint.unlocked}
                           <button
                             disabled
                             class="btn btn-error"
-                            formaction="?/scan">Not Scanning</button
+                            formaction="?/scan">Start scanning</button
                           >
                         {:else}
-                          <button class="btn btn-error" formaction="?/scan"
-                            >Not Scanning</button
+                          <div
+                            class="tooltip"
+                            data-tip="Scanning will cancel automatically after 5min"
                           >
+                            <button class="btn btn-error" formaction="?/scan"
+                              >Start scanning</button
+                            >
+                          </div>
                         {/if}
                         {#if accessPoint.unlocked}
                           <button class="btn btn-info" formaction="?/unlock"

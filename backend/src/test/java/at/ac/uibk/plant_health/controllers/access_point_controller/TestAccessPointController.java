@@ -252,7 +252,7 @@ public class TestAccessPointController {
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(person))
 								.param("accessPointId", String.valueOf(accessPoint.getDeviceId()))
-								.param("unlocked", "true")
+								.param("scanActive", "true")
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
@@ -428,6 +428,7 @@ public class TestAccessPointController {
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(person))
 								.param("accessPointId", String.valueOf(UUID.randomUUID()))
+								.param("scanActive", "true")
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isNotFound());
 	}

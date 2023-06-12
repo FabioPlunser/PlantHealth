@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import at.ac.uibk.plant_health.models.device.AccessPoint;
 import at.ac.uibk.plant_health.models.device.SensorStation;
@@ -212,13 +214,24 @@ public class AccessPointService {
 	 * @throws ServiceException if the AccessPoint could not be found.
 	 */
 	@Transactional
-	public void startScan(UUID deviceId) throws ServiceException {
-		AccessPoint accessPoint = findById(deviceId);
-		if (!accessPoint.isConnected()) {
+	public void setScan(UUID deviceId, boolean scanActive) throws ServiceException {
+		AtomicReference<AccessPoint> accessPoint = new AtomicReference<>(findById(deviceId));
+		if (!accessPoint.get().isConnected()) {
 			throw new ServiceException("AccessPoint is not connected", 400);
 		}
-		accessPoint.setScanActive(true);
-		save(accessPoint);
+		accessPoint.get().setScanActive(scanActive);
+		save(accessPoint.get());
+
+		ScheduledExecutorService ex = Executors.newSingleThreadScheduledExecutor();
+		ex.schedule(() -> {
+			try {
+				accessPoint.set(findById(deviceId));
+				accessPoint.get().setScanActive(false);
+				save(accessPoint.get());
+			} catch (ServiceException e) {
+				e.printStackTrace();
+			}
+		}, 5, TimeUnit.MINUTES);
 	}
 
 	/**

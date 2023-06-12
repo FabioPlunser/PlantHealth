@@ -1,10 +1,8 @@
 package at.ac.uibk.plant_health.controllers;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
-import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +22,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.With;
 
 @RestController
 public class AccessPointController {
@@ -214,11 +211,14 @@ public class AccessPointController {
 	@AnyPermission(Permission.ADMIN)
 	@PostMapping("/scan-for-sensor-stations")
 	public RestResponseEntity
-	scanForSensorStations(@RequestParam(name = "accessPointId") final UUID accessPointId) {
+	scanForSensorStations(
+			@RequestParam(name = "accessPointId") final UUID accessPointId,
+			@RequestParam(name = "scanActive") final boolean scanActive
+	) {
 		try {
 			accessPointService.findById(accessPointId);
 			accessPointService.isUnlockedByDeviceId(accessPointId);
-			accessPointService.startScan(accessPointId);
+			accessPointService.setScan(accessPointId, scanActive);
 		} catch (ServiceException e) {
 			return MessageResponse.builder()
 					.statusCode(e.getStatusCode())

@@ -12,10 +12,10 @@
   import SensorStationDeleteButton from "../sensorStationInfo/SensorStationDeleteButton.svelte";
   import SensorStationNameGardenerComposition from "./SensorStationNameGardenerComposition.svelte";
 
-  export let sensorStations: SensorStation[];
+  export let sensorStations: any[];
   export let gardener: any;
 
-  let columns: ColumnDef<SensorStation>[] = [
+  let columns: ColumnDef<any>[] = [
     {
       id: "station",
       accessorKey: "_",
