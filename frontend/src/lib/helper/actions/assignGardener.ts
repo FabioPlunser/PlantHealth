@@ -17,12 +17,12 @@ export async function assignGardener(event: any, formData?: any) {
   /* HACK: we somehow need to be able to update a sensor station that is not yet assigned
    * so we return early from this function as the update action always calls updateSensorStation() and assignGardener()
    */
-  if (gardenerId === '') {
-    toasts.addToast(
-      event.locals.user?.personId,
-      "error",
-      "No gardener assigned"
-    );
+  if (gardenerId === "") {
+    // toasts.addToast(
+    //   event.locals.user?.personId,
+    //   "error",
+    //   "No gardener assigned"
+    // );
     return;
   }
   let params = new URLSearchParams();

@@ -38,7 +38,11 @@
   >
     <input type="hidden" name="sensorStationId" value={sensorStationId} />
     <div>
-      <label for="file-input" data-tip="Upload Image" class="tooltip">
+      <label
+        for="file-input"
+        data-tip="Upload Image"
+        class="tooltip tooltip-primary"
+      >
         <i
           class="bi bi-camera-fill text-4xl btn btn-primary hover:text-black"
         />

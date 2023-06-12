@@ -112,8 +112,8 @@ Usage example:
       >
         {#each sensors as sensor, i (i)}
           <div
-            in:fly|self={{ y: -50, duration: 50, delay: 100 * i }}
-            class="tooltip"
+            in:fly|local|self={{ y: -50, duration: 50, delay: 100 * i }}
+            class="tooltip tooltip-primary"
             data-tip={sensor.sensorType}
           >
             <button on:click={() => (currentSensor = sensor)}>

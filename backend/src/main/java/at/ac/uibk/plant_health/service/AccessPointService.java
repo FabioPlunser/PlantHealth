@@ -87,7 +87,7 @@ public class AccessPointService {
 		}
 		try {
 			// AccessPoint already exists quietly abort
-			//			setLastConnection(findBySelfAssignedId(selfAssignedId));
+			setLastConnection(findBySelfAssignedId(selfAssignedId));
 			return;
 		} catch (ServiceException e) {
 			// AccessPoint does not exist
@@ -345,6 +345,7 @@ public class AccessPointService {
 			throws ServiceException {
 		for (AccessPoint accessPoint : accessPoints) {
 			for (SensorStation sensorStation : accessPoint.getSensorStations()) {
+				if (sensorStation.isReported()) continue;
 				sensorStation.setReported(true);
 				sensorStationService.save(sensorStation);
 			}

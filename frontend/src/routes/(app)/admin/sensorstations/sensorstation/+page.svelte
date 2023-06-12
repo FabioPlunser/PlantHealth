@@ -15,19 +15,18 @@
   });
   // ----------------------------------
   // ----------------------------------
-  export let data;
+  export let data: SensorStationDetailComponent;
   export let form;
   // ----------------------------------
   // ----------------------------------
-  $: sensorStationsData = {
-    dates: data.dates,
-    sensorStations: Array.of(data.streamed.sensorStation),
-  };
-  $: console.log(data);
+  // $: sensorStationsData = {
+  //   dates: data.dates,
+  //   sensorStations: Array.of(data.streamed.sensorStation),
+  // };
 </script>
 
 {#if rendered}
   <section in:fly={{ y: -200, duration: 200 }}>
-    <SensorStationDetail data={sensorStationsData} {form} />
+    <SensorStationDetail {data} {form} />
   </section>
 {/if}

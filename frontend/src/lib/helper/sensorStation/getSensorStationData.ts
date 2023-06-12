@@ -9,7 +9,9 @@ type Dates = {
 
 export async function getSensorStationData(
   event: any,
-  sensorStation: Responses.SensorStationBaseResponse,
+  sensorStation:
+    | Responses.SensorStationBaseResponse
+    | Responses.SensorStationInnerResponse,
   dates: Dates
 ): Promise<Responses.SensorStationDataResponse> {
   return await new Promise(async (resolve, reject) => {

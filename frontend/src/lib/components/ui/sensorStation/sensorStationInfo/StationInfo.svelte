@@ -69,34 +69,3 @@
     </div>
   {/if}
 </div>
-
-<style>
-  .blinking {
-    position: relative;
-    color: red;
-  }
-
-  .blinking::before {
-    content: "";
-    position: absolute;
-    color: white;
-    animation: blinking-animation 1s ease-in-out infinite;
-  }
-
-  @keyframes blinking-animation {
-    0% {
-      color: red;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.3;
-      color: black;
-      transform: scale(1.001);
-    }
-    100% {
-      /* opacity: 1; */
-      color: red;
-      transform: scale(1);
-    }
-  }
-</style>

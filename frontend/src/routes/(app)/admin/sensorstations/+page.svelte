@@ -65,7 +65,7 @@
         {#each buttonGroup as button (button.description)}
           <button
             data-tip={button.description}
-            class="btn tooltip bg-base-200 dark:bg-gray-500 border border-base-300 hover:bg-primary {state ===
+            class="btn  tooltip-primary bg-base-200 dark:bg-gray-500 border border-base-300 hover:bg-primary {state ===
             button.name
               ? 'btn-active dark:btn-active'
               : ''}"
@@ -132,49 +132,3 @@
     {/if}
   </section>
 {/if}
-
-<style>
-  .blinking-border {
-    position: relative;
-  }
-
-  .blinking-border-red::before {
-    content: "";
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    border: 8px solid transparent;
-    border-radius: 1rem;
-    box-shadow: 0px 0px 0px 4px red;
-    animation: blink-animation 1s ease-in-out infinite;
-  }
-  .blinking-border-blue::before {
-    content: "";
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    border: 8px solid transparent;
-    border-radius: 1rem;
-    box-shadow: 0px 0px 0px 4px blue;
-    animation: blink-animation 1s ease-in-out infinite;
-  }
-
-  @keyframes blink-animation {
-    0% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.3;
-      transform: scale(1.03);
-    }
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-</style>

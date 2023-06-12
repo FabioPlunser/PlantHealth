@@ -48,10 +48,8 @@
         {#if sensorStation.gardener && sensorStation.gardener.username === person.username}
           <option selected value={person.personId}>{person.username}</option>
           <option value={true}> Unassign </option>
-        {:else if !sensorStation.gardener || i == 0}
-          <option selected value={"No gardener assigned"}
-            >No gardener assigned</option
-          >
+        {:else if !sensorStation.gardener && i == 0}
+          <option selected value={""}>No gardener assigned</option>
           <option value={person.personId}>{person.username}</option>
         {:else}
           <option value={person.personId}>{person.username}</option>

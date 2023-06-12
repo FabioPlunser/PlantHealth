@@ -34,39 +34,47 @@ export async function load(event) {
   //-------------------------------------------------------------------------------------------------------------------------
   let sensorStationId = String(cookies.get("sensorStationId"));
 
-  let res = await fetch(
-    `${BACKEND_URL}/get-sensor-station?sensorStationId=${sensorStationId}`
-  );
-  if (!res.ok) {
-    errorHandler(
-      event.locals.user?.personId,
-      "Couldn't get sensor station",
-      res
-    );
-  }
+  async function getSensorStation(): Promise<SensorStationDetailComponent> {
+    return new Promise(async (resolve, reject) => {
+      let res = await fetch(
+        `${BACKEND_URL}/get-sensor-station?sensorStationId=${sensorStationId}`
+      );
+      if (!res.ok) {
+        errorHandler(
+          event.locals.user?.personId,
+          "Couldn't get sensor station",
+          res
+        );
+      }
 
-  let data = await res.json();
-  let sensorStation = data.sensorStation;
-  sensorStation.data = getSensorStationData(event, sensorStation, dates);
-  sensorStation.pictures = await getSensorStationPictures(event, sensorStation);
-  sensorStation.limits = getSensorStationLimits(event, sensorStation);
+      let data: Responses.SensorStationDetailResponse = await res.json();
+
+      let sensorStation: SensorStationDetailComponent = data.sensorStation;
+      sensorStation.data = getSensorStationData(event, sensorStation, dates);
+      sensorStation.pictures = await getSensorStationPictures(
+        event,
+        sensorStation
+      );
+
+      resolve(sensorStation);
+    });
+  }
   //-------------------------------------------------------------------------------------------------------------------------
   // get all gardener
   //-------------------------------------------------------------------------------------------------------------------------
   let gardener = null;
-  res = await fetch(`${BACKEND_URL}/get-all-gardener`);
+  let res = await fetch(`${BACKEND_URL}/get-all-gardener`);
   if (!res.ok) {
     logger.error("Could not get gardener");
     throw error(res.status, "Could not get gardener");
   } else {
     gardener = await res.json();
-    gardener = gardener.items;
   }
   //-------------------------------------------------------------------------------------------------------------------------
   //-------------------------------------------------------------------------------------------------------------------------
   return {
     streamed: {
-      sensorStation,
+      sensorStation: getSensorStation(),
     },
     gardener,
     dates: {

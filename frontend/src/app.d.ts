@@ -81,6 +81,11 @@ declare interface SensorValue {
   alarm: string;
 }
 
+declare interface Dates {
+  from: Date;
+  to: Date;
+}
+
 declare interface Picture {
   pictureId: string;
   imageRef: string;
@@ -94,4 +99,19 @@ declare interface SensorStationComponent
   extends Responses.SensorStationBaseResponse {
   data: Promise<Responses.SensorStationDataResponse>;
   pictures: SensorStationPicture[];
+}
+
+declare interface SensorStationDetailComponentInner
+  extends Responses.SensorStationInnerResponse {
+  data: Promise<Responses.SensorStationDataResponse>;
+  pictures: SensorStationPicture[];
+}
+
+declare interface SensorStationDetailComponent
+  extends Responses.SensorStationInnerResponse {
+  streamed: {
+    sensorStation: Promise<SensorStationComponent>;
+  };
+  gradener: Responses.ListResponse;
+  dates: Dates;
 }

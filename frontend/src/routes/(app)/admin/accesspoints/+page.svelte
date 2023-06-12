@@ -177,7 +177,10 @@
                         <div class="badge badge-error">Disconnected</div>
                       {/if}
                       {#if accessPoint.sensorStations.length > 0}
-                        <div class="tooltip" data-tip="Go to Sensorstations">
+                        <div
+                          class="tooltip tooltip-primary"
+                          data-tip="Go to Sensorstations"
+                        >
                           <a
                             href="/admin/accesspoints/sensorstations?accessPointId={accessPoint.accessPointId}"
                           >
@@ -234,7 +237,7 @@
                           >
                         {:else}
                           <div
-                            class="tooltip"
+                            class="tooltip tooltip-primary"
                             data-tip="Scanning will cancel automatically after 5min"
                           >
                             <button class="btn btn-error" formaction="?/scan"

@@ -29,7 +29,7 @@ async function getPictureIds(
 export async function getSensorStationPictures(
   event: any,
   sensorStation: Responses.SensorStationBaseResponse
-): Promise<Promise<Picture>[]> {
+): Promise<SensorStationPicture[]> {
   let pictures = await getPictureIds(event, sensorStation);
   let possiblePictures = pictures.pictures;
 

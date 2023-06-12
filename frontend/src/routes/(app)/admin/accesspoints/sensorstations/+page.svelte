@@ -67,7 +67,7 @@
         {#each buttonGroup as button (button.description)}
           <button
             data-tip={button.description}
-            class="btn tooltip bg-base-200 dark:bg-gray-500 border border-base-300 hover:bg-primary {state ===
+            class="btn tooltip tooltip-primary bg-base-200 dark:bg-gray-500 border border-base-300 hover:bg-primary {state ===
             button.name
               ? 'btn-active dark:btn-active'
               : ''}"
