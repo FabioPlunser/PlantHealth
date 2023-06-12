@@ -24,15 +24,25 @@
   //---------------------------------------------------
   //---------------------------------------------------
   let searchTerm = "";
+  let allSensorStations: Responses.SensorStationsInnerResponse[] | null = null;
+  let dashBoardSensorStations: Responses.SensorStationBaseResponse[] | null =
+    null;
+  $: {
+    data.streamed.dashBoardSensorStations.then((res) => {
+      dashBoardSensorStations = res.sensorStations;
+    });
+    data.streamed.allSensorStations.then((res) => {
+      console.log(res);
+      allSensorStations = res.sensorStations;
+    });
+  }
 </script>
 
 {#if rendered}
   <section>
-    {#await data.streamed.allSensorStations}
-      <Spinner />
-    {:then sensorStations}
+    {#if allSensorStations}
       <SensorStationsModal
-        data={sensorStations}
+        data={allSensorStations}
         bind:showModal={sensorStationModal}
         on:close={() => (sensorStationModal = false)}
       />
@@ -43,12 +53,12 @@
           on:click={() => (sensorStationModal = true)}>SensorStations</button
         >
       </div>
-    {/await}
-
-    {#await data.streamed.dashBoardSensorStations}
-      <Spinner />
-    {:then sensorStations}
-      {#if sensorStations.length === 0}
+    {:else}
+      <h1 class="flex justify-center">Something went wrong</h1>
+    {/if}
+    <!-- ----------------------------------------------------------------------- -->
+    {#if dashBoardSensorStations}
+      {#if dashBoardSensorStations.length === 0}
         <div class="flex justify-center mt-20">
           <h1 class="text-2xl font-bold">
             You have no SensorStations in your Dashboard
@@ -66,7 +76,7 @@
         </div>
         <div class="flex justify-center mt-20">
           <div class="gap-4 grid jusitfy-center w-full">
-            {#each sensorStations as sensorStation, i (sensorStation.sensorStationId)}
+            {#each dashBoardSensorStations as sensorStation, i (sensorStation.sensorStationId)}
               {#if sensorStation.name.includes(searchTerm) || sensorStation.roomName.includes(searchTerm)}
                 <div
                   in:fly={{ y: -200, duration: 200, delay: 200 * i }}
@@ -79,6 +89,8 @@
           </div>
         </div>
       {/if}
-    {/await}
+    {:else}
+      <h1 class="flex justify-center">Something went wrong</h1>
+    {/if}
   </section>
 {/if}

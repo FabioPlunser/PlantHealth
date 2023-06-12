@@ -4,7 +4,6 @@
   import PageTransition from "$components/pageTransition.svelte";
 
   export let data: any;
-  console.log(data);
 </script>
 
 <Nav user={data?.permission} />

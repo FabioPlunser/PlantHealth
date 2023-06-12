@@ -7,16 +7,14 @@
   import Line from "./Line.svelte";
   import MediaQuery from "$helper/MediaQuery.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
+  import Graph from "../ui/Graph.svelte";
   // ---------------------------------------------------
   // ---------------------------------------------------
-  export let data: Responses.SensorStationDataResponse;
-  export let sensorStation: Responses.InnerResponse;
+  export let sensorStation: SensorStationComponent;
   export let loading = false;
   export let options = {};
   // ---------------------------------------------------
   // ---------------------------------------------------
-  let sensors = $sensorsStore;
-  let currentSensor: any = sensors[0].sensorType;
   let graphData: any = {};
   let width = 0;
   $: {
@@ -47,44 +45,61 @@
   }
   // ---------------------------------------------------
   // ---------------------------------------------------
-  async function addMissingSensors(dynamicSensors: any) {
-    for (let sensor of dynamicSensors) {
-      if (!sensors.some((s) => s.sensorType === sensor.sensorType)) {
-        let newSensor = {
-          sensorId: sensor.sensorId,
-          sensorType: sensor.sensorType,
-          sensorUnit: sensor.sensorUnit,
-          bootstrap: "",
-          google: "sensors",
-        };
-        sensors = [...sensors, newSensor];
-      }
+  let currentSensor: any = null;
+  let sensors: any[] = [];
+  let storedSensors = $sensorsStore;
+  let data = sensorStation.data;
+  $: console.log(data);
+  data.then(async (res) => {
+    console.log(res.data);
+    for (let sensor of res.data) {
+      let storedSensor = storedSensors.find(
+        (s) => s.sensorType === sensor.sensorType
+      );
+      let foundSensor = {
+        sensorId: sensor.sensorId,
+        sensorType: sensor.sensorType,
+        sensorUnit: sensor.sensorUnit,
+        bootstrap:
+          storedSensor?.bootstrap === "" ? "" : storedSensor?.bootstrap,
+        google: storedSensor?.google === "" ? "" : storedSensor?.google,
+      };
+      sensors = [...sensors, foundSensor];
+    }
+    graphData = createGraphData(res.data);
+  });
+
+  $: {
+    if (sensors.length > 0) {
+      currentSensor = sensors[0];
     }
   }
-  if (data instanceof Promise) {
-    data
-      .then(async (res: any) => {
-        addMissingSensors(res.data);
-        graphData = createGraphData(res.data);
-      })
-      .catch((err: any) => {
-        console.error("Error while fetching data", { payload: err });
-      });
-  } else {
-    addMissingSensors(data);
-    graphData = createGraphData(data);
-  }
-  // ---------------------------------------------------
-  // ---------------------------------------------------
-  $: console.log(sensorStation.alarms);
-  $: {
-    sensorStation.alarms.some((a) => {
-      if (a.sensor.type === currentSensor) {
-        console.log(a);
-      }
-    });
-  }
+
   $: console.log(sensors);
+  // if (data instanceof Promise) {
+  //   data
+  //     .then(async (res: any) => {
+  //       // addMissingSensors(res.data);
+  //       graphData = createGraphData(res.data);
+  //     })
+  //     .catch((err: any) => {
+  //       console.error("Error while fetching data", { payload: err });
+  //     });
+  // } else {
+  //   // addMissingSensors(data);
+  //   graphData = createGraphData(data);
+  // }
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // $: console.log(sensorStation.alarms);
+  // $: {
+  //   sensorStation.alarms.some((a) => {
+  //     if (a.sensor.type === currentSensor) {
+  //       console.log(a);
+  //     }
+  //   });
+  // }
+  // $: console.log(sensors);
 </script>
 
 <!-- @component
@@ -106,41 +121,41 @@ Usage example:
       {:else if Object.keys(graphData).length === 0}
         <h1 class="font-bold text-4xl flex justify-center">No data found</h1>
       {:else}
+        <h1 class="font-bold">{currentSensor.sensorUnit}</h1>
         <MediaQuery query="(width <= 640px)" let:matches>
           {#key matches}
-            <Line data={graphData?.[currentSensor]} {options} />
+            <Line data={graphData?.[currentSensor.sensorType]} {options} />
           {/key}
         </MediaQuery>
       {/if}
     </div>
 
-    <div
-      class="bg-green-400 mx-auto shadow-2xl rounded-2xl flex justify-center items-ceter gap-4 md:grid md:flex-none md:justify-normal md:gap-2 p-2"
-    >
-      {#each sensors as sensor, i (i)}
-        <div
-          in:fly|self={{ y: -50, duration: 50, delay: 100 * i }}
-          class="tooltip"
-          data-tip={sensor.sensorType}
-        >
-          <!-- {#if sensorStation.alarms.some((a) => a.sensor.type === sensor.sensorType && a.alarm !== 'n')}
-           {sensor.sensorType}
-          {/if} -->
-          <button on:click={() => (currentSensor = sensor.sensorType)}>
-            <i
-              class="bi {sensor.bootstrap} transform transition-transform active:scale-110 material-symbols-outlined text-2xl sm:text-3xl md:text-4xl xl:text-5xl hover:text-blue-400 hover:scale-105 hover:dark:text-black
-              {sensor.sensorType === currentSensor
-                ? 'text-black'
-                : 'text-white'}"
-              class:alarm={sensorStation.alarms.some(
-                (a) => a.sensor.type === sensor.sensorType && a.alarm !== "n"
-              )}
-            >
-              {sensor?.google}
-            </i>
-          </button>
-        </div>
-      {/each}
-    </div>
+    {#if Object.keys(graphData).length > 0}
+      <div
+        class="bg-green-400 mx-auto shadow-2xl rounded-2xl flex justify-center items-ceter gap-4 md:grid md:flex-none md:justify-normal md:gap-2 p-2"
+      >
+        {#each sensors as sensor, i (i)}
+          <div
+            in:fly|self={{ y: -50, duration: 50, delay: 100 * i }}
+            class="tooltip"
+            data-tip={sensor.sensorType}
+          >
+            <button on:click={() => (currentSensor = sensor)}>
+              <i
+                class="bi {sensor.bootstrap} transform transition-transform active:scale-110 material-symbols-outlined text-2xl sm:text-3xl md:text-4xl xl:text-5xl hover:text-blue-400 hover:scale-105 hover:dark:text-black
+              {sensor.sensorType === currentSensor.sensorType
+                  ? 'text-black'
+                  : 'text-white'}"
+                class:alarm={sensorStation.alarms.some(
+                  (a) => a.sensor.type === sensor.sensorType && a.alarm !== "n"
+                )}
+              >
+                {sensor?.google}
+              </i>
+            </button>
+          </div>
+        {/each}
+      </div>
+    {/if}
   </div>
 </div>

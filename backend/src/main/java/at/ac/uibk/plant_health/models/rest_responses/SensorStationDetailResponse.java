@@ -24,6 +24,7 @@ public class SensorStationDetailResponse extends RestResponse implements Seriali
 	}
 
 	@Getter
+
 	private static class SensorStationInnerResponse
 			extends SensorStationBaseResponse implements Serializable {
 		private final List<SensorLimitsResponse> sensorLimits;
@@ -80,22 +81,6 @@ public class SensorStationDetailResponse extends RestResponse implements Seriali
 				this.sensor = sensorLimit.getSensor();
 				this.gardener = sensorLimit.getGardener();
 				this.deleted = sensorLimit.isDeleted();
-			}
-		}
-
-		@Getter
-		public static class AlarmResponse implements Serializable {
-			private final Sensor sensor;
-			private final String alarm;
-
-			public AlarmResponse(Sensor sensor, SensorStation sensorStation) {
-				this.sensor = sensor;
-				this.alarm = sensorStation.getSensorData()
-									 .stream()
-									 .filter(d -> d.getSensor().equals(sensor))
-									 .max(Comparator.comparing(SensorData::getTimeStamp))
-									 .map(SensorData::getAlarm)
-									 .orElse("n");
 			}
 		}
 	}

@@ -32,22 +32,20 @@ export async function load(event) {
     to: to,
   };
 
-  let data = await fetch(`${BACKEND_URL}/get-dashboard`).then(async (res) => {
-    if (!res.ok) {
-      errorHandler(
-        event.locals.user?.personId,
-        "Error while fetching dashboard sensor stations",
-        await res.json()
-      );
-    }
-    return await res.json();
-  });
-
-  let dashBoardSensorStations = data?.sensorStations;
-
-  async function getDashBoardSensorStations(): Promise<any> {
+  async function getDashBoardSensorStations(): Promise<Responses.UserDashBoardResponse> {
     return new Promise(async (resolve, reject) => {
-      if (dashBoardSensorStations.length == 0) resolve([]);
+      let res = await fetch(`${BACKEND_URL}/get-dashboard`);
+      if (!res.ok) {
+        errorHandler(
+          event.locals.user?.personId,
+          "Error while fetching dashboard sensor stations",
+          await res.json()
+        );
+      }
+      let data = await res.json();
+      console.log(data);
+      let dashBoardSensorStations = data.sensorStations;
+      if (dashBoardSensorStations.length == 0) resolve({ sensorStations: [] });
       for (let sensorStation of dashBoardSensorStations) {
         sensorStation.data = getSensorStationData(event, sensorStation, dates);
         sensorStation.pictures = await getSensorStationPictures(
@@ -56,14 +54,7 @@ export async function load(event) {
         );
       }
 
-      resolve(dashBoardSensorStations);
-    }).catch((e) => {
-      errorHandler(
-        event.locals.user?.personId,
-        "Error while fetching dashboard sensor stations",
-        e
-      );
-      return null;
+      resolve({ sensorStations: dashBoardSensorStations });
     });
   }
 

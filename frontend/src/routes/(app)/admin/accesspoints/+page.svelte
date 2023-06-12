@@ -130,9 +130,9 @@
                             event.preventDefault();
                             return;
                           }
-                          throw redirect(307, "/admin/accesspoints");
                         }}
                         formaction="?/delete"
+                        formnovalidate={true}
                       >
                         <i
                           class="absolute top-0 right-0 m-4 bi bi-trash text-4xl hover:text-red-500"

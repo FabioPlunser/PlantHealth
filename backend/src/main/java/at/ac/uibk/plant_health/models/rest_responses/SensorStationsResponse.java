@@ -32,6 +32,9 @@ public class SensorStationsResponse extends RestResponse implements Serializable
 		private final UUID sensorStationId;
 		private final String roomName;
 		private final String name;
+		// newest picture for the response interface in frontend
+		// because it gets fetched in a separate request
+		private final String newestPicture = "";
 		public SensorStationsInnerResponse(SensorStation sensorStation) {
 			this.sensorStationId = sensorStation.getDeviceId();
 			this.roomName = sensorStation.getAccessPoint().getRoomName();

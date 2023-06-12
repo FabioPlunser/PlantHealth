@@ -43,6 +43,7 @@ public class SensorStationService {
 
 	private static final String NOT_FOUND_ERROR_MESSAGE = "Could not find SensorStation";
 
+	@Transactional
 	public SensorStation findById(UUID id) throws ServiceException {
 		Optional<SensorStation> maybeSensorStation = this.sensorStationRepository.findById(id);
 		if (maybeSensorStation.isEmpty()) {
@@ -51,6 +52,7 @@ public class SensorStationService {
 		return maybeSensorStation.get();
 	}
 
+	@Transactional
 	public List<SensorStation> findAssociated(Person person) {
 		if (person.getPermissions().contains(Permission.GARDENER)) {
 			return sensorStationRepository.findNewForGardener(person);
@@ -59,10 +61,12 @@ public class SensorStationService {
 		}
 	}
 
+	@Transactional
 	public List<SensorStation> findAll() {
 		return sensorStationRepository.findAll();
 	}
 
+	@Transactional
 	public SensorStation findByBdAddress(String bdAddress) throws ServiceException {
 		if (bdAddress == null) {
 			throw new ServiceException(NOT_FOUND_ERROR_MESSAGE, 404);
@@ -75,12 +79,13 @@ public class SensorStationService {
 		return maybeSensorStation.get();
 	}
 
+	@Transactional
 	public SensorStation sensorStationExists(String bdAddress) {
 		Optional<SensorStation> maybeSensorStation =
 				this.sensorStationRepository.findByBdAddress(bdAddress);
 		return maybeSensorStation.orElse(null);
 	}
-
+	@Transactional
 	public SensorStation save(SensorStation sensorStation) throws ServiceException {
 		try {
 			return sensorStationRepository.save(sensorStation);
@@ -96,6 +101,7 @@ public class SensorStationService {
 	 * @return
 	 * @throws ServiceException
 	 */
+	@Transactional
 	public void setUnlocked(boolean unlocked, UUID sensorStationId) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
 		sensorStation.setUnlocked(unlocked);
@@ -122,7 +128,7 @@ public class SensorStationService {
 				);
 			Sensor sensor = maybeSensor.get();
 			SensorLimits newLimit = new SensorLimits(
-					LocalDateTime.now(), limit.getLowerLimit(), limit.getUpperLimit(),
+					LocalDateTime.now(), limit.getUpperLimit(), limit.getLowerLimit(),
 					limit.getThresholdDuration(), sensor, person, sensorStation
 			);
 			try {
@@ -138,6 +144,7 @@ public class SensorStationService {
 	 * @param sensorStation
 	 * @param name
 	 */
+	@Transactional
 	public void updateSensorStation(
 			SensorStation sensorStation, String name, Integer transferInterval
 	) {
@@ -150,6 +157,7 @@ public class SensorStationService {
 		save(sensorStation);
 	}
 
+	@Transactional
 	public void assignGardenerToSensorStation(
 			SensorStation sensorStation, UUID personId, boolean delete
 	) throws ServiceException {
@@ -158,7 +166,7 @@ public class SensorStationService {
 			save(sensorStation);
 			return;
 		}
-		if(personId == null) throw new ServiceException("No personId was given", 404);
+		if (personId == null) throw new ServiceException("No personId was given", 404);
 		Optional<Person> maybePerson = personService.findById(personId);
 		if (maybePerson.isEmpty()) throw new ServiceException("Person does not exist", 404);
 		Person person = maybePerson.get();
@@ -172,17 +180,20 @@ public class SensorStationService {
 	 * @param sensorStationId
 	 * @return list of base64 encoded pictures
 	 */
+	@Transactional
 	public List<SensorStationPicture> getPictures(UUID sensorStationId) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
 		return sensorStation.getSensorStationPictures();
 	}
 
+	@Transactional
 	public SensorStationPicture getPicture(UUID pictureId) throws ServiceException {
 		Optional<SensorStationPicture> maybePicture = plantPictureRepository.findById(pictureId);
 		if (maybePicture.isEmpty()) throw new ServiceException("Picture does not exist", 404);
 		return maybePicture.get();
 	}
 
+	@Transactional
 	public SensorStationPicture getNewestPicture(UUID sensorStationId) throws ServiceException {
 		try {
 			SensorStation sensorStation = findById(sensorStationId);
@@ -199,6 +210,7 @@ public class SensorStationService {
 	 * @param picture base64 encoded picture
 	 * @return true if upload was successful
 	 */
+	@Transactional
 	public void uploadPicture(MultipartFile picture, UUID sensorStationId) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
 		SensorStationPicture plantPicture = null;
@@ -223,6 +235,7 @@ public class SensorStationService {
 		save(sensorStation);
 	}
 
+	@Transactional
 	public byte[] convertPictureToByteArray(SensorStationPicture picture) throws ServiceException {
 		try {
 			return Files.readAllBytes(Paths.get(picture.getPicturePath()));
@@ -242,6 +255,7 @@ public class SensorStationService {
 	 * @return
 	 * @throws ServiceException
 	 */
+	@Transactional
 	public void deletePicture(UUID pictureId) throws ServiceException {
 		Optional<SensorStationPicture> maybePicture = plantPictureRepository.findById(pictureId);
 		if (maybePicture.isEmpty()) throw new ServiceException("Picture does not exist", 404);
@@ -264,6 +278,7 @@ public class SensorStationService {
 	 * @param sensorStationId
 	 * @throws ServiceException
 	 */
+	@Transactional
 	public void deleteAllPictures(UUID sensorStationId) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
 		List<SensorStationPicture> pictures =
@@ -280,6 +295,7 @@ public class SensorStationService {
 		}
 	}
 
+	@Transactional
 	private void savePicture(SensorStationPicture picture) {
 		try {
 			Path path = Paths.get(picture.getPicturePath());
@@ -291,6 +307,7 @@ public class SensorStationService {
 		}
 	}
 
+	@Transactional
 	public void addSensorData(SensorStation sensorStation, SensorData data)
 			throws ServiceException {
 		if (data == null || sensorStation == null) throw new ServiceException("Invalid data", 400);
@@ -307,6 +324,7 @@ public class SensorStationService {
 		this.sensorDataRepository.save(data);
 	}
 
+	@Transactional
 	public void addSensorData(SensorStation sensorStation, List<SensorData> dataList)
 			throws ServiceException {
 		if (dataList == null || sensorStation == null)
@@ -333,6 +351,7 @@ public class SensorStationService {
 	 * @param sensorStationId
 	 * @throws ServiceException
 	 */
+	@Transactional
 	public void deleteSensorStation(UUID sensorStationId) throws ServiceException {
 		Optional<SensorStation> maybeSensorStation =
 				sensorStationRepository.findById(sensorStationId);

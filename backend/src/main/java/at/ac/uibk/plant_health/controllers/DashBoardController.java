@@ -90,7 +90,6 @@ public class DashBoardController {
 	public RestResponseEntity
 	getDashboard(Person person) {
 		try {
-			System.out.println(person);
 			if (person.getPermissions().contains(Permission.ADMIN))
 				return new AdminDashBoardResponse(
 							   sensorStationService.findAll(),

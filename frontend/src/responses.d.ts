@@ -63,9 +63,9 @@ declare namespace Responses {
     lastConnection: string;
     username: string;
     authorities: GrantedAuthority[];
+    connected: boolean;
     unlocked: boolean;
     password: string;
-    connected: boolean;
     deleted: boolean;
   }
 
@@ -94,10 +94,10 @@ declare namespace Responses {
     sensorStationPersonReferences: SensorStationPersonReference[];
     sensorStationPictures: SensorStationPicture[];
     authorities: GrantedAuthority[];
-    unlocked: boolean;
-    password: string;
     connected: boolean;
     username: string;
+    unlocked: boolean;
+    password: string;
     deleted: boolean;
   }
 
@@ -164,6 +164,8 @@ declare namespace Responses {
     sensorStationId: string;
     roomName: string;
     name: string;
+    /** base64 */
+    newestPicture: string;
   }
 
   declare interface SensorStationsResponse {
@@ -203,6 +205,7 @@ declare namespace Responses {
     name: string;
     /** Format: int32 */
     transferInterval: number;
+    gardener: Person;
     alarms: AlarmResponse[];
     unlocked: boolean;
     accessPointUnlocked: boolean;
@@ -256,6 +259,11 @@ declare namespace Responses {
     belowLimit: boolean;
   }
 
+  declare interface GardenerDashBoardResponse {
+    assignedSensorStations: SensorStationBaseResponse[];
+    addedSensorStations: SensorStationBaseResponse[];
+  }
+
   declare interface SensorStationBaseResponse {
     /** Format: uuid */
     sensorStationId: string;
@@ -266,6 +274,7 @@ declare namespace Responses {
     name: string;
     /** Format: int32 */
     transferInterval: number;
+    gardener: Person;
     alarms: AlarmResponse[];
     unlocked: boolean;
     accessPointUnlocked: boolean;
@@ -275,11 +284,6 @@ declare namespace Responses {
 
   declare interface UserDashBoardResponse {
     sensorStations: SensorStationBaseResponse[];
-  }
-
-  declare interface GardenerDashBoardResponse {
-    assignedSensorStations: SensorStationBaseResponse[];
-    addedSensorStations: SensorStationBaseResponse[];
   }
 
   declare interface AdminDashBoardResponse {
@@ -314,6 +318,7 @@ declare namespace Responses {
     name: string;
     /** Format: int32 */
     transferInterval: number;
+    gardener: Person;
     alarms: AlarmResponse[];
     unlocked: boolean;
     accessPointUnlocked: boolean;

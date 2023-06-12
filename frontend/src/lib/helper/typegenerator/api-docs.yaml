@@ -529,14 +529,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "200":
-          description: Sensor Stations successfully added
+        "400":
+          description: Sensor Stations could not be added
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "400":
-          description: Sensor Stations could not be added
+        "200":
+          description: Sensor Stations successfully added
           content:
             "*/*":
               schema:
@@ -567,14 +567,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "200":
-          description: Sensor Stations successfully added
+        "400":
+          description: Sensor Stations could not be added
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "400":
-          description: Sensor Stations could not be added
+        "200":
+          description: Sensor Stations successfully added
           content:
             "*/*":
               schema:
@@ -1816,14 +1816,14 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "400":
-          description: Access Point info could not be updated
+        "200":
+          description: Access Point info successfully updated
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "200":
-          description: Access Point info successfully updated
+        "400":
+          description: Access Point info could not be updated
           content:
             "*/*":
               schema:
@@ -2549,24 +2549,24 @@ paths:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "404":
-          description: User not found
-          content:
-            "*/*":
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
-        "200":
-          description: Successfully retrieved dashboard data
-          content:
-            "*/*":
-              schema:
-                $ref: "#/components/schemas/UserDashBoardResponse"
         "210":
           description: Successfully retrieved dashboard data
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/GardenerDashBoardResponse"
+        "200":
+          description: Successfully retrieved dashboard data
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/UserDashBoardResponse"
+        "404":
+          description: User not found
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "209":
           description: Successfully retrieved dashboard data
           content:
@@ -2675,18 +2675,18 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-        "200":
-          description: Access Points successfully retrieved
-          content:
-            "*/*":
-              schema:
-                $ref: "#/components/schemas/AccessPointListResponse"
         "400":
           description: Access Points could not be retrieved
           content:
             "*/*":
               schema:
                 $ref: "#/components/schemas/MessageResponse"
+        "200":
+          description: Access Points successfully retrieved
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/AccessPointListResponse"
   /get-access-point-sensor-stations:
     get:
       tags:
@@ -2950,12 +2950,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GrantedAuthority"
+        connected:
+          type: boolean
         unlocked:
           type: boolean
         password:
           type: string
-        connected:
-          type: boolean
         deleted:
           type: boolean
       description: ""
@@ -3014,13 +3014,13 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GrantedAuthority"
-        unlocked:
-          type: boolean
-        password:
-          type: string
         connected:
           type: boolean
         username:
+          type: string
+        unlocked:
+          type: boolean
+        password:
           type: string
         deleted:
           type: boolean
@@ -3516,6 +3516,8 @@ components:
         transferInterval:
           type: integer
           format: int32
+        gardener:
+          $ref: "#/components/schemas/Person"
         alarms:
           type: array
           items:
@@ -3613,6 +3615,18 @@ components:
           type: boolean
         belowLimit:
           type: boolean
+    GardenerDashBoardResponse:
+      type: object
+      properties:
+        assignedSensorStations:
+          type: array
+          items:
+            $ref: "#/components/schemas/SensorStationBaseResponse"
+        addedSensorStations:
+          type: array
+          items:
+            $ref: "#/components/schemas/SensorStationBaseResponse"
+      description: ""
     SensorStationBaseResponse:
       type: object
       properties:
@@ -3631,6 +3645,8 @@ components:
         transferInterval:
           type: integer
           format: int32
+        gardener:
+          $ref: "#/components/schemas/Person"
         alarms:
           type: array
           items:
@@ -3647,18 +3663,6 @@ components:
       type: object
       properties:
         sensorStations:
-          type: array
-          items:
-            $ref: "#/components/schemas/SensorStationBaseResponse"
-      description: ""
-    GardenerDashBoardResponse:
-      type: object
-      properties:
-        assignedSensorStations:
-          type: array
-          items:
-            $ref: "#/components/schemas/SensorStationBaseResponse"
-        addedSensorStations:
           type: array
           items:
             $ref: "#/components/schemas/SensorStationBaseResponse"
@@ -3724,6 +3728,8 @@ components:
         transferInterval:
           type: integer
           format: int32
+        gardener:
+          $ref: "#/components/schemas/Person"
         alarms:
           type: array
           items:

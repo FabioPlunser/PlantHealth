@@ -43,16 +43,10 @@ export async function load(event) {
       "Couldn't get sensor station",
       res
     );
-    throw error(500, "Couldn't get sensor station");
   }
 
-  interface Data extends Responses.InnerResponse {
-    data: Promise<Responses.SensorStationDataResponse>;
-    pictures: Promise<Picture>[];
-    limits: Promise<Responses.SensorStationResponse>;
-  }
   let data = await res.json();
-  let sensorStation: Data = data.sensorStation;
+  let sensorStation = data.sensorStation;
   sensorStation.data = getSensorStationData(event, sensorStation, dates);
   sensorStation.pictures = await getSensorStationPictures(event, sensorStation);
   sensorStation.limits = getSensorStationLimits(event, sensorStation);
