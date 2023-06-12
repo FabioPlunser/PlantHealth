@@ -42,7 +42,7 @@
 /* ------------------------------------------------- */
 /* ------------------------------------------------- */
 .alarm {
-  animation: blink 1.5s infinite;
+  animation: blink 4s infinite;
 }
 
 @keyframes blink {

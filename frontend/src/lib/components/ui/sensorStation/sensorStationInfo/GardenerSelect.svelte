@@ -33,8 +33,6 @@
       }
     }
   }
-  $: console.log(gardener);
-  $: console.log(sensorStation);
 </script>
 
 <div>

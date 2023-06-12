@@ -87,14 +87,14 @@ public class AccessPointService {
 		}
 		try {
 			// AccessPoint already exists quietly abort
-			setLastConnection(findBySelfAssignedId(selfAssignedId));
+			//			setLastConnection(findBySelfAssignedId(selfAssignedId));
 			return;
 		} catch (ServiceException e) {
 			// AccessPoint does not exist
 		}
 		AccessPoint accessPoint = new AccessPoint(selfAssignedId, roomName, false);
 		save(accessPoint);
-		setLastConnection(findBySelfAssignedId(selfAssignedId));
+		//		setLastConnection(findBySelfAssignedId(selfAssignedId));
 	}
 
 	/**

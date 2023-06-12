@@ -5,7 +5,7 @@
    
 -->
 <script lang="ts">
-  export let sensorStation: SensorStation;
+  export let sensorStation: Responses.SensorStationBaseResponse;
 
   async function downloadQRCode() {
     let response = await fetch(
