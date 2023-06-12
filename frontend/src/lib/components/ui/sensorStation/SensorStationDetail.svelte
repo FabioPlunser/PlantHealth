@@ -78,9 +78,11 @@
   let sensorStation: SensorStationDetailComponentInner | null = null;
   $: {
     if (data.streamed.sensorStation instanceof Promise) {
-      data.streamed.sensorStation.then((res) => {
-        sensorStation = res;
-      });
+      data.streamed.sensorStation.then(
+        (res: SensorStationDetailComponentInner) => {
+          sensorStation = res;
+        }
+      );
     } else {
       sensorStation = data.streamed.sensorStation;
     }

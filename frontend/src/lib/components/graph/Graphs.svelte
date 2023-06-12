@@ -33,6 +33,7 @@
         interaction: {
           intersect: false,
         },
+
         scales: {
           x: {
             display: true,
@@ -42,9 +43,12 @@
             type: "linear",
             display: true,
             position: "left",
+            // suggestedMin: 25,
+            // suggestedMax: 35,
+            ticks: {
+              stepSize: 0.01,
+            },
           },
-          suggestedMin: -10,
-          suggestedMax: 200,
         },
       };
     }

@@ -8,10 +8,17 @@ export function createGraphData(data: Responses.InnerSensors[]) {
 
     let sensorLimits = sensor.sensorLimits || [];
 
+    sensor.values.sort((a, b) => {
+      return new Date(a.timeStamp).getTime() - new Date(b.timeStamp).getTime();
+    });
+    sensor.sensorLimits.sort((a, b) => {
+      return new Date(a.timeStamp).getTime() - new Date(b.timeStamp).getTime();
+    });
     const timeStamps = [
       ...sensor.values.map((data) => new Date(data.timeStamp)),
-      // ...sensor.sensorLimits.map(data => new Date(data.timeStamp)),
+      ...sensor.sensorLimits.map((data) => new Date(data.timeStamp)),
     ];
+    console.log(sensor.sensorLimits);
 
     timeStamps.sort((a, b) => a.getTime() - b.getTime());
 
@@ -74,9 +81,10 @@ export function createGraphData(data: Responses.InnerSensors[]) {
         label: "UpperLimit",
         fill: false,
         pointRadius: 4,
+        lineTension: 0.5,
         backgroundColor: "rgba(255,0,0,1)",
         borderColor: "rgba(255,0,0,1)",
-        data: upperLimitData,
+        data: interpolateMissingValues(upperLimitData),
       };
       datasets.push(upperLimit);
 
@@ -88,9 +96,10 @@ export function createGraphData(data: Responses.InnerSensors[]) {
         label: "LowerLimit",
         fill: false,
         pointRadius: 4,
+        lineTension: 0.5,
         backgroundColor: "rgba(0,0,255,1)",
         borderColor: "rgba(0,0,255,1)",
-        data: lowerLimitData,
+        data: interpolateMissingValues(lowerLimitData),
       };
       datasets.push(lowerLimit);
     }
@@ -117,28 +126,30 @@ export function createGraphData(data: Responses.InnerSensors[]) {
 }
 
 function interpolateMissingValues(data) {
-  const interpolatedData = [];
+  let interpolatedData = [];
+  let lastValue = null;
   for (let i = 0; i < data.length; i++) {
-    if (data[i] !== null) {
-      interpolatedData.push(data[i]);
-    } else {
-      let j = i + 1;
-      while (j < data.length && data[j] === null) {
-        j++;
-      }
-      if (j === data.length) {
-        // Reached the end of the array, fill with the last non-null value
-        interpolatedData.push(data[i - 1]);
+    if (data[i] === null) {
+      if (lastValue === null) {
+        interpolatedData.push(null);
       } else {
-        const startValue = data[i - 1];
-        const endValue = data[j];
-        const numInterpolations = j - i + 1;
-        const step = (endValue - startValue) / numInterpolations;
-        for (let k = 0; k < numInterpolations; k++) {
-          interpolatedData.push(startValue + (k + 1) * step);
+        let nextValue = null;
+        let j = i + 1;
+        while (nextValue === null && j < data.length) {
+          nextValue = data[j];
+          j++;
+        }
+        if (nextValue === null) {
+          interpolatedData.push(null);
+        } else {
+          interpolatedData.push((lastValue + nextValue) / 2);
         }
       }
+    } else {
+      interpolatedData.push(data[i]);
+      lastValue = data[i];
     }
   }
+
   return interpolatedData;
 }

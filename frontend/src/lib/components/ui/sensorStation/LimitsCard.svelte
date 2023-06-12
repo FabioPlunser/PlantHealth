@@ -3,8 +3,14 @@
   import { enhance } from "$app/forms";
   import FormError from "$components/ui/FormError.svelte";
   export let sensorStationId: string;
-  export let limit: SensorLimit;
+  export let limit: any;
   export let form: any;
+
+  const customEnhance = () => {
+    return async ({ update }) => {
+      await update({ reset: false });
+    };
+  };
 </script>
 
 <div class="flex justify-center">
@@ -19,7 +25,7 @@
           <span class="ml-2 justify-center">[{limit.sensor.unit}]</span>
         </h1>
       </div>
-      <form method="post" use:enhance>
+      <form method="post" use:enhance={customEnhance}>
         <input type="hidden" name="sensorStationId" value={sensorStationId} />
         <input type="hidden" name="sensor" value={limit.sensor.type} />
         <Input
