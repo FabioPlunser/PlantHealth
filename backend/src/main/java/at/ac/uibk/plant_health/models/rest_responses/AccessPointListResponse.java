@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import at.ac.uibk.plant_health.models.device.AccessPoint;
+import at.ac.uibk.plant_health.models.device.SensorStation;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -29,7 +30,7 @@ public class AccessPointListResponse extends RestResponse {
 		private final boolean scanActive;
 		private final boolean connected;
 		private final int transferInterval;
-		private final AdminSensorStationsResponse sensorStations;
+		private final List<AccessPointListResponseSensorStation> sensorStations;
 
 		public InnerAccessPoint(AccessPoint accessPoint) {
 			this.accessPointId = accessPoint.getDeviceId();
@@ -39,7 +40,22 @@ public class AccessPointListResponse extends RestResponse {
 			this.scanActive = accessPoint.getScanActive();
 			this.connected = accessPoint.isConnected();
 			this.transferInterval = accessPoint.getTransferInterval();
-			this.sensorStations = new AdminSensorStationsResponse(accessPoint.getSensorStations());
+			this.sensorStations = accessPoint.getSensorStations()
+										  .stream()
+										  .filter(s -> !s.isDeleted())
+										  .map(AccessPointListResponseSensorStation::new)
+										  .toList();
+		}
+	}
+
+	@Getter
+	private static class AccessPointListResponseSensorStation
+			extends SensorStationBaseResponse implements Serializable {
+		private final boolean reported;
+
+		public AccessPointListResponseSensorStation(SensorStation sensorStation) {
+			super(sensorStation);
+			this.reported = sensorStation.isReported();
 		}
 	}
 }

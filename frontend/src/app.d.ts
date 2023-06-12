@@ -40,18 +40,6 @@ declare module "*.svg?url" {
   export default content;
 }
 
-declare interface User {
-  personId: string;
-  username: string;
-  token: string;
-  permissions: string[];
-  [key: string]: any;
-}
-
-declare interface Typed {
-  [key: string]: any;
-}
-
 /**
  * An object representing the visibility of table columns.
  * Each key should be equivalent to the ID of the column.
@@ -69,23 +57,6 @@ declare interface Typed {
  */
 declare interface ColumnVisibility {
   [column: string]: boolean;
-}
-
-declare interface Sensor {
-  type: string;
-  unit: string;
-}
-
-declare interface SensorLimit {
-  upperLimit: number;
-  lowerLimit: number;
-  thresholdDuration: number;
-  sensor: Sensor;
-}
-
-declare interface SensorStation {
-  sensorStationId: string;
-  [key: string]: any;
 }
 
 declare interface ResponseSensorValues {
@@ -110,8 +81,41 @@ declare interface SensorValue {
   alarm: string;
 }
 
+declare interface Dates {
+  from: Date;
+  to: Date;
+}
+
 declare interface Picture {
   pictureId: string;
   imageRef: string;
   creationDate: Date;
+}
+declare interface SensorStationPicture {
+  pictureId: string;
+  promise: Promise<Picture>;
+}
+declare interface SensorStationComponent
+  extends Responses.SensorStationBaseResponse {
+  data: Promise<Responses.SensorStationDataResponse>;
+  pictures: SensorStationPicture[];
+}
+
+declare interface Dashboard {
+  sensorStations: SensorStationComponent[];
+}
+
+declare interface SensorStationDetailComponentInner
+  extends Responses.SensorStationInnerResponse {
+  data: Promise<Responses.SensorStationDataResponse>;
+  pictures: SensorStationPicture[];
+}
+
+declare interface SensorStationDetailComponent
+  extends Responses.SensorStationInnerResponse {
+  streamed: {
+    sensorStation: Promise<SensorStationDetailComponentInner>;
+  };
+  gradener: Responses.ListResponse;
+  dates: Dates;
 }

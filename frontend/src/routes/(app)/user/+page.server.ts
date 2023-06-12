@@ -11,43 +11,25 @@ import {
   getSensorStationData,
   getSensorStationPictures,
   getSensorStationLimits,
+  setDates,
 } from "$helper/sensorStation";
 
 export async function load(event) {
   const { cookies, fetch } = event;
 
-  let cookieFrom = cookies.get("from") || "";
-  let cookieTo = cookies.get("to") || "";
-
-  let from: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  let to: Date = new Date(Date.now());
-
-  if (cookieFrom !== "" && cookieTo !== "") {
-    from = new Date(cookieFrom);
-    to = new Date(cookieTo);
-  }
-
-  let dates = {
-    from: from,
-    to: to,
-  };
-
-  let data = await fetch(`${BACKEND_URL}/get-dashboard`).then(async (res) => {
-    if (!res.ok) {
-      errorHandler(
-        event.locals.user?.personId,
-        "Error while fetching dashboard sensor stations",
-        await res.json()
-      );
-    }
-    return await res.json();
-  });
-
-  let dashBoardSensorStations = data?.sensorStations;
-
-  async function getDashBoardSensorStations(): Promise<any> {
+  async function getDashBoardSensorStations(): Promise<Dashboard> {
     return new Promise(async (resolve, reject) => {
-      if (dashBoardSensorStations.length == 0) resolve([]);
+      let res = await fetch(`${BACKEND_URL}/get-dashboard`);
+      if (!res.ok) {
+        errorHandler(
+          event.locals.user?.personId,
+          "Error while fetching dashboard sensor stations",
+          await res.json()
+        );
+      }
+      let data = await res.json();
+      let dashBoardSensorStations = data.sensorStations;
+      if (dashBoardSensorStations.length == 0) resolve({ sensorStations: [] });
       for (let sensorStation of dashBoardSensorStations) {
         sensorStation.data = getSensorStationData(event, sensorStation, dates);
         sensorStation.pictures = await getSensorStationPictures(
@@ -56,17 +38,11 @@ export async function load(event) {
         );
       }
 
-      resolve(dashBoardSensorStations);
-    }).catch((e) => {
-      errorHandler(
-        event.locals.user?.personId,
-        "Error while fetching dashboard sensor stations",
-        e
-      );
-      return null;
+      resolve({ sensorStations: dashBoardSensorStations });
     });
   }
 
+  let dates = setDates(event);
   return {
     dates,
     streamed: {

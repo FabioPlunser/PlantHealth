@@ -2,12 +2,7 @@ import { BACKEND_URL } from "$env/static/private";
 import { logger } from "$helper/logger";
 import { redirect, error } from "@sveltejs/kit";
 
-export async function load({ url, locals }) {
-  if (locals.user) {
-    return {
-      permission: locals.user.permissions[0],
-    };
-  }
+export async function load(event) {
   try {
     await fetch(`${BACKEND_URL}/get-sensor-station-info`);
   } catch (err: any) {
@@ -15,6 +10,13 @@ export async function load({ url, locals }) {
     if (err.cause.code === "ECONNREFUSED") {
       throw redirect(307, "/logout");
     }
+  }
+
+  if (event.locals.user) {
+    return {
+      permission:
+        event.locals.user.permissions[event.locals.user.permissions.length - 1],
+    };
   }
 
   return {

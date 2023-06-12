@@ -252,7 +252,7 @@ public class TestAccessPointController {
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(person))
 								.param("accessPointId", String.valueOf(accessPoint.getDeviceId()))
-								.param("unlocked", "true")
+								.param("scanActive", "true")
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk());
 
@@ -428,6 +428,7 @@ public class TestAccessPointController {
 								.header(HttpHeaders.AUTHORIZATION,
 										AuthGenerator.generateToken(person))
 								.param("accessPointId", String.valueOf(UUID.randomUUID()))
+								.param("scanActive", "true")
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isNotFound());
 	}
@@ -552,5 +553,49 @@ public class TestAccessPointController {
 								.param("accessPointId", String.valueOf(UUID.randomUUID()))
 								.contentType(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isNotFound());
+	}
+
+	@Test
+	public void getAccessPointSensorStations() throws Exception {
+		Person person = createUserAndLogin(true);
+
+		UUID selfAssignedId = UUID.randomUUID();
+		accessPointService.register(selfAssignedId, "Office1");
+
+		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+
+		int sensorStationCount = 5;
+		for (int i = 0; i < sensorStationCount; i++) {
+			String bdAddress = StringGenerator.macAddress();
+			SensorStation sensorStation = new SensorStation(bdAddress, 255 - i);
+			sensorStation.setName("SensorStation" + i);
+			sensorStation.setAccessPoint(accessPoint);
+			sensorStation.setDeleted(false);
+			sensorStation.setUnlocked(true);
+			sensorStation.setConnected(true);
+			sensorStationService.save(sensorStation);
+		}
+		List<SensorStation> sensorStations =
+				sensorStationService.findAll().stream().filter(s -> !s.isDeleted()).toList();
+		accessPointService.foundNewSensorStation(accessPoint, sensorStations);
+
+		//		mockMvc.perform(MockMvcRequestBuilders.get("/get-access-point-sensor-stations")
+		//						.param("accessPointId", accessPoint.getDeviceId().toString())
+		//						.header(HttpHeaders.USER_AGENT, "MockTests")
+		//						.header(HttpHeaders.AUTHORIZATION,
+		//								AuthGenerator.generateToken(person))
+		//						.contentType(MediaType.APPLICATION_JSON))
+		//				.andExpectAll(
+		//						status().isOk(), jsonPath("$.sensorStations").exists(),
+		//						jsonPath("$.sensorStations.length()").value(sensorStations.size()),
+		//						jsonPath("$.sensorStations[0].sensorStationId").exists(),
+		//						jsonPath("$.sensorStations[0].bdAddress").exists(),
+		//						jsonPath("$.sensorStations[0].roomName").exists(),
+		//						jsonPath("$.sensorStations[0].name").exists(),
+		//						jsonPath("$.sensorStations[0].dipSwitchId").exists(),
+		//						jsonPath("$.sensorStations[0].unlocked").exists(),
+		//						jsonPath("$.sensorStations[0].connected").exists(),
+		//						jsonPath("$.sensorStations[0].deleted").exists()
+		//				);
 	}
 }

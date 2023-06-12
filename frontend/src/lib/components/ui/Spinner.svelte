@@ -5,7 +5,10 @@
   export let background: string = "text-base-300";
 </script>
 
-<div class="flex justify-center">
+<div class="flex justify-center mx-auto items-center">
+  <span class="loading loading-spinner text-primary loading-lg" />
+</div>
+<!-- <div class="flex justify-center">
   <div role="status">
     <svg
       aria-hidden="true"
@@ -25,4 +28,4 @@
     </svg>
     <span class="sr-only">Loading...</span>
   </div>
-</div>
+</div> -->

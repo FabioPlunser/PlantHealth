@@ -7,35 +7,31 @@ type Dates = {
   to: Date;
 };
 
+async function getPictureIds(
+  event: any,
+  sensorStation: Responses.SensorStationBaseResponse
+): Promise<Responses.PlantPicturesResponse> {
+  let res = await fetch(
+    `${BACKEND_URL}/get-sensor-station-pictures?sensorStationId=${sensorStation.sensorStationId}`
+  );
+
+  if (!res.ok) {
+    errorHandler(
+      event.locals.user?.personId,
+      "Error while fetching sensor station pictures",
+      await res.json()
+    );
+  }
+
+  return await res.json();
+}
+
 export async function getSensorStationPictures(
   event: any,
-  sensorStation: SensorStation
-) {
-  let possiblePictures = await fetch(
-    `${BACKEND_URL}/get-sensor-station-pictures?sensorStationId=${sensorStation.sensorStationId}`
-  )
-    .then(async (res: any) => {
-      if (!res.ok) {
-        let data = await res.json();
-        errorHandler(
-          event.locals.user?.personId,
-          "Error while fetching sensor station pictures",
-          data
-        );
-        throw error(res.status, "Error while fetching sensor station pictures");
-      }
-
-      let data = await res.json();
-      return data.pictures;
-    })
-    .catch((err: any) => {
-      errorHandler(
-        event.locals.user?.personId,
-        "Error while fetching sensor station pictures",
-        err
-      );
-      throw error(500, "Error while fetching sensor station pictures");
-    });
+  sensorStation: Responses.SensorStationBaseResponse
+): Promise<SensorStationPicture[]> {
+  let pictures = await getPictureIds(event, sensorStation);
+  let possiblePictures = pictures.pictures;
 
   let picturePromises: any[] = [];
 
@@ -76,14 +72,8 @@ export async function getSensorStationPictures(
           );
           resolve(null);
         });
-    }).catch((err: any) => {
-      errorHandler(
-        event.locals.user?.personId,
-        "Error while fetching sensor station picture",
-        err
-      );
-      throw error(500, "Error while fetching sensor station pictures");
     });
+
     let picture = {
       pictureId: possiblePicture.pictureId,
       promise: picturePromise,

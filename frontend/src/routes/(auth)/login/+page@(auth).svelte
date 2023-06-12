@@ -37,7 +37,7 @@
         <FormError field="username" {form} />
         <PasswordInput
           field="password"
-          label="New Password"
+          label="Password"
           placeholder="Password"
         />
         <FormError field="password" {form} />
@@ -51,7 +51,7 @@
           <button
             type="button"
             disabled={data?.error != null}
-            class="btn text-white"
+            class="btn btn-neutral text-white"
           >
             <a href="/register">Register</a>
           </button>

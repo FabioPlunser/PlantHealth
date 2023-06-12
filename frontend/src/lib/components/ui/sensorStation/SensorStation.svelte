@@ -17,7 +17,7 @@
   });
   // ---------------------------------------------------
   // ---------------------------------------------------
-  export let sensorStation: any;
+  export let sensorStation: SensorStationComponent;
   export let dates: any;
   // ---------------------------------------------------
   // ---------------------------------------------------
@@ -35,7 +35,7 @@
     };
   };
 
-  $: console.table("sensorStation", sensorStation);
+  $: console.log("sensorStation", sensorStation);
   let openPictureModal = false;
   let selectedPicture = "";
 </script>
@@ -85,7 +85,7 @@
                 {#if loading}
                   <Spinner fill="fill-primary" />
                 {:else}
-                  <Graphs data={sensorStation.data} />
+                  <Graphs {sensorStation} />
                 {/if}
               </div>
             </div>
@@ -177,7 +177,7 @@
                                 class="rounded-2xl shadow-xl cursor-pointer w-64"
                               />
                               <h1 class="flex justify-center">
-                                {data.creationDate.toLocaleDateString()}
+                                {data.creationDate.toLocaleDateString("de-De")}
                               </h1>
                             </div>
                           </div>

@@ -75,6 +75,7 @@
     email: false,
     permissions: false,
   };
+  $: console.log(data);
 </script>
 
 {#if addUserModal}
@@ -84,7 +85,8 @@
   <section>
     {#await data.streamed.users}
       <Spinner />
-    {:then users}
+    {:then promise}
+      {@const users = promise.items}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <btn
         class="btn btn-primary flex justify-center w-fit mx-auto m-4"

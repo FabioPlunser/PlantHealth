@@ -107,6 +107,9 @@ public class TestSensorStationController {
 		accessPointService.register(selfAssignedId, "Office1");
 
 		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+		accessPoint.setUnlocked(true);
+		accessPoint.setConnected(true);
+		accessPointService.save(accessPoint);
 
 		int sensorStationCount = 5;
 		for (int i = 0; i < sensorStationCount; i++) {
@@ -135,7 +138,7 @@ public class TestSensorStationController {
 						jsonPath("$.sensorStations.length()").value(sensorStations.size()),
 						jsonPath("$.sensorStations[0].sensorStationId").exists(),
 						jsonPath("$.sensorStations[0].roomName").exists(),
-						jsonPath("$.sensorStations[0].sensorStationName").exists()
+						jsonPath("$.sensorStations[0].name").exists()
 				);
 	}
 

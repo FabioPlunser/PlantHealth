@@ -29,7 +29,7 @@ public class SensorStationPersonReferenceService {
 	@Autowired
 	private SensorStationRepository sensorStationRepository;
 
-	//	@Transactional
+	@Transactional
 	public void addPlantToDashboard(Person person, SensorStation sensorStation)
 			throws ServiceException {
 		if (person == null || sensorStation == null)
@@ -63,7 +63,7 @@ public class SensorStationPersonReferenceService {
 		}
 	}
 
-	//	@Transactional
+	@Transactional
 	public void removePlantFromDashboard(Person person, SensorStation sensorStation)
 			throws ServiceException {
 		if (person == null || sensorStation == null)

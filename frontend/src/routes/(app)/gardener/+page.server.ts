@@ -11,27 +11,11 @@ import {
   getSensorStationData,
   getSensorStationPictures,
   getSensorStationLimits,
+  setDates,
 } from "$helper/sensorStation";
 
 export async function load(event) {
   const { cookies, fetch } = event;
-
-  let cookieFrom = cookies.get("from") || "";
-  let cookieTo = cookies.get("to") || "";
-
-  let from: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  let to: Date = new Date(Date.now());
-
-  if (cookieFrom !== "" && cookieTo !== "") {
-    from = new Date(cookieFrom);
-    to = new Date(cookieTo);
-  }
-
-  let dates = {
-    from: from,
-    to: to,
-  };
-
   //---------------------------------------------------------------------
   // get all sensor stations available to add to dashboard
   //---------------------------------------------------------------------
@@ -82,22 +66,21 @@ export async function load(event) {
   async function getAssignedSensorStations(): Promise<any> {
     return new Promise(async (resolve, reject) => {
       if (assignedSensorStations.length == 0)
-        reject("No assigned sensor stations found");
-      for (let assignedSensorStation of assignedSensorStations) {
-        assignedSensorStation.data = getSensorStationData(
-          event,
-          assignedSensorStation,
-          dates
-        );
-        assignedSensorStation.pictures = await getSensorStationPictures(
-          event,
-          assignedSensorStation
-        );
-        assignedSensorStation.limits = getSensorStationLimits(
-          event,
-          assignedSensorStation
-        );
-      }
+        for (let assignedSensorStation of assignedSensorStations) {
+          assignedSensorStation.data = getSensorStationData(
+            event,
+            assignedSensorStation,
+            dates
+          );
+          assignedSensorStation.pictures = await getSensorStationPictures(
+            event,
+            assignedSensorStation
+          );
+          assignedSensorStation.limits = getSensorStationLimits(
+            event,
+            assignedSensorStation
+          );
+        }
       resolve(assignedSensorStations);
     }).catch((e) => {
       errorHandler(
@@ -105,10 +88,10 @@ export async function load(event) {
         "Error while fetching dashboard sensor stations",
         e
       );
-      throw error(500, "Error while fetching dashboard sensor stations");
     });
   }
 
+  let dates = setDates(event);
   return {
     dates,
     streamed: {

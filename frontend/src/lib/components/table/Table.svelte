@@ -11,6 +11,7 @@
   @example
   ``` html
     <script lang="ts">
+	import { tailwind } from 'tailwindcss';
       export let data : {
         users: User[],
       };
@@ -45,7 +46,6 @@
   ```
   
 -->
-
 <script lang="ts">
   import type { ColumnDef, TableOptions } from "@tanstack/svelte-table";
   import {
@@ -259,10 +259,10 @@
       />
     </div>
     <div in:slide={{ duration: 400, axis: "y" }}>
-      <table class="table table-auto w-full">
+      <table class="myTable">
         <thead class="">
           {#each $table.getHeaderGroups() as headerGroup}
-            <tr>
+            <tr class="">
               {#each headerGroup.headers as header}
                 <th colspan={header.colSpan}>
                   {#if !header.isPlaceholder}
@@ -288,9 +288,9 @@
         </thead>
         <tbody>
           {#each $table.getRowModel().rows as row}
-            <tr class="table-row">
+            <tr class="">
               {#each row.getVisibleCells() as cell}
-                <td class="table-cell">
+                <td class="">
                   <div class="flex justify-center">
                     <svelte:component
                       this={flexRender(
@@ -370,3 +370,51 @@
     </div>
   </div>
 {/if}
+
+<style>
+  .myTable {
+    position: relative;
+    width: 100%;
+    text-align: left;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    --tw-bg-opacity: 1;
+    background-color: hsl(var(--b1) / var(--tw-bg-opacity));
+    border-radius: 1rem !important;
+  }
+
+  .myTable td,
+  th {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    vertical-align: middle;
+  }
+  .myTable tbody tr:not(:last-child) {
+    border-bottom: 2px solid hsl(var(--b2));
+  }
+  /* .myTable tbody tr:hover {
+    background-color: hsl(var(--p) / var(--tw-bg-opacity)) !important;
+    border-radius: 10rem !important;
+  } */
+  .myTable thead th:first-child {
+    border-radius: 1rem 0rem 0rem 0rem !important;
+  }
+  .myTable thead th:last-child {
+    border-radius: 0rem 1rem 0rem 0rem !important;
+  }
+
+  .myTable tbody tr:last-child td:first-child {
+    border-radius: 0rem 0rem 0rem 1rem !important;
+  }
+  .myTable tbody tr:last-child td:last-child {
+    border-radius: 0rem 0rem 1rem 0rem !important;
+  }
+  /* .myTable tbody tr:nth-child(odd) {
+    background-color: hsl(var(--b1));
+  } */
+  .myTable thead {
+    background-color: hsl(var(--b3));
+  }
+</style>

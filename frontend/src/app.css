@@ -3,3 +3,62 @@
 @tailwind components;
 @tailwind utilities;
 @tailwind variants;
+
+/* ------------------------------------------------- */
+/* ------------------------------------------------- */
+/* ------------------------------------------------- */
+.blinking-border {
+  position: relative;
+}
+
+.blinking-border::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 8px solid transparent;
+  border-radius: 1rem;
+  box-shadow: 0px 0px 0px 4px red;
+  animation: blink-animation 1s ease-in-out infinite;
+}
+
+@keyframes blink-animation {
+  0% {
+    opacity: 1;
+    /* transform: scale(1); */
+  }
+  50% {
+    opacity: 0.3;
+    /* transform: scale(1.001); */
+  }
+  100% {
+    opacity: 1;
+    /* transform: scale(1); */
+  }
+}
+/* ------------------------------------------------- */
+/* ------------------------------------------------- */
+/* ------------------------------------------------- */
+.alarm {
+  animation: blink 4s infinite;
+}
+
+@keyframes blink {
+  0% {
+    color: red;
+  }
+  50% {
+    color: white;
+  }
+  100%{
+    color: red;
+  }
+}
+.btn-primary {
+  color: white;
+}
+/* ------------------------------------------------- */
+/* ------------------------------------------------- */
+/* ------------------------------------------------- */

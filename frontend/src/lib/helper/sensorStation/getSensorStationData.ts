@@ -9,9 +9,11 @@ type Dates = {
 
 export async function getSensorStationData(
   event: any,
-  sensorStation: SensorStation,
+  sensorStation:
+    | Responses.SensorStationBaseResponse
+    | Responses.SensorStationInnerResponse,
   dates: Dates
-) {
+): Promise<Responses.SensorStationDataResponse> {
   return await new Promise(async (resolve, reject) => {
     await event
       .fetch(
@@ -41,15 +43,7 @@ export async function getSensorStationData(
           "Error while fetching sensor station data",
           err
         );
-        reject(err);
         throw error(500, "Error while fetching sensor station data");
       });
-  }).catch((err: any) => {
-    errorHandler(
-      event.locals.user?.personId,
-      "Error while fetching sensor station data",
-      err
-    );
-    throw error(500, "Error while fetching sensor station data");
   });
 }

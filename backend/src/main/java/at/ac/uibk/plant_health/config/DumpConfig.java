@@ -51,7 +51,7 @@ public class DumpConfig {
 		int numUsers = 5;
 		int numAccessPoints = 2;
 		int numSensorStations = 8;
-		int numSensorData = 500;
+		int numSensorData = 1000;
 
 		final String defaultPassword = "password";
 		final String emailSuffix = "@planthealth.at";

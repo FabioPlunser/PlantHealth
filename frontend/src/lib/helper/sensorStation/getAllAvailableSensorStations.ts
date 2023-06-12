@@ -2,7 +2,9 @@ import { BACKEND_URL } from "$env/static/private";
 import { errorHandler } from "../errorHandler";
 import { error } from "@sveltejs/kit";
 
-export async function getAllSensorStations(event: any): Promise<any> {
+export async function getAllSensorStations(
+  event: any
+): Promise<Responses.SensorStationsResponse> {
   return new Promise(async (resolve, reject) => {
     await event
       .fetch(`${BACKEND_URL}/get-sensor-stations`)
@@ -14,8 +16,7 @@ export async function getAllSensorStations(event: any): Promise<any> {
             "Error while fetching all sensor stations",
             data
           );
-          resolve([]);
-          throw error(res.status, "Error while fetching all sensor stations");
+          resolve({ sensorStations: [] });
         }
 
         let data = await res.json();
@@ -25,7 +26,7 @@ export async function getAllSensorStations(event: any): Promise<any> {
         // get newest picture of sensor stations
         //---------------------------------------------------------------------
         getNewestPicture(event, sensorStations);
-        resolve(sensorStations);
+        resolve({ sensorStations: sensorStations });
       })
       .catch((err: any) => {
         errorHandler(
@@ -33,8 +34,7 @@ export async function getAllSensorStations(event: any): Promise<any> {
           "Error while fetching all sensor stations",
           err
         );
-        reject(err);
-        throw error(500, "Error while fetching all sensor stations");
+        resolve({ sensorStations: [] });
       });
   });
 }
