@@ -5,7 +5,6 @@
   import Spinner from "$components/ui/Spinner.svelte";
   import ImagesGrid from "./ImagesGrid.svelte";
 
-  import Camera from "$lib/assets/icons/Camera.svg?component";
   import type { SubmitFunction } from "./$types.js";
   // ----------------------------------------------- //
   let isRendered = false;
@@ -62,7 +61,7 @@
               for="file-input"
               class="btn btn-primary mt-3 hover:dark:fill-black hover:fill-white"
             >
-              <Camera class="w-12 dark:fill-white" />
+              <span class="material-symbols-outlined"> add_a_photo </span>
             </label>
             <input
               id="file-input"
