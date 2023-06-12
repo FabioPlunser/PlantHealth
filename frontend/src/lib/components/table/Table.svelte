@@ -390,6 +390,8 @@
     padding-top: 0.75rem;
     padding-bottom: 0.75rem;
     vertical-align: middle;
+  }
+  .myTable tbody tr:not(:last-child) {
     border-bottom: 2px solid hsl(var(--b2));
   }
   /* .myTable tbody tr:hover {
