@@ -4,19 +4,60 @@
   export let placeholder: string = "";
   export let value: string = "";
 
+  let isPasswordHidden: boolean = true;
+</script>
+
+<div>
+  <label class="" for={field}>
+    <span class="label-text text-xl font-bold">{label}</span>
+    <div class="relative">
+      <input
+        value
+        name={field}
+        type={isPasswordHidden ? "password" : "text"}
+        {placeholder}
+        class="input input-bordered w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black mb-2 mt-2"
+      />
+      <div class="absolute right-2 top-5">
+        {#if isPasswordHidden}
+          <button
+            type="button"
+            class="hover:text-primary"
+            on:click={() => (isPasswordHidden = !isPasswordHidden)}
+          >
+            <i
+              class="material-symbols-outlined my-auto flex items-center transition-opacity duration-300"
+            >
+              visibility
+            </i>
+          </button>
+        {:else}
+          <button
+            type="button"
+            class="hover:text-primary"
+            on:click={() => (isPasswordHidden = !isPasswordHidden)}
+          >
+            <i
+              class="material-symbols-outlined my-auto flex items-center transition-opacity duration-300"
+            >
+              visibility_off
+            </i>
+          </button>
+        {/if}
+      </div>
+    </div>
+  </label>
+</div>
+
+<!-- <div>
   let ispasswordHidden: boolean = true;
   let inputType: string;
   $: {
     inputType = ispasswordHidden ? "password" : "text";
   }
-</script>
-
-<div>
-  <!-- svelte-ignore a11y-label-has-associated-control -->
   <label class="label">
     <span class="label-text text-xl font-bold">{label}</span>
   </label>
-  <!-- it seems like the focus properties of input input-bordered do not translate to a div... therefore I had to imitate the behaviour-->
   <div
     class="flex input dark:input-bordered w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black
     focus-within:ring-2 focus-within:ring-offset-2 first-line:focus-within:ring-opacity-50
@@ -52,4 +93,4 @@
       </label>
     </div>
   </div>
-</div>
+</div> -->
