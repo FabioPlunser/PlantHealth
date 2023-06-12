@@ -62,15 +62,14 @@ export function createGraphData(data: Responses.InnerSensors[]) {
             lowerLimitData.push(limit.lowerLimit);
           }
         });
-        // upperLimitData.push(sensorLimits[sensorLimits.length-1].upperLimit);
-        // lowerLimitData.push(sensorLimits[sensorLimits.length-1].lowerLimit);
+        upperLimitData.push(null);
+        lowerLimitData.push(null);
       });
       // let upperLimitData = sensorLimits.map(data => {
 
       //   const index = labels.findIndex((label) => label.getTime() === new Date(data.timeStamp).getTime());
       //   return index !== -1 ? data.upperLimit : 0;
       // })
-      console.log(upperLimitData);
       let upperLimit = {
         label: "UpperLimit",
         fill: false,
@@ -86,7 +85,7 @@ export function createGraphData(data: Responses.InnerSensors[]) {
       //   return index !== -1 ? data.lowerLimit : 0;
       // });
       let lowerLimit = {
-        label: "UpperLimit",
+        label: "LowerLimit",
         fill: false,
         pointRadius: 4,
         backgroundColor: "rgba(0,0,255,1)",
@@ -114,6 +113,32 @@ export function createGraphData(data: Responses.InnerSensors[]) {
       datasets: datasets,
     };
   }
-  console.log(graphData);
   return graphData;
+}
+
+function interpolateMissingValues(data) {
+  const interpolatedData = [];
+  for (let i = 0; i < data.length; i++) {
+    if (data[i] !== null) {
+      interpolatedData.push(data[i]);
+    } else {
+      let j = i + 1;
+      while (j < data.length && data[j] === null) {
+        j++;
+      }
+      if (j === data.length) {
+        // Reached the end of the array, fill with the last non-null value
+        interpolatedData.push(data[i - 1]);
+      } else {
+        const startValue = data[i - 1];
+        const endValue = data[j];
+        const numInterpolations = j - i + 1;
+        const step = (endValue - startValue) / numInterpolations;
+        for (let k = 0; k < numInterpolations; k++) {
+          interpolatedData.push(startValue + (k + 1) * step);
+        }
+      }
+    }
+  }
+  return interpolatedData;
 }

@@ -30,15 +30,21 @@
     } else {
       options = {
         responsive: true,
+        interaction: {
+          intersect: false,
+        },
         scales: {
           x: {
             display: true,
+            autoSkip: true,
           },
           y: {
             type: "linear",
             display: true,
             position: "left",
           },
+          suggestedMin: -10,
+          suggestedMax: 200,
         },
       };
     }
@@ -65,6 +71,7 @@
       };
       sensors = [...sensors, foundSensor];
     }
+    sensors.sort((a, b) => b.sensorType.localeCompare(a.sensorType));
     graphData = createGraphData(res.data);
     loading = false;
   });
@@ -74,8 +81,6 @@
       currentSensor = sensors[0];
     }
   }
-
-  $: console.log(sensors);
 </script>
 
 <!-- @component
