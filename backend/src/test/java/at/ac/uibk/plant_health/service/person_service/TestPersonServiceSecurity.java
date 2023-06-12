@@ -163,7 +163,8 @@ public class TestPersonServiceSecurity {
 		// when: saving user again using old Password
 		String hashedPassword = person.getPassword();
 		assertTrue(
-				personService.update(person, null, null, null, null), "Unable to create user for test"
+				personService.update(person, null, null, null, null),
+				"Unable to create user for test"
 		);
 
 		// then: password is not hashed again
@@ -185,7 +186,8 @@ public class TestPersonServiceSecurity {
 		// when: saving user again using new Password
 		String hashedPassword = person.getPassword();
 		assertTrue(
-				personService.update(person, null, null, password, null), "Unable to create user for test"
+				personService.update(person, null, null, password, null),
+				"Unable to create user for test"
 		);
 
 		// then: password is hashed again

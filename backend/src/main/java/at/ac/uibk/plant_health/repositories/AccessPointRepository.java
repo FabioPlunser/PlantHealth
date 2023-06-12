@@ -3,13 +3,14 @@ package at.ac.uibk.plant_health.repositories;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import at.ac.uibk.plant_health.models.annotations.AuditLogAnnotation;
 import at.ac.uibk.plant_health.models.device.AccessPoint;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface AccessPointRepository extends CrudRepository<AccessPoint, UUID> {
 	@Override
