@@ -114,7 +114,7 @@ declare interface SensorStationDetailComponentInner
 declare interface SensorStationDetailComponent
   extends Responses.SensorStationInnerResponse {
   streamed: {
-    sensorStation: Promise<SensorStationComponent>;
+    sensorStation: Promise<SensorStationDetailComponentInner>;
   };
   gradener: Responses.ListResponse;
   dates: Dates;

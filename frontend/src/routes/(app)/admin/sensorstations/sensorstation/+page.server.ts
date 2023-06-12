@@ -37,7 +37,7 @@ export async function load(event) {
 
       let data: Responses.SensorStationDetailResponse = await res.json();
 
-      let sensorStation: SensorStationDetailComponent = data.sensorStation;
+      let sensorStation: SensorStationDetailComponentInner = data.sensorStation;
       sensorStation.data = getSensorStationData(event, sensorStation, dates);
       sensorStation.pictures = await getSensorStationPictures(
         event,
@@ -66,10 +66,7 @@ export async function load(event) {
       sensorStation: getSensorStation(),
     },
     gardener,
-    dates: {
-      from,
-      to,
-    },
+    dates,
   };
 }
 

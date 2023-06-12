@@ -46,7 +46,7 @@
             // suggestedMin: 25,
             // suggestedMax: 35,
             ticks: {
-              stepSize: 0.01,
+              stepSize: 0.1,
             },
           },
         },

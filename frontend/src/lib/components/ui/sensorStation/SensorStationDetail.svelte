@@ -78,11 +78,9 @@
   let sensorStation: SensorStationDetailComponentInner | null = null;
   $: {
     if (data.streamed.sensorStation instanceof Promise) {
-      data.streamed.sensorStation.then(
-        (res: SensorStationDetailComponentInner) => {
-          sensorStation = res;
-        }
-      );
+      data.streamed.sensorStation.then((res) => {
+        sensorStation = res;
+      });
     } else {
       sensorStation = data.streamed.sensorStation;
     }
@@ -98,7 +96,7 @@
     on:close={() => (showPicture = false)}
   />
   <section>
-    <div class="mb-4 flex justify-ceter">
+    <!-- <div class="mb-4 flex justify-ceter">
       <input
         bind:value={searchTerm}
         type="search"
@@ -106,7 +104,7 @@
         placeholder="Global Search"
         class="input dark:input-bordered w-fit min-w-64 mx-auto dark:bg-gray-800 bg-gray-200 dark:text-white text-black mt-4"
       />
-    </div>
+    </div> -->
     {#if sensorStation}
       {#if sensorStation.name.includes(searchTerm) || sensorStation.roomName.includes(searchTerm)}
         <div

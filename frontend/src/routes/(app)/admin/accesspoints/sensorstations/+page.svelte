@@ -49,7 +49,7 @@
     },
   ];
 
-  let sensorStations: Responses.InnerResponse[] = [];
+  let sensorStations: Responses.SensorStationBaseResponse[] = [];
   $: data.streamed.sensorStations.then((data) => {
     sensorStations = data.sensorStations;
   });

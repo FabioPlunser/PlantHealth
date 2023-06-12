@@ -8,17 +8,25 @@ export function createGraphData(data: Responses.InnerSensors[]) {
 
     let sensorLimits = sensor.sensorLimits || [];
 
+    // make sure that the values are sorted by timestamp
     sensor.values.sort((a, b) => {
       return new Date(a.timeStamp).getTime() - new Date(b.timeStamp).getTime();
     });
+    // make sure that the limits are sorted by timestamp
     sensor.sensorLimits.sort((a, b) => {
       return new Date(a.timeStamp).getTime() - new Date(b.timeStamp).getTime();
     });
+
+    // get the start and end time of the values
+    const startTime = new Date(sensor.values[0].timeStamp).getTime();
+    const endTime = new Date(
+      sensor.values[sensor.values.length - 1].timeStamp
+    ).getTime();
+    // get all timestamps of the values and limits
     const timeStamps = [
       ...sensor.values.map((data) => new Date(data.timeStamp)),
       ...sensor.sensorLimits.map((data) => new Date(data.timeStamp)),
     ];
-    console.log(sensor.sensorLimits);
 
     timeStamps.sort((a, b) => a.getTime() - b.getTime());
 
@@ -69,6 +77,12 @@ export function createGraphData(data: Responses.InnerSensors[]) {
             lowerLimitData.push(limit.lowerLimit);
           }
         });
+        let newestLimit = sensorLimits[sensorLimits.length - 1];
+        if (label.getTime() > new Date(newestLimit.timeStamp).getTime()) {
+          upperLimitData.push(newestLimit.upperLimit);
+          lowerLimitData.push(newestLimit.lowerLimit);
+        }
+
         upperLimitData.push(null);
         lowerLimitData.push(null);
       });
@@ -80,7 +94,7 @@ export function createGraphData(data: Responses.InnerSensors[]) {
       let upperLimit = {
         label: "UpperLimit",
         fill: false,
-        pointRadius: 4,
+        pointRadius: 0,
         lineTension: 0.5,
         backgroundColor: "rgba(255,0,0,1)",
         borderColor: "rgba(255,0,0,1)",
@@ -95,7 +109,7 @@ export function createGraphData(data: Responses.InnerSensors[]) {
       let lowerLimit = {
         label: "LowerLimit",
         fill: false,
-        pointRadius: 4,
+        pointRadius: 0,
         lineTension: 0.5,
         backgroundColor: "rgba(0,0,255,1)",
         borderColor: "rgba(0,0,255,1)",
