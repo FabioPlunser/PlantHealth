@@ -1,8 +1,6 @@
 package at.ac.uibk.plant_health.service;
 
-import at.ac.uibk.plant_health.repositories.SensorLimitsRepository;
-import at.ac.uibk.plant_health.repositories.SensorStationPersonReferenceRepository;
-import at.ac.uibk.plant_health.repositories.SensorStationRepository;
+import at.ac.uibk.plant_health.models.annotations.AuditLogAnnotation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +15,9 @@ import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.repositories.PersonRepository;
+import at.ac.uibk.plant_health.repositories.SensorLimitsRepository;
+import at.ac.uibk.plant_health.repositories.SensorStationPersonReferenceRepository;
+import at.ac.uibk.plant_health.repositories.SensorStationRepository;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -127,6 +128,7 @@ public class PersonService {
 	 * @param person person to be created
 	 * @return true if person has been created, false otherwise
 	 */
+	@AuditLogAnnotation(successMessage = "Created Person {person.id}")
 	public boolean create(Person person) {
 		if (person != null && person.getPersonId() == null) {
 			return save(person) != null;
@@ -167,6 +169,7 @@ public class PersonService {
 	 * @return true if the user could be found and could be updated, false
 	 *     otherwise.
 	 */
+	@AuditLogAnnotation(successMessage = "Updated Person {person.id}")
 	public boolean update(
 			Person person, String username, String email, String password,
 			Set<Permission> permissions
@@ -219,6 +222,7 @@ public class PersonService {
 	 * @param personId The ID of the Person to delete.
 	 * @return true if the person was deleted, false otherwise.
 	 */
+	@AuditLogAnnotation(successMessage = "Deleted Person {personId}")
 	public boolean delete(UUID personId) {
 		try {
 			Optional<Person> maybePerson = personRepository.findById(personId);
@@ -227,17 +231,27 @@ public class PersonService {
 			}
 			Person person = maybePerson.get();
 
-			sensorStationRepository.findAll().stream()
-							.filter(st -> st.getGardener() != null)
-							.filter(st -> st.getGardener().equals(person))
-							.forEach(st -> {st.setGardener(null); sensorStationRepository.save(st);});
+			sensorStationRepository.findAll()
+					.stream()
+					.filter(st -> st.getGardener() != null)
+					.filter(st -> st.getGardener().equals(person))
+					.forEach(st -> {
+						st.setGardener(null);
+						sensorStationRepository.save(st);
+					});
 
-			sensorLimitsRepository.findAll().stream()
-							.filter(sl -> sl.getGardener() != null)
-							.filter(sl -> sl.getGardener().equals(person))
-							.forEach(sl -> {sl.setGardener(null); sensorLimitsRepository.save(sl);});
+			sensorLimitsRepository.findAll()
+					.stream()
+					.filter(sl -> sl.getGardener() != null)
+					.filter(sl -> sl.getGardener().equals(person))
+					.forEach(sl -> {
+						sl.setGardener(null);
+						sensorLimitsRepository.save(sl);
+					});
 
-			sensorStationPersonReferenceRepository.deleteAll(person.getSensorStationPersonReferences());
+			sensorStationPersonReferenceRepository.deleteAll(
+					person.getSensorStationPersonReferences()
+			);
 			this.personRepository.deleteById(personId);
 			return true;
 		} catch (Exception e) {

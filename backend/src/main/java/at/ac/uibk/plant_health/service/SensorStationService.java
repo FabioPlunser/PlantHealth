@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import at.ac.uibk.plant_health.models.annotations.AuditLogAnnotation;
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.exceptions.ServiceException;
 import at.ac.uibk.plant_health.models.plant.Sensor;
@@ -101,8 +102,11 @@ public class SensorStationService {
 	 * @return
 	 * @throws ServiceException
 	 */
-	@Transactional
-	public void setUnlocked(boolean unlocked, UUID sensorStationId) throws ServiceException {
+	@AuditLogAnnotation(
+			successMessage = "Set Lock on Sensor Station {sensorStationId} to {unlocked}"
+	)
+	public void
+	setUnlocked(boolean unlocked, UUID sensorStationId) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
 		sensorStation.setUnlocked(unlocked);
 		save(sensorStation);
@@ -115,9 +119,12 @@ public class SensorStationService {
 	 * @return
 	 */
 	@Transactional
-	public void setSensorLimits(
-			List<SensorLimits> sensorLimits, SensorStation sensorStation, Person person
-	) throws ServiceException {
+	@AuditLogAnnotation(
+			successMessage = "Set Sensor Limits on Sensor Station {sensorStation.deviceId}"
+	)
+	public void
+	setSensorLimits(List<SensorLimits> sensorLimits, SensorStation sensorStation, Person person)
+			throws ServiceException {
 		if (!sensorStation.isUnlocked()) throw new ServiceException("SensorStation is locked", 403);
 		if (sensorStation.isDeleted()) throw new ServiceException("SensorStation is deleted", 403);
 		for (SensorLimits limit : sensorLimits) {
@@ -144,10 +151,12 @@ public class SensorStationService {
 	 * @param sensorStation
 	 * @param name
 	 */
-	@Transactional
-	public void updateSensorStation(
-			SensorStation sensorStation, String name, Integer transferInterval
-	) {
+	@AuditLogAnnotation(
+			successMessage =
+					"Updated Sensor Station {sensorStation.deviceId}: {name} {transferInterval}"
+	)
+	public void
+	updateSensorStation(SensorStation sensorStation, String name, Integer transferInterval) {
 		if (!Objects.isNull(name)) {
 			sensorStation.setName(name);
 		}
@@ -157,10 +166,13 @@ public class SensorStationService {
 		save(sensorStation);
 	}
 
-	@Transactional
-	public void assignGardenerToSensorStation(
-			SensorStation sensorStation, UUID personId, boolean delete
-	) throws ServiceException {
+	@AuditLogAnnotation(
+			successMessage =
+					"Assigned Gardener {personId} to Sensor Station {sensorStation.deviceId}"
+	)
+	public void
+	assignGardenerToSensorStation(SensorStation sensorStation, UUID personId, boolean delete)
+			throws ServiceException {
 		if (delete) {
 			sensorStation.setGardener(null);
 			save(sensorStation);
@@ -351,7 +363,7 @@ public class SensorStationService {
 	 * @param sensorStationId
 	 * @throws ServiceException
 	 */
-	@Transactional
+	@AuditLogAnnotation(successMessage = "Deleted Sensor Station {sensorStationId}")
 	public void deleteSensorStation(UUID sensorStationId) throws ServiceException {
 		Optional<SensorStation> maybeSensorStation =
 				sensorStationRepository.findById(sensorStationId);
