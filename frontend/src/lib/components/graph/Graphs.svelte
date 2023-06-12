@@ -11,7 +11,7 @@
   // ---------------------------------------------------
   // ---------------------------------------------------
   export let sensorStation: SensorStationComponent;
-  export let loading = false;
+  export let loading = true;
   export let options = {};
   // ---------------------------------------------------
   // ---------------------------------------------------
@@ -51,7 +51,6 @@
   let data = sensorStation.data;
   $: console.log(data);
   data.then(async (res) => {
-    console.log(res.data);
     for (let sensor of res.data) {
       let storedSensor = storedSensors.find(
         (s) => s.sensorType === sensor.sensorType
@@ -67,6 +66,7 @@
       sensors = [...sensors, foundSensor];
     }
     graphData = createGraphData(res.data);
+    loading = false;
   });
 
   $: {
@@ -76,30 +76,6 @@
   }
 
   $: console.log(sensors);
-  // if (data instanceof Promise) {
-  //   data
-  //     .then(async (res: any) => {
-  //       // addMissingSensors(res.data);
-  //       graphData = createGraphData(res.data);
-  //     })
-  //     .catch((err: any) => {
-  //       console.error("Error while fetching data", { payload: err });
-  //     });
-  // } else {
-  //   // addMissingSensors(data);
-  //   graphData = createGraphData(data);
-  // }
-  // ---------------------------------------------------
-  // ---------------------------------------------------
-  // $: console.log(sensorStation.alarms);
-  // $: {
-  //   sensorStation.alarms.some((a) => {
-  //     if (a.sensor.type === currentSensor) {
-  //       console.log(a);
-  //     }
-  //   });
-  // }
-  // $: console.log(sensors);
 </script>
 
 <!-- @component

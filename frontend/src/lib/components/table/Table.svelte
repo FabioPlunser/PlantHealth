@@ -379,7 +379,7 @@
     font-size: 0.875rem;
     line-height: 1.25rem;
     --tw-bg-opacity: 1;
-    background-color: hsl(var(--b3) / var(--tw-bg-opacity));
+    background-color: hsl(var(--b1) / var(--tw-bg-opacity));
     border-radius: 1rem !important;
   }
 
@@ -390,11 +390,12 @@
     padding-top: 0.75rem;
     padding-bottom: 0.75rem;
     vertical-align: middle;
+    border-bottom: 2px solid hsl(var(--b2));
   }
-  .myTable tbody tr:hover {
+  /* .myTable tbody tr:hover {
     background-color: hsl(var(--p) / var(--tw-bg-opacity)) !important;
     border-radius: 10rem !important;
-  }
+  } */
   .myTable thead th:first-child {
     border-radius: 1rem 0rem 0rem 0rem !important;
   }
@@ -408,7 +409,10 @@
   .myTable tbody tr:last-child td:last-child {
     border-radius: 0rem 0rem 1rem 0rem !important;
   }
-  .myTable tbody tr:nth-child(odd) {
+  /* .myTable tbody tr:nth-child(odd) {
     background-color: hsl(var(--b1));
+  } */
+  .myTable thead {
+    background-color: hsl(var(--b3));
   }
 </style>
