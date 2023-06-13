@@ -105,12 +105,15 @@ class FlashStorage {
 			// }
 			DEBUG_PRINTF(2, "Read %s from flash.\n", (char *) ramBuffer);
 			arduino::String pairedDevice;
+			Serial.println("Size Bytes = %lu\n", PAIRED_DEVICE_BLOCK.sizeBytes);
 			for (uint32_t i = 0; i < PAIRED_DEVICE_BLOCK.sizeBytes; i++) {
 				if (ramBuffer[i] == 0) {
 					break;
 				}
 				pairedDevice += ramBuffer[i];
 			}
+			Serial.println("Paired Device = %s\n", pairedDevice.c_str());
+			delete[] ramBuffer;
 			return pairedDevice;
 		}
 
