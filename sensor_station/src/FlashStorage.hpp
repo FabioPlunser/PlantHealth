@@ -30,8 +30,8 @@ class FlashStorage {
 				uint32_t sizeBytes;
 		};
 		// The total size of the flash buffer
-		const uint32_t * FLASH_BLOCK_START =
-			reinterpret_cast<uint32_t *>(flash_buffer);
+		const uint32_t FLASH_BLOCK_START =
+			reinterpret_cast<uint32_t>(flash_buffer);
 		// The block to store the paired device in
 		const struct storageBlock PAIRED_DEVICE_BLOCK = {
 			FLASH_BLOCK_START, FLASH_BUFFER_ALIGN(64)};
@@ -40,8 +40,9 @@ class FlashStorage {
 
 		// Private constructor to make the class a singleton
 		FlashStorage() {
-			this->flash =
-				new FlashIAPBlockDevice(FLASH_BLOCK_START, FLASH_BLOCK_SIZE);
+			this->flash = new FlashIAPBlockDevice(
+				FLASH_BLOCK_START, FLASH_BUFFER_SIZE_ALIGNED
+			);
 		}
 
 		~FlashStorage() { delete this->flash; }
