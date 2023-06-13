@@ -81,7 +81,7 @@ class FlashStorage {
 			);
 			this->flash->init();
 			this->flash->erase(0, PAIRED_DEVICE_BLOCK.sizeBytes);
-			this->flash->program(&ramBuffer, 0, PAIRED_DEVICE_BLOCK.sizeBytes);
+			this->flash->program(ramBuffer, 0, PAIRED_DEVICE_BLOCK.sizeBytes);
 			this->flash->deinit();
 			delete[] ramBuffer;
 		}
@@ -97,7 +97,7 @@ class FlashStorage {
 				PAIRED_DEVICE_BLOCK.startAdress, PAIRED_DEVICE_BLOCK.sizeBytes
 			);
 			this->flash->init();
-			this->flash->read(&ramBuffer, 0, PAIRED_DEVICE_BLOCK.sizeBytes);
+			this->flash->read(ramBuffer, 0, PAIRED_DEVICE_BLOCK.sizeBytes);
 			this->flash->deinit();
 			// for(int i = 0; i < 128; i++){
 			// 	Serial.print(ramBuffer[i]);
@@ -112,7 +112,7 @@ class FlashStorage {
 				if (ramBuffer[i] == 0) {
 					break;
 				}
-				pairedDevice += ramBuffer[i];
+				pairedDevice += (char)ramBuffer[i];
 			}
 			DEBUG_PRINTF(2, "Paired Device = %s\n", pairedDevice.c_str());
 			delete[] ramBuffer;

@@ -94,7 +94,7 @@ void setup() {
 
 void loop() {
 	static arduino::String pairedDevice			  = readPairedDeviceFromFlash();
-	static bool inPairingMode					  = true;
+	static bool inPairingMode					  = false;
 	static unsigned long timeBetweenMeasures	  = 0;
 	static unsigned long previousDataTransmission = millis();
 	static unsigned long previousSensorMeasurement = millis();
@@ -210,13 +210,13 @@ void checkResetButtonPressed() {
 	static unsigned long timePressedStart = 0;
 	static bool isPressed				  = false;
 	if (digitalRead(PIN_BUTTON_3) == PinStatus::HIGH) {
-		DEBUG_PRINT_POS(2, "Reset button pressed!");
+		DEBUG_PRINT_POS(2, "Reset button pressed!\n");
 		if (!isPressed) {
 			timePressedStart = millis();
 			isPressed		 = true;
 		} else {
 			if (millis() - timePressedStart > TIME_BUTTON_PRESS_TO_RESET) {
-				DEBUG_PRINT_POS(1, "Reset initiated!");
+				DEBUG_PRINT_POS(1, "\nReset initiated!\n\n");
 				NVIC_SystemReset();
 			}
 		}

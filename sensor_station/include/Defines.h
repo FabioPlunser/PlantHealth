@@ -51,7 +51,7 @@
  * If set to TRUE the arduino will wait in the setup till a serial connection
  * for debug prints is present.
  */
-#define WAIT_FOR_SERIAL_CONNECTION			   TRUE
+#define WAIT_FOR_SERIAL_CONNECTION			   FALSE
 
 /**
  * If this is set to true the led and piezo buzzer will never output anything.
