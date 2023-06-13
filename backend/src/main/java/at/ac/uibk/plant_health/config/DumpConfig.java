@@ -27,7 +27,7 @@ import at.ac.uibk.plant_health.service.PersonService;
 import at.ac.uibk.plant_health.service.SensorStationService;
 
 @Component
-//@Profile("!prod & !test & !Prod & !Test & !PROD & !TEST")
+@Profile("!prod & !test & !Prod & !Test & !PROD & !TEST")
 public class DumpConfig {
 	@Autowired
 	private PersonService personService;

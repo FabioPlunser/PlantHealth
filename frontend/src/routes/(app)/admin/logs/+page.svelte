@@ -15,8 +15,6 @@
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   export let data;
-  $: console.log(data);
-  // $: console.log(data);
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   let logs = "backend";
@@ -57,49 +55,12 @@
 
 {#if rendered}
   <section>
-    <div class="flex justify-center mx-auto mt-10 overflow-auto">
-      <div class="btn-group flex justify-center my-2">
-        <button
-          class="btn {logs === 'backend' ? 'btn-active' : ''}"
-          on:click={() => (logs = "backend")}
-        >
-          Backend
-        </button>
-        <button
-          class="btn {logs === 'frontend' ? 'btn-active' : ''}"
-          on:click={() => (logs = "frontend")}
-        >
-          Frontend
-        </button>
+    {#await data.streamed.backendLogs}
+      <Spinner />
+    {:then backendLogs}
+      <div class="overflow-auto">
+        <Table data={backendLogs} {columns} {mobileColumnVisibility} />
       </div>
-    </div>
-
-    {#if logs === "backend"}
-      {#await data.streamed.backendLogs}
-        <Spinner />
-      {:then backendLogs}
-        <div class="overflow-auto">
-          <Table
-            data={backendLogs}
-            {columns}
-            {mobileColumnVisibility}
-            maxRowSize={backendLogs?.length ?? 0}
-          />
-        </div>
-      {/await}
-    {:else}
-      {#await data.streamed.frontendLogs}
-        <Spinner />
-      {:then frontendLogs}
-        <div class="overflow-auto">
-          <Table
-            data={frontendLogs}
-            {columns}
-            {mobileColumnVisibility}
-            maxRowSize={frontendLogs?.length ?? 0}
-          />
-        </div>
-      {/await}
-    {/if}
+    {/await}
   </section>
 {/if}
