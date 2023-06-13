@@ -4,6 +4,7 @@
 #ifdef DO_MAIN
 
 #include "../lib/NotificationHandler/SensorErrors.h"
+#include "FlashStorage.hpp"
 #include "SensorClasses/AirSensor.cpp"
 #include "SensorClasses/DipSwitch.cpp"
 #include "SensorClasses/Hydrometer.cpp"
@@ -42,6 +43,8 @@ double sensorValueWeightCalculationFunction(
 );
 void checkResetButtonPressed();
 void playPairingMelody();
+arduino::String readPairedDeviceFromFlash();
+void writePairedDeviceToFlash(arduino::String & pairedDevice);
 
 // ----- Global Variables ----- //
 
@@ -52,6 +55,7 @@ DipSwitchClass * dipSwitch;
 NotificationHandler * notificationHandler;
 Adafruit_BME680 bme680;
 SensorValueHandlerClass * sensorValueHandler;
+FlashStorage * flashStorage;
 
 // ----- Setup ----- //
 
@@ -69,6 +73,8 @@ void setup() {
 	sensorValueHandler = SensorValueHandlerClass::getInstance(
 		airSensor, hydrometer, phototransistor
 	);
+	flashStorage = FlashStorage::getInstance();
+
 	sensorValueHandler->setWeightCalculatorFunction(
 		sensorValueWeightCalculationFunction
 	);
@@ -87,11 +93,16 @@ void setup() {
 // ----- Loop ----- //
 
 void loop() {
-	static arduino::String pairedDevice			   = "";
-	static bool inPairingMode					   = true;
-	static unsigned long timeBetweenMeasures	   = 0;
-	static unsigned long previousDataTransmission  = millis();
+	static arduino::String pairedDevice			  = readPairedDeviceFromFlash();
+	static bool inPairingMode					  = false;
+	static unsigned long timeBetweenMeasures	  = 0;
+	static unsigned long previousDataTransmission = millis();
 	static unsigned long previousSensorMeasurement = millis();
+	static bool firstRun						   = true;
+	if (firstRun) {
+		DEBUG_PRINTF(2, "Paired device is: %s\n", pairedDevice.c_str());
+		firstRun = false;
+	}
 
 	checkResetButtonPressed();
 
@@ -99,7 +110,7 @@ void loop() {
 	checkPairingButtonAndStatus(inPairingMode);
 	updateNotificationHandler_PairingMode(inPairingMode);
 	enable_pairing_mode();
-#else 
+#else
 	inPairingMode = true;
 #endif
 	checkNotificationSilenceButtonPressed();
@@ -107,7 +118,7 @@ void loop() {
 
 #if PAIRING_BUTTON_REQUIRED
 	updateNotificationHandler_PairingMode(inPairingMode);
-#endif 
+#endif
 	// If sensor data got transmitted we want to measure new values directly.
 	if (get_sensor_data_read_flag() == SENSOR_DATA_READ_VALUE) {
 		timeBetweenMeasures		 = 0;
@@ -156,17 +167,56 @@ void loop() {
 
 // ----- Functions ----- //
 
+/**
+ * Reads the previous paired device from the flash storage.
+ * If no device was paired previously it will return an empty string.
+ */
+arduino::String readPairedDeviceFromFlash() {
+	arduino::String pairedDevice = flashStorage->readPairedDevice();
+	// Check if it matches the format "AB:CD:EF:12:34:56". If not it will count
+	// as not set.
+	DEBUG_PRINTF(2, "Read paired device: \"%s\"\n", pairedDevice.c_str());
+	if (pairedDevice.length() != 17) {
+		DEBUG_PRINTF_POS(
+			1, "Stored string was not a valied Mac address! \"%s\"\n",
+			pairedDevice.c_str()
+		);
+		pairedDevice = "";
+	}
+	DEBUG_PRINTF(2, "Will return pairedDevice \"%s\" \n", pairedDevice.c_str());
+	return pairedDevice;
+}
+
+/**
+ * Writes the paired device to the flash storage.
+ * Asserts that the provided string matches the format "AB:CD:EF:12:34:56".
+ */
+void writePairedDeviceToFlash(arduino::String & pairedDevice) {
+	// Check if it matches the format "AB:CD:EF:12:34:56". If not it will count
+	// as not set.
+	if (pairedDevice.length() != 17) {
+		DEBUG_PRINTF_POS(
+			1,
+			"String \"%s\" did not match the format \"AB:CD:EF:12:34:56\"!\n",
+			pairedDevice.c_str()
+		);
+		return;
+	}
+	DEBUG_PRINTF_POS(1, "Paired device set to \"%s\"\n", pairedDevice.c_str());
+	flashStorage->writePairedDevice(pairedDevice);
+}
+
 void checkResetButtonPressed() {
 	static unsigned long timePressedStart = 0;
 	static bool isPressed				  = false;
 	if (digitalRead(PIN_BUTTON_3) == PinStatus::HIGH) {
-		DEBUG_PRINT_POS(2, "Reset button pressed!");
+		DEBUG_PRINT_POS(2, "Reset button pressed!\n");
 		if (!isPressed) {
 			timePressedStart = millis();
 			isPressed		 = true;
 		} else {
 			if (millis() - timePressedStart > TIME_BUTTON_PRESS_TO_RESET) {
-				DEBUG_PRINT_POS(1, "Reset initiated!");
+				DEBUG_PRINT_POS(1, "\nReset initiated!\n\n");
 				NVIC_SystemReset();
 			}
 		}
@@ -193,7 +243,10 @@ unsigned long calculateTimeBetweenMeasures(
 	}
 	float waitFactor = pow((std::sin(PI / 2 * normedValue)), 2);
 	DEBUG_PRINTF(3, "Wait factor: %f\n", waitFactor);
-	DEBUG_PRINTF(3, "Time between measures: %f\n", ((waitFactor * (timeMax - timeMin) + timeMin)));
+	DEBUG_PRINTF(
+		3, "Time between measures: %f\n",
+		((waitFactor * (timeMax - timeMin) + timeMin))
+	);
 	return (unsigned long) ((waitFactor * (timeMax - timeMin) + timeMin));
 }
 
@@ -273,6 +326,7 @@ void handleCentralDeviceIfPresent(
 			if (get_sensorstation_locked_status() ==
 				SENSOR_STATION_UNLOCKED_VALUE) {
 				pairedDevice = central.address();
+				writePairedDeviceToFlash(pairedDevice);
 				DEBUG_PRINTF(
 					1, "New device is: \"%s\".\n", pairedDevice.c_str()
 				);
@@ -373,4 +427,4 @@ void playPairingMelody() {
 	notificationHandler->playMelodyOnPiezoBuzzer(melodyVector);
 }
 
-#endif 
+#endif
