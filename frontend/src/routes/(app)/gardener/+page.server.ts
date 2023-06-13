@@ -16,33 +16,30 @@ import {
 
 export async function load(event) {
   const { cookies, fetch } = event;
+  let dates = setDates(event);
   //---------------------------------------------------------------------
-  // get all sensor stations available to add to dashboard
+  // get dashboard, assigned and added to dashboard sensor stations
   //---------------------------------------------------------------------
-  let data = await fetch(`${BACKEND_URL}/get-dashboard`)
-    .then(async (res) => {
-      if (!res.ok) {
-        errorHandler(
-          event.locals.user?.personId,
-          "Error while fetching dashboard sensor stations",
-          await res.json()
-        );
-      }
-      return await res.json();
-    })
-    .catch((e) => {
-      errorHandler(
-        event.locals.user?.personId,
-        "Error while fetching dashboard sensor stations",
-        e
-      );
-      throw error(500, "Error while fetching dashboard sensor stations");
-    });
+  let res = await fetch(`${BACKEND_URL}/get-dashboard`);
+  if (!res.ok) {
+    let data = await res.json();
+    errorHandler(
+      event.locals.user?.personId,
+      "Error while fetching dashboard sensor stations",
+      data
+    );
+    resolve({ sensorStations: [] });
+    throw error(500, "Error while fetching dashboard sensor stations");
+  }
+  let data: Responses.GardenerDashBoardResponse = await res.json();
+  let dashBoardSensorStations: SensorStationComponent[] =
+    data.addedSensorStations;
+  let assignedSensorStations: SensorStationDetailComponentInner[] =
+    data.assignedSensorStations;
 
-  let dashBoardSensorStations = data?.addedSensorStations;
-  async function getDashBoardSensorStations(): Promise<any> {
+  async function getDashBoardSensorStations(): Promise<Dashboard> {
     return new Promise(async (resolve, reject) => {
-      if (dashBoardSensorStations.length == 0) resolve([]);
+      if (dashBoardSensorStations.length == 0) resolve({ sensorStations: [] });
       for (let sensorStation of dashBoardSensorStations) {
         sensorStation.data = getSensorStationData(event, sensorStation, dates);
         sensorStation.pictures = await getSensorStationPictures(
@@ -51,47 +48,30 @@ export async function load(event) {
         );
       }
 
-      resolve(dashBoardSensorStations);
-    }).catch((e) => {
-      errorHandler(
-        event.locals.user?.personId,
-        "Error while fetching dashboard sensor stations",
-        e
-      );
-      return null;
+      resolve({ sensorStations: dashBoardSensorStations });
     });
   }
 
-  let assignedSensorStations = data?.assignedSensorStations;
-  async function getAssignedSensorStations(): Promise<any> {
+  async function getAssignedSensorStations(): Promise<
+    SensorStationDetailComponentInner[] | []
+  > {
     return new Promise(async (resolve, reject) => {
-      if (assignedSensorStations.length == 0)
-        for (let assignedSensorStation of assignedSensorStations) {
-          assignedSensorStation.data = getSensorStationData(
-            event,
-            assignedSensorStation,
-            dates
-          );
-          assignedSensorStation.pictures = await getSensorStationPictures(
-            event,
-            assignedSensorStation
-          );
-          assignedSensorStation.limits = getSensorStationLimits(
-            event,
-            assignedSensorStation
-          );
-        }
+      if (assignedSensorStations.length == 0) resolve([]);
+      for (let assignedSensorStation of assignedSensorStations) {
+        assignedSensorStation.data = getSensorStationData(
+          event,
+          assignedSensorStation,
+          dates
+        );
+        assignedSensorStation.pictures = await getSensorStationPictures(
+          event,
+          assignedSensorStation
+        );
+      }
       resolve(assignedSensorStations);
-    }).catch((e) => {
-      errorHandler(
-        event.locals.user?.personId ?? "unknown",
-        "Error while fetching dashboard sensor stations",
-        e
-      );
     });
   }
 
-  let dates = setDates(event);
   return {
     dates,
     streamed: {

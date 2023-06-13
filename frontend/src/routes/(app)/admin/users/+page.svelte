@@ -75,7 +75,6 @@
     email: false,
     permissions: false,
   };
-  $: console.log(data);
 </script>
 
 {#if addUserModal}

@@ -113,4 +113,10 @@ export const actions = {
   updateFromTo: async (event) => {
     await updateFromTo(event);
   },
+  //---------------------------------------------------------------------
+  //
+  //---------------------------------------------------------------------
+  uploadPicture: async (event) => {
+    await uploadPicture(event);
+  },
 };

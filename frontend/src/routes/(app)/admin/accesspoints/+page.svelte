@@ -26,9 +26,9 @@
         accessPoints = res.accessPoints;
         loading = false;
       } else {
-        if (browser) {
-          goto("/logout");
-        }
+        // if (browser) {
+        //   goto("/logout");
+        // }
       }
     });
   }
@@ -77,7 +77,6 @@
   function setSensorStations(accessPoint: Responses.InnerAccessPoint) {
     $apSensorStations = accessPoint.sensorStations;
   }
-  $: console.log(data);
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   let searchTerm = "";

@@ -7,6 +7,7 @@
   import StationInfo from "$lib/components/ui/sensorStation/sensorStationInfo/StationInfo.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
   import SensorStationsTable from "$lib/components/ui/sensorStation/sensorStationsTable/SensorStationsTable.svelte";
+  import SensorStationCard from "$lib/components/ui/sensorStation/SensorStationCard.svelte";
   // ----------------------------------
   // ----------------------------------
   let rendered = false;
@@ -96,29 +97,12 @@
               {#if sensorStation.roomName.includes(searchTerm) || sensorStation.bdAddress.includes(searchTerm) || sensorStation.dipSwitchId
                   .toString()
                   .includes(searchTerm)}
-                <div
-                  class:blinking-border-red={sensorStation.alarms.some(
-                    (alarm) => {
-                      return alarm.alarm != "n";
-                    }
-                  )}
-                  class="relative"
-                >
-                  <div
-                    class="card w-full h-fit bg-base-100 dark:border-none shadow-2xl"
-                    in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
-                    out:fly|local|self={{ y: 200, duration: 200 }}
-                  >
-                    <div class="card-body">
-                      <StationInfo
-                        {sensorStation}
-                        {form}
-                        showDetailLink={true}
-                        gardener={data.gardener.items}
-                      />
-                    </div>
-                  </div>
-                </div>
+                <SensorStationCard
+                  {sensorStation}
+                  {form}
+                  showDetailLink={true}
+                  gardner={data.gardener}
+                />
               {/if}
             {/each}
           </div>

@@ -45,7 +45,7 @@ spring:
     hibernate:
       dialect: org.hibernate.dialect.MySQLDialect
       # Create Model Tables on Startup
-      ddl-auto: create-drop
+      ddl-auto: create
   web:
     resources:
       # Disable static Resource Mapping

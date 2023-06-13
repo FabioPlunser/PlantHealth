@@ -232,41 +232,6 @@ public class AccessPointController {
 				.toEntity();
 	}
 
-	@Operation(summary = "Set the transfer interval of an Access Point")
-	@ApiResponses({
-		@ApiResponse(
-				responseCode = "200", description = "Transfer interval successfully set",
-				content = @Content(schema = @Schema(implementation = MessageResponse.class))
-		)
-		,
-				@ApiResponse(
-						responseCode = "400", description = "Transfer interval could not be set",
-						content = @Content(schema = @Schema(implementation = MessageResponse.class))
-				)
-	})
-	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
-	@PostMapping("/set-access-point-transfer-interval")
-	public RestResponseEntity
-	setAPTransferInterval(
-			@RequestParam(name = "accessPointId") final UUID accessPointId,
-			@RequestParam(name = "transferInterval") final int transferInterval
-	) {
-		try {
-			accessPointService.findById(accessPointId);
-			accessPointService.setTransferInterval(accessPointId, transferInterval);
-		} catch (ServiceException e) {
-			return MessageResponse.builder()
-					.statusCode(e.getStatusCode())
-					.message(e.getMessage())
-					.toEntity();
-		}
-
-		return MessageResponse.builder()
-				.statusCode(200)
-				.message("Successfully set transfer interval")
-				.toEntity();
-	}
-
 	@Operation(summary = "Update the information of an Access Point")
 	@ApiResponses({
 		@ApiResponse(

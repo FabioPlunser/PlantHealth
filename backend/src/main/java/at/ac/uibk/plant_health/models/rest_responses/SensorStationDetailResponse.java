@@ -24,8 +24,7 @@ public class SensorStationDetailResponse extends RestResponse implements Seriali
 	}
 
 	@Getter
-
-	private static class SensorStationInnerResponse
+	public static class SensorStationInnerResponse
 			extends SensorStationBaseResponse implements Serializable {
 		private final List<SensorLimitsResponse> sensorLimits;
 		private final List<SensorStationPersonReference> sensorStationPersonReferences;

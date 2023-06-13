@@ -11,18 +11,23 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 public class GardenerDashBoardResponse extends RestResponse implements Serializable {
-	private final List<SensorStationBaseResponse> assignedSensorStations;
+	private final List<SensorStationDetailResponse.SensorStationInnerResponse>
+			assignedSensorStations;
 	private final List<SensorStationBaseResponse> addedSensorStations;
 	public GardenerDashBoardResponse(List<SensorStation> allSensorStation, Person person) {
-		this.assignedSensorStations = allSensorStation.stream()
-											  .filter(s -> {
-												  if (s.getGardener() != null)
-													  return s.getGardener().equals(person);
-												  else
-													  return false;
-											  })
-											  .map(SensorStationBaseResponse::new)
-											  .toList();
+		this.assignedSensorStations =
+				allSensorStation.stream()
+						.filter(s -> {
+							if (s.getGardener() != null)
+								return s.getGardener().equals(person);
+							else
+								return false;
+						})
+						.map(sensorStation
+							 -> new SensorStationDetailResponse.SensorStationInnerResponse(
+									 sensorStation, person
+							 ))
+						.toList();
 		this.addedSensorStations = person.getSensorStationPersonReferences()
 										   .stream()
 										   .filter(SensorStationPersonReference::isInDashboard)

@@ -85,7 +85,6 @@
       sensorStation = data.streamed.sensorStation;
     }
   }
-  $: console.log(data);
   let searchTerm = "";
 </script>
 
@@ -219,9 +218,9 @@
                         />
                         <DateInput
                           format="dd.MM.yyyy"
-                          placeholder={new Date(
-                            Date.now()
-                          ).toLocaleDateString()}
+                          placeholder={new Date(Date.now()).toLocaleDateString(
+                            "de-DE"
+                          )}
                           bind:value={newDates.from}
                         />
                       </label>
@@ -234,9 +233,9 @@
                         />
                         <DateInput
                           format="dd.MM.yyyy"
-                          placeholder={new Date(
-                            Date.now()
-                          ).toLocaleDateString()}
+                          placeholder={new Date(Date.now()).toLocaleDateString(
+                            "de-DE"
+                          )}
                           bind:value={newDates.to}
                         />
                       </label>
@@ -268,9 +267,9 @@
                         />
                         <DateInput
                           format="dd.MM.yyyy"
-                          placeholder={new Date(
-                            Date.now()
-                          ).toLocaleDateString()}
+                          placeholder={new Date(Date.now()).toLocaleDateString(
+                            "de-DE"
+                          )}
                           bind:value={newDates.from}
                         />
                       </label>
@@ -283,9 +282,9 @@
                         />
                         <DateInput
                           format="dd.MM.yyyy"
-                          placeholder={new Date(
-                            Date.now()
-                          ).toLocaleDateString()}
+                          placeholder={new Date(Date.now()).toLocaleDateString(
+                            "de-DE"
+                          )}
                           bind:value={newDates.to}
                         />
                       </label>
@@ -309,24 +308,23 @@
                   <h1 class="flex justify-center text-3xl font-bold">
                     No Limits
                   </h1>
+                {:else if sensorStation.sensorLimits}
+                  {@const limits = sensorStation.sensorLimits.sort((a, b) => {
+                    return b.sensor.type.localeCompare(a.sensor.type);
+                  })}
+                  <div
+                    class="grid grid-rows sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4"
+                  >
+                    {#each limits as limit, i}
+                      <LimitsCard
+                        {limit}
+                        sensorStationId={sensorStation.sensorStationId}
+                        {form}
+                      />
+                    {/each}
+                  </div>
                 {:else}
-                  {#await sensorStation.sensorLimits}
-                    <Spinner />
-                  {:then limits}
-                    <div
-                      class="grid grid-rows sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4"
-                    >
-                      {#each limits as limit, i}
-                        <LimitsCard
-                          {limit}
-                          sensorStationId={sensorStation.sensorStationId}
-                          {form}
-                        />
-                      {/each}
-                    </div>
-                  {:catch error}
-                    <p class="text-red-500">{error.message}</p>
-                  {/await}
+                  <Spinner />
                 {/if}
               {:else if state === "pictures"}
                 <div class="grid grid-cols gap-2">
@@ -419,7 +417,7 @@
                                 }}
                               />
                               <h1 class="flex justify-center">
-                                {data.creationDate.toLocaleDateString()}
+                                {data.creationDate.toLocaleDateString("de-DE")}
                               </h1>
                             </div>
                           {:catch error}

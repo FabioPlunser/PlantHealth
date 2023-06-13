@@ -11,7 +11,7 @@ export async function load(event) {
 
   async function getAccessPoints(): Promise<Responses.AccessPointListResponse | null> {
     return new Promise(async (resolve, reject) => {
-      await fetch(`${BACKEND_URL}/get-access-points`)
+      let res = await fetch(`${BACKEND_URL}/get-access-points`)
         .then(async (res) => {
           if (!res.ok) {
             res = await res.json();
@@ -20,6 +20,8 @@ export async function load(event) {
               "Error while getting access points",
               res
             );
+            throw error(500, "Error while getting access points");
+            resolve(null);
           }
           resolve(await res.json());
         })
@@ -29,13 +31,16 @@ export async function load(event) {
             "Error while getting access points",
             err
           );
+          resolve(null);
         });
     });
   }
 
   return {
     streamed: {
-      accessPoints: getAccessPoints(),
+      accessPoints: getAccessPoints().catch((err) => {
+        throw error(500, "Error while getting access points");
+      }),
     },
   };
 }
@@ -118,7 +123,6 @@ export const actions = {
     const formData = await request.formData();
     let accessPointId = String(formData.get("accessPointId"));
     let scanActive = String(formData.get("scanActive"));
-    console.log(scanActive);
     await fetch(
       `${BACKEND_URL}/scan-for-sensor-stations?accessPointId=${accessPointId}&scanActive=${scanActive}`,
       { method: "POST" }

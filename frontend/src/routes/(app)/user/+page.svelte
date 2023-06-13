@@ -31,7 +31,6 @@
       dashBoardSensorStations = res.sensorStations;
     });
     data.streamed.allSensorStations.then((res) => {
-      console.log(res);
       allSensorStations = res.sensorStations;
     });
   }

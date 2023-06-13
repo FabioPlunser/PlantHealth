@@ -9,6 +9,7 @@
   import Spinner from "$components/ui/Spinner.svelte";
   import DateInput from "$components/datepicker/DateInput.svelte";
   import BigPictureModal from "$components/ui/BigPictureModal.svelte";
+  import UploadPicture from "./UploadPicture.svelte";
   // ---------------------------------------------------
   // ---------------------------------------------------
   let rendered = false;
@@ -24,7 +25,7 @@
   let loading = false;
   let showPictures = false;
   let newDates = dates;
-  let dateNow = new Date(Date.now()).toLocaleDateString();
+  let dateNow = new Date(Date.now()).toLocaleDateString("de-DE");
   // ---------------------------------------------------
   // ---------------------------------------------------
   const customEnhance: SubmitFunction = () => {
@@ -35,7 +36,6 @@
     };
   };
 
-  $: console.log("sensorStation", sensorStation);
   let openPictureModal = false;
   let selectedPicture = "";
 </script>
@@ -159,34 +159,48 @@
               <div class="p-4 m-4">
                 <div class="carousel space-x-4">
                   {#if sensorStation.pictures}
-                    {#if sensorStation.pictures.length > 0}
-                      {#each sensorStation?.pictures as picture, i (picture.pictureId)}
-                        {#await picture.promise}
-                          <Spinner fill="fill-primary" />
-                        {:then data}
-                          <div class="carousel-item">
-                            <div>
-                              <!-- svelte-ignore a11y-click-events-have-key-events -->
-                              <img
-                                on:click={() => {
-                                  selectedPicture = data.imageRef;
-                                  openPictureModal = true;
-                                }}
-                                src={data.imageRef}
-                                alt="SensorStationPicture"
-                                class="rounded-2xl shadow-xl cursor-pointer w-64"
-                              />
-                              <h1 class="flex justify-center">
-                                {data.creationDate.toLocaleDateString("de-De")}
-                              </h1>
-                            </div>
-                          </div>
-                        {:catch error}
-                          <h1>Error: {error.message}</h1>
-                        {/await}
-                      {/each}
+                    {#if sensorStation.pictures.length === 0}
+                      <h1 class="flex justify-center text-3xl font-bold">
+                        No Pictures
+                      </h1>
+                      <UploadPicture
+                        sensorStationId={sensorStation.sensorStationId}
+                      />
                     {:else}
-                      <h1>Not Pictures found</h1>
+                      <div class="flex gap-2">
+                        <UploadPicture
+                          sensorStationId={sensorStation.sensorStationId}
+                        />
+                        {#each sensorStation?.pictures as picture, i (picture.pictureId)}
+                          {#await picture.promise}
+                            <Spinner fill="fill-primary" />
+                          {:then data}
+                            <div>
+                              <div class="carousel-item">
+                                <div>
+                                  <!-- svelte-ignore a11y-click-events-have-key-events -->
+                                  <img
+                                    on:click={() => {
+                                      selectedPicture = data.imageRef;
+                                      openPictureModal = true;
+                                    }}
+                                    src={data.imageRef}
+                                    alt="SensorStationPicture"
+                                    class="rounded-2xl shadow-xl cursor-pointer w-64"
+                                  />
+                                  <h1 class="flex justify-center">
+                                    {data.creationDate.toLocaleDateString(
+                                      "de-De"
+                                    )}
+                                  </h1>
+                                </div>
+                              </div>
+                            </div>
+                          {:catch error}
+                            <h1>Error: {error.message}</h1>
+                          {/await}
+                        {/each}
+                      </div>
                     {/if}
                   {/if}
                 </div>

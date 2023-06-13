@@ -261,29 +261,6 @@ public class TestAccessPointController {
 	}
 
 	@Test
-	void setTransferInterval() throws Exception {
-		Person person = createUserAndLogin(true);
-		UUID selfAssignedId = UUID.randomUUID();
-		accessPointService.register(selfAssignedId, "Office1");
-		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
-		accessPointService.setUnlocked(true, accessPoint.getDeviceId());
-
-		int transferInterval = 10;
-
-		mockMvc.perform(MockMvcRequestBuilders.post("/set-access-point-transfer-interval")
-								.header(HttpHeaders.USER_AGENT, "MockTests")
-								.header(HttpHeaders.AUTHORIZATION,
-										AuthGenerator.generateToken(person))
-								.param("accessPointId", String.valueOf(accessPoint.getDeviceId()))
-								.param("transferInterval", String.valueOf(transferInterval))
-								.contentType(MediaType.APPLICATION_JSON))
-				.andExpectAll(status().isOk());
-
-		accessPoint = accessPointRepository.findByDeviceId(accessPoint.getDeviceId()).get();
-		assertEquals(transferInterval, accessPoint.getTransferInterval());
-	}
-
-	@Test
 	void updateAccessPoint() throws Exception {
 		Person person = createUserAndLogin(true);
 		UUID selfAssignedId = UUID.randomUUID();

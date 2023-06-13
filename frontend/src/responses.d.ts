@@ -260,7 +260,7 @@ declare namespace Responses {
   }
 
   declare interface GardenerDashBoardResponse {
-    assignedSensorStations: SensorStationBaseResponse[];
+    assignedSensorStations: SensorStationInnerResponse[];
     addedSensorStations: SensorStationBaseResponse[];
   }
 

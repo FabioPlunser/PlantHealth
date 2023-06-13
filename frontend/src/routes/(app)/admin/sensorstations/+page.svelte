@@ -53,7 +53,6 @@
   $: data.streamed.sensorStations.then((data) => {
     sensorStations = data.sensorStations;
   });
-  $: console.log(data);
 </script>
 
 {#if rendered}
@@ -95,6 +94,8 @@
                   .toString()
                   .includes(searchTerm)}
                 <div
+                  in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
+                  out:fly|self={{ y: 200, duration: 200 }}
                   class:blinking-border={sensorStation.alarms.some(
                     (a) => a.alarm !== "n"
                   )}
@@ -102,8 +103,6 @@
                 >
                   <div
                     class="card w-full h-fit bg-base-100 dark:border-none shadow-2xl"
-                    in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
-                    out:fly|local|self={{ y: 200, duration: 200 }}
                   >
                     <div class="card-body">
                       <StationInfo

@@ -28,10 +28,35 @@
   let sensorStationsModal = false;
   // ---------------------------------------------------
   // ---------------------------------------------------
-  $: sensorStationsData = {
-    dates: data.dates,
-    sensorStations: data.streamed.assignedSensorStations,
-  };
+  let allSensorStations: Responses.SensorStationsInnerResponse[] | null = null;
+  let dashBoardSensorStations: SensorStationComponent[] | null = null;
+  let assignedSensorStations: SensorStationDetailComponent[] | null = null;
+
+  $: {
+    data.streamed.allSensorStations.then((res) => {
+      allSensorStations = res.sensorStations;
+    });
+    data.streamed.dashBoardSensorStations.then((res) => {
+      dashBoardSensorStations = res.sensorStations;
+    });
+    data.streamed.assignedSensorStations.then((res) => {
+      let temp: any = [];
+      if (res) {
+        for (let sensorStation of res) {
+          let newStation = {
+            streamed: {
+              sensorStation: sensorStation,
+            },
+            dates: data.dates,
+          };
+          temp.push(newStation);
+        }
+      } else {
+        assignedSensorStations = [];
+      }
+      assignedSensorStations = temp;
+    });
+  }
   // ---------------------------------------------------
   // ---------------------------------------------------
   let searchTerm = "";
@@ -60,11 +85,9 @@
       >
     </div>
     {#if !assignedAdded}
-      {#await data.streamed.allSensorStations}
-        <Spinner />
-      {:then sensorStations}
+      {#if allSensorStations}
         <SensorStationsModal
-          data={sensorStations}
+          data={allSensorStations}
           bind:showModal={sensorStationsModal}
           on:close={() => (sensorStationsModal = false)}
         />
@@ -76,14 +99,12 @@
             }}>SensorStations</button
           >
         </div>
-      {:catch err}
-        <p class="text-red">{err}</p>
-      {/await}
-
-      {#await data.streamed.dashBoardSensorStations}
+      {:else}
         <Spinner />
-      {:then sensorStations}
-        {#if sensorStations.length === 0}
+      {/if}
+
+      {#if dashBoardSensorStations}
+        {#if dashBoardSensorStations.length === 0}
           <div class="flex justify-center h-screen">
             <p class="text-xl font-bold">No SensorStations added yet</p>
           </div>
@@ -98,7 +119,7 @@
           />
         </div>
         <div class="grid grid-rows gap-2">
-          {#each sensorStations as sensorStation, i (sensorStation.sensorStationId)}
+          {#each dashBoardSensorStations as sensorStation, i (sensorStation.sensorStationId)}
             {#if sensorStation.name.includes(searchTerm) || sensorStation.roomName.includes(searchTerm)}
               <div in:fly={{ y: -200, duration: 200, delay: 200 * i }}>
                 <SensorStation {sensorStation} dates={data.dates} />
@@ -106,13 +127,21 @@
             {/if}
           {/each}
         </div>
-      {:catch err}
-        <p class="text-red">{err}</p>
-      {/await}
+      {:else}
+        <Spinner />
+      {/if}
     {/if}
 
     {#if assignedAdded}
-      <SensorStationDetail data={sensorStationsData} {form} />
+      {#if assignedSensorStations}
+        <div class="grid grid-row gap-4">
+          {#each assignedSensorStations as sensorStation, i (sensorStation.streamed.sensorStation.sensorStationId)}
+            <SensorStationDetail data={sensorStation} {form} />
+          {/each}
+        </div>
+      {:else}
+        <Spinner />
+      {/if}
     {/if}
   </section>
 {/if}

@@ -27,7 +27,7 @@ import at.ac.uibk.plant_health.service.PersonService;
 import at.ac.uibk.plant_health.service.SensorStationService;
 
 @Component
-@Profile("!prod & !test & !Prod & !Test & !PROD & !TEST")
+//@Profile("!prod & !test & !Prod & !Test & !PROD & !TEST")
 public class DumpConfig {
 	@Autowired
 	private PersonService personService;
@@ -116,9 +116,10 @@ public class DumpConfig {
 				IntStream.range(0, numSensorStations)
 						.mapToObj(i -> {
 							var s = new SensorStation(macAddress(), i);
+							// randomly assign gardener
+							if (i > 2) s.setGardener(gardeners.get(i % gardeners.size()));
 
 							s.setName("SensorStation_" + i);
-
 							var refs =
 									Stream.concat(IntStream.range(0, users.size())
 														  .filter(j -> (i % 3) == (j % 3))
@@ -205,8 +206,14 @@ public class DumpConfig {
 	private static final String NUMBERS = "0123456789";
 
 	public static String macAddress() {
-		int macAddressLength = 17;
-		return base(SMALL_LETTERS + CAPITAL_LETTERS + NUMBERS, macAddressLength);
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < 6; i++) {
+			if (i > 0) {
+				sb.append(":");
+			}
+			sb.append(base("0123456789ABCDEF", 2));
+		}
+		return sb.toString();
 	}
 
 	private static final SecureRandom random = new SecureRandom();

@@ -13,14 +13,15 @@
   import SensorStationSettingsButton from "./SensorStationSettingsButton.svelte";
   //---------------------------------------------------------------
   //---------------------------------------------------------------
-  export let sensorStation: any;
+  export let sensorStation: Responses.SensorStationBaseResponse;
   export let showDetailLink: boolean = false;
-  export let gardener: any;
+  export let gardener: Responses.Person[];
   export let form: any;
   //---------------------------------------------------------------
   //---------------------------------------------------------------
 </script>
 
+<!-- @Component -->
 <div class="float margin-right text-2xl">
   {#if !sensorStation.accessPointUnlocked}
     <div class="font-bold text-2xl flex justify-center">

@@ -16,13 +16,13 @@ import {
 
 export async function load(event) {
   const { cookies, fetch } = event;
-
+  let dates = setDates(event);
   //-------------------------------------------------------------------------------------------------------------------------
   // get sensor station
   //-------------------------------------------------------------------------------------------------------------------------
   let sensorStationId = String(cookies.get("sensorStationId"));
 
-  async function getSensorStation(): Promise<SensorStationDetailComponent> {
+  async function getSensorStation(): Promise<SensorStationDetailComponentInner> {
     return new Promise(async (resolve, reject) => {
       let res = await fetch(
         `${BACKEND_URL}/get-sensor-station?sensorStationId=${sensorStationId}`
@@ -43,7 +43,6 @@ export async function load(event) {
         event,
         sensorStation
       );
-
       resolve(sensorStation);
     });
   }
@@ -60,7 +59,6 @@ export async function load(event) {
   }
   //-------------------------------------------------------------------------------------------------------------------------
   //-------------------------------------------------------------------------------------------------------------------------
-  let dates = setDates(event);
   return {
     streamed: {
       sensorStation: getSensorStation(),

@@ -45,9 +45,9 @@
             position: "left",
             // suggestedMin: 25,
             // suggestedMax: 35,
-            ticks: {
-              stepSize: 0.1,
-            },
+            // ticks: {
+            //   stepSize: 0.1,
+            // },
           },
         },
       };
@@ -59,7 +59,6 @@
   let sensors: any[] = [];
   let storedSensors = $sensorsStore;
   let data = sensorStation.data;
-  $: console.log(data);
   data.then(async (res) => {
     for (let sensor of res.data) {
       let storedSensor = storedSensors.find(

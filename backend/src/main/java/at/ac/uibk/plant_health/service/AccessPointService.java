@@ -246,19 +246,6 @@ public class AccessPointService {
 		save(accessPoint);
 	}
 
-	/**
-	 * Set the transfer interval of the AccessPoint with the given ID.
-	 * @param accessPointId The ID of the AccessPoint to set the transfer interval for.
-	 * @param interval The interval to set.
-	 * @throws ServiceException if the AccessPoint could not be found.
-	 */
-	@Transactional
-	public void setTransferInterval(UUID accessPointId, int interval) throws ServiceException {
-		AccessPoint accessPoint = findById(accessPointId);
-		accessPoint.setTransferInterval(interval);
-		save(accessPoint);
-	}
-
 	@Transactional
 	public void updateAccessPointInfo(UUID deviceId, String roomName, int transferInterval)
 			throws ServiceException {
