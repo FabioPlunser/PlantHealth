@@ -20,7 +20,7 @@
 // The size of the aligned buffer in bytes
 #define FLASH_BUFFER_SIZE_ALIGNED FLASH_BUFFER_ALIGN(1024)
 // The buffer itself, aligned to the block size
-alignas(FLASH_BLOCK_SIZE
+alignas(FLASH_BUFFER_SIZE_ALIGNED
 ) const uint8_t flash_buffer[FLASH_BUFFER_SIZE_ALIGNED] = {};
 
 class FlashStorage {
@@ -32,8 +32,8 @@ class FlashStorage {
 				uint32_t sizeBytes;
 		};
 		// The total size of the flash buffer
-		const uint32_t FLASH_BLOCK_START =
-			reinterpret_cast<uint32_t>(flash_buffer);
+		const uint32_t* FLASH_BLOCK_START =
+			reinterpret_cast<uint32_t*>(flash_buffer);
 		// The block to store the paired device in
 		const struct storageBlock PAIRED_DEVICE_BLOCK = {
 			FLASH_BLOCK_START, FLASH_BUFFER_ALIGN(64)};
@@ -82,10 +82,10 @@ class FlashStorage {
 			);
 			this->flash->init();
 			this->flash->erase(
-				PAIRED_DEVICE_BLOCK.startAdress, PAIRED_DEVICE_BLOCK.sizeBytes
+				0, PAIRED_DEVICE_BLOCK.sizeBytes
 			);
 			this->flash->program(
-				ramBuffer, PAIRED_DEVICE_BLOCK.startAdress,
+				&ramBuffer, 0,
 				PAIRED_DEVICE_BLOCK.sizeBytes
 			);
 			this->flash->deinit();
@@ -104,7 +104,7 @@ class FlashStorage {
 			);
 			this->flash->init();
 			this->flash->read(
-				ramBuffer, PAIRED_DEVICE_BLOCK.startAdress,
+				&ramBuffer, 0,
 				PAIRED_DEVICE_BLOCK.sizeBytes
 			);
 			this->flash->deinit();
