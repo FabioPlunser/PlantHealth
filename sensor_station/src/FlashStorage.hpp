@@ -8,8 +8,6 @@
 #include <cassert>
 #include <string>
 #include <vector>
-#include <Defines.h>
-#include <CompilerFunctions.hpp>
 
 // The arduino requires the flash buffer to be aligned to the block size
 #define FLASH_BLOCK_SIZE 4096
@@ -32,8 +30,8 @@ class FlashStorage {
 				uint32_t sizeBytes;
 		};
 		// The total size of the flash buffer
-		const uint32_t* FLASH_BLOCK_START =
-			reinterpret_cast<uint32_t*>(flash_buffer);
+		const uint32_t * FLASH_BLOCK_START =
+			reinterpret_cast<uint32_t *>(flash_buffer);
 		// The block to store the paired device in
 		const struct storageBlock PAIRED_DEVICE_BLOCK = {
 			FLASH_BLOCK_START, FLASH_BUFFER_ALIGN(64)};
@@ -81,13 +79,8 @@ class FlashStorage {
 				PAIRED_DEVICE_BLOCK.startAdress, PAIRED_DEVICE_BLOCK.sizeBytes
 			);
 			this->flash->init();
-			this->flash->erase(
-				0, PAIRED_DEVICE_BLOCK.sizeBytes
-			);
-			this->flash->program(
-				&ramBuffer, 0,
-				PAIRED_DEVICE_BLOCK.sizeBytes
-			);
+			this->flash->erase(0, PAIRED_DEVICE_BLOCK.sizeBytes);
+			this->flash->program(&ramBuffer, 0, PAIRED_DEVICE_BLOCK.sizeBytes);
 			this->flash->deinit();
 			delete[] ramBuffer;
 		}
@@ -103,10 +96,7 @@ class FlashStorage {
 				PAIRED_DEVICE_BLOCK.startAdress, PAIRED_DEVICE_BLOCK.sizeBytes
 			);
 			this->flash->init();
-			this->flash->read(
-				&ramBuffer, 0,
-				PAIRED_DEVICE_BLOCK.sizeBytes
-			);
+			this->flash->read(&ramBuffer, 0, PAIRED_DEVICE_BLOCK.sizeBytes);
 			this->flash->deinit();
 			// for(int i = 0; i < 128; i++){
 			// 	Serial.print(ramBuffer[i]);
