@@ -175,6 +175,7 @@ arduino::String readPairedDeviceFromFlash() {
 	arduino::String pairedDevice = flashStorage->readPairedDevice();
 	// Check if it matches the format "AB:CD:EF:12:34:56". If not it will count
 	// as not set.
+	DEBUG_PRINTF(2, "Read paired device: \"%s\"\n", pairedDevice.c_str());
 	if (pairedDevice.length() != 17) {
 		DEBUG_PRINTF_POS(
 			1, "Stored string was not a valied Mac address! \"%s\"\n",
@@ -182,6 +183,7 @@ arduino::String readPairedDeviceFromFlash() {
 		);
 		pairedDevice = "";
 	}
+	DEBUG_PRINTF(2, "Will return pairedDevice \"%s\" \n", pairedDevice.c_str());
 	return pairedDevice;
 }
 
@@ -194,7 +196,8 @@ void writePairedDeviceToFlash(arduino::String & pairedDevice) {
 	// as not set.
 	if (pairedDevice.length() != 17) {
 		DEBUG_PRINTF_POS(
-			1, "String \"%s\" did not match the format \"AB:CD:EF:12:34:56\"!\n",
+			1,
+			"String \"%s\" did not match the format \"AB:CD:EF:12:34:56\"!\n",
 			pairedDevice.c_str()
 		);
 		return;
