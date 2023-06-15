@@ -635,6 +635,10 @@ class NotificationHandler {
 			);
 		}
 
+		/**
+		 * @param noteAndDurationList a vector of tuples with the first value
+		 * being the note and the second value being the duration of that note.
+		 */
 		void playMelodyOnPiezoBuzzer(
 			std::vector<std::tuple<uint16_t, uint16_t>> noteAndDurationList
 		) {
