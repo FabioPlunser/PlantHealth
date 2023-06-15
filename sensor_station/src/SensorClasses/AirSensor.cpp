@@ -25,6 +25,8 @@ class AirSensorClass {
 
 	private:
 		/**
+		 * Will perform a reading on the sensor and update the values, if
+		 * possible. If not init yet, it will try to init the sensor.
 		 * @return Will set error of type UPDATE_ERROR:\
 		 * @return NOTHING  -> Success\
 		 * @return TO_EARLY -> Values might not be updated\
@@ -65,6 +67,8 @@ class AirSensorClass {
 		~AirSensorClass() { delete (this->bme680); }
 
 		/**
+		 * Set the values in the provided parameters to the measured values.
+		 * If any value stays NULL, it will not be updated.
 		 * @return Will set error of type UPDATE_ERROR:
 		 * @return NOTHING  -> Success
 		 * @return TO_EARLY -> Values might not be updated
