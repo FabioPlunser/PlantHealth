@@ -11,14 +11,27 @@
 #include <tuple>
 #include <vector>
 
+/**
+ * Check castability by checking if the notification type is of the type Sensor
+ * Error.
+ */
 #define CHECK_IF_CASTABLE_TO_SENSOR_ERROR(notification)             \
 	(notification != NULL && notification->getNotificationType() == \
 								 Notification::NotificationType::SENSOR_ERROR)
 
+/**
+ * Casts the notification to a sensor error and store it in the given variable.
+ * This macro should only be used if the notification is checked with
+ * CHECK_IF_CASTABLE_TO_SENSOR_ERROR before.
+ */
 #define CAST_NOTIFICATION_TO_SENSOR_ERROR(notification, varName) \
 	assert(CHECK_IF_CASTABLE_TO_SENSOR_ERROR(notification));     \
 	varName = static_cast<const SensorError *>(notification);
 
+/**
+ * Check if a value for a sensor error is valid. Valid values are
+ * ERROR_VALUE_NOTHING, ERROR_VALUE_LOW and ERROR_VALUE_HIGH.
+ */
 #define CHECK_VALID_VALUE_VALID(value)                              \
 	if (value != ERROR_VALUE_NOTHING && value != ERROR_VALUE_LOW && \
 		value != ERROR_VALUE_HIGH) {                                \
@@ -26,6 +39,9 @@
 		return;                                                     \
 	}
 
+/**
+ * Helper macro to decompose a hex value to its rgb values.
+ */
 #define DECOMPOSE_HEX_RGB_R(hexval) ((hexval >> 16) & 0xFF)
 #define DECOMPOSE_HEX_RGB_G(hexval) ((hexval >> 8) & 0xFF)
 #define DECOMPOSE_HEX_RGB_B(hexval) (hexval & 0xFF)
@@ -53,6 +69,9 @@ class NotificationHandler {
 		NotificationHandler & operator=(NotificationHandler &) = delete;
 		NotificationHandler(NotificationHandler &)			   = delete;
 
+		/**
+		 * Get singelton instance of the notification handler.
+		 */
 		static NotificationHandler * getInstance(
 			uint8_t ledPinRed, uint8_t ledPinGreen, uint8_t ledPinBlue
 		) {
@@ -64,6 +83,13 @@ class NotificationHandler {
 		}
 
 	private:
+		/**
+		 * Add a sensor Error to the notification queue.
+		 * Gets the priority of the error from the error type and status from
+		 * the defines header.
+		 * @param errorType The type of the error.
+		 * @param errorStatus The status of the error. (High or low)
+		 */
 		void addSensorError(
 			SensorErrors::Type errorType, SensorErrors::Status errorStatus
 		) {
@@ -107,8 +133,16 @@ class NotificationHandler {
 			notificationQueue->addError(error);
 		}
 
+		/**
+		 * Function to set the colors and time arrays in the led controller form
+		 * a notification.
+		 * @return The time in ms till the next required execution to
+		 * update LED.
+		 */
 		int16_t setLEDfromNotification(const Notification & notification) {
 			DEBUG_PRINT_POS(4, "\n");
+			// Only change led status if the notification is not the same as the
+			// previous one.
 			if (prevErrorNotification != NULL &&
 				*prevErrorNotification == notification) {
 				DEBUG_PRINT_POS(
@@ -123,6 +157,7 @@ class NotificationHandler {
 				LED_TIME_NOTIFICATION_BLINK_PAUSE_MS,
 				LED_TIME_NOTIFICATION_OFF_MS};
 			uint8_t arraySize = sizeof(ledOnMs) / sizeof(ledOnMs[0]);
+			// Currently only the pairing mode is a pure notification.
 			uint8_t colorR =
 				DECOMPOSE_HEX_RGB_R(LED_COLOR_NOTIFICATION_PAIRING);
 			uint8_t colorG =
@@ -149,11 +184,17 @@ class NotificationHandler {
 		 */
 		int16_t setLEDfromSensorError(const SensorError & sensorError) {
 			DEBUG_PRINT_POS(4, "\n");
+			// Only change led status if the notification is not the same as the
+			// previous one. Therefore try to cast the previous notification to
+			// a sensor error. If not possible, the notification is not a sensor
+			// error and therefore a new one. Else they get compared.
 			if (CHECK_IF_CASTABLE_TO_SENSOR_ERROR(prevErrorNotification)) {
 				const SensorError * prevSensorError;
 				CAST_NOTIFICATION_TO_SENSOR_ERROR(
 					prevErrorNotification, prevSensorError
 				);
+				// If the previous sensor error is the same as the current one
+				// the time till the next update is returned.
 				if (prevSensorError != NULL &&
 					*prevSensorError == sensorError) {
 					DEBUG_PRINT_POS(3, "Led got updated without changes\n");
@@ -163,7 +204,7 @@ class NotificationHandler {
 			uint32_t colorCode = 0;
 			bool isHigh =
 				sensorError.getErrorStatus() == SensorErrors::Status::High;
-
+			// Set the color code depending on the error type.
 			switch (sensorError.getErrorType()) {
 				case SensorErrors::Type::AirHumidityError:
 					colorCode = LED_COLOR_ERROR_AIR_HUMIDITY;
@@ -188,11 +229,13 @@ class NotificationHandler {
 			}
 
 			DEBUG_PRINTF_POS(
-				3, "LED will be set with color coude %p\n", (void *) colorCode
+				3, "LED will be set with color code %p\n", (void *) colorCode
 			);
 
 			std::vector<uint16_t> ledOnMs;
 			std::vector<uint16_t> ledOffMs;
+			// If the value is high the LED will blink twice. Otherwise just
+			// once.
 			if (isHigh) {
 				ledOnMs.push_back(LED_TIME_ERROR_ON_MS);
 				ledOffMs.push_back(LED_TIME_ERROR_BLINK_PAUSE_MS);
@@ -209,6 +252,7 @@ class NotificationHandler {
 					ledOffMs.at(i)
 				);
 			}
+			// Decompose the color code into the corresponding RGB values.
 			uint8_t colorR = DECOMPOSE_HEX_RGB_R(colorCode);
 			uint8_t colorG = DECOMPOSE_HEX_RGB_G(colorCode);
 			uint8_t colorB = DECOMPOSE_HEX_RGB_B(colorCode);
@@ -220,15 +264,21 @@ class NotificationHandler {
 			DEBUG_PRINTF_POS(
 				3, "Led controller got set. Is high was %d.\n", isHigh
 			);
+			// If the previous error notification not Null we delete it.
 			if (prevErrorNotification != NULL) {
 				delete (prevErrorNotification);
 				prevErrorNotification = NULL;
 			}
+			// Create a copy of the sensor error and save it as the previous.
 			prevErrorNotification = new SensorError(sensorError);
+			// Update the LED status and return the time till the next update.
 			return ledConstroller->updateLEDStatus();
 		}
 
 	public:
+		/**
+		 * @returns if there are any notifications in the queue.
+		 */
 		bool isEmpty() {
 			DEBUG_PRINT_POS(4, "\n");
 			return this->notificationQueue->isEmpty();
@@ -254,6 +304,7 @@ class NotificationHandler {
 		 */
 		int32_t update() {
 			DEBUG_PRINT_POS(4, "\n");
+			// Timetamp of the last tone played.
 			static unsigned long previousTone = 0;
 			DEBUG_PRINTF(
 				3, "Currently there are %u notifications.\n",
@@ -268,6 +319,7 @@ class NotificationHandler {
 			this->inSilentMode	   = true;
 			this->timeOfSilenceEnd = millis() + 100'000;
 #endif
+			// If in silent mode we check if the time of silence has passed.
 			if (this->inSilentMode) {
 				DEBUG_PRINT_POS(3, "In silent mode.\n");
 				if ((int32_t) this->timeOfSilenceEnd - (int32_t) millis() < 0) {
@@ -275,14 +327,20 @@ class NotificationHandler {
 					this->inSilentMode = false;
 					return ledConstroller->updateLEDStatus();
 				} else {
+					// Set the LED to the silent mode in case it is the first
+					// call.
 					ledConstroller->silence();
 					return this->timeOfSilenceEnd - millis();
 				}
 			} else {
 				const Notification * topNotification =
 					notificationQueue->getPrioritisedNotification();
-					// Only play a tone if an error has the highest priority
-				if (millis() - previousTone > PIEZO_BUZZER_TONE_INTERVALL_MS && topNotification->getNotificationType() == Notification::NotificationType::SENSOR_ERROR) {
+				// Only play a tone if the the top notification is a error ant
+				// enough time has passed since the last tone.
+				// (Only errors to exclude the pairing notification)
+				if (millis() - previousTone > PIEZO_BUZZER_TONE_INTERVALL_MS &&
+					topNotification->getNotificationType() ==
+						Notification::NotificationType::SENSOR_ERROR) {
 					DEBUG_PRINT_POS(3, "Buzzer tone.\n");
 					previousTone = millis();
 					piezoBuzzerController->startBuzzer(
@@ -290,7 +348,10 @@ class NotificationHandler {
 						PIEZO_BUZZER_TONE_DURATION_MS
 					);
 				}
+				// Time to wait till the next update.
 				int16_t timeToWait;
+				// Provide current top notification to the LED controller in
+				// case it did change.
 				if (CHECK_IF_CASTABLE_TO_SENSOR_ERROR(topNotification)) {
 					const SensorError * error;
 					CAST_NOTIFICATION_TO_SENSOR_ERROR(topNotification, error);
@@ -308,9 +369,16 @@ class NotificationHandler {
 			}
 		}
 
+		/**
+		 * This function udates the queue with the current pairing state.
+		 * If the value did change and in silent mode the silent mode will end.
+		 */
 		void updatePairingNotification(bool isActive) {
 			DEBUG_PRINT_POS(4, "\n");
+			// Store previous value to only update the queue if something
+			// changed.
 			static bool prevValue = false;
+			// Return if the value did not change.
 			if (isActive == prevValue) {
 				DEBUG_PRINTF_POS(
 					3, "Is active with same value as previous. Value was %d\n",
@@ -320,6 +388,8 @@ class NotificationHandler {
 			}
 			this->inSilentMode = false;
 			Notification notification(NOTIFICATION_PAIRING_MODE_PRIORITY);
+			// If set to active add the notification to the queue. Otherwise
+			// delete it from the queue.
 			if (isActive) {
 				DEBUG_PRINT_POS(3, "Error gets added to queue.\n");
 				notificationQueue->addError(notification);
@@ -331,14 +401,26 @@ class NotificationHandler {
 			prevValue = isActive;
 		}
 
+		/**
+		 * This function updates the queue with the current SoilHumidityValid
+		 * value.
+		 * @param value is only allowed if it is either ERROR_VALUE_NOTHING,
+		 * -LOW or -HIGH.
+		 */
 		void updateSoilHumidityValid(uint8_t value) {
 			DEBUG_PRINT_POS(4, "\n");
+			// Store previous value to only update the queue if something
+			// changed.
 			static uint8_t prevValue = ERROR_VALUE_NOTHING;
+			// Value is only allowed if it is either ERROR_VALUE_NOTHING, -LOW
+			// or -HIGH. Otherwise return
 			CHECK_VALID_VALUE_VALID(value);
 			if (value == prevValue) {
 				return;
 			}
 			this->inSilentMode = false;
+			// If previous value was different from -NOTHING it will remove the
+			// previous error.
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::SoilHumidityError
@@ -349,6 +431,8 @@ class NotificationHandler {
 				update();
 				return;
 			}
+			// Add sensor Error by type and witht he priority dependent on the
+			// provided value.
 			addSensorError(
 				SensorErrors::Type::SoilHumidityError,
 				value == ERROR_VALUE_HIGH ? SensorErrors::Status::High
@@ -356,14 +440,26 @@ class NotificationHandler {
 			);
 		}
 
+		/**
+		 * This function updates the queue with the current AirHumidityValid
+		 * value.
+		 * @param value is only allowed if it is either ERROR_VALUE_NOTHING,
+		 * -LOW or -HIGH.
+		 */
 		void updateAirHumidityValid(uint8_t value) {
 			DEBUG_PRINT_POS(4, "\n");
+			// Store previous value to only update the queue if something
+			// changed.
 			static uint8_t prevValue = ERROR_VALUE_NOTHING;
+			// Value is only allowed if it is either ERROR_VALUE_NOTHING, -LOW
+			// or -HIGH. Otherwise return
 			CHECK_VALID_VALUE_VALID(value);
 			if (value == prevValue) {
 				return;
 			}
 			this->inSilentMode = false;
+			// If previous value was different from -NOTHING it will remove the
+			// previous error.
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::AirHumidityError
@@ -374,6 +470,8 @@ class NotificationHandler {
 				update();
 				return;
 			}
+			// Add sensor Error by type and witht he priority dependent on the
+			// provided value.
 			addSensorError(
 				SensorErrors::Type::AirHumidityError,
 				value == ERROR_VALUE_HIGH ? SensorErrors::Status::High
@@ -381,14 +479,26 @@ class NotificationHandler {
 			);
 		}
 
+		/**
+		 * This function updates the queue with the current AirPressureValid
+		 * value.
+		 * @param value is only allowed if it is either ERROR_VALUE_NOTHING,
+		 * -LOW or -HIGH.
+		 */
 		void updateAirPressureValid(uint8_t value) {
 			DEBUG_PRINT_POS(4, "\n");
+			// Store previous value to only update the queue if something
+			// changed.
 			static uint8_t prevValue = ERROR_VALUE_NOTHING;
+			// Value is only allowed if it is either ERROR_VALUE_NOTHING, -LOW
+			// or -HIGH. Otherwise return
 			CHECK_VALID_VALUE_VALID(value);
 			if (value == prevValue) {
 				return;
 			}
 			this->inSilentMode = false;
+			// If previous value was different from -NOTHING it will remove the
+			// previous error.
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::AirPressureError
@@ -399,6 +509,8 @@ class NotificationHandler {
 				update();
 				return;
 			}
+			// Add sensor Error by type and witht he priority dependent on the
+			// provided value.
 			addSensorError(
 				SensorErrors::Type::AirPressureError,
 				value == ERROR_VALUE_HIGH ? SensorErrors::Status::High
@@ -406,14 +518,26 @@ class NotificationHandler {
 			);
 		}
 
+		/**
+		 * This function updates the queue with the current AirTemperatureValid
+		 * value.
+		 * @param value is only allowed if it is either ERROR_VALUE_NOTHING,
+		 * -LOW or -HIGH.
+		 */
 		void updateAirTemperatureValid(uint8_t value) {
 			DEBUG_PRINT_POS(4, "\n");
+			// Store previous value to only update the queue if something
+			// changed.
 			static uint8_t prevValue = ERROR_VALUE_NOTHING;
+			// Value is only allowed if it is either ERROR_VALUE_NOTHING, -LOW
+			// or -HIGH. Otherwise return
 			CHECK_VALID_VALUE_VALID(value);
 			if (value == prevValue) {
 				return;
 			}
 			this->inSilentMode = false;
+			// If previous value was different from -NOTHING it will remove the
+			// previous error.
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::AirTemperatureError
@@ -424,6 +548,8 @@ class NotificationHandler {
 				update();
 				return;
 			}
+			// Add sensor Error by type and witht he priority dependent on the
+			// provided value.
 			addSensorError(
 				SensorErrors::Type::AirTemperatureError,
 				value == ERROR_VALUE_HIGH ? SensorErrors::Status::High
@@ -431,14 +557,26 @@ class NotificationHandler {
 			);
 		}
 
+		/**
+		 * This function updates the queue with the current AirQualityValid
+		 * value.
+		 * @param value is only allowed if it is either ERROR_VALUE_NOTHING,
+		 * -LOW or -HIGH.
+		 */
 		void updateAirQualityValid(uint8_t value) {
 			DEBUG_PRINT_POS(4, "\n");
+			// Store previous value to only update the queue if something
+			// changed.
 			static uint8_t prevValue = ERROR_VALUE_NOTHING;
+			// Value is only allowed if it is either ERROR_VALUE_NOTHING, -LOW
+			// or -HIGH. Otherwise return
 			CHECK_VALID_VALUE_VALID(value);
 			if (value == prevValue) {
 				return;
 			}
 			this->inSilentMode = false;
+			// If previous value was different from -NOTHING it will remove the
+			// previous error.
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::AirQualityError
@@ -449,6 +587,8 @@ class NotificationHandler {
 				update();
 				return;
 			}
+			// Add sensor Error by type and witht he priority dependent on the
+			// provided value.
 			addSensorError(
 				SensorErrors::Type::AirQualityError,
 				value == ERROR_VALUE_HIGH ? SensorErrors::Status::High
@@ -456,14 +596,26 @@ class NotificationHandler {
 			);
 		}
 
+		/**
+		 * This function updates the queue with the current LightIntensityValid
+		 * value.
+		 * @param value is only allowed if it is either ERROR_VALUE_NOTHING,
+		 * -LOW or -HIGH.
+		 */
 		void updateLightIntensityValid(uint8_t value) {
 			DEBUG_PRINT_POS(4, "\n");
+			// Store previous value to only update the queue if something
+			// changed.
 			static uint8_t prevValue = ERROR_VALUE_NOTHING;
+			// Value is only allowed if it is either ERROR_VALUE_NOTHING, -LOW
+			// or -HIGH. Otherwise return
 			CHECK_VALID_VALUE_VALID(value);
 			if (value == prevValue) {
 				return;
 			}
 			this->inSilentMode = false;
+			// If previous value was different from -NOTHING it will remove the
+			// previous error.
 			if (prevValue != ERROR_VALUE_NOTHING) {
 				notificationQueue->deleteErrorFromQueue(
 					SensorErrors::Type::LightIntensityError
@@ -474,6 +626,8 @@ class NotificationHandler {
 				update();
 				return;
 			}
+			// Add sensor Error by type and witht he priority dependent on the
+			// provided value.
 			addSensorError(
 				SensorErrors::Type::LightIntensityError,
 				value == ERROR_VALUE_HIGH ? SensorErrors::Status::High

@@ -295,7 +295,7 @@ double sensorValueWeightCalculationFunction(
  * the time since the first measurement.
  * Will move in form of a sine² wave from "timeMin" to "timeMax" in the time
  * between "totalTillMax".
- * @returns: Time in milliseconds till the next sensor measurement.
+ * @returns Time in milliseconds till the next sensor measurement.
  */
 unsigned long calculateTimeBetweenMeasures(
 	unsigned long now, unsigned long firstMeasure, unsigned long timeMin,
@@ -530,7 +530,7 @@ bool updateNotificationHandler_Errors() {
 
 /**
  * Update the notification handler with the current pairing mode status.
- * @returns: True if there is a notification in the queue, else false.
+ * @returns True if there is a notification in the queue, else false.
  */
 bool updateNotificationHandler_PairingMode(bool active) {
 	DEBUG_PRINTF_POS(4, "Update notification with value %d\n", active);

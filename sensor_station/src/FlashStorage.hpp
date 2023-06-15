@@ -95,7 +95,7 @@ class FlashStorage {
 		/**
 		 * Reads the paired device from flash. If no device is paired the
 		 * behaviour is undefined.
-		 * @returns: The paired device if there was one stored previously.
+		 * @returns The paired device if there was one stored previously.
 		 * Otherwise undefined.
 		 */
 		arduino::String readPairedDevice() {

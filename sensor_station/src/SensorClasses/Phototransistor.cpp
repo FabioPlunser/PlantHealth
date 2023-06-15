@@ -35,7 +35,7 @@ class PhototransistorClass {
 
 		/**
 		 * Will try to update the currently stored value of the lighting.
-		 * @returns: The lighting in 16bit format (0-1023)
+		 * @returns The lighting in 16bit format (0-1023)
 		 */
 		uint16_t getLighting_16bit() {
 			tryUpdateValues();
@@ -44,7 +44,7 @@ class PhototransistorClass {
 
 		/**
 		 * Will convert the 16bit lighting value to a percentage.
-		 * @returns: The lighting in floating point percentage (0-100)
+		 * @returns The lighting in floating point percentage (0-100)
 		 */
 		float getLighting_percentage() {
 			tryUpdateValues();

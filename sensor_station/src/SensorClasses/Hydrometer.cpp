@@ -34,7 +34,7 @@ class HydrometerClass {
 		}
 		/**
 		 * Will try to update the currently stored value of the humidity.
-		 * @returns: The humidity in 16bit format (0-1023)
+		 * @returns The humidity in 16bit format (0-1023)
 		 */
 		uint16_t getHumidity_16bit() {
 			tryUpdateValues();
@@ -43,7 +43,7 @@ class HydrometerClass {
 
 		/**
 		 * Will convert the 16bit humidity value to a percentage.
-		 * @returns: The humidity in floating point percentage (0-100)
+		 * @returns The humidity in floating point percentage (0-100)
 		 */
 		float getHumidity_percentage() {
 			tryUpdateValues();
