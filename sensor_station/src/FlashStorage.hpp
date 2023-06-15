@@ -9,6 +9,12 @@
 #include <string>
 #include <vector>
 
+/*
+	Reference taken from
+   https://github.com/petewarden/arduino_nano_ble_write_flash/blob/main/arduino_nano_ble_write_flash.ino.
+	Last accessed on 15.06.2023.
+*/
+
 // The arduino requires the flash buffer to be aligned to the block size
 #define FLASH_BLOCK_SIZE 4096
 // We need to align the buffer to the block size
@@ -89,6 +95,8 @@ class FlashStorage {
 		/**
 		 * Reads the paired device from flash. If no device is paired the
 		 * behaviour is undefined.
+		 * @returns The paired device if there was one stored previously.
+		 * Otherwise undefined.
 		 */
 		arduino::String readPairedDevice() {
 			uint8_t * ramBuffer = new uint8_t[PAIRED_DEVICE_BLOCK.sizeBytes];
@@ -112,7 +120,7 @@ class FlashStorage {
 				if (ramBuffer[i] == 0) {
 					break;
 				}
-				pairedDevice += (char)ramBuffer[i];
+				pairedDevice += (char) ramBuffer[i];
 			}
 			DEBUG_PRINTF(2, "Paired Device = %s\n", pairedDevice.c_str());
 			delete[] ramBuffer;

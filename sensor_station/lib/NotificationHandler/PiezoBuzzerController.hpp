@@ -7,6 +7,10 @@
 #include <tuple>
 #include <vector>
 
+/**
+ * Controller class for the piezo buzzer.
+ * Provides methods to play a melody or a single tone.
+ */
 class PiezoBuzzerController {
 	private:
 		uint8_t buzzerPin;
@@ -36,6 +40,13 @@ class PiezoBuzzerController {
 		}
 		void stopBuzzer() { noTone(this->buzzerPin); }
 
+		/**
+		 * Will play a melody provided over the parameter.
+		 * Does block the execution of the program.
+		 * @param noteAndDurationList A list of tuples, where the first value is
+		 * the frequency of the tone and the second value is the duration of
+		 * that tone.
+		 */
 		void playMelody(
 			std::vector<std::tuple<uint16_t, uint16_t>> noteAndDurationList
 		) {

@@ -11,6 +11,10 @@
 #include <Defines.h>
 #include <modules/communication.h>
 
+/**
+ * Class to handle the values of the AirSensor, Hydrometer and Phototransistor.
+ * Provides functionality to read values and calculate averages.
+ */
 class SensorValueHandlerClass {
 		// ---------- Variables ---------- //
 	private:
@@ -53,10 +57,14 @@ class SensorValueHandlerClass {
 		}
 
 	public:
-		void setWeightCalculatorFunction(double (*weightFunction)(
-			unsigned long timeNow, unsigned long timeLastUpdate,
-			unsigned long timeLastReset
-		)) {
+		/**
+		 * Set the function to calculate the weight of a sensor value.
+		 * If no function is set, or the provided function is NULL, the default
+		 * weight function from the ValueAccumulatorClass will be used.
+		 */
+		void setWeightCalculatorFunction(double (*weightFunction
+		)(unsigned long timeNow, unsigned long timeLastUpdate,
+		  unsigned long timeLastReset)) {
 			DEBUG_PRINT_POS(4, "\n");
 			airTemperatureAccumulator->setWeightFunction(weightFunction);
 			airHumidityAccumulator->setWeightFunction(weightFunction);
@@ -66,6 +74,7 @@ class SensorValueHandlerClass {
 			luminosityAccumulator->setWeightFunction(weightFunction);
 		}
 
+		// Get the singelton instance of this class.
 		static SensorValueHandlerClass * getInstance(
 			AirSensorClass * airSensor, HydrometerClass * hydrometer,
 			PhototransistorClass * phototransistor
@@ -80,6 +89,15 @@ class SensorValueHandlerClass {
 			return &instance;
 		}
 
+		/**
+		 * This function sets the current sensor values in the provided struct.
+		 * If an update error occures from the AirSensor, the values will be set
+		 * to the GATT "not known" values.
+		 * @param str Pointer to the struct to set the values in.
+		 * @return UPDATE_ERROR::NOTHING if no error occured, otherwise the
+		 * 	   error code. See AirSensorClass::UPDATE_ERROR enum for more
+		 * information.
+		 */
 		AirSensorClass::UPDATE_ERROR
 		setSensorValuesFromSensors(sensor_data_t * str) {
 			DEBUG_PRINT_POS(4, "\n");
@@ -119,10 +137,13 @@ class SensorValueHandlerClass {
 
 		// ---------- Functions ---------- //
 	private:
+		/**
+		 * @returns The converted value according to the GATT humidity value.
+		 */
 		uint16_t convertToGATT_soilHumidity(uint16_t humidity) {
 			DEBUG_PRINT_POS(4, "\n");
 			DEBUG_PRINTF_POS(2, "Soil humidity = %u\n", humidity);
-
+			// Calibration values
 			static uint16_t valueHigh = 300;
 			static uint16_t valueLow  = 950;
 			float calculation		  = 100 - ((humidity - valueHigh) /
@@ -134,11 +155,18 @@ class SensorValueHandlerClass {
 			}
 			return uint16_t(calculation * 100);
 		}
+		/**
+		 * @returns The GATT humidity value for "not known".
+		 */
 		uint16_t convertToGATT_soilHumidity_notKnown() {
 			DEBUG_PRINT_POS(4, "\n");
 			return (uint16_t) 0xFFFF;
 		}
 
+		/**
+		 * @returns The converted value according to the GATT air humidity
+		 * value.
+		 */
 		uint16_t convertToGATT_airHumidity(float humidity) {
 			DEBUG_PRINT_POS(4, "\n");
 			if (humidity < 0 || humidity > 100) {
@@ -146,31 +174,52 @@ class SensorValueHandlerClass {
 			}
 			return uint16_t(humidity * 100);
 		}
+		/**
+		 * @returns The GATT air humidity value for "not known".
+		 */
 		uint16_t convertToGATT_airHumidity_notKnown() {
 			DEBUG_PRINT_POS(4, "\n");
 			return (uint16_t) 0xFFFF;
 		}
 
+		/**
+		 * @returns The converted value according to the GATT air pressure
+		 * value.
+		 */
 		uint32_t convertToGATT_airPressure(float pressure) {
 			DEBUG_PRINT_POS(4, "\n");
 			return uint32_t(pressure * 10);
 		}
+		/**
+		 * @returns The GATT air pressure value for "not known".
+		 */
 		uint32_t convertToGATT_airPressure_notKnown() {
 			DEBUG_PRINT_POS(4, "\n");
 			return (uint8_t) 0xFFFF'FFFF;
 		}
 
+		/**
+		 * @returns The converted value according to the GATT air quality
+		 * value.
+		 */
 		uint8_t convertToGATT_airQuality(float gas_resistance) {
 			DEBUG_PRINT_POS(4, "\n");
 			DEBUG_PRINTF_POS(2, "Quality is %f\n", gas_resistance);
 			const float calibrationValue = 250'000;
 			return (uint8_t) (100 - (gas_resistance / calibrationValue) * 100);
 		}
+		/**
+		 * @returns The GATT air quality value for "not known".
+		 */
 		uint8_t convertToGATT_airQuality_notKnown() {
 			DEBUG_PRINT_POS(4, "\n");
 			return (uint8_t) 0xFF;
 		}
 
+		/**
+		 * @returns The converted value according to the GATT air temperature
+		 * value.
+		 */
 		uint8_t convertToGATT_airTemperature(float temperature) {
 			DEBUG_PRINT_POS(4, "\n");
 			if (temperature < -64 || temperature > 63) {
@@ -178,11 +227,18 @@ class SensorValueHandlerClass {
 			}
 			return (uint8_t) (temperature * 2);
 		}
+		/**
+		 * @returns The GATT air temperature value for "not known".
+		 */
 		uint8_t convertToGATT_airTemperature_notKnown() {
 			DEBUG_PRINT_POS(4, "\n");
 			return (uint8_t) 0x7F;
 		}
 
+		/**
+		 * @returns The converted value according to the GATT light intensity
+		 * value.
+		 */
 		uint16_t convertToGATT_lightIntensity(float lightIntensity) {
 			DEBUG_PRINT_POS(4, "\n");
 			uint16_t luminosity =
@@ -192,11 +248,17 @@ class SensorValueHandlerClass {
 			}
 			return luminosity;
 		}
+		/**
+		 * @returns The GATT light intensity value for "not known".
+		 */
 		uint16_t convertToGATT_lightIntensity_notKnown() {
 			DEBUG_PRINT_POS(4, "\n");
 			return (uint16_t) 0xFFFF;
 		}
 
+		/**
+		 * @returns The luminoisty in lumen from the Voltage.
+		 */
 		uint16_t luminosityFromVoltage(uint16_t measured) {
 			DEBUG_PRINT_POS(4, "\n");
 			const float R	= 2200;
@@ -211,6 +273,11 @@ class SensorValueHandlerClass {
 		}
 
 	public:
+		/**
+		 * Gets the current sensor value of the sensors and adds them to the
+		 * accumulators. Will clear the sensor data read flag so signal that
+		 * sensor values for reding are available.
+		 */
 		void addSensorValuesToAccumulator() {
 			DEBUG_PRINT_POS(4, "\n");
 			float airPressure = 0, airTemperature = 0, airHumidity = 0;
@@ -247,6 +314,11 @@ class SensorValueHandlerClass {
 			clear_sensor_data_read_flag();
 		};
 
+		/**
+		 * Will read the sensor values and set them in the BLE characteristics.
+		 * Resets the accumulators afterwards.
+		 * @returns True if the sensor values were set successfully. Else False
+		 */
 		bool setAccumulatedSensorValuesInBle() {
 			DEBUG_PRINT_POS(4, "\n");
 			if (soilHumidityAccumulator->getTotalWeight() <= 0) {
