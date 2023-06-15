@@ -1,5 +1,6 @@
 import { createLogger, format, transports } from "winston";
 const { combine, timestamp, printf } = format;
+import { redirect } from "@sveltejs/kit";
 
 const logFormat = printf(({ level, message, timestamp, payload }) => {
   const logMessage = payload

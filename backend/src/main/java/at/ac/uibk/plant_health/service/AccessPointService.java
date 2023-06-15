@@ -24,7 +24,12 @@ public class AccessPointService {
 	@Autowired
 	private SensorStationService sensorStationService;
 
-	@Transactional
+	/**
+	 * Find the AccessPoint with the given ID.
+	 * @param id
+	 * @return
+	 * @throws ServiceException
+	 */
 	public AccessPoint findById(UUID id) throws ServiceException {
 		Optional<AccessPoint> maybeAccessPoint = this.accessPointRepository.findById(id);
 		if (maybeAccessPoint.isEmpty()) {
@@ -33,7 +38,12 @@ public class AccessPointService {
 		return maybeAccessPoint.get();
 	}
 
-	@Transactional
+	/**
+	 * Find the AccessPoint with the given selfAssignedId.
+	 * @param id
+	 * @return
+	 * @throws ServiceException
+	 */
 	public AccessPoint findBySelfAssignedId(UUID id) throws ServiceException {
 		Optional<AccessPoint> maybeAccessPoint =
 				this.accessPointRepository.findBySelfAssignedId(id);
@@ -43,7 +53,10 @@ public class AccessPointService {
 		return maybeAccessPoint.get();
 	}
 
-	@Transactional
+	/**
+	 * Update the lastConnection of the given AccessPoint.
+	 * @return
+	 */
 	public int updateLastConnection() {
 		return this.accessPointRepository.updateIsConnectedByLastConnection();
 	}
@@ -52,7 +65,6 @@ public class AccessPointService {
 	 * Get all AccessPoints.
 	 * @return List of AccessPoints
 	 */
-	@Transactional
 	public List<AccessPoint> findAllAccessPoints() {
 		return accessPointRepository.findAll();
 	}
@@ -64,7 +76,7 @@ public class AccessPointService {
 	 * @param roomName The roomName of the AccessPoint to register.
 	 * @throws ServiceException if the AccessPoint could not be registered.
 	 */
-	@AuditLogAnnotation(successMessage = "Registered AccessPoint {deviceId} {roomName}")
+	@AuditLogAnnotation(successMessage = "Registered AccessPoint {selfAssignedId} {roomName}")
 	public void register(UUID selfAssignedId, String roomName) throws ServiceException {
 		if (selfAssignedId == null || roomName == null) {
 			throw new ServiceException("Could not register AccessPoint", 400);
@@ -81,7 +93,6 @@ public class AccessPointService {
 	 * @param roomName The roomName of the AccessPoint to save.
 	 * @throws ServiceException if the AccessPoint could not be saved.
 	 */
-	@Transactional
 	public void create(UUID selfAssignedId, String roomName) throws ServiceException {
 		if (selfAssignedId == null && roomName == null) {
 			throw new ServiceException("Could not create AccessPoint", 400);
@@ -106,7 +117,6 @@ public class AccessPointService {
 	 * @return the saved AccessPoint
 	 * @throws ServiceException if the AccessPoint could not be saved.
 	 */
-	@Transactional
 	public AccessPoint save(AccessPoint accessPoint) throws ServiceException {
 		try {
 			return accessPointRepository.save(accessPoint);
@@ -120,7 +130,6 @@ public class AccessPointService {
 	 * @param selfAssignedId The selfAssignedId of the AccessPoint to get.
 	 * @throws ServiceException if the AccessPoint is locked.
 	 */
-	@Transactional
 	public void isUnlockedBySelfAssignedId(UUID selfAssignedId) throws ServiceException {
 		AccessPoint accessPoint = findBySelfAssignedId(selfAssignedId);
 		if (!accessPoint.isUnlocked()) {
@@ -133,7 +142,6 @@ public class AccessPointService {
 	 * @param deviceId The deviceId of the AccessPoint to get.
 	 * @throws ServiceException if the AccessPoint is locked.
 	 */
-	@Transactional
 	public void isUnlockedByDeviceId(UUID deviceId) throws ServiceException {
 		AccessPoint accessPoint = findById(deviceId);
 		if (!accessPoint.isUnlocked()) {
@@ -146,7 +154,6 @@ public class AccessPointService {
 	 * @param selfAssignedId
 	 * @return
 	 */
-	@Transactional
 	public UUID getAccessPointAccessToken(UUID selfAssignedId) {
 		AccessPoint accessPoint = findBySelfAssignedId(selfAssignedId);
 		setLastConnection(accessPoint);
@@ -185,7 +192,6 @@ public class AccessPointService {
 	 * @param sensorStationList List of found SensorStations.
 	 * @throws ServiceException if the SensorStations could not be saved.
 	 */
-	@Transactional
 	public void foundNewSensorStation(
 			AccessPoint accessPoint, List<SensorStation> sensorStationList
 	) throws ServiceException {
@@ -214,7 +220,7 @@ public class AccessPointService {
 	 * @param deviceId The deviceId of the AccessPoint to start the scan for.
 	 * @throws ServiceException if the AccessPoint could not be found.
 	 */
-	@Transactional
+	@AuditLogAnnotation(successMessage = "Set AccessPoint, {deviceId}, scan to {scanActive}")
 	public void setScan(UUID deviceId, boolean scanActive) throws ServiceException {
 		AtomicReference<AccessPoint> accessPoint = new AtomicReference<>(findById(deviceId));
 		if (!accessPoint.get().isConnected()) {
@@ -236,18 +242,17 @@ public class AccessPointService {
 	}
 
 	/**
-	 * Stop a scan for SensorStations.
-	 * @param deviceId The deviceId of the AccessPoint to stop the scan for.
-	 * @throws ServiceException if the AccessPoint could not be found.
+	 * Update the AccessPoint's room name and transfer interval.
+	 * @param deviceId
+	 * @param roomName
+	 * @param transferInterval
+	 * @throws ServiceException
 	 */
-	public void stopScan(UUID deviceId) throws ServiceException {
-		AccessPoint accessPoint = findById(deviceId);
-		accessPoint.setScanActive(false);
-		save(accessPoint);
-	}
-
-	@Transactional
-	public void updateAccessPointInfo(UUID deviceId, String roomName, int transferInterval)
+	@AuditLogAnnotation(
+			successMessage = "Updated AccessPoint, {deviceId}, to {roomName}, {transferInterval}"
+	)
+	public void
+	updateAccessPointInfo(UUID deviceId, String roomName, int transferInterval)
 			throws ServiceException {
 		AccessPoint accessPoint = findById(deviceId);
 		accessPoint.setRoomName(roomName);
@@ -260,7 +265,6 @@ public class AccessPointService {
 	 * @param sensorStations List of SensorStations to set data for.
 	 * @throws ServiceException if sensorData could not be set.
 	 */
-	@Transactional
 	public void setSensorStationData(List<SensorStation> sensorStations, AccessPoint accessPoint)
 			throws ServiceException {
 		try {
@@ -279,7 +283,10 @@ public class AccessPointService {
 		}
 	}
 
-	@Transactional
+	/**
+	 * Set the last connection of the AccessPoint to now.
+	 * @param accesspoint
+	 */
 	public void setLastConnection(AccessPoint accesspoint) {
 		accesspoint.setLastConnection(LocalDateTime.now());
 		accesspoint.setConnected(true);
@@ -316,7 +323,6 @@ public class AccessPointService {
 	 * @param accessPointId
 	 * @throws ServiceException
 	 */
-	@Transactional
 	public List<SensorStation> getAccessPointSensorStations(UUID accessPointId)
 			throws ServiceException {
 		AccessPoint accessPoint = findById(accessPointId);
@@ -328,7 +334,6 @@ public class AccessPointService {
 	 * @param accessPoints
 	 * @throws ServiceException
 	 */
-	@Transactional
 	public void setAccessPointSensorStationsReported(List<AccessPoint> accessPoints)
 			throws ServiceException {
 		for (AccessPoint accessPoint : accessPoints) {

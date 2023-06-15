@@ -52,7 +52,7 @@
         >
       </div>
     {:else}
-      <h1 class="flex justify-center">Something went wrong</h1>
+      <Spinner />
     {/if}
     <!-- ----------------------------------------------------------------------- -->
     {#if dashBoardSensorStations}
@@ -88,7 +88,7 @@
         </div>
       {/if}
     {:else}
-      <h1 class="flex justify-center">Something went wrong</h1>
+      <Spinner />
     {/if}
   </section>
 {/if}

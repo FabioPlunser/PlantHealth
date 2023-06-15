@@ -20,18 +20,31 @@ export async function load(event) {
   //---------------------------------------------------------------------
   // get dashboard, assigned and added to dashboard sensor stations
   //---------------------------------------------------------------------
-  let res = await fetch(`${BACKEND_URL}/get-dashboard`);
-  if (!res.ok) {
-    let data = await res.json();
-    errorHandler(
-      event.locals.user?.personId,
-      "Error while fetching dashboard sensor stations",
-      data
-    );
-    resolve({ sensorStations: [] });
-    throw error(500, "Error while fetching dashboard sensor stations");
-  }
-  let data: Responses.GardenerDashBoardResponse = await res.json();
+  let data = await fetch(`${BACKEND_URL}/get-dashboard`)
+    .then(async (res) => {
+      if (!res.ok) {
+        errorHandler(
+          String(event.locals.user?.personId),
+          "Error while fetching dashboard sensor stations",
+          await res.json()
+        );
+        throw error(res.status, {
+          message: "Error while fetching dashboard sensor stations",
+        });
+      }
+      return await res.json();
+    })
+    .catch((err) => {
+      errorHandler(
+        String(event.locals.user?.personId),
+        "Error while fetching dashboard sensor stations",
+        err
+      );
+      throw error(500, {
+        message: "Error while fetching dashboard sensor stations",
+      });
+    });
+
   let dashBoardSensorStations: SensorStationComponent[] =
     data.addedSensorStations;
   let assignedSensorStations: SensorStationDetailComponentInner[] =
