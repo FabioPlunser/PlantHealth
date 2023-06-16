@@ -156,6 +156,13 @@ export const actions = {
         }
       }
     });
+
+    // NOTE: Cancel submit if no role was selected
+    if (permissions.length < 1) {
+      toasts.addToast(event.locals.user?.personId, "error", "No role selected");
+      return;
+    }
+
     let username = String(formData.get("username"));
     let email = String(formData.get("email"));
     let password = String(formData.get("password"));
