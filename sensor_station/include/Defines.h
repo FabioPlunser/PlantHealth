@@ -163,7 +163,7 @@
 
 #define PIEZO_BUZZER_TONE_INTERVALL_MS		   15'000
 #define PIEZO_BUZZER_TONE_DURATION_MS		   100
-#define PIEZO_BUZZER_TONE_FREQUENCY_HZ		   3'000
+#define PIEZO_BUZZER_TONE_FREQUENCY_HZ		   NOTE_G7
 
 // ----------------------------
 // |    Melody definitions    |
@@ -174,6 +174,11 @@
 #define MELODY_PAIRING_SUCCESSFUL        \
 	{                                    \
 		{NOTE_C4, 500}, { NOTE_G4, 500 } \
+	}
+
+#define MELODY_STARTUP   \
+	{                    \
+		{ NOTE_G5, 500 } \
 	}
 
 // ---------------------
