@@ -162,7 +162,7 @@
                           type="number"
                           class="input dark:input-bordered w-full dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
                           min="30"
-                          max="240"
+                          max="3600"
                         />
                       </div>
                     </label>

@@ -6,31 +6,24 @@
   @param sensorStation \{SensorStation} - The sensor station that a gardener should be assigned to
 -->
 <script lang="ts">
-  export let gardener: any;
+  export let gardener: Responses.Person[] = [];
   export let sensorStation: any;
   let value: any = undefined;
 
   function handleSelect() {
-    if (value === true) {
-      sensorStation.unassign = true;
+    if (value === "unnasign") {
+      sensorStation.gardener = null;
     } else {
-      sensorStation.unassign = false;
-      if (sensorStation.gardener) {
-        sensorStation.gardener.personId = value;
-        return;
-      } else {
-        let gardener: Responses.Person = {
-          personId: value,
-          username: "",
-          password: "",
-          token: "",
-          permissions: [],
-          sensorStationPersonReferences: [],
-          email: "",
-        };
-        sensorStation.gardener = gardener;
-        sensorStation.gardener.personId = value;
-      }
+      let gardener: Responses.Person = {
+        personId: value.personId,
+        username: value.username,
+        password: "",
+        token: "",
+        permissions: [],
+        sensorStationPersonReferences: [],
+        email: "",
+      };
+      sensorStation.gardener = gardener;
     }
   }
 </script>
@@ -44,17 +37,20 @@
       bind:value
       on:change={handleSelect}
     >
-      {#each gardener as person, i}
-        {#if sensorStation.gardener && sensorStation.gardener.username === person.username}
-          <option selected value={person.personId}>{person.username}</option>
-          <option value={true}> Unassign </option>
-        {:else if !sensorStation.gardener && i == 0}
-          <option selected value={""}>No gardener assigned</option>
-          <option value={person.personId}>{person.username}</option>
-        {:else}
-          <option value={person.personId}>{person.username}</option>
-        {/if}
-      {/each}
+      {#key sensorStation}
+        {#each gardener as person, i (person.personId)}
+          {#if i === 0 && !sensorStation.gardener}
+            <option selected value={"unnasign"}>Unassigned</option>
+          {:else if i === 0}
+            <option value={"unnasign"}>Unassigned</option>
+          {/if}
+          {#if sensorStation.gardener && sensorStation.gardener.username === person.username}
+            <option selected value={person}>{person.username}</option>
+          {:else}
+            <option value={person}>{person.username}</option>
+          {/if}
+        {/each}
+      {/key}
     </select>
   {/if}
 </div>

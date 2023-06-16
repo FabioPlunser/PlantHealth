@@ -3,7 +3,7 @@
   import SensorStationNameInput from "../sensorStationInfo/SensorStationNameInput.svelte";
   import SensorStationUpdateButton from "../sensorStationInfo/SensorStationUpdateButton.svelte";
 
-  export let sensorStation: SensorStation;
+  export let sensorStation: Responses.SensorStationBaseResponse;
   export let gardener: any;
 </script>
 
