@@ -13,9 +13,18 @@ export async function load(event) {
   }
 
   if (event.locals.user) {
-    return {
-      permission: event.locals.user.permissions[0],
-    };
+    let temp = event.locals.user.permissions;
+    if (temp.length > 0) {
+      if (temp.includes("ADMIN")) {
+        return { permission: "ADMIN" };
+      } else if (temp.includes("GARDENER")) {
+        return { permission: "GARDENER" };
+      } else if (temp.includes("USER")) {
+        return { permission: "USER" };
+      }
+    } else {
+      return { permission: "GUEST" };
+    }
   }
 
   return {
