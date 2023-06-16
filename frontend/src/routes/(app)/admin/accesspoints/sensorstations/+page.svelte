@@ -93,7 +93,7 @@
         </div>
         <div class="flex justify-center mx-auto">
           <div class="grid grid-rows md:grid-cols-3 gap-4">
-            {#each sensorStations as sensorStation, i (sensorStation.sensorStationId)}
+            {#each sensorStations as sensorStation (sensorStation.sensorStationId)}
               {#if sensorStation.roomName.includes(searchTerm) || sensorStation.bdAddress.includes(searchTerm) || sensorStation.dipSwitchId
                   .toString()
                   .includes(searchTerm)}
@@ -101,7 +101,7 @@
                   {sensorStation}
                   {form}
                   showDetailLink={true}
-                  gardner={data.gardener}
+                  gardener={data.gardener}
                 />
               {/if}
             {/each}
@@ -109,10 +109,7 @@
         </div>
       {:else}
         <div class="flex justify-center">
-          <SensorStationsTable
-            gardener={data.gardener.items}
-            {sensorStations}
-          />
+          <SensorStationsTable gardener={data.gardener} {sensorStations} />
         </div>
       {/if}
     {:else}

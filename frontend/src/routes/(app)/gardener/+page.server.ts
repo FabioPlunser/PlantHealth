@@ -54,11 +54,20 @@ export async function load(event) {
     return new Promise(async (resolve, reject) => {
       if (dashBoardSensorStations.length == 0) resolve({ sensorStations: [] });
       for (let sensorStation of dashBoardSensorStations) {
-        sensorStation.data = getSensorStationData(event, sensorStation, dates);
-        sensorStation.pictures = await getSensorStationPictures(
-          event,
-          sensorStation
-        );
+        if (!sensorStation.deleted) {
+          sensorStation.data = getSensorStationData(
+            event,
+            sensorStation,
+            dates
+          );
+          sensorStation.pictures = await getSensorStationPictures(
+            event,
+            sensorStation
+          );
+        } else {
+          sensorStation.data = null;
+          sensorStation.pictures = null;
+        }
       }
 
       resolve({ sensorStations: dashBoardSensorStations });
@@ -71,15 +80,20 @@ export async function load(event) {
     return new Promise(async (resolve, reject) => {
       if (assignedSensorStations.length == 0) resolve([]);
       for (let assignedSensorStation of assignedSensorStations) {
-        assignedSensorStation.data = getSensorStationData(
-          event,
-          assignedSensorStation,
-          dates
-        );
-        assignedSensorStation.pictures = await getSensorStationPictures(
-          event,
-          assignedSensorStation
-        );
+        if (!assignedSensorStation.deleted) {
+          assignedSensorStation.data = getSensorStationData(
+            event,
+            assignedSensorStation,
+            dates
+          );
+          assignedSensorStation.pictures = await getSensorStationPictures(
+            event,
+            assignedSensorStation
+          );
+        } else {
+          assignedSensorStation.data = null;
+          assignedSensorStation.pictures = null;
+        }
       }
       resolve(assignedSensorStations);
     });

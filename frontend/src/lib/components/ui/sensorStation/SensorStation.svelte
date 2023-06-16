@@ -2,7 +2,6 @@
   import { onMount } from "svelte";
   import { fly } from "svelte/transition";
   import { enhance } from "$app/forms";
-  import type { SubmitFunction } from "$app/forms";
   // ---------------------------------------------------
   // ---------------------------------------------------
   import Graphs from "$components/graph/Graphs.svelte";
@@ -28,7 +27,7 @@
   let dateNow = new Date(Date.now()).toLocaleDateString("de-DE");
   // ---------------------------------------------------
   // ---------------------------------------------------
-  const customEnhance: SubmitFunction = () => {
+  const customEnhance = () => {
     loading = true;
     return async ({ update }) => {
       await update();
@@ -71,13 +70,13 @@
             <h1>Name: {sensorStation.name}</h1>
           </div>
 
-          {#if !sensorStation.unlocked}
-            <h1 class="text-2xl font-bold flex justify-center">
-              SensorStation is locked
-            </h1>
-          {:else if sensorStation.deleted}
+          {#if sensorStation.deleted}
             <h1 class="text-2xl font-bold flex justify-center">
               SensorStation got deleted
+            </h1>
+          {:else if !sensorStation.unlocked}
+            <h1 class="text-2xl font-bold flex justify-center">
+              SensorStation is locked
             </h1>
           {:else}
             <div class="">

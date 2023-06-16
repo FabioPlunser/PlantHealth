@@ -97,8 +97,8 @@ declare interface SensorStationPicture {
 }
 declare interface SensorStationComponent
   extends Responses.SensorStationBaseResponse {
-  data: Promise<Responses.SensorStationDataResponse>;
-  pictures: SensorStationPicture[];
+  data: Promise<Responses.SensorStationDataResponse> | null;
+  pictures: SensorStationPicture[] | null;
 }
 
 declare interface Dashboard {
@@ -107,8 +107,8 @@ declare interface Dashboard {
 
 declare interface SensorStationDetailComponentInner
   extends Responses.SensorStationInnerResponse {
-  data: Promise<Responses.SensorStationDataResponse>;
-  pictures: SensorStationPicture[];
+  data: Promise<Responses.SensorStationDataResponse> | null;
+  pictures: SensorStationPicture[] | null;
 }
 
 declare interface SensorStationDetailComponent

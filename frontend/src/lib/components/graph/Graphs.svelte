@@ -59,25 +59,28 @@
   let sensors: any[] = [];
   let storedSensors = $sensorsStore;
   let data = sensorStation.data;
-  data.then(async (res) => {
-    for (let sensor of res.data) {
-      let storedSensor = storedSensors.find(
-        (s) => s.sensorType === sensor.sensorType
-      );
-      let foundSensor = {
-        sensorId: sensor.sensorId,
-        sensorType: sensor.sensorType,
-        sensorUnit: sensor.sensorUnit,
-        bootstrap:
-          storedSensor?.bootstrap === "" ? "" : storedSensor?.bootstrap,
-        google: storedSensor?.google === "" ? "" : storedSensor?.google,
-      };
-      sensors = [...sensors, foundSensor];
-    }
-    sensors.sort((a, b) => b.sensorType.localeCompare(a.sensorType));
-    graphData = createGraphData(res.data);
-    loading = false;
-  });
+
+  if (data) {
+    data.then(async (res) => {
+      for (let sensor of res.data) {
+        let storedSensor = storedSensors.find(
+          (s) => s.sensorType === sensor.sensorType
+        );
+        let foundSensor = {
+          sensorId: sensor.sensorId,
+          sensorType: sensor.sensorType,
+          sensorUnit: sensor.sensorUnit,
+          bootstrap:
+            storedSensor?.bootstrap === "" ? "" : storedSensor?.bootstrap,
+          google: storedSensor?.google === "" ? "" : storedSensor?.google,
+        };
+        sensors = [...sensors, foundSensor];
+      }
+      sensors.sort((a, b) => b.sensorType.localeCompare(a.sensorType));
+      graphData = createGraphData(res.data);
+      loading = false;
+    });
+  }
 
   $: {
     if (sensors.length > 0) {

@@ -28,9 +28,10 @@
   let sensorStationsModal = false;
   // ---------------------------------------------------
   // ---------------------------------------------------
-  let allSensorStations: Responses.SensorStationsInnerResponse[] | null = null;
-  let dashBoardSensorStations: SensorStationComponent[] | null = null;
-  let assignedSensorStations: SensorStationDetailComponent[] | null = null;
+  let allSensorStations: Responses.SensorStationsInnerResponse[] | null | [] =
+    null;
+  let dashBoardSensorStations: SensorStationComponent[] | null | [] = null;
+  let assignedSensorStations: SensorStationDetailComponent[] | null | [] = null;
 
   $: {
     data.streamed.allSensorStations.then((res) => {
@@ -41,7 +42,7 @@
     });
     data.streamed.assignedSensorStations.then((res) => {
       let temp: any = [];
-      if (res) {
+      if (res.length > 0) {
         for (let sensorStation of res) {
           let newStation = {
             streamed: {
@@ -51,8 +52,6 @@
           };
           temp.push(newStation);
         }
-      } else {
-        assignedSensorStations = [];
       }
       assignedSensorStations = temp;
     });
@@ -134,11 +133,17 @@
 
     {#if assignedAdded}
       {#if assignedSensorStations}
-        <div class="grid grid-row gap-4">
-          {#each assignedSensorStations as sensorStation, i (sensorStation.streamed.sensorStation.sensorStationId)}
-            <SensorStationDetail data={sensorStation} {form} />
-          {/each}
-        </div>
+        {#if assignedSensorStations.length === 0}
+          <h1 class="text-xl font-bold text-center">
+            No SensorStations assigned yet
+          </h1>
+        {:else}
+          <div class="grid grid-row gap-4">
+            {#each assignedSensorStations as sensorStation, i (i)}
+              <SensorStationDetail data={sensorStation} {form} />
+            {/each}
+          </div>
+        {/if}
       {:else}
         <Spinner />
       {/if}

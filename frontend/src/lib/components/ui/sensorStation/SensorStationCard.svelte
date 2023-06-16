@@ -8,7 +8,7 @@
 </script>
 
 <div
-  in:fly|self={{ y: -200, duration: 200, delay: 100 * i }}
+  in:fly|self={{ y: -200, duration: 200, delay: 100 }}
   out:fly|self={{ y: 200, duration: 200 }}
   class:blinking-border-red={sensorStation.alarms.some((alarm) => {
     return alarm.alarm != "n";

@@ -23,6 +23,7 @@ public class GardenerDashBoardResponse extends RestResponse implements Serializa
 							else
 								return false;
 						})
+						.filter(s -> !s.isDeleted())
 						.map(sensorStation
 							 -> new SensorStationDetailResponse.SensorStationInnerResponse(
 									 sensorStation, person

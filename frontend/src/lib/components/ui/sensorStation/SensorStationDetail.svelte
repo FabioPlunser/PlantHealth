@@ -153,8 +153,10 @@
                     <h1 class="label-text font-bold">TransferInterval [s]:</h1>
                     <input
                       name="transferInterval"
-                      class="w-36 rounded-2xl p-2 border dark:bg-gray-800 bg-gray-200 dark:border-gray-700 bg-gray-200 dark:text-white text-black"
+                      class="w-36 rounded-2xl p-2 border dark:bg-gray-80 dark:border-gray-700 bg-gray-200 dark:text-white text-black"
                       value={sensorStation.transferInterval}
+                      min="30"
+                      max="3600"
                     />
                     <FormError
                       field="transferInterval"
@@ -170,13 +172,13 @@
               >
             </form>
 
-            {#if !sensorStation.unlocked}
-              <h1 class="text-2xl font-bold flex justify-center">
-                SensorStation is locked
-              </h1>
-            {:else if sensorStation.deleted}
+            {#if sensorStation.deleted}
               <h1 class="text-2xl font-bold flex justify-center">
                 SensorStation got deleted
+              </h1>
+            {:else if !sensorStation.unlocked}
+              <h1 class="text-2xl font-bold flex justify-center">
+                SensorStation is locked
               </h1>
             {:else if loading}
               <Spinner />
@@ -328,7 +330,7 @@
                 {/if}
               {:else if state === "pictures"}
                 <div class="grid grid-cols gap-2">
-                  {#if sensorStation.pictures.length === 0}
+                  {#if sesnorStation.pictures && sensorStation.pictures.length === 0}
                     <h1 class="flex justify-center text-3xl font-bold">
                       No Pictures
                     </h1>
@@ -371,7 +373,7 @@
                     <div
                       class="grid grid-rows sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
                     >
-                      {#if sensorStation.pictures.length > 0}
+                      {#if sensorStation.pictures && sensorStation.pictures.length > 0}
                         {#each sensorStation.pictures as picture, i (picture.pictureId)}
                           {#await picture.promise}
                             <Spinner />

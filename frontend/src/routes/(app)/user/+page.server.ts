@@ -47,11 +47,20 @@ export async function load(event) {
       let dashBoardSensorStations = data.sensorStations;
       if (dashBoardSensorStations.length == 0) resolve({ sensorStations: [] });
       for (let sensorStation of dashBoardSensorStations) {
-        sensorStation.data = getSensorStationData(event, sensorStation, dates);
-        sensorStation.pictures = await getSensorStationPictures(
-          event,
-          sensorStation
-        );
+        if (!sensorStation.deleted) {
+          sensorStation.data = getSensorStationData(
+            event,
+            sensorStation,
+            dates
+          );
+          sensorStation.pictures = await getSensorStationPictures(
+            event,
+            sensorStation
+          );
+        } else {
+          sensorStation.data = [];
+          sensorStation.pictures = [];
+        }
       }
 
       resolve({ sensorStations: dashBoardSensorStations });
