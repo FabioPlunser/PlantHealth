@@ -38,6 +38,13 @@
           x: {
             display: true,
             autoSkip: true,
+            type: "time",
+            time: {
+              unit: "day",
+              displayFormats: {
+                day: "MMM DD",
+              },
+            },
           },
           y: {
             type: "linear",

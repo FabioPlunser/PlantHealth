@@ -149,7 +149,7 @@ public class SensorStationController {
 		return MessageResponse.builder().statusCode(200).toEntity();
 	}
 
-	@Operation(summary = "Update sensor station name and trasnfer interval")
+	@Operation(summary = "Update sensor station name and transfer interval")
 	@ApiResponse(
 			responseCode = "200", description = "Successfully updated sensor station",
 			content = @Content(schema = @Schema(implementation = MessageResponse.class))

@@ -54,6 +54,8 @@
   $: data.streamed.sensorStations.then((data) => {
     sensorStations = data.sensorStations;
   });
+
+  $: console.log(sensorStations);
 </script>
 
 {#if rendered}

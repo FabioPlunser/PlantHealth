@@ -330,7 +330,7 @@
                 {/if}
               {:else if state === "pictures"}
                 <div class="grid grid-cols gap-2">
-                  {#if sesnorStation.pictures && sensorStation.pictures.length === 0}
+                  {#if sensorStation.pictures && sensorStation.pictures.length === 0}
                     <h1 class="flex justify-center text-3xl font-bold">
                       No Pictures
                     </h1>

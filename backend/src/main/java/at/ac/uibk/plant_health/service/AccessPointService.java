@@ -15,7 +15,6 @@ import at.ac.uibk.plant_health.models.device.AccessPoint;
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.exceptions.ServiceException;
 import at.ac.uibk.plant_health.repositories.AccessPointRepository;
-import jakarta.transaction.Transactional;
 
 @Service
 public class AccessPointService {
@@ -201,12 +200,13 @@ public class AccessPointService {
 						sensorStationService.findByBdAddress(sensorStation.getBdAddress());
 				dbSensorStation.setDipSwitchId(sensorStation.getDipSwitchId());
 				dbSensorStation.setAccessPoint(accessPoint);
-				dbSensorStation.setConnected(true);
+				dbSensorStation.setConnected(sensorStation.isConnected());
 				sensorStationService.save(dbSensorStation);
 				continue;
 			}
-			sensorStation.setConnected(true);
+			sensorStation.setConnected(false);
 			sensorStation.setAccessPoint(accessPoint);
+			sensorStation.setUnlocked(false);
 			sensorStationService.save(sensorStation);
 		}
 		accessPoint.setSensorStations(sensorStationList);
@@ -268,12 +268,15 @@ public class AccessPointService {
 	public void setSensorStationData(List<SensorStation> sensorStations, AccessPoint accessPoint)
 			throws ServiceException {
 		try {
+			System.out.println(sensorStations);
 			for (SensorStation sensorStation : sensorStations) {
 				SensorStation dbSensorStation =
 						sensorStationService.findByBdAddress(sensorStation.getBdAddress());
 				if (!dbSensorStation.isUnlocked())
 					throw new ServiceException("SensorStation is locked", 409);
 				sensorStationService.addSensorData(dbSensorStation, sensorStation.getSensorData());
+				dbSensorStation.setConnected(sensorStation.isConnected());
+				sensorStationService.save(dbSensorStation);
 			}
 			setLastConnection(accessPoint);
 		} catch (ServiceException s) {
