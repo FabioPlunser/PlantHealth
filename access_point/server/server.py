@@ -230,7 +230,7 @@ class Server:
         """
         # setup entries for each known sensor station
         data = [{'bdAddress': adr,
-                 'isConnected': status.get('connection_alive'),
+                 'connected': status.get('connection_alive'),
                  'dipSwitchId': status.get('dip_id')}
                  for adr, status in station_data.items()]
 
