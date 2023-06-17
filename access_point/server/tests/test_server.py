@@ -134,7 +134,7 @@ def test_transfer_data(requests_mock: Mocker):
                             'alarm': 'h'}])
     sent = requests_mock.last_request.json()
     assert sent[0]['bdAddress'] == 'adr 1'
-    assert sent[0]['isConnected'] == True
+    assert sent[0]['connected'] == True
     assert sent[0]['dipSwitchId'] == 1
     assert sent[0]['sensorData'][0]['timeStamp'] == timestamp.isoformat(timespec="seconds")
     assert sent[0]['sensorData'][0]['value'] == -12.34
@@ -147,5 +147,5 @@ def test_transfer_data(requests_mock: Mocker):
     assert sent[0]['sensorData'][1]['sensor']['type'] == 'sensor 2'
     assert sent[0]['sensorData'][1]['sensor']['unit'] == '°C'
     assert sent[1]['bdAddress'] == 'adr 2'
-    assert sent[1]['isConnected'] == False
+    assert sent[1]['connected'] == False
     assert sent[1]['dipSwitchId'] == None
