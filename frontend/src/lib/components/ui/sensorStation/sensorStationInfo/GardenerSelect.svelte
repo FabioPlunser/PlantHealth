@@ -11,7 +11,7 @@
   let value: any = undefined;
 
   function handleSelect() {
-    if (value === "unnasign") {
+    if (value === "unassign") {
       sensorStation.gardener = null;
     } else {
       let gardener: Responses.Person = {
@@ -40,9 +40,9 @@
       {#key sensorStation}
         {#each gardener as person, i (person.personId)}
           {#if i === 0 && !sensorStation.gardener}
-            <option selected value={"unnasign"}>Unassigned</option>
+            <option selected value={"unassign"}>Unassigned</option>
           {:else if i === 0}
-            <option value={"unnasign"}>Unassigned</option>
+            <option value={"unassign"}>Unassigned</option>
           {/if}
           {#if sensorStation.gardener && sensorStation.gardener.username === person.username}
             <option selected value={person}>{person.username}</option>
