@@ -2,8 +2,6 @@
   export let field: string = "";
   export let label: string = "";
   export let placeholder: string = "";
-  export let value: string = "";
-
   let isPasswordHidden: boolean = true;
 </script>
 

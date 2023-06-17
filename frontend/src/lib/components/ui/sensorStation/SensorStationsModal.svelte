@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { enhance, type SubmitFunction } from "$app/forms";
+  import { enhance } from "$app/forms";
   import { fly, slide } from "svelte/transition";
 
   import Spinner from "$components/ui/Spinner.svelte";

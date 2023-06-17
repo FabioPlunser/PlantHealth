@@ -4,8 +4,8 @@ import { error } from "@sveltejs/kit";
 
 export async function getSensorStationLimits(
   event: any,
-  sensorStation: SensorStation
-): Promise<Responses.SensorStationResponse> {
+  sensorStation: Responses.SensorStationBaseResponse
+): Promise<Responses.SensorStationBaseResponse> {
   return new Promise(async (resolve, reject) => {
     await event
       .fetch(

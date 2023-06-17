@@ -95,6 +95,7 @@ import {
   addToDashboard,
   removeFromDashboard,
   updateFromTo,
+  uploadPicture,
 } from "$helper/actions";
 
 export const actions = {

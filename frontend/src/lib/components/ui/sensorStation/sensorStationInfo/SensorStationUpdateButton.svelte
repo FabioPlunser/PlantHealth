@@ -27,7 +27,6 @@
   />
   <input type="hidden" name="gardener" bind:value={gardener} />
 
-  <input type="hidden" name="unassign" bind:value={sensorStation.unassign} />
   <input type="hidden" name="name" bind:value={sensorStation.name} />
   <button formaction="?/update" class="btn btn-primary">Update</button>
 </form>

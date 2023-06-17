@@ -27,7 +27,7 @@
   let addUserModal = false;
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  let columns: ColumnDef<User>[] = [
+  let columns: ColumnDef<Responses.Person>[] = [
     {
       id: "username",
       accessorKey: "username",

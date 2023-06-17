@@ -69,7 +69,7 @@ export async function load(event) {
         });
       });
   } else {
-    permissions.forEach((permission) => {
+    permissions.forEach((permission: any) => {
       userPermissions[permission.toLowerCase()] = true;
     });
   }

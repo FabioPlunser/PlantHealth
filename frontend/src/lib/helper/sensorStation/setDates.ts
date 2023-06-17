@@ -1,4 +1,4 @@
-export function setDates(event) {
+export function setDates(event: any) {
   let cookieFrom = event.cookies.get("from") || "";
   let cookieTo = event.cookies.get("to") || "";
 

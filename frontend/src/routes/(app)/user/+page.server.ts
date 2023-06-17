@@ -85,6 +85,7 @@ import {
   updateFromTo,
   addToDashboard,
   removeFromDashboard,
+  uploadPicture,
 } from "$helper/actions";
 
 export const actions = {

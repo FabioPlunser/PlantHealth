@@ -3,7 +3,7 @@
   import { enhance } from "$app/forms";
   import FormError from "$lib/helper/formError.svelte";
   export let sensorStationId: string;
-  export let limit: SensorLimit;
+  export let limit: Responses.SensorLimits;
   export let form: any;
 </script>
 
