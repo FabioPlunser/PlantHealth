@@ -38,17 +38,11 @@
           x: {
             display: true,
             autoSkip: true,
-            type: "time",
           },
           y: {
             type: "linear",
             display: true,
             position: "left",
-            // suggestedMin: 25,
-            // suggestedMax: 35,
-            // ticks: {
-            //   stepSize: 0.1,
-            // },
           },
         },
       };
