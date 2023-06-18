@@ -57,7 +57,7 @@ pythonSonarCheck-job:
 pythonDoc-job:
   stage: pythonDoc
   image:
-    name: python:3.17-alpine
+    name: alpine:3.17
   script:
     - cd access_point
     - python3 -m venv venv
