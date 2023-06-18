@@ -2,9 +2,15 @@ import { BACKEND_URL } from "$env/static/private";
 import { errorHandler } from "../errorHandler";
 import { error } from "@sveltejs/kit";
 
-export async function getAllSensorStations(
-  event: any
-): Promise<Responses.SensorStationsResponse> {
+/**
+ * This function fetches all sensor stations from a backend URL and returns them as an array, while
+ * also handling errors and getting the newest picture of the sensor stations.
+ * @param {any} event - The `event` parameter is an object that represents the event that triggered the
+ * function. It is likely an HTTP request object that contains information about the incoming request,
+ * such as headers, query parameters, and request body.
+ * @returns A Promise that resolves to an array of sensor stations.
+ */
+export async function getAllSensorStations(event: any): Promise<any> {
   return new Promise(async (resolve, reject) => {
     await event
       .fetch(`${BACKEND_URL}/get-sensor-stations`)
@@ -39,6 +45,13 @@ export async function getAllSensorStations(
   });
 }
 
+/**
+ * The function fetches the newest picture from a sensor station and encodes it as a base64 string.
+ * @param {any} event - The event parameter is likely an object representing an event that triggered
+ * the function, such as a button click or a page load.
+ * @param {any[]} sensorStations - An array of objects representing sensor stations, each with a unique
+ * `sensorStationId` property.
+ */
 function getNewestPicture(event: any, sensorStations: any[]): void {
   for (let sensorStation of sensorStations) {
     sensorStation.newestPicture = new Promise(async (resolve, reject) => {
