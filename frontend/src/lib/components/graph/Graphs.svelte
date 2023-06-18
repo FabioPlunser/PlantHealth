@@ -39,12 +39,6 @@
             display: true,
             autoSkip: true,
             type: "time",
-            time: {
-              unit: "day",
-              displayFormats: {
-                day: "MMM DD",
-              },
-            },
           },
           y: {
             type: "linear",
@@ -110,7 +104,7 @@ Usage example:
     <div class="w-full h-full">
       {#if loading}
         <div class="mb-2">
-          <Spinner fill="fill-primary" />
+          <Spinner />
         </div>
       {:else if Object.keys(graphData).length === 0}
         <h1 class="font-bold text-4xl flex justify-center">No data found</h1>

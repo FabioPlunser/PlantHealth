@@ -82,7 +82,7 @@
             <div class="">
               <div class="">
                 {#if loading}
-                  <Spinner fill="fill-primary" />
+                  <Spinner />
                 {:else}
                   <Graphs {sensorStation} />
                 {/if}
@@ -172,7 +172,7 @@
                         />
                         {#each sensorStation?.pictures as picture, i (picture.pictureId)}
                           {#await picture.promise}
-                            <Spinner fill="fill-primary" />
+                            <Spinner />
                           {:then data}
                             <div>
                               <div class="carousel-item">

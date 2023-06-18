@@ -153,7 +153,7 @@
                     <h1 class="label-text font-bold">TransferInterval [s]:</h1>
                     <input
                       name="transferInterval"
-                      class="w-36 rounded-2xl p-2 border dark:bg-gray-80 dark:border-gray-700 bg-gray-200 dark:text-white text-black"
+                      class="w-36 rounded-2xl p-2 border dark:bg-gray-80 dark:border-gray-700 dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
                       value={sensorStation.transferInterval}
                       min="30"
                       max="3600"
