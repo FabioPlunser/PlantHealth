@@ -1,5 +1,6 @@
 import sqlite3
 
+from functools import wraps
 from datetime import datetime, timedelta
 from typing import Optional, Literal, Union, Any
 
@@ -21,6 +22,8 @@ class DatabaseError(Exception):
 class Database:
     """
     Handler class for the actual data storage.
+
+    :param db_filename: Name of the database file.
     """
 
     # Number of failed connection attempts until a connection is flagged as lost
@@ -30,6 +33,7 @@ class Database:
         """
         Initializes the local SQLite database handler.
         Does not initialize the database file. Call setup() for that.
+
         :param db_filename: Name of the database file.
         """
         self._db_filename = db_filename
@@ -39,6 +43,7 @@ class Database:
         """
         Internal only decorator method used for methods that require a database connection.
         """
+        @wraps(f)
         def decorated(self, *args, **kwargs):
             try:
                 self._conn = sqlite3.connect(self._db_filename)
@@ -55,6 +60,7 @@ class Database:
     def setup(self) -> None:
         """
         Initializes all required database tables.
+
         :raises DatabaseError: If one of the database tables could not be created
         """
         create_table = lambda query : self._conn.cursor().execute(query)
@@ -67,6 +73,7 @@ class Database:
     def enable_sensor_station(self, address: str) -> None:
         """
         Adds a sensor station to the database (or re-enables it, if it already exists).
+
         :param address: Address of the sensor station to add
         :raises DatabaseError: If the sensor station could not be added
         """
@@ -81,6 +88,7 @@ class Database:
     def disable_sensor_station(self, address: str) -> None:
         """
         Disables a sensor station in the database.
+
         :param address: Address of the sensor station to disable
         :raises DatabaseError: If the sensor station could not be disabled
         """
@@ -97,6 +105,7 @@ class Database:
         """
         Deletes a sensor station from the database.
         Also deletes all associated sensor and measurements.
+
         :param address: Address of the sensor station to disable
         :raises DatabaseError: If the sensor station could not be deleted
         """
@@ -121,6 +130,7 @@ class Database:
         The sensor is automatically created within the database if it does not exist yet.
         Also updates the timestamp of the last measured value within limits for the sensor
         and flags the connection to the sensor station as alive.
+
         :param sensor_station_address: Address of the sensor station
         :param sensor_name: Name of the sensor
         :param unit: Unit of the measurement - changes after first input will be ignored
@@ -191,6 +201,7 @@ class Database:
     def set_dip_id(self, sensor_station_address: str, dip_id: int) -> None:
         """
         Sets the DIP switch position for a sensor station and flags the connection as alive.
+
         :param sensor_station_address: Address of the sensor station
         :param dip_id: Integer decoded position of the DIP switches
         :raises DatabaseError: If the DIP switch position could not be set
@@ -212,8 +223,9 @@ class Database:
         Adds info that there was a failed connection attempt to a sensor station.
         After MAX_FAILED_CONNECTION_ATTEMPTS (default = 3) failed attempts the connection to the
         sensor station is flagged as lost.
+
         :param sensor_station_address: Address of the sensor station
-        .raises DatabaseError: If the failed connection attempt could not be added or the 
+        :raises DatabaseError: If the failed connection attempt could not be added or the 
             connection could not be flagged as lost
         """
         query = """
@@ -241,6 +253,7 @@ class Database:
         Updates the settings for a specific sensor. The sensor must already exist before
         settings are updated. Sensors are created when the first measurement for a sensor
         is added. See add_measurement().
+
         :param sensor_station_address: Address of the sensor station
         :param sensor_name: Name of the sensor
         :param lower_limit: Lower limit for the sensor value to trigger alarms
@@ -277,6 +290,7 @@ class Database:
     def get_all_known_sensor_station_addresses(self) -> list[str]:
         """
         Gets all sensor stations that are stored in the database and enabled.
+
         :return: List with the addresses of all enabled sensor stations
         :raises DatabaseError: If the sensor station addresses could not be retrieved
         """
@@ -300,6 +314,7 @@ class Database:
     def get_all_disabled_sensor_station_addresses(self) -> list[str]:
         """
         Gets all sensor staitons that are stored in the database but disabled (marked for locking)
+
         :return: List with addresses of all disabled sensor stations
         :raises DatabaseError: If the sensor station addresses could not be retrieved
         """
@@ -320,16 +335,23 @@ class Database:
     def get_all_measurements(self) -> list[dict[str, Union[int, str, datetime, float, None]]]:
         """
         Gets all measurements that are currently stored in the database.
+
         :return: A list of dictionaries constructed as
-            {
-                "id": Id of the measurement for later deletion -> int
-                "sensor_station_address": Address of the sensor station -> str,
-                "sensor_name": Name of the sensor -> str,
-                "unit": Unit of the measured value -> str | None,
-                "timestamp": Timestamp of the measurement -> datetime,
-                "value": Measured value -> float,
-                "alarm": Alarm active at the time of the measurement -> str ['n' no alarm | 'l' below limit | 'h' above limit]
-            }
+
+            "id": Id of the measurement for later deletion -> int
+
+            "sensor_station_address": Address of the sensor station -> str
+
+            "sensor_name": Name of the sensor -> str
+
+            "unit": Unit of the measured value -> str | None
+
+            "timestamp": Timestamp of the measurement -> datetime
+
+            "value": Measured value -> float
+
+            "alarm": Alarm active at the time of the measurement -> str ['n' no alarm | 'l' below limit | 'h' above limit]
+
         :raises DatabaseError: If the measurements could not be retrieved from the database
         """
         query = """
@@ -369,13 +391,19 @@ class Database:
                    sensor_station_address: str) -> dict[str, dict[str, Union[Optional[float], Optional[float], Optional[timedelta], Optional[datetime]]]]:
         """
         Gets the currently set limits and timing information on limits for all sensors of a sensor stations.
+
         :param sensor_station_address: Address of the sensor station
         :return: A dictionary with the sensor names as keys and subordinated dictionaries like:
-            lower_limit: The currently set lower limit -> float
-            upper_limit: The currently set upper limit -> float
-            alarm_tripping_time: The currently set time until tripping an alarm -> timedelta
-            last_inside_limits: The time at which the value has been inside limits at last
-                (or the time at which the first measurement for the sensor has been added) -> datetime
+
+            "lower_limit": The currently set lower limit -> float
+
+            "upper_limit": The currently set upper limit -> float
+
+            "alarm_tripping_time": The currently set time until tripping an alarm -> timedelta
+
+            "last_inside_limits": The time at which the value has been inside limits at last
+            (or the time at which the first measurement for the sensor has been added) -> datetime
+
         :raises DatabaseError: If the limits could not be retrieved from the database
         """
         query = """
@@ -404,11 +432,13 @@ class Database:
     def get_all_states(self) -> dict[str, dict[str, Union[bool, Optional[int]]]]:
         """
         Gets the states of all known sensor stations
+
         :return: A dictionary with the sensor station addresses as keys and subordinated dictionaries:
-            {
-                'connection_alive': 'True' if the connection is alive, 'False' if not -> bool
-                'dip_id': Integer encoded DIP switch position -> int
-            }
+
+            "connection_alive": 'True' if the connection is alive, 'False' if not -> bool
+
+            "dip_id": Integer encoded DIP switch position -> int
+
         :raises DatabaseError: If the states could not be retrieved from the database
         """
         query = """
@@ -429,6 +459,7 @@ class Database:
         Deletes all measurements with the given ids from the database.
         This method DOES NOT use a prepared SQL statement. Ensure
         that the ids parameter is not used for SQL injection.
+
         :param ids: List of IDs of measurements to delete
         :raises DatabaseError: If the ids could not be deleted from the database
         """

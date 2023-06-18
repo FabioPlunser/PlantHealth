@@ -28,6 +28,10 @@ class TokenDeclinedError(Exception):
 class Server:
     """
     Handler class for the backend.
+
+    
+    :param address: The URL or IP at which the backend can be reached
+    :param token: An authentication token to use for communication with the backend
     """
 
     # time limit for all requests
@@ -40,6 +44,7 @@ class Server:
     def __init__(self, address: str, token=None) -> None:
         """
         Initializes the backend handler.
+
         :param address: The URL or IP at which the backend can be reached
         :param token: An authentication token to use for communication with the backend
         """
@@ -72,6 +77,7 @@ class Server:
     def token(self, value: Optional[str]) -> None:
         """
         Assigns a new value to the token and updates requests headers.
+
         :param value: The new value of the token
         :raises TokenDeclinedError: If there has been a token previously and the token is removed
         """
@@ -89,6 +95,7 @@ class Server:
     def _get_endpoint_url(self, endpoint: str) -> str:
         """
         Generate the full URL for a given endpoint.
+
         :param endpoint: The endpoint for which the full URL is wanted
         :return: Full URL of the endpoint
         """
@@ -98,6 +105,7 @@ class Server:
         """
         Tries to register at the backend. If successful the received token is internally
         stored.
+
         :param id: Self assigned ID
         :param room_name: Name of the room in which the access point is located
         :return: The token, if received
@@ -130,29 +138,41 @@ class Server:
         """
         Tries to get a configuration update from the backend. The update also contains info
         which sensor stations currently are enabled.
+
         :return: A tuple with a dictionary and a list of dictionaries
+
             The former for the configuration regarding the access point:
-                {
-                    "room_name": Name of the room in which the access point is located -> str
-                    "scan_active": Flag that inidicates if the access point shall search for new sensor stations -> bool
-                    "transfer_data_interval": Time in seconds between transfering sensor data to the backend -> int
-                }
-            The latter for enabled sensor stations:
+
+                "room_name": Name of the room in which the access point is located -> str
+
+                "scan_active": Flag that inidicates if the access point shall search for new sensor stations -> bool
+
+                "transfer_data_interval": Time in seconds between transfering sensor data to the backend -> int
+                
+            The latter dictionaries for enabled sensor stations:
                 [
                     {
                         "address": Address of the sensor station
+
                         "sensors: [
                             {
+                            
                                 "sensor_name": Name of the sensor -> str
+
                                 "lower_limit": Lower limit for alarms -> float 
+
                                 "upper_limit": Upper limit for alarms -> float
+
                                 "alarm_tripping_time": Time in seconds until an alarm is tripped -> int
+
                             },
-                            ...
+
                         ]
+
                     },
-                    ...
+
                 ]
+
         :raises TokenDeclinedError: If the token is not accepted anymore
         :raises ConnectionError: If the request failed or the content of the request is greatly malformed
         """
@@ -210,21 +230,36 @@ class Server:
         """
         Transfers measured sensor data to the backend. Also contains info
         on the connection status of sensor stations (if connections are lost).
+
         :param station_data: Dictionary with sensor station addresses as keys and
             subordinated dictionaries for connection state and DIP switch id
+
                 {
+                
                     'connection_alive': 'True' if the connection is alive, 'False' if not
+
                     'dip_id': Integer encoded DIP switch position
+
                 }
+
         :param measurements: A list of dictionaries structured as:
+
             {
+            
                 "sensor_station_address": Address of the sensor station -> str,
+
                 "sensor_name": Name of the sensor -> str,
+
                 "unit": Unit of the measured value -> str | None,
+
                 "timestamp": Timestamp of the measurement -> datetime,
+
                 "value": Measured value -> float,
+
                 "alarm": Alarm active at the time of the measurement -> str ['n' no alarm | 'l' below limit | 'h' above limit]
+
             }
+            
         :raises TokenDeclinedError: If the token is not accepted anymore
         :raises ConnectionError: If the request fails
         """
@@ -268,11 +303,17 @@ class Server:
     def report_found_sensor_station(self, sensor_stations: list[dict[str, Union[str, int]]]) -> None:
         """
         Reports newly found sensor stations to the backend.
+
         :param sensor_stations: A list with one dictionary for each sensor station, like
+
             {
+            
                 "address": The address of the sensor stations,
+
                 "dip-switch": The integer encoded position of the dip switches
+
             }
+
         :raises TokenDeclinedError: If the token is not accepted anymore
         :raises ConnectionError: If the request fails
         """

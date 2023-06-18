@@ -49,6 +49,7 @@ def find_stations(config: Config):
 def run_scan() -> list[str]:
     """
     Runs the actual scan for sensor stations
+
     :return: A list with the addresses of potential new sensor stations
     """
     database = Database(DB_FILENAME)
@@ -68,6 +69,7 @@ def run_scan() -> list[str]:
 def get_data_from_new_stations(addresses: list[str]) -> list[dict[str, Union[str, int]]]:
     """
     Connects to the potential new sensor stations and tries to read the DIP switch id
+
     :param addresses: The addresses of the sensor stations
     :return: A list of dictionaries with addresses and dip-switch ids
     """
@@ -86,6 +88,7 @@ def get_data_from_new_stations(addresses: list[str]) -> list[dict[str, Union[str
 def clean_data(report_data: list[dict[str, Union[str, int]]]):
     """
     Removes data of any sensor station from the report that has been enabled in the meantime
+
     :param report_data: Output of get_data_from_new_stations()
     :return: report_data with all these entries removed that belong to sensor stations that are enabled
     """
@@ -100,6 +103,7 @@ def clean_data(report_data: list[dict[str, Union[str, int]]]):
 def send_data_to_backend(config:Config, report_data: list[dict[str, Union[str, int]]]) -> None:
     """
     Sends the info on found sensor stations to the backend
+
     :param config: The configuration containing backend address and token
     :param report_data: Output from clean_data (or get_data_from_new_stations)
     """
@@ -122,6 +126,7 @@ async def get_dip_id(address: str) -> int:
     """
     Handles a single connection to a BLE device for reading the
     DIP switch position.
+    
     :param address: The address of the sensor station
     :return: The integer encoded DIP switch position
     :raises BLEConnectionError: If the connection to the device fails

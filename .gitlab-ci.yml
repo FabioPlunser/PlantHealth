@@ -1,6 +1,7 @@
 stages: # List of stages for jobs, and their order of execution
   - pythonTests
   - pythonSonarCheck
+  - pythonDoc
   - javaTest
   - javaSonarCheck
 
@@ -52,6 +53,23 @@ pythonSonarCheck-job:
   only:
     - dev-access_point
     - dev
+
+pythonDoc-job:
+  stage: pythonDoc
+  image:
+    name: python:3.17-alpine
+  script:
+    - cd access_point
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - pip install wheel
+    - pip install -r requirements.txt
+    - sphinx-apidoc -o docs/source .
+    - cd docs
+    - sphinx-build -b html ./source ./build
+  artifacts:
+    paths:
+    - ./access_point/docs/build
 
 javaTest-job: # This job runs in the test stage.
   image: alpine:3.17

@@ -15,6 +15,7 @@ logging.getLogger('asyncio').setLevel(logging.WARNING)
 def scan_for_new_stations(known_station_addresses: list[str], identifier: str, duration: timedelta) -> list[str]:
     """
     Scans for new sensor stations.
+
     :param known_station_addresses: A list with addresses of already known stations
     :param identifier: Only devices with names like the given identifier will be recognized as potential sensor stations
     :param duration: Duration of scan
@@ -29,6 +30,7 @@ def scan_for_new_stations(known_station_addresses: list[str], identifier: str, d
 async def _scan(duration: timedelta) -> list[tuple[str, str]]:
     """
     Internal method - scans for bluetooth devices
+    
     :param duration: Duration of scan
     :return: A list of tuples, containing device names and address
     :raises ConnectionError: If a hardware problem occured while trying to scan

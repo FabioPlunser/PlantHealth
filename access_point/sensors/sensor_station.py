@@ -56,6 +56,11 @@ class WriteError(Exception):
 class Sensor:
     """
     Handler class for a single sensor of a sensor station.
+
+    :param name: Name of the sensor to read
+    :param service_uuid: Full UUID of the service on which the sensor data can be found
+    :param client: The BleakClient connected to the sensor station
+    :param transform: A function used to transform the bytearray output of the sensors value before further processing
     """
     ALARM_CHARACTERISTIC_UUID = '2a9a'
     ALARM_CODES = {
@@ -76,6 +81,7 @@ class Sensor:
     def __init__(self, name: str, service_uuid: str, client: BleakClient, transform: Callable = lambda x: x ) -> None:
         """
         Initializes the sensor handler class.
+
         :param name: Name of the sensor to read
         :param service_uuid: Full UUID of the service on which the sensor data can be found
         :param client: The BleakClient connected to the sensor station
@@ -102,6 +108,7 @@ class Sensor:
     async def get_value(self) -> float:
         """
         Gets the value measured by the sensor.
+
         :return: The value measured by the sensor converted to is designated unit
         :raises ReadError: If its not possible to read the sensor value
         :raises NoConnectionError: If the BleakClient was not properly initialized
@@ -132,6 +139,7 @@ class Sensor:
     async def set_alarm(self, alarm: Literal['n', 'l', 'h']) -> None:
         """
         Sets and alarm for the sensor.
+
         :param alarm: 'n' -> no alarm | 'l' -> value below lower limit | 'h' -> value above upper limit
         :raises WriteError: If it was not possible to write the alarm
         """
@@ -161,6 +169,7 @@ class Sensor:
         """
         The unit of the measurement.
         Defaults to None if unit is unknown.
+
         :raises ReadError: If the sensor data has not been read yet.
         """
         if self.characteristic_uuid and get_short_uuid(self.characteristic_uuid) in self.VALUE_FIELD_SPECIFICATIONS:
@@ -186,6 +195,7 @@ class SensorStation:
     def __init__(self, address:str, client: BleakClient = None) -> None:
         """
         Initializes a sensor station.
+
         :param address: The address of the sensor station
         :param client: The BleakClient used to communicate with the sensor
         """
@@ -253,6 +263,7 @@ class SensorStation:
     async def dip_id(self) -> int:
         """
         Integer encoded DIP switch position.
+
         :raises ReadError: If it was not possible to read the DIP switch position
         :raises NoConnectionError: If the BleakClient was not properly initialized
         """
@@ -263,6 +274,7 @@ class SensorStation:
     async def unlocked(self) -> bool:
         """
         Flag if the sensor station has been unlocked.
+
         :raises ReadError: If it was not possible to read the flag
         :raises NoConnectionError: If the BleakClient was not properly initialized 
         """
@@ -272,6 +284,7 @@ class SensorStation:
     async def set_unlocked(self, value: bool) -> None:
         """
         Sets/resets the flag that indicates whether a sensor station has been unlocked.
+
         :param value: 'True' to unlock the sensor station | 'False' to lock the sensor station
         :raises WriteError: If it was not possible to write the flag
         :raises NoConnectionError: If the BleakClient was not properly initialized
@@ -284,6 +297,7 @@ class SensorStation:
     async def sensor_data_read(self) -> bool:
         """
         Flag that indicates if new sensor value is available on the sensor station
+
         :return: 'True' if data has already been read and no new data is available | 'False' otherwise
         :raises ReadError: If it was not possible to read the flag
         :raises NoConnectionError: If the BleakClient was not properly initialized
@@ -294,6 +308,7 @@ class SensorStation:
     async def set_sensor_data_read(self, value: bool) -> None:
         """
         Sets/resets the flag that indicates if sensor data has been read from the station.
+
         :param value: 'True' to indicate that the sensor values have been read | 'False' otherwise
         :raises WriteError: If it was not possible to write the flag
         :raises NoConnectionError: If the BleakClient was not properly initialized
@@ -308,6 +323,7 @@ class SensorStation:
         Values of the individual sensors of the sensor stations.
         Checks alls descriptors that match the names in SENSORS.
         Unreadable values will be ignored.
+
         :return: A dictionary with the sensor names as keys and the received values
         :raises NoConnectionError: If the BleakClient was not properly initialized
         """
@@ -327,6 +343,7 @@ class SensorStation:
     async def battery_level(self) -> Optional[int]:
         """
         Current battery level of the sensor station.
+
         :return: Battery level if measured by sensor station in %, otherwise None
         :raises ReadError: If it was not possible to read the battery level
         :raises NoConnectionError: If the BleakClient was not properly initialized
@@ -358,6 +375,7 @@ class SensorStation:
     async def set_alarms(self, alarms: dict[str, Literal['n', 'l', 'h']]) -> None:
         """
         Sets alarms to the given state:
+
         :param alarms: A dictionary with the sensor names as keys and the alarm states
             'n' -> No alarm
             'l' -> Lower limit exceeded
@@ -382,6 +400,7 @@ class SensorStation:
     def get_sensor_unit(self, sensor_name: str) -> Optional[str]:
         """
         Returns the unit for a specific sensor.
+
         :param sensor_name: The name of the sensor
         :return: The unit in which the measured values are or None if the sensor is unknown
         :raises ReadError: If the sensor unit is not yet known - read the sensor value first
