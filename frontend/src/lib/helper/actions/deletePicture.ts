@@ -4,6 +4,13 @@ import { toasts } from "$stores/toastStore";
 import { errorHandler } from "../errorHandler";
 import { error } from "@sveltejs/kit";
 
+/**
+ * This is a TypeScript function that deletes a picture from a sensor station and handles errors.
+ * @param {any} event - The `event` parameter is an object that contains information about the event
+ * that triggered the function. It includes a `request` object that contains information about the HTTP
+ * request that triggered the function, and a `fetch` function that can be used to make HTTP requests
+ * to other endpoints.
+ */
 export async function deletePicture(event: any) {
   const { request, fetch } = event;
   let formData = await request.formData();

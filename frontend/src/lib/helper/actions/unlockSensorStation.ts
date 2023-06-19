@@ -5,6 +5,13 @@ import { errorHandler } from "../errorHandler";
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
 
+/**
+ * This is an async function that unlocks a sensor station by sending a POST request to a backend URL
+ * with the sensor station ID and unlocked status as parameters.
+ * @param {any} event - The event parameter is an object that contains information about the HTTP
+ * request that triggered the function, including the request object and the fetch function that can be
+ * used to make HTTP requests.
+ */
 export async function unlockSensorStation(event: any) {
   const { request, fetch } = event;
   const formData = await request.formData();

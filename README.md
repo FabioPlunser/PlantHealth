@@ -54,7 +54,10 @@ For an overview of the system see the corresponding [Wiki](https://git.uibk.ac.a
 
 - **Sensorstation:**
     - The sensorstation is an Arduino 33 BLE that is programmed using [Platform IO](https://platformio.org/).
-	
+
+## Source Code Documentation
+
+Source code documentation can be retrieved from the artifacts of the latest successful CI/CD pipeline execution.
 
 ## License
 
