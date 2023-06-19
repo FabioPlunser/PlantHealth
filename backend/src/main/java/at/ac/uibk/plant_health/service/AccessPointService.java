@@ -231,13 +231,9 @@ public class AccessPointService {
 
 		ScheduledExecutorService ex = Executors.newSingleThreadScheduledExecutor();
 		ex.schedule(() -> {
-			try {
-				accessPoint.set(findById(deviceId));
-				accessPoint.get().setScanActive(false);
-				save(accessPoint.get());
-			} catch (ServiceException e) {
-				e.printStackTrace();
-			}
+			accessPoint.set(findById(deviceId));
+			accessPoint.get().setScanActive(false);
+			save(accessPoint.get());
 		}, 5, TimeUnit.MINUTES);
 	}
 
