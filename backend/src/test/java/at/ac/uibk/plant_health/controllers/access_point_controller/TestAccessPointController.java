@@ -288,7 +288,7 @@ public class TestAccessPointController {
 		ArrayNode sensorStations = mapper.createArrayNode();
 
 		Map<String, String> sensorMap = new HashMap<>();
-		sensorMap.put("TEMPERATURE", "°C");
+		sensorMap.put("TEMPERATURE", "C");
 		sensorMap.put("HUMIDITY", "%");
 		sensorMap.put("PRESSURE", "hPa");
 		sensorMap.put("SOILHUMIDITY", "%");
@@ -444,7 +444,7 @@ public class TestAccessPointController {
 		ArrayNode sensorStations = mapper.createArrayNode();
 
 		Map<String, String> sensorMap = new HashMap<>();
-		sensorMap.put("TEMPERATURE", "°C");
+		sensorMap.put("TEMPERATURE", "C");
 		sensorMap.put("HUMIDITY", "%");
 		sensorMap.put("PRESSURE", "hPa");
 		sensorMap.put("SOILHUMIDITY", "%");

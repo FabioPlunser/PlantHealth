@@ -51,7 +51,7 @@ public class TestSensorDataModel {
 		if ((maybeSensor = sensorRepository.findByType("TEMPERATURE")).isPresent()) {
 			sensor = maybeSensor.get();
 		} else {
-			sensor = new Sensor("TEMPERATURE", "°C");
+			sensor = new Sensor("TEMPERATURE", "C");
 			sensorRepository.save(sensor);
 		}
 

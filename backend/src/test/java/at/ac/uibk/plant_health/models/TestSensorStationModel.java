@@ -67,7 +67,7 @@ public class TestSensorStationModel {
 	@Test
 	void setSensorLimits() {
 		Map<String, String> sensorMap = new HashMap<>();
-		sensorMap.put("TEMPERATURE", "°C");
+		sensorMap.put("TEMPERATURE", "C");
 		sensorMap.put("HUMIDITY", "%");
 		sensorMap.put("PRESSURE", "hPa");
 		sensorMap.put("SOILHUMIDITY", "%");

@@ -6,12 +6,11 @@ import java.io.Serializable;
 import java.util.Set;
 import java.util.UUID;
 
+import at.ac.uibk.plant_health.models.rest_responses.TokenResponse;
+import at.ac.uibk.plant_health.models.rest_responses.TokenResponse.TokenResponseBuilder;
 import at.ac.uibk.plant_health.models.user.Authenticable;
 import at.ac.uibk.plant_health.models.user.Person;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Getter
