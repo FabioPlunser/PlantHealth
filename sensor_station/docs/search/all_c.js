@@ -1,0 +1,24 @@
+var searchData = [
+  [
+    "readpaireddevice_0",
+    [
+      "readPairedDevice",
+      [
+        "../class_flash_storage.html#a9411142af71e61e86b97626d7da6c946",
+        1,
+        "FlashStorage",
+      ],
+    ],
+  ],
+  [
+    "reset_1",
+    [
+      "reset",
+      [
+        "../class_value_accumulator_class.html#a6b4acc9272f28fc5d0159a175dbb4bac",
+        1,
+        "ValueAccumulatorClass",
+      ],
+    ],
+  ],
+];
