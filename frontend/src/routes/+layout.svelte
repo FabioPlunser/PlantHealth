@@ -1,11 +1,12 @@
 <script lang="ts">
   import "../app.css";
   import toast, { Toaster } from "$components/toast";
-  import type { ToastPosition } from "$components/toast";
+  import { browser } from "$app/environment";
+  // import type { ToastPosition } from "$components/toast";
   export let data: any;
   $: {
     data?.streamed?.notifications.then((notification: any) => {
-      let position: ToastPosition = "top-right";
+      let position: string = "top-right";
       let toastId = "";
       if (notification) {
         switch (notification.type) {
@@ -19,11 +20,17 @@
       }
     });
   }
+  let height = 0;
+  $: {
+    if (browser) {
+      height = window.innerHeight;
+    }
+  }
 </script>
 
 {#if data?.error}
   <div
-    class="bg-red-400 p-4 w-1/2 rounded-2xl shadow-2xl  mx-auto text-black my-auto absolute mt-24 left-0 right-0"
+    class="bg-red-400 p-4 w-1/2 rounded-2xl shadow-2xl mx-auto text-black my-auto absolute mt-24 left-0 right-0"
   >
     <div>
       <h1 class="text-3xl font-bold mx-auto flex justify-center">
@@ -37,8 +44,9 @@
 {/if}
 <Toaster />
 <main
-  class="dark:bg-gradient-to-br from-gray-900 via-gray-900 to-violet-900 bg-fixed overflow-clip"
+  class="dark:bg-gradient-to-br from-gray-900 via-gray-900 to-violet-900 bg-fixed"
 >
   <slot />
-  <div class="pb-96" />
+  <!-- {document.documentElement.clientHeight} -->
+  <div class="pb-[{height}px]" style="padding-bottom: {height}px;" />
 </main>

@@ -27,7 +27,7 @@
   let addUserModal = false;
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  let columns: ColumnDef<User>[] = [
+  let columns: ColumnDef<Responses.Person>[] = [
     {
       id: "username",
       accessorKey: "username",
@@ -84,7 +84,8 @@
   <section>
     {#await data.streamed.users}
       <Spinner />
-    {:then users}
+    {:then promise}
+      {@const users = promise.items}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <btn
         class="btn btn-primary flex justify-center w-fit mx-auto m-4"

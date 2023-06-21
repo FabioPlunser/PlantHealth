@@ -4,10 +4,18 @@ from typing import Union
 BYTEORDER ='little'
 
 class Field:
-    """Represents a field within a GATT characteristic"""
+    """
+    Represents a field within a GATT characteristic
+    
+    :param num_bytes: The size of the field in bytes
+    :raises ValueError: If the length in bytes is smaller than or equal to 0
+    """
+
     def __init__(self, num_bytes: int) -> None:
         """
         Initializes the field with the given specification.
+
+        :param num_bytes: The size of the field in bytes
         :raises ValueError: If the length in bytes is smaller than or equal to 0
         """
         if num_bytes <= 0:
@@ -46,10 +54,17 @@ class BooleanField(Field):
         return represented_value.to_bytes(1, BYTEORDER)
 
 class BooleanArrayField(Field):
-    """Represents a field within a GATT characteristic representing a boolean array"""
+    """
+    Represents a field within a GATT characteristic representing a boolean array
+    
+    :param num_bytes: The size of the field in bytes
+    :raises ValueError: If the length in bytes is smaller than or equal to 0
+    """
     def __init__(self, num_bytes: int) -> None:
         """
         Initializes the field with the given specification.
+
+        :param num_bytes: The size of the field in bytes
         :raises ValueError: If the length in bytes is smaller than or equal to 0
         """
         super().__init__(num_bytes)
@@ -57,6 +72,7 @@ class BooleanArrayField(Field):
     def get_represented_value(self, raw_value: bytearray) -> list[bool]:
         """
         Calculates the list of booleans value from the given bytearray.
+
         :param raw_value: Raw value as bytearray
         :raises ValueError: If there are more booleans in the bytearray than allowed
         """
@@ -71,6 +87,7 @@ class BooleanArrayField(Field):
     def get_raw_value(self, represented_value: list[bool]) -> bytes:
         """
         Calculates the raw value (as bytearray) from the given represented value.
+
         :param represented_value: Represented value as list of booleans
         :raises ValueError: If the represented value contains more values than allowed
         """
@@ -80,7 +97,20 @@ class BooleanArrayField(Field):
 
 
 class ScalarField(Field):
-    """Represents a field within a GATT characteristic representing a scalar value"""
+    """
+    Represents a field within a GATT characteristic representing a scalar value
+
+    :param multiplier: Positive or negative multiplier between -10 and +10
+    :param decimal_exponent: Positive or negative integer
+    :param binary_exponent: Positive or negative integer
+    :param min: Minimum allowed represented value
+    :param max: Maximum allowed represented value
+    :param num_bytes: Length of the raw value in bytes
+    :raises ValueError: If the multiplier is < -10 or > +10
+    :raises ValueError: If the minimum value is greater than or equal to the maximum value
+    :raises ValueError: If the length in bytes is smaller than or equal to 0
+    """
+
     def __init__(self,
                  multiplier: int,
                  decimal_exponent: int,
@@ -90,6 +120,7 @@ class ScalarField(Field):
                  max: float = None) -> None:
         """
         Initializes the field with the given specification.
+
         :param multiplier: Positive or negative multiplier between -10 and +10
         :param decimal_exponent: Positive or negative integer
         :param binary_exponent: Positive or negative integer
@@ -118,6 +149,7 @@ class ScalarField(Field):
     def get_represented_value(self, raw_value: bytearray) -> float:
         """
         Calculates the represented value from the given bytearray.
+
         :param raw_value: Raw value as bytearray
         :raises ValueError: If the calculated represented value is outside the allowed range
         """
@@ -129,6 +161,7 @@ class ScalarField(Field):
     def get_raw_value(self, represented_value: float) -> bytes:
         """
         Calculates the raw value (as bytearray) from the given represented value.
+
         :param represented_value: Represented value as float
         :raises ValueError: If the given represented value is outside the allowed range
         """
@@ -138,18 +171,23 @@ class ScalarField(Field):
         return raw_int_value.to_bytes(self.num_bytes, BYTEORDER, signed=self.signed)
 
 class IndexField(Field):
-    """Represents a field within a GATT characteristic representing an index"""
+    """
+    Represents a field within a GATT characteristic representing an index
+    
+    :param num_bytes: Length of the raw value in bytes
+    :raises ValueError: If the length in bytes is smaller than or equal to 0
+    """
+
     def __init__(self, num_bytes: int) -> None:
         """
         Initializes the field with the given specification
-        :param num_bytes: Length of the raw value in bytes
-        :raises ValueError: If the length in bytes is smaller than or equal to 0
         """
         super().__init__(num_bytes)
 
     def get_represented_value(self, raw_value: bytearray) -> int:
         """
         Calculates the represented value from the given bytearray.
+
         :param raw_value: Raw value as bytearray
         :raises ValueError: If the calculated represented value is outside the allowed range
         """
@@ -161,6 +199,7 @@ class IndexField(Field):
     def get_raw_value(self, represented_value: int) -> bytes:
         """
         Calculates the raw value from the given represented value.
+
         :param represented_value: Represented value
         :raises ValueError: If the given represented value is outside the allowed range
         """

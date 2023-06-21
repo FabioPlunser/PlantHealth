@@ -4,6 +4,13 @@ import { toasts } from "$stores/toastStore";
 import { errorHandler } from "../errorHandler";
 import { error } from "@sveltejs/kit";
 
+/**
+ * This function deletes all pictures associated with a specific sensor station.
+ * @param {any} event - The `event` parameter is an object that contains information about the HTTP
+ * request that triggered the function. It includes properties such as `request` (an object
+ * representing the incoming request), `fetch` (a function for making HTTP requests), and `locals` (an
+ * object containing additional information about the request
+ */
 export async function deleteAllPictures(event: any) {
   const { request, fetch } = event;
   let formData = await request.formData();

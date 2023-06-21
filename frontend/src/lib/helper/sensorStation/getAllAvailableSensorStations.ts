@@ -2,6 +2,14 @@ import { BACKEND_URL } from "$env/static/private";
 import { errorHandler } from "../errorHandler";
 import { error } from "@sveltejs/kit";
 
+/**
+ * This function fetches all sensor stations from a backend URL and returns them as an array, while
+ * also handling errors and getting the newest picture of the sensor stations.
+ * @param {any} event - The `event` parameter is an object that represents the event that triggered the
+ * function. It is likely an HTTP request object that contains information about the incoming request,
+ * such as headers, query parameters, and request body.
+ * @returns A Promise that resolves to an array of sensor stations.
+ */
 export async function getAllSensorStations(event: any): Promise<any> {
   return new Promise(async (resolve, reject) => {
     await event
@@ -14,8 +22,7 @@ export async function getAllSensorStations(event: any): Promise<any> {
             "Error while fetching all sensor stations",
             data
           );
-          resolve([]);
-          throw error(res.status, "Error while fetching all sensor stations");
+          resolve({ sensorStations: [] });
         }
 
         let data = await res.json();
@@ -25,7 +32,7 @@ export async function getAllSensorStations(event: any): Promise<any> {
         // get newest picture of sensor stations
         //---------------------------------------------------------------------
         getNewestPicture(event, sensorStations);
-        resolve(sensorStations);
+        resolve({ sensorStations: sensorStations });
       })
       .catch((err: any) => {
         errorHandler(
@@ -33,12 +40,18 @@ export async function getAllSensorStations(event: any): Promise<any> {
           "Error while fetching all sensor stations",
           err
         );
-        reject(err);
-        throw error(500, "Error while fetching all sensor stations");
+        resolve({ sensorStations: [] });
       });
   });
 }
 
+/**
+ * The function fetches the newest picture from a sensor station and encodes it as a base64 string.
+ * @param {any} event - The event parameter is likely an object representing an event that triggered
+ * the function, such as a button click or a page load.
+ * @param {any[]} sensorStations - An array of objects representing sensor stations, each with a unique
+ * `sensorStationId` property.
+ */
 function getNewestPicture(event: any, sensorStations: any[]): void {
   for (let sensorStation of sensorStations) {
     sensorStation.newestPicture = new Promise(async (resolve, reject) => {

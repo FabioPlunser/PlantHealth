@@ -43,8 +43,16 @@ export const actions = {
     const formData = await request.formData();
     const zod = schema.safeParse(Object.fromEntries(formData));
 
-    if (formData.get("password") !== formData.get("passwordConfirm")) {
-      return fail(400, { error: true, errors: "Passwords do not match" });
+    if (
+      String(formData.get("password")) !==
+      String(formData.get("passwordConfirm"))
+    ) {
+      return fail(400, {
+        error: true,
+        errors: [
+          { field: "passwordConfirm", message: "Passwords don't match" },
+        ],
+      });
     }
 
     if (!zod.success) {

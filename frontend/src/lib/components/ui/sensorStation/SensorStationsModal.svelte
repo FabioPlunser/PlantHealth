@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { enhance, type SubmitFunction } from "$app/forms";
+  import { enhance } from "$app/forms";
   import { fly, slide } from "svelte/transition";
 
   import Spinner from "$components/ui/Spinner.svelte";
@@ -31,13 +31,13 @@
           />
         </div>
         <div class="grid grid-rows sm:grid-cols-2 md:grid-cols-3 gap-4 w-fit">
-          {#each data as item, i (item.sensorStationId)}
-            {#if item.roomName.includes(searchTerm) || item.sensorStationName.includes(searchTerm)}
+          {#each data as sensorStation, i (sensorStation.sensorStationId)}
+            {#if sensorStation.roomName.includes(searchTerm) || sensorStation.name.includes(searchTerm)}
               <div
                 in:fly|self={{ x: -200, duration: 300, delay: 200 * i }}
                 class="card w-64 h-92 dark:bg-base-100 bg-base-100 shadow-2xl border-gray-200 border dark:border-none"
               >
-                {#await item?.newestPicture}
+                {#await sensorStation?.newestPicture}
                   <div>
                     <Spinner />
                   </div>
@@ -48,7 +48,9 @@
                       <img src={picture} alt="newest image" class="w-fit" />
                     </figure>
                   {:else}
-                    <div class="h-full flex items-center justify-center">
+                    <div
+                      class="h-full flex sensorStations-center justify-center"
+                    >
                       <h1>No picture found</h1>
                     </div>
                   {/if}
@@ -60,10 +62,10 @@
                     <input
                       type="hidden"
                       name="sensorStationId"
-                      value={item.sensorStationId}
+                      value={sensorStation.sensorStationId}
                     />
-                    <h2 class="card-title">Room: {item.roomName}</h2>
-                    <h2 class="card-title">Name: {item.sensorStationName}</h2>
+                    <h2 class="card-title">Room: {sensorStation.roomName}</h2>
+                    <h2 class="card-title">Name: {sensorStation.name}</h2>
                     <div class="card-actions flex justify-center">
                       <button class="btn btn-primary mt-4" type="submit"
                         >Add to Dashboard</button

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { enhance, type SubmitFunction } from "$app/forms";
+  import { enhance } from "$app/forms";
   import FormError from "$helper/formError.svelte";
   import Input from "$components/ui/Input.svelte";
   import BooleanButton from "$lib/components/ui/BooleanButton.svelte";
@@ -15,7 +15,7 @@
     isRendered = true;
   });
 
-  const customEnhance: SubmitFunction = () => {
+  const customEnhance = () => {
     return async ({ update }) => {
       await update({ reset: false });
     };

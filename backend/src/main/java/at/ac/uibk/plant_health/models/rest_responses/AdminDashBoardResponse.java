@@ -6,7 +6,6 @@ import java.util.*;
 import at.ac.uibk.plant_health.models.SensorStationPersonReference;
 import at.ac.uibk.plant_health.models.device.AccessPoint;
 import at.ac.uibk.plant_health.models.device.SensorStation;
-import at.ac.uibk.plant_health.models.rest_responses.GardenerDashBoardResponse.InnerResponse;
 import at.ac.uibk.plant_health.models.user.Person;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -17,7 +16,7 @@ public class AdminDashBoardResponse extends RestResponse implements Serializable
 	private final int numOfUsers;
 	private final int numOfConnectedSensorStations;
 	private final int numOfConnectedAccessPoints;
-	private final List<InnerResponse> sensorStations;
+	private final List<SensorStationBaseResponse> sensorStations;
 	public AdminDashBoardResponse(
 			List<SensorStation> sensorStationList, List<AccessPoint> accessPointList,
 			List<Person> personList, Person person
@@ -33,8 +32,7 @@ public class AdminDashBoardResponse extends RestResponse implements Serializable
 									  .stream()
 									  .filter(SensorStationPersonReference::isInDashboard)
 									  .map(SensorStationPersonReference::getSensorStation)
-									  .filter(st -> !st.isDeleted())
-									  .map(InnerResponse::new)
+									  .map(SensorStationBaseResponse::new)
 									  .toList();
 	}
 }

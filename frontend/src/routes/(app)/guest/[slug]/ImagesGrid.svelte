@@ -54,7 +54,7 @@
               }}
             />
             <h1 class="flex justify-center">
-              Date: {data.creationDate.toLocaleDateString()}
+              Date: {data.creationDate.toLocaleDateString("de-DE")}
             </h1>
           </div>
         {:catch error}

@@ -7,15 +7,14 @@
   import Line from "./Line.svelte";
   import MediaQuery from "$helper/MediaQuery.svelte";
   import Spinner from "$components/ui/Spinner.svelte";
+  import Graph from "../ui/Graph.svelte";
   // ---------------------------------------------------
   // ---------------------------------------------------
-  export let data: any;
-  export let loading = false;
+  export let sensorStation: SensorStationComponent;
+  export let loading = true;
   export let options = {};
   // ---------------------------------------------------
   // ---------------------------------------------------
-  let sensors = $sensorsStore;
-  let currentSensor: any = sensors[0].sensorType;
   let graphData: any = {};
   let width = 0;
   $: {
@@ -31,9 +30,14 @@
     } else {
       options = {
         responsive: true,
+        interaction: {
+          intersect: false,
+        },
+
         scales: {
           x: {
             display: true,
+            autoSkip: true,
           },
           y: {
             type: "linear",
@@ -46,34 +50,37 @@
   }
   // ---------------------------------------------------
   // ---------------------------------------------------
+  /**
+   * The `addMissingSensors` function is an asynchronous function that takes an array of `dynamicSensors` 
+   * as an argument. It loops through each sensor in the `dynamicSensors` 
+   * array and checks if it already exists in the `sensors` array. 
+   * If it does not exist, it creates a new sensor object with the `sensorType`, 
+   * `sensorUnit`, `bootstrap`, and `google` properties and adds it to the `sensors` 
+   * array. This function ensures that all sensors in the `dynamicSensors` array are present in the `sensors` array.
+   */
   async function addMissingSensors(dynamicSensors: any) {
     for (let sensor of dynamicSensors) {
       if (!sensors.some((s) => s.sensorType === sensor.sensorType)) {
         let newSensor = {
           sensorType: sensor.sensorType,
           sensorUnit: sensor.sensorUnit,
-          bootstrap: "",
-          google: "sensors",
+          bootstrap:
+            storedSensor?.bootstrap === "" ? "" : storedSensor?.bootstrap,
+          google: storedSensor?.google === "" ? "" : storedSensor?.google,
         };
-        sensors = [...sensors, newSensor];
+        sensors = [...sensors, foundSensor];
       }
+      sensors.sort((a, b) => b.sensorType.localeCompare(a.sensorType));
+      graphData = createGraphData(res.data);
+      loading = false;
+    });
+  }
+
+  $: {
+    if (sensors.length > 0) {
+      currentSensor = sensors[0];
     }
   }
-  if (data instanceof Promise) {
-    data
-      .then(async (res: any) => {
-        addMissingSensors(res.data);
-        graphData = createGraphData(res.data);
-      })
-      .catch((err: any) => {
-        console.error("Error while fetching data", { payload: err });
-      });
-  } else {
-    addMissingSensors(data);
-    graphData = createGraphData(data);
-  }
-  // ---------------------------------------------------
-  // ---------------------------------------------------
 </script>
 
 <!-- @component
@@ -90,40 +97,46 @@ Usage example:
     <div class="w-full h-full">
       {#if loading}
         <div class="mb-2">
-          <Spinner fill="fill-primary" />
+          <Spinner />
         </div>
       {:else if Object.keys(graphData).length === 0}
         <h1 class="font-bold text-4xl flex justify-center">No data found</h1>
       {:else}
+        <h1 class="font-bold">{currentSensor.sensorUnit}</h1>
         <MediaQuery query="(width <= 640px)" let:matches>
           {#key matches}
-            <Line data={graphData?.[currentSensor]} {options} />
+            <Line data={graphData?.[currentSensor.sensorType]} {options} />
           {/key}
         </MediaQuery>
       {/if}
     </div>
 
-    <div
-      class="bg-green-400 mx-auto shadow-2xl rounded-2xl flex justify-center items-ceter gap-4 md:grid md:flex-none md:justify-normal md:gap-2 p-2"
-    >
-      {#each sensors as sensor, i (i)}
-        <div
-          in:fly|self={{ y: -50, duration: 50, delay: 100 * i }}
-          class="tooltip"
-          data-tip={sensor.sensorType}
-        >
-          <button on:click={() => (currentSensor = sensor.sensorType)}>
-            <i
-              class="bi {sensor.bootstrap} transform transition-transform active:scale-110 material-symbols-outlined text-2xl sm:text-3xl md:text-4xl xl:text-5xl hover:text-blue-400 hover:scale-105 hover:dark:text-black
-              {sensor.sensorType === currentSensor
-                ? 'text-black'
-                : 'text-white'}"
-            >
-              {sensor?.google}
-            </i>
-          </button>
-        </div>
-      {/each}
-    </div>
+    {#if Object.keys(graphData).length > 0}
+      <div
+        class="bg-green-400 mx-auto shadow-2xl rounded-2xl flex justify-center items-ceter gap-4 md:grid md:flex-none md:justify-normal md:gap-2 p-2"
+      >
+        {#each sensors as sensor, i (i)}
+          <div
+            in:fly|local|self={{ y: -50, duration: 50, delay: 100 * i }}
+            class="tooltip tooltip-primary"
+            data-tip={sensor.sensorType}
+          >
+            <button on:click={() => (currentSensor = sensor)}>
+              <i
+                class="bi {sensor.bootstrap} transform transition-transform active:scale-110 material-symbols-outlined text-2xl sm:text-3xl md:text-4xl xl:text-5xl hover:text-blue-400 hover:scale-105 hover:dark:text-black
+              {sensor.sensorType === currentSensor.sensorType
+                  ? 'text-black'
+                  : 'text-white'}"
+                class:alarm={sensorStation.alarms.some(
+                  (a) => a.sensor.type === sensor.sensorType && a.alarm !== "n"
+                )}
+              >
+                {sensor?.google}
+              </i>
+            </button>
+          </div>
+        {/each}
+      </div>
+    {/if}
   </div>
 </div>

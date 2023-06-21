@@ -1,7 +1,7 @@
 <script lang="ts">
   import { SensorStationsModal } from "$components/ui/sensorStation";
   import { fly } from "svelte/transition";
-  import { enhance, type SubmitFunction } from "$app/forms";
+  import { enhance } from "$app/forms";
   // ---------------------------------------------------
   // ---------------------------------------------------
   import Spinner from "$components/ui/Spinner.svelte";
@@ -23,7 +23,7 @@
   });
   // ---------------------------------------------------
   // ---------------------------------------------------
-  export let data: any;
+  export let data: SensorStationDetailComponent;
   export let form: any;
   let newDates = data.dates;
   let loading = false;
@@ -66,7 +66,7 @@
   let selectedPicture = "";
   // ---------------------------------------------------
   // ---------------------------------------------------
-  const customEnhance: SubmitFunction = () => {
+  const customEnhance = () => {
     loading = true;
     return async ({ update }) => {
       await update({ reset: false });
@@ -75,14 +75,14 @@
   };
   // ---------------------------------------------------
   // ---------------------------------------------------
-  let sensorStations: any[] = [];
+  let sensorStation: SensorStationDetailComponentInner | null = null;
   $: {
-    if (data.sensorStations instanceof Promise) {
-      data.sensorStations.then((res: any) => {
-        sensorStations = res;
+    if (data.streamed.sensorStation instanceof Promise) {
+      data.streamed.sensorStation.then((res) => {
+        sensorStation = res;
       });
     } else {
-      sensorStations = data.sensorStations;
+      sensorStation = data.streamed.sensorStation;
     }
   }
   let searchTerm = "";
@@ -95,7 +95,7 @@
     on:close={() => (showPicture = false)}
   />
   <section>
-    <div class="mb-4 flex justify-ceter">
+    <!-- <div class="mb-4 flex justify-ceter">
       <input
         bind:value={searchTerm}
         type="search"
@@ -103,13 +103,12 @@
         placeholder="Global Search"
         class="input dark:input-bordered w-fit min-w-64 mx-auto dark:bg-gray-800 bg-gray-200 dark:text-white text-black mt-4"
       />
-    </div>
-    <div class="grid grid-rows gap-2">
-      {#each sensorStations as sensorStation, i (sensorStation.sensorStationId)}
+    </div> -->
+    {#if sensorStation}
       {#if sensorStation.name.includes(searchTerm) || sensorStation.roomName.includes(searchTerm)}
         <div
           class="m-0 p-0 w-full sm:max-w-10/12 2xl:max-w-8/12 mx-auto"
-          in:fly={{ y: -200, duration: 200, delay: 200 * i }}
+          in:fly={{ y: -200, duration: 200, delay: 200 }}
         >
           <div
             class="card bg-base-100 shadow-2xl rounded-2xl p-4 justify-center mx-auto"
@@ -124,6 +123,10 @@
                 name="sensorStationId"
                 value={sensorStation.sensorStationId}
               />
+              <!--
+                  TODO: find a way fro the page not to fail on delete clicked.
+                  <SensorStationDeleteButton sensorStationId={sensorStation.sensorStationId}/>
+                -->
               <h1 class="text-xl font-bold">
                 Room: {sensorStation.roomName}
               </h1>
@@ -144,14 +147,16 @@
                     />
                   </label>
                   <label
-                    class="tooltip"
+                    class="tooltip tooltip-primary"
                     data-tip="Disclaimer: Because of the specification this sets the transfer interval between the access point and the backend so every sensor station from the same access point in your dashboard will be updated"
                   >
                     <h1 class="label-text font-bold">TransferInterval [s]:</h1>
                     <input
                       name="transferInterval"
-                      class="w-36 rounded-2xl p-2 border dark:bg-gray-800 bg-gray-200 dark:border-gray-700 bg-gray-200 dark:text-white text-black"
+                      class="w-36 rounded-2xl p-2 border dark:bg-gray-80 dark:border-gray-700 dark:bg-gray-800 bg-gray-200 dark:text-white text-black"
                       value={sensorStation.transferInterval}
+                      min="30"
+                      max="3600"
                     />
                     <FormError
                       field="transferInterval"
@@ -167,13 +172,13 @@
               >
             </form>
 
-            {#if !sensorStation.unlocked}
-              <h1 class="text-2xl font-bold flex justify-center">
-                SensorStation is locked
-              </h1>
-            {:else if sensorStation.deleted}
+            {#if sensorStation.deleted}
               <h1 class="text-2xl font-bold flex justify-center">
                 SensorStation got deleted
+              </h1>
+            {:else if !sensorStation.unlocked}
+              <h1 class="text-2xl font-bold flex justify-center">
+                SensorStation is locked
               </h1>
             {:else if loading}
               <Spinner />
@@ -215,9 +220,9 @@
                         />
                         <DateInput
                           format="dd.MM.yyyy"
-                          placeholder={new Date(
-                            Date.now()
-                          ).toLocaleDateString()}
+                          placeholder={new Date(Date.now()).toLocaleDateString(
+                            "de-DE"
+                          )}
                           bind:value={newDates.from}
                         />
                       </label>
@@ -230,9 +235,9 @@
                         />
                         <DateInput
                           format="dd.MM.yyyy"
-                          placeholder={new Date(
-                            Date.now()
-                          ).toLocaleDateString()}
+                          placeholder={new Date(Date.now()).toLocaleDateString(
+                            "de-DE"
+                          )}
                           bind:value={newDates.to}
                         />
                       </label>
@@ -244,7 +249,7 @@
                     </div>
                   </div>
                 </form>
-                <Graphs data={sensorStation.data} />
+                <Graphs {sensorStation} />
               {:else if state === "table"}
                 <form
                   method="POST"
@@ -264,9 +269,9 @@
                         />
                         <DateInput
                           format="dd.MM.yyyy"
-                          placeholder={new Date(
-                            Date.now()
-                          ).toLocaleDateString()}
+                          placeholder={new Date(Date.now()).toLocaleDateString(
+                            "de-DE"
+                          )}
                           bind:value={newDates.from}
                         />
                       </label>
@@ -279,9 +284,9 @@
                         />
                         <DateInput
                           format="dd.MM.yyyy"
-                          placeholder={new Date(
-                            Date.now()
-                          ).toLocaleDateString()}
+                          placeholder={new Date(Date.now()).toLocaleDateString(
+                            "de-DE"
+                          )}
                           bind:value={newDates.to}
                         />
                       </label>
@@ -300,34 +305,32 @@
                     <SensorStationDetailTable {data} />
                   {/await}
                 </div>
-                <h1>Table</h1>
               {:else if state === "limits"}
-                {#if sensorStation.limits.length === 0}
+                {#if sensorStation.sensorLimits.length === 0}
                   <h1 class="flex justify-center text-3xl font-bold">
                     No Limits
                   </h1>
+                {:else if sensorStation.sensorLimits}
+                  {@const limits = sensorStation.sensorLimits.sort((a, b) => {
+                    return b.sensor.type.localeCompare(a.sensor.type);
+                  })}
+                  <div
+                    class="grid grid-rows sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4"
+                  >
+                    {#each limits as limit, i}
+                      <LimitsCard
+                        {limit}
+                        sensorStationId={sensorStation.sensorStationId}
+                        {form}
+                      />
+                    {/each}
+                  </div>
                 {:else}
-                  {#await sensorStation.limits}
-                    <Spinner />
-                  {:then limits}
-                    <div
-                      class="grid grid-rows sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4"
-                    >
-                      {#each limits as limit, i}
-                        <LimitsCard
-                          {limit}
-                          sensorStationId={sensorStation.sensorStationId}
-                          {form}
-                        />
-                      {/each}
-                    </div>
-                  {:catch error}
-                    <p class="text-red-500">{error.message}</p>
-                  {/await}
+                  <Spinner />
                 {/if}
               {:else if state === "pictures"}
                 <div class="grid grid-cols gap-2">
-                  {#if sensorStation.pictures.length === 0}
+                  {#if sensorStation.pictures && sensorStation.pictures.length === 0}
                     <h1 class="flex justify-center text-3xl font-bold">
                       No Pictures
                     </h1>
@@ -370,7 +373,7 @@
                     <div
                       class="grid grid-rows sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
                     >
-                      {#if sensorStation.pictures.length > 0}
+                      {#if sensorStation.pictures && sensorStation.pictures.length > 0}
                         {#each sensorStation.pictures as picture, i (picture.pictureId)}
                           {#await picture.promise}
                             <Spinner />
@@ -416,7 +419,7 @@
                                 }}
                               />
                               <h1 class="flex justify-center">
-                                {data.creationDate.toLocaleDateString()}
+                                {data.creationDate.toLocaleDateString("de-DE")}
                               </h1>
                             </div>
                           {:catch error}
@@ -433,8 +436,11 @@
             {/if}
           </div>
         </div>
-        {/if}
-      {/each}
-    </div>
+      {/if}
+    {:else}
+      <div class="flex justify-center">
+        <Spinner />
+      </div>
+    {/if}
   </section>
 {/if}

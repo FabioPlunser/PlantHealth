@@ -9,9 +9,9 @@ export async function load(event) {
   const { fetch, depends } = event;
   depends("app:getAccessPoints");
 
-  async function getAccessPoints(): Promise<any> {
+  async function getAccessPoints(): Promise<Responses.AccessPointListResponse | null> {
     return new Promise(async (resolve, reject) => {
-      await fetch(`${BACKEND_URL}/get-access-points`)
+      let res = await fetch(`${BACKEND_URL}/get-access-points`)
         .then(async (res) => {
           if (!res.ok) {
             res = await res.json();
@@ -20,10 +20,10 @@ export async function load(event) {
               "Error while getting access points",
               res
             );
-            reject(res);
+            throw error(500, "Error while getting access points");
+            resolve(null);
           }
-          let data = await res.json();
-          resolve(data.accessPoints);
+          resolve(await res.json());
         })
         .catch((err) => {
           errorHandler(
@@ -31,15 +31,16 @@ export async function load(event) {
             "Error while getting access points",
             err
           );
-          reject(err);
-          throw error(500, "Error while getting access points");
+          resolve(null);
         });
     });
   }
 
   return {
     streamed: {
-      accessPoints: getAccessPoints(),
+      accessPoints: getAccessPoints().catch((err) => {
+        throw error(500, "Error while getting access points");
+      }),
     },
   };
 }
@@ -120,10 +121,10 @@ export const actions = {
   scan: async (event) => {
     const { cookies, request, fetch } = event;
     const formData = await request.formData();
-    let accessPointId = formData.get("accessPointId");
-
+    let accessPointId = String(formData.get("accessPointId"));
+    let scanActive = String(formData.get("scanActive"));
     await fetch(
-      `${BACKEND_URL}/scan-for-sensor-stations?accessPointId=${accessPointId}`,
+      `${BACKEND_URL}/scan-for-sensor-stations?accessPointId=${accessPointId}&scanActive=${scanActive}`,
       { method: "POST" }
     )
       .then(async (res: any) => {
@@ -135,6 +136,11 @@ export const actions = {
             res
           );
         }
+        toasts.addToast(
+          event.locals.user?.personId,
+          "success",
+          "Set access point scanning to: " + scanActive
+        );
       })
       .catch((err: any) => {
         errorHandler(

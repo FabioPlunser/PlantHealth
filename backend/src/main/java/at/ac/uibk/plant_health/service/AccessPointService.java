@@ -7,7 +7,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 
+import at.ac.uibk.plant_health.models.annotations.AuditLogAnnotation;
 import at.ac.uibk.plant_health.models.device.AccessPoint;
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.exceptions.ServiceException;
@@ -20,6 +23,12 @@ public class AccessPointService {
 	@Autowired
 	private SensorStationService sensorStationService;
 
+	/**
+	 * Find the AccessPoint with the given ID.
+	 * @param id
+	 * @return
+	 * @throws ServiceException
+	 */
 	public AccessPoint findById(UUID id) throws ServiceException {
 		Optional<AccessPoint> maybeAccessPoint = this.accessPointRepository.findById(id);
 		if (maybeAccessPoint.isEmpty()) {
@@ -28,6 +37,12 @@ public class AccessPointService {
 		return maybeAccessPoint.get();
 	}
 
+	/**
+	 * Find the AccessPoint with the given selfAssignedId.
+	 * @param id
+	 * @return
+	 * @throws ServiceException
+	 */
 	public AccessPoint findBySelfAssignedId(UUID id) throws ServiceException {
 		Optional<AccessPoint> maybeAccessPoint =
 				this.accessPointRepository.findBySelfAssignedId(id);
@@ -37,6 +52,10 @@ public class AccessPointService {
 		return maybeAccessPoint.get();
 	}
 
+	/**
+	 * Update the lastConnection of the given AccessPoint.
+	 * @return
+	 */
 	public int updateLastConnection() {
 		return this.accessPointRepository.updateIsConnectedByLastConnection();
 	}
@@ -56,6 +75,7 @@ public class AccessPointService {
 	 * @param roomName The roomName of the AccessPoint to register.
 	 * @throws ServiceException if the AccessPoint could not be registered.
 	 */
+	@AuditLogAnnotation(successMessage = "Registered AccessPoint {selfAssignedId} {roomName}")
 	public void register(UUID selfAssignedId, String roomName) throws ServiceException {
 		if (selfAssignedId == null || roomName == null) {
 			throw new ServiceException("Could not register AccessPoint", 400);
@@ -85,7 +105,7 @@ public class AccessPointService {
 		}
 		AccessPoint accessPoint = new AccessPoint(selfAssignedId, roomName, false);
 		save(accessPoint);
-		setLastConnection(findBySelfAssignedId(selfAssignedId));
+		//		setLastConnection(findBySelfAssignedId(selfAssignedId));
 	}
 
 	/**
@@ -145,6 +165,7 @@ public class AccessPointService {
 	 * @param deviceId
 	 * @return true if the AccessPoint was unlocked, false otherwise
 	 */
+	@AuditLogAnnotation(successMessage = "Unlocked AccessPoint {deviceId}")
 	public void setUnlocked(boolean unlocked, UUID deviceId) throws ServiceException {
 		AccessPoint accessPoint = null;
 		accessPoint = findById(deviceId);
@@ -179,12 +200,13 @@ public class AccessPointService {
 						sensorStationService.findByBdAddress(sensorStation.getBdAddress());
 				dbSensorStation.setDipSwitchId(sensorStation.getDipSwitchId());
 				dbSensorStation.setAccessPoint(accessPoint);
-				dbSensorStation.setConnected(true);
+				dbSensorStation.setConnected(sensorStation.isConnected());
 				sensorStationService.save(dbSensorStation);
 				continue;
 			}
-			sensorStation.setConnected(true);
+			sensorStation.setConnected(false);
 			sensorStation.setAccessPoint(accessPoint);
+			sensorStation.setUnlocked(false);
 			sensorStationService.save(sensorStation);
 		}
 		accessPoint.setSensorStations(sensorStationList);
@@ -198,39 +220,35 @@ public class AccessPointService {
 	 * @param deviceId The deviceId of the AccessPoint to start the scan for.
 	 * @throws ServiceException if the AccessPoint could not be found.
 	 */
-	public void startScan(UUID deviceId) throws ServiceException {
-		AccessPoint accessPoint = findById(deviceId);
-		if (!accessPoint.isConnected()) {
+	@AuditLogAnnotation(successMessage = "Set AccessPoint, {deviceId}, scan to {scanActive}")
+	public void setScan(UUID deviceId, boolean scanActive) throws ServiceException {
+		AtomicReference<AccessPoint> accessPoint = new AtomicReference<>(findById(deviceId));
+		if (!accessPoint.get().isConnected()) {
 			throw new ServiceException("AccessPoint is not connected", 400);
 		}
-		accessPoint.setScanActive(true);
-		save(accessPoint);
+		accessPoint.get().setScanActive(scanActive);
+		save(accessPoint.get());
+
+		ScheduledExecutorService ex = Executors.newSingleThreadScheduledExecutor();
+		ex.schedule(() -> {
+			accessPoint.set(findById(deviceId));
+			accessPoint.get().setScanActive(false);
+			save(accessPoint.get());
+		}, 5, TimeUnit.MINUTES);
 	}
 
 	/**
-	 * Stop a scan for SensorStations.
-	 * @param deviceId The deviceId of the AccessPoint to stop the scan for.
-	 * @throws ServiceException if the AccessPoint could not be found.
+	 * Update the AccessPoint's room name and transfer interval.
+	 * @param deviceId
+	 * @param roomName
+	 * @param transferInterval
+	 * @throws ServiceException
 	 */
-	public void stopScan(UUID deviceId) throws ServiceException {
-		AccessPoint accessPoint = findById(deviceId);
-		accessPoint.setScanActive(false);
-		save(accessPoint);
-	}
-
-	/**
-	 * Set the transfer interval of the AccessPoint with the given ID.
-	 * @param accessPointId The ID of the AccessPoint to set the transfer interval for.
-	 * @param interval The interval to set.
-	 * @throws ServiceException if the AccessPoint could not be found.
-	 */
-	public void setTransferInterval(UUID accessPointId, int interval) throws ServiceException {
-		AccessPoint accessPoint = findById(accessPointId);
-		accessPoint.setTransferInterval(interval);
-		save(accessPoint);
-	}
-
-	public void updateAccessPointInfo(UUID deviceId, String roomName, int transferInterval)
+	@AuditLogAnnotation(
+			successMessage = "Updated AccessPoint, {deviceId}, to {roomName}, {transferInterval}"
+	)
+	public void
+	updateAccessPointInfo(UUID deviceId, String roomName, int transferInterval)
 			throws ServiceException {
 		AccessPoint accessPoint = findById(deviceId);
 		accessPoint.setRoomName(roomName);
@@ -246,12 +264,15 @@ public class AccessPointService {
 	public void setSensorStationData(List<SensorStation> sensorStations, AccessPoint accessPoint)
 			throws ServiceException {
 		try {
+			System.out.println(sensorStations);
 			for (SensorStation sensorStation : sensorStations) {
 				SensorStation dbSensorStation =
 						sensorStationService.findByBdAddress(sensorStation.getBdAddress());
 				if (!dbSensorStation.isUnlocked())
 					throw new ServiceException("SensorStation is locked", 409);
 				sensorStationService.addSensorData(dbSensorStation, sensorStation.getSensorData());
+				dbSensorStation.setConnected(sensorStation.isConnected());
+				sensorStationService.save(dbSensorStation);
 			}
 			setLastConnection(accessPoint);
 		} catch (ServiceException s) {
@@ -261,6 +282,10 @@ public class AccessPointService {
 		}
 	}
 
+	/**
+	 * Set the last connection of the AccessPoint to now.
+	 * @param accesspoint
+	 */
 	public void setLastConnection(AccessPoint accesspoint) {
 		accesspoint.setLastConnection(LocalDateTime.now());
 		accesspoint.setConnected(true);
@@ -272,7 +297,8 @@ public class AccessPointService {
 	 * @param accessPointId
 	 * @throws ServiceException
 	 */
-	public void deleteAccessPoint(UUID accessPointId) throws ServiceException{
+	@AuditLogAnnotation(successMessage = "Deleted AccessPoint {accessPointId}")
+	public void deleteAccessPoint(UUID accessPointId) throws ServiceException {
 		Optional<AccessPoint> maybeAccessPoint = accessPointRepository.findById(accessPointId);
 		if (maybeAccessPoint.isEmpty()) {
 			throw new ServiceException("AccessPoint not found", 404);
@@ -289,5 +315,32 @@ public class AccessPointService {
 			sensorStationService.deleteSensorStation(sensorStation.getDeviceId());
 		}
 		accessPointRepository.save(accessPoint);
+	}
+
+	/**
+	 * Get all SensorStations of an AccessPoint
+	 * @param accessPointId
+	 * @throws ServiceException
+	 */
+	public List<SensorStation> getAccessPointSensorStations(UUID accessPointId)
+			throws ServiceException {
+		AccessPoint accessPoint = findById(accessPointId);
+		return accessPoint.getSensorStations();
+	}
+
+	/**
+	 * Set all new sensor stations of an access point to reported
+	 * @param accessPoints
+	 * @throws ServiceException
+	 */
+	public void setAccessPointSensorStationsReported(List<AccessPoint> accessPoints)
+			throws ServiceException {
+		for (AccessPoint accessPoint : accessPoints) {
+			for (SensorStation sensorStation : accessPoint.getSensorStations()) {
+				if (sensorStation.isReported()) continue;
+				sensorStation.setReported(true);
+				sensorStationService.save(sensorStation);
+			}
+		}
 	}
 }

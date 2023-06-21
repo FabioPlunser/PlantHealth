@@ -11,101 +11,91 @@ import {
   getSensorStationData,
   getSensorStationPictures,
   getSensorStationLimits,
+  setDates,
 } from "$helper/sensorStation";
 
 export async function load(event) {
   const { cookies, fetch } = event;
-
-  let cookieFrom = cookies.get("from") || "";
-  let cookieTo = cookies.get("to") || "";
-
-  let from: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  let to: Date = new Date(Date.now());
-
-  if (cookieFrom !== "" && cookieTo !== "") {
-    from = new Date(cookieFrom);
-    to = new Date(cookieTo);
-  }
-
-  let dates = {
-    from: from,
-    to: to,
-  };
-
+  let dates = setDates(event);
   //---------------------------------------------------------------------
-  // get all sensor stations available to add to dashboard
+  // get dashboard, assigned and added to dashboard sensor stations
   //---------------------------------------------------------------------
   let data = await fetch(`${BACKEND_URL}/get-dashboard`)
     .then(async (res) => {
       if (!res.ok) {
         errorHandler(
-          event.locals.user?.personId,
+          String(event.locals.user?.personId),
           "Error while fetching dashboard sensor stations",
           await res.json()
         );
+        throw error(res.status, {
+          message: "Error while fetching dashboard sensor stations",
+        });
       }
       return await res.json();
     })
-    .catch((e) => {
+    .catch((err) => {
       errorHandler(
-        event.locals.user?.personId,
+        String(event.locals.user?.personId),
         "Error while fetching dashboard sensor stations",
-        e
+        err
       );
-      throw error(500, "Error while fetching dashboard sensor stations");
+      throw error(500, {
+        message: "Error while fetching dashboard sensor stations",
+      });
     });
 
-  let dashBoardSensorStations = data?.addedSensorStations;
-  async function getDashBoardSensorStations(): Promise<any> {
+  let dashBoardSensorStations: SensorStationComponent[] =
+    data.addedSensorStations;
+  let assignedSensorStations: SensorStationDetailComponentInner[] =
+    data.assignedSensorStations;
+
+  async function getDashBoardSensorStations(): Promise<Dashboard> {
     return new Promise(async (resolve, reject) => {
-      if (dashBoardSensorStations.length == 0) resolve([]);
+      if (dashBoardSensorStations.length == 0) resolve({ sensorStations: [] });
       for (let sensorStation of dashBoardSensorStations) {
-        sensorStation.data = getSensorStationData(event, sensorStation, dates);
-        sensorStation.pictures = await getSensorStationPictures(
-          event,
-          sensorStation
-        );
+        if (!sensorStation.deleted) {
+          sensorStation.data = getSensorStationData(
+            event,
+            sensorStation,
+            dates
+          );
+          sensorStation.pictures = await getSensorStationPictures(
+            event,
+            sensorStation
+          );
+        } else {
+          sensorStation.data = null;
+          sensorStation.pictures = null;
+        }
       }
 
-      resolve(dashBoardSensorStations);
-    }).catch((e) => {
-      errorHandler(
-        event.locals.user?.personId,
-        "Error while fetching dashboard sensor stations",
-        e
-      );
-      return null;
+      resolve({ sensorStations: dashBoardSensorStations });
     });
   }
 
-  let assignedSensorStations = data?.assignedSensorStations;
-  async function getAssignedSensorStations(): Promise<any> {
+  async function getAssignedSensorStations(): Promise<
+    SensorStationDetailComponentInner[] | []
+  > {
     return new Promise(async (resolve, reject) => {
-      if (assignedSensorStations.length == 0)
-        reject("No assigned sensor stations found");
+      if (assignedSensorStations.length == 0) resolve([]);
       for (let assignedSensorStation of assignedSensorStations) {
-        assignedSensorStation.data = getSensorStationData(
-          event,
-          assignedSensorStation,
-          dates
-        );
-        assignedSensorStation.pictures = await getSensorStationPictures(
-          event,
-          assignedSensorStation
-        );
-        assignedSensorStation.limits = getSensorStationLimits(
-          event,
-          assignedSensorStation
-        );
+        if (!assignedSensorStation.deleted) {
+          assignedSensorStation.data = getSensorStationData(
+            event,
+            assignedSensorStation,
+            dates
+          );
+          assignedSensorStation.pictures = await getSensorStationPictures(
+            event,
+            assignedSensorStation
+          );
+        } else {
+          assignedSensorStation.data = null;
+          assignedSensorStation.pictures = null;
+        }
       }
       resolve(assignedSensorStations);
-    }).catch((e) => {
-      errorHandler(
-        event.locals.user?.personId ?? "unknown",
-        "Error while fetching dashboard sensor stations",
-        e
-      );
-      throw error(500, "Error while fetching dashboard sensor stations");
     });
   }
 

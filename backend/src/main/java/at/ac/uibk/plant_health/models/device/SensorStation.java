@@ -40,10 +40,14 @@ public class SensorStation extends Device implements Serializable {
 	@Column(name = "dip_switch_id", nullable = false)
 	private int dipSwitchId;
 
+	@JdbcTypeCode(SqlTypes.BOOLEAN)
+	@Column(name = "reported", nullable = false)
+	private boolean reported = false;
+
 	@JsonIgnore
 	@Fetch(FetchMode.SELECT)
 	@OneToOne()
-	@JoinColumn(name = "gardener_id", nullable = true)
+	@JoinColumn(name = "gardener_id")
 	private Person gardener = null;
 
 	@JsonIgnore
@@ -83,9 +87,9 @@ public class SensorStation extends Device implements Serializable {
 
 	@Override
 	public String toString() {
-		return "SensorStation [bdAddress=" + bdAddress + ", name=" + name
-				+ ", dipSwitchId=" + dipSwitchId + ", accessPoint=" + accessPoint
-				+ ", sensorStationPersonReferences=" + sensorStationPersonReferences + "]";
+		return "SensorStation [bdAddress=" + bdAddress + ", name=" + name + ", dipSwitchId="
+				+ dipSwitchId + ", accessPoint=" + accessPoint + ", sensorStationPersonReferences="
+				+ sensorStationPersonReferences + ", connected: " + isConnected() + "]";
 	}
 
 	@Override

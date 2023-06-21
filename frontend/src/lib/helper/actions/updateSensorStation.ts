@@ -13,6 +13,17 @@ const nameSchema = z.object({
     .trim(),
 });
 
+/**
+ * This is an async function that updates a sensor station with data from a form submission.
+ * @param {any} event - The event parameter is an object that contains information about the HTTP
+ * request that triggered the function, such as the request method, headers, and body.
+ * @param {any | undefined} formData - formData is an object that contains the data submitted through a
+ * form. In this case, it is being passed as a parameter to the updateSensorStation function and is
+ * used to extract the values of the form fields such as name and transferInterval. If formData is
+ * undefined, the function will use the request object
+ * @returns either a response with a status code of 400 and an error object containing validation
+ * errors, or it is returning a success message indicating that the sensor station was updated.
+ */
 export async function updateSensorStation(
   event: any,
   formData: any | undefined
@@ -32,6 +43,7 @@ export async function updateSensorStation(
   if (!zodData.success) {
     // Loop through the errors array and create a custom errors array
     const errors = zodData.error.errors.map((error) => {
+      toasts.addToast(event.locals.user?.personId, "error", error.message);
       return {
         field: error.path[0],
         message: error.message,
@@ -69,7 +81,6 @@ export async function updateSensorStation(
         message = data.message;
       }
       let data = await res.json();
-      console.log(data);
       toasts.addToast(
         event.locals.user?.personId,
         "success",

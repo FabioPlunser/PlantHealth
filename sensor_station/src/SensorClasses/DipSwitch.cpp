@@ -26,6 +26,11 @@ class DipSwitchClass {
 
 		~DipSwitchClass() { free(pins); }
 
+		/**
+		 * Returns the currently set dip switch value from the provided pins at
+		 * construction. If no dip switch is connected, the behavior is
+		 * undefined.
+		 */
 		uint64_t getdipSwitchValue() {
 			uint64_t currentStatus = 0;
 			for (int i = 0; i < this->pinArraySize; i++) {

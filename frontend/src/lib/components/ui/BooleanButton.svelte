@@ -1,6 +1,4 @@
 <script lang="ts">
-  import CheckRing from "$lib/assets/icons/checkRing.svg?component";
-
   export let text: string;
   export let bool: boolean;
   export let disabled: boolean;
@@ -24,7 +22,7 @@
   </div>
   <div>
     {#if bool}
-      <CheckRing class="fill-none" />
+      <span class="material-symbols-outlined"> check_circle </span>
     {/if}
   </div>
 </label>

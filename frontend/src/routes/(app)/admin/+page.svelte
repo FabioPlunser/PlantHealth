@@ -18,7 +18,7 @@
   });
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  let showSensorStationsModal = false;
+  let sensorStationModal = false;
   let infoBadges = [
     {
       icon: "bi bi-router-fill",
@@ -42,6 +42,18 @@
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   let searchTerm = "";
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+  let allSensorStations: Responses.SensorStationsInnerResponse[] | null = null;
+  let dashBoardSensorStations: SensorStationComponent[] | null = null;
+  $: {
+    data.streamed.dashBoardSensorStations.then((res) => {
+      dashBoardSensorStations = res.sensorStations;
+    });
+    data.streamed.allSensorStations.then((res) => {
+      allSensorStations = res.sensorStations;
+    });
+  }
 </script>
 
 {#if rendered}
@@ -61,31 +73,25 @@
       {/each}
     </div>
 
-    {#await data.streamed.allSensorStations}
-      <Spinner fill="fill-primary" />
-    {:then sensorStations}
-      <div>
-        <SensorStationsModal
-          data={sensorStations}
-          bind:showModal={showSensorStationsModal}
-          on:close={() => (showSensorStationsModal = false)}
-        />
-      </div>
-      <div class="flex justify-center mx-auto mt-2">
+    {#if allSensorStations}
+      <SensorStationsModal
+        data={allSensorStations}
+        bind:showModal={sensorStationModal}
+        on:close={() => (sensorStationModal = false)}
+      />
+
+      <div class="flex justify-center mt-4">
         <button
-          class="btn btn-primary flex justify-center"
-          on:click={() => (showSensorStationsModal = true)}
-          >SensorStation</button
+          class="btn btn-primary"
+          on:click={() => (sensorStationModal = true)}>SensorStations</button
         >
       </div>
-    {:catch error}
-      <p class="text-red">Something went wrong: {JSON.stringify(error)}</p>
-    {/await}
+    {:else}
+      <h1 class="flex justify-center">Something went wrong</h1>
+    {/if}
 
-    {#await data.streamed.dashboardSensorStations}
-      <Spinner fill="fill-primary" />
-    {:then sensorStations}
-      {#if sensorStations?.length === 0}
+    {#if dashBoardSensorStations}
+      {#if dashBoardSensorStations.length === 0}
         <h1
           class="text-2xl font-bold flex justify-center items-center my-auto mt-2"
         >
@@ -102,7 +108,7 @@
           />
         </div>
         <div class="grid grid-rows gap-2 mt-2">
-          {#each sensorStations as sensorStation, i (sensorStation.sensorStationId)}
+          {#each dashBoardSensorStations as sensorStation, i (sensorStation.sensorStationId)}
             {#if sensorStation.name.includes(searchTerm) || sensorStation.roomName.includes(searchTerm)}
               <div class="">
                 <SensorStation {sensorStation} dates={data.dates} />
@@ -111,8 +117,8 @@
           {/each}
         </div>
       {/if}
-    {:catch error}
-      <p class="text-red">Something went wrong: {JSON.stringify(error)}</p>
-    {/await}
+    {:else}
+      <h1 class="flex justify-center">Something went wrong</h1>
+    {/if}
   </section>
 {/if}

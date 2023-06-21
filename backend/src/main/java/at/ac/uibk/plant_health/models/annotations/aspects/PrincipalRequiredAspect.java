@@ -32,8 +32,7 @@ public class PrincipalRequiredAspect {
 											 .value();
 
 		Object principle = AuthContext.getPrincipal().orElse(null);
-		if (principle == null)
-			throw new AccessDeniedException("No Principle was found");
+		if (principle == null) throw new AccessDeniedException("No Principle was found");
 
 		if (requiredPrinciple.isAssignableFrom(principle.getClass())) {
 			Object[] args = jp.getArgs();

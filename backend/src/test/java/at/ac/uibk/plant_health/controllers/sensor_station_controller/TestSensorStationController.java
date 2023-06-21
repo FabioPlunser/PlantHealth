@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -37,7 +36,6 @@ import at.ac.uibk.plant_health.models.device.AccessPoint;
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.plant.Sensor;
 import at.ac.uibk.plant_health.models.plant.SensorData;
-import at.ac.uibk.plant_health.models.plant.SensorLimits;
 import at.ac.uibk.plant_health.models.plant.SensorStationPicture;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
@@ -107,6 +105,9 @@ public class TestSensorStationController {
 		accessPointService.register(selfAssignedId, "Office1");
 
 		AccessPoint accessPoint = accessPointService.findBySelfAssignedId(selfAssignedId);
+		accessPoint.setUnlocked(true);
+		accessPoint.setConnected(true);
+		accessPointService.save(accessPoint);
 
 		int sensorStationCount = 5;
 		for (int i = 0; i < sensorStationCount; i++) {
@@ -135,7 +136,7 @@ public class TestSensorStationController {
 						jsonPath("$.sensorStations.length()").value(sensorStations.size()),
 						jsonPath("$.sensorStations[0].sensorStationId").exists(),
 						jsonPath("$.sensorStations[0].roomName").exists(),
-						jsonPath("$.sensorStations[0].sensorStationName").exists()
+						jsonPath("$.sensorStations[0].name").exists()
 				);
 	}
 
@@ -199,7 +200,7 @@ public class TestSensorStationController {
 		accessPointService.foundNewSensorStation(accessPoint, List.of(sensorStation));
 
 		Map<String, String> sensorMap = new HashMap<>();
-		sensorMap.put("TEMPERATURE", "°C");
+		sensorMap.put("TEMPERATURE", "C");
 		sensorMap.put("HUMIDITY", "%");
 		sensorMap.put("PRESSURE", "hPa");
 		sensorMap.put("SOILHUMIDITY", "%");
@@ -343,7 +344,7 @@ public class TestSensorStationController {
 
 		// precondition sensorStation has at least one sensor
 		Map<String, String> sensorMap = new HashMap<>();
-		sensorMap.put("TEMPERATURE", "°C");
+		sensorMap.put("TEMPERATURE", "C");
 		sensorMap.put("HUMIDITY", "%");
 		sensorMap.put("PRESSURE", "hPa");
 		sensorMap.put("SOILHUMIDITY", "%");
@@ -411,7 +412,7 @@ public class TestSensorStationController {
 
 		// precondition sensorStation has at least one sensor
 		Map<String, String> sensorMap = new HashMap<>();
-		sensorMap.put("TEMPERATURE", "°C");
+		sensorMap.put("TEMPERATURE", "C");
 		sensorMap.put("HUMIDITY", "%");
 		sensorMap.put("PRESSURE", "hPa");
 		sensorMap.put("SOILHUMIDITY", "%");
@@ -476,7 +477,7 @@ public class TestSensorStationController {
 		sensorStation = sensorStationService.findByBdAddress(bdAddress);
 
 		Map<String, String> sensorMap = new HashMap<>();
-		sensorMap.put("TEMPERATURE", "°C");
+		sensorMap.put("TEMPERATURE", "C");
 		sensorMap.put("HUMIDITY", "%");
 		sensorMap.put("PRESSURE", "hPa");
 		sensorMap.put("SOILHUMIDITY", "%");

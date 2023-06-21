@@ -24,16 +24,27 @@ import at.ac.uibk.plant_health.models.rest_responses.*;
 import at.ac.uibk.plant_health.models.user.Permission;
 import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.service.SensorStationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @RestController
 public class SensorStationController {
 	@Autowired
 	private SensorStationService sensorStationService;
 
+	@Operation(summary = "Get all available sensor stations to be added to dashboard")
+	@ApiResponse(
+			responseCode = "200", description = "Successfully retrieved sensor station data",
+			content = @Content(schema = @Schema(implementation = SensorStationsResponse.class))
+	)
+	@ReadOperation
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER, Permission.USER})
 	@PrincipalRequired(Person.class)
 	@GetMapping("/get-sensor-stations")
-	public RestResponseEntity getSensorStations(Person person) {
+	public RestResponseEntity
+	getSensorStations(Person person) {
 		try {
 			return new SensorStationsResponse(sensorStationService.findAll(), person).toEntity();
 		} catch (ServiceException e) {
@@ -44,9 +55,16 @@ public class SensorStationController {
 		}
 	}
 
+	@Operation(summary = "Get all sensor stations")
+	@ApiResponse(
+			responseCode = "200", description = "Successfully retrieved sensor station data",
+			content = @Content(schema = @Schema(implementation = AdminSensorStationsResponse.class))
+	)
+	@ReadOperation
 	@AnyPermission({Permission.ADMIN})
 	@GetMapping("/get-all-sensor-stations")
-	public RestResponseEntity getAllSensorStations() {
+	public RestResponseEntity
+	getAllSensorStations() {
 		try {
 			return new AdminSensorStationsResponse(sensorStationService.findAll()).toEntity();
 		} catch (ServiceException e) {
@@ -56,14 +74,21 @@ public class SensorStationController {
 					.toEntity();
 		}
 	}
+	@Operation(summary = "Get sensor station by id")
+	@ApiResponse(
+			responseCode = "200", description = "Successfully retrieved sensor station data",
+			content = @Content(schema = @Schema(implementation = SensorStationDetailResponse.class))
+	)
+	@ReadOperation
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
 	@PrincipalRequired(Person.class)
 	@GetMapping("/get-sensor-station")
-	public RestResponseEntity getSensorStation(
-			Person person, @RequestParam("sensorStationId") final UUID sensorStationId
-	) {
+	public RestResponseEntity
+	getSensorStation(Person person, @RequestParam("sensorStationId") final UUID sensorStationId) {
 		try {
-			return new SensorStationResponse(sensorStationService.findById(sensorStationId), person)
+			return new SensorStationDetailResponse(
+						   sensorStationService.findById(sensorStationId), person
+			)
 					.toEntity();
 		} catch (ServiceException e) {
 			return MessageResponse.builder()
@@ -72,10 +97,17 @@ public class SensorStationController {
 					.toEntity();
 		}
 	}
+
+	@Operation(summary = "Get sensor station by id")
+	@ApiResponse(
+			responseCode = "200", description = "Successfully retrieved sensor station data",
+			content = @Content(schema = @Schema(implementation = SensorStationPublicInfo.class))
+	)
+	@ReadOperation
 	@PublicEndpoint
 	@GetMapping("/get-sensor-station-info")
-	public RestResponseEntity getSensorStationInfo(@RequestParam("sensorStationId"
-	) final UUID sensorStationId) {
+	public RestResponseEntity
+	getSensorStationInfo(@RequestParam("sensorStationId") final UUID sensorStationId) {
 		try {
 			sensorStationService.findById(sensorStationId);
 		} catch (ServiceException e) {
@@ -89,6 +121,12 @@ public class SensorStationController {
 				.toEntity();
 	}
 
+	@Operation(summary = "Set unlock status of sensor station")
+	@ApiResponse(
+			responseCode = "200", description = "Successfully set unlock status of sensor station",
+			content = @Content(schema = @Schema(implementation = MessageResponse.class))
+	)
+	@WriteOperation
 	@AnyPermission(Permission.ADMIN)
 	@RequestMapping(
 			value = "/set-unlocked-sensor-station", method = {RequestMethod.POST, RequestMethod.PUT}
@@ -111,6 +149,12 @@ public class SensorStationController {
 		return MessageResponse.builder().statusCode(200).toEntity();
 	}
 
+	@Operation(summary = "Update sensor station name and transfer interval")
+	@ApiResponse(
+			responseCode = "200", description = "Successfully updated sensor station",
+			content = @Content(schema = @Schema(implementation = MessageResponse.class))
+	)
+	@WriteOperation
 	@AnyPermission({Permission.GARDENER, Permission.ADMIN})
 	@PrincipalRequired(Person.class)
 	@RequestMapping(
@@ -140,11 +184,18 @@ public class SensorStationController {
 				.toEntity();
 	}
 
+	@Operation(summary = "Assign gardener to sensor station")
+	@ApiResponse(
+			responseCode = "200", description = "Successfully assigned gardener to sensor station",
+			content = @Content(schema = @Schema(implementation = MessageResponse.class))
+	)
+	@WriteOperation
 	@AnyPermission(Permission.ADMIN)
 	@PostMapping("/assign-gardener-to-sensor-station")
-	public RestResponseEntity assignGardenerToSensorStation(
+	public RestResponseEntity
+	assignGardenerToSensorStation(
 			@RequestParam("sensorStationId") final UUID sensorStationId,
-			@RequestParam("gardenerId") final UUID gardenerId,
+			@RequestParam(value = "gardenerId", required = false) final UUID gardenerId,
 			@RequestParam(value = "delete", required = false) final boolean delete
 	) {
 		try {
@@ -163,10 +214,17 @@ public class SensorStationController {
 		}
 	}
 
+	@Operation(summary = "Get sensor station data")
+	@ApiResponse(
+			responseCode = "200", description = "Successfully retrieved sensor station data",
+			content = @Content(schema = @Schema(implementation = SensorStationDataResponse.class))
+	)
+	@ReadOperation
 	@AnyPermission({Permission.GARDENER, Permission.ADMIN, Permission.USER})
 	@PrincipalRequired(Person.class)
 	@GetMapping("/get-sensor-station-data")
-	public RestResponseEntity getSensorStationData(
+	public RestResponseEntity
+	getSensorStationData(
 			Person person, @RequestParam("sensorStationId") final UUID sensorStationId,
 			@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") @RequestParam("from"
 			) final LocalDateTime from,
@@ -187,6 +245,11 @@ public class SensorStationController {
 		}
 	}
 
+	@Operation(summary = "Upload sensor station picture")
+	@ApiResponse(
+			responseCode = "200", description = "Successfully uploaded sensor station picture",
+			content = @Content(schema = @Schema(implementation = MessageResponse.class))
+	)
 	@PublicEndpoint
 	@WriteOperation
 	@RequestMapping(
@@ -211,11 +274,16 @@ public class SensorStationController {
 		return MessageResponse.builder().statusCode(200).toEntity();
 	}
 
+	@Operation(summary = "Get sensor station pictures")
+	@ApiResponse(
+			responseCode = "200", description = "Successfully retrieved sensor station pictures",
+			content = @Content(schema = @Schema(implementation = PlantPicturesResponse.class))
+	)
 	@PublicEndpoint
 	@ReadOperation
 	@GetMapping("/get-sensor-station-pictures")
-	public RestResponseEntity getSensorStationPictures(@RequestParam("sensorStationId"
-	) final UUID sensorStationId) {
+	public RestResponseEntity
+	getSensorStationPictures(@RequestParam("sensorStationId") final UUID sensorStationId) {
 		try {
 			sensorStationService.findById(sensorStationId);
 			return new PlantPicturesResponse(
@@ -232,6 +300,11 @@ public class SensorStationController {
 		}
 	}
 
+	@Operation(summary = "Get sensor station picture")
+	@ApiResponse(
+			responseCode = "200", description = "Successfully retrieved sensor station picture",
+			content = @Content(schema = @Schema(implementation = byte[].class))
+	)
 	@PublicEndpoint
 	@ReadOperation
 	@GetMapping(
@@ -256,6 +329,12 @@ public class SensorStationController {
 		}
 	}
 
+	@Operation(summary = "Get newest sensor station picture")
+	@ApiResponse(
+			responseCode = "200",
+			description = "Successfully retrieved newest sensor station picture",
+			content = @Content(schema = @Schema(implementation = byte[].class))
+	)
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER, Permission.USER})
 	@ReadOperation
 	@GetMapping(
@@ -283,11 +362,16 @@ public class SensorStationController {
 		}
 	}
 
+	@Operation(summary = "Delete sensor station picture")
+	@ApiResponse(
+			responseCode = "200", description = "Successfully deleted sensor station picture",
+			content = @Content(schema = @Schema(implementation = MessageResponse.class))
+	)
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
 	@WriteOperation
 	@PostMapping("/delete-sensor-station-picture")
-	public RestResponseEntity deleteSensorStationPicture(@RequestParam("pictureId"
-	) final UUID pictureId) {
+	public RestResponseEntity
+	deleteSensorStationPicture(@RequestParam("pictureId") final UUID pictureId) {
 		try {
 			sensorStationService.deletePicture(pictureId);
 		} catch (ServiceException e) {
@@ -303,11 +387,16 @@ public class SensorStationController {
 				.toEntity();
 	}
 
+	@Operation(summary = "Delete all sensor station pictures")
+	@ApiResponse(
+			responseCode = "200", description = "Successfully deleted all sensor station pictures",
+			content = @Content(schema = @Schema(implementation = MessageResponse.class))
+	)
 	@AnyPermission({Permission.ADMIN, Permission.GARDENER})
 	@WriteOperation
 	@PostMapping("/delete-all-sensor-station-pictures")
-	public RestResponseEntity deleteAllSensorStationPictures(@RequestParam("sensorStationId"
-	) final UUID sensorStationId) {
+	public RestResponseEntity
+	deleteAllSensorStationPictures(@RequestParam("sensorStationId") final UUID sensorStationId) {
 		try {
 			sensorStationService.findById(sensorStationId);
 			sensorStationService.deleteAllPictures(sensorStationId);
@@ -324,11 +413,16 @@ public class SensorStationController {
 				.toEntity();
 	}
 
+	@Operation(summary = "Delete sensor station")
+	@ApiResponse(
+			responseCode = "200", description = "Successfully deleted sensor station",
+			content = @Content(schema = @Schema(implementation = MessageResponse.class))
+	)
 	@AnyPermission({Permission.ADMIN})
 	@WriteOperation
 	@DeleteMapping("/delete-sensor-station")
-	public RestResponseEntity deleteSensorStation(@RequestParam("sensorStationId"
-	) final UUID sensorStationId) {
+	public RestResponseEntity
+	deleteSensorStation(@RequestParam("sensorStationId") final UUID sensorStationId) {
 		try {
 			sensorStationService.deleteSensorStation(sensorStationId);
 		} catch (ServiceException e) {

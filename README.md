@@ -54,7 +54,13 @@ For an overview of the system see the corresponding [Wiki](https://git.uibk.ac.a
 
 - **Sensorstation:**
     - The sensorstation is an Arduino 33 BLE that is programmed using [Platform IO](https://platformio.org/).
-	
+
+## Source Code Documentation
+
+    - Frontend: Directly in code, no automatic documentation tools available due to relatively new SvelteKit framework
+    - Backend: See [backend/docs](https://git.uibk.ac.at/informatik/qe/swess23/group1/g1t1/-/tree/main/backend/docs)
+    - Accesspoint: See artifacts of latest successfull [CI/CD pipeline](https://git.uibk.ac.at/informatik/qe/swess23/group1/g1t1/-/pipelines)
+    - Sensorstation: See [sensorstation/docs](https://git.uibk.ac.at/informatik/qe/swess23/group1/g1t1/-/tree/main/sensor_station/docs)
 
 ## License
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { enhance, type SubmitFunction } from "$app/forms";
+  import { enhance } from "$app/forms";
   import Spinner from "$components/ui/Spinner.svelte";
   //--------------------------------------------
   //--------------------------------------------
@@ -18,7 +18,7 @@
   }
   //--------------------------------------------
   //--------------------------------------------
-  const addPicture: SubmitFunction = () => {
+  const addPicture = () => {
     submitting = true;
 
     return async ({ update }) => {
@@ -38,7 +38,11 @@
   >
     <input type="hidden" name="sensorStationId" value={sensorStationId} />
     <div>
-      <label for="file-input" data-tip="Upload Image" class="tooltip">
+      <label
+        for="file-input"
+        data-tip="Upload Image"
+        class="tooltip tooltip-primary"
+      >
         <i
           class="bi bi-camera-fill text-4xl btn btn-primary hover:text-black"
         />

@@ -2,11 +2,11 @@ package at.ac.uibk.plant_health.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 import at.ac.uibk.plant_health.models.SensorStationPersonReference;
+import at.ac.uibk.plant_health.models.annotations.AuditLogAnnotation;
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.exceptions.ServiceException;
 import at.ac.uibk.plant_health.models.user.Person;
@@ -29,7 +29,6 @@ public class SensorStationPersonReferenceService {
 	@Autowired
 	private SensorStationRepository sensorStationRepository;
 
-	//	@Transactional
 	public void addPlantToDashboard(Person person, SensorStation sensorStation)
 			throws ServiceException {
 		if (person == null || sensorStation == null)
@@ -63,7 +62,6 @@ public class SensorStationPersonReferenceService {
 		}
 	}
 
-	//	@Transactional
 	public void removePlantFromDashboard(Person person, SensorStation sensorStation)
 			throws ServiceException {
 		if (person == null || sensorStation == null)

@@ -1,6 +1,8 @@
 #ifndef GENERAL_PURPOSE_DEFINITIONS
 #define GENERAL_PURPOSE_DEFINITIONS
 
+#include "NoteFrequenzies.h"
+
 #define TRUE			  1
 #define FALSE			  0
 
@@ -16,7 +18,7 @@
  * 3 -> Even more notifications. (Not used so far)
  * 4 -> Full call stack of every function call. (Not implemented so far)
  */
-#define DEBUG_PRINT_LEVEL 0
+#define DEBUG_PRINT_LEVEL 2
 
 /* If DO_HARDWARE_TEST is defined the hardware tests will be executet to test
  all the connected devices of the Arduino. Otherwise the main programm will be
@@ -161,32 +163,48 @@
 
 #define PIEZO_BUZZER_TONE_INTERVALL_MS		   15'000
 #define PIEZO_BUZZER_TONE_DURATION_MS		   100
-#define PIEZO_BUZZER_TONE_FREQUENCY_HZ		   3'000
+#define PIEZO_BUZZER_TONE_FREQUENCY_HZ		   NOTE_G7
+
+// ----------------------------
+// |    Melody definitions    |
+// ----------------------------
+// Expected in the shape of a 2D array, where the first dimension is the
+// frequenzy in Hz and the second the duration in ms.
+
+#define MELODY_PAIRING_SUCCESSFUL        \
+	{                                    \
+		{NOTE_C4, 500}, { NOTE_G4, 500 } \
+	}
+
+#define MELODY_STARTUP   \
+	{                    \
+		{ NOTE_G5, 500 } \
+	}
 
 // ---------------------
 // |    Pin Mapping    |
 // ---------------------
 
-#define PIN_PHOTOTRANSISTOR					   A0
-#define PIN_HYDROMETER						   A1
-#define PIN_PIEZO_BUZZER					   A2
-#define PIN_RGB_RED							   A3
-#define PIN_SDA								   A4
-#define PIN_SCL								   A5
-#define PIN_RGB_BLUE						   A6
-#define PIN_RGB_GREEN						   A7
+#define PIN_PHOTOTRANSISTOR A0
+#define PIN_HYDROMETER		A1
+#define PIN_PIEZO_BUZZER	A2
+#define PIN_RGB_RED			A3
+#define PIN_SDA				A4
+#define PIN_SCL				A5
+#define PIN_RGB_BLUE		A6
+#define PIN_RGB_GREEN		A7
 
-#define PIN_DIP_8							   D12 // Lowest
-#define PIN_DIP_7							   D11
-#define PIN_DIP_6							   D10
-#define PIN_DIP_5							   D9
-#define PIN_DIP_4							   D8
-#define PIN_DIP_3							   D7
-#define PIN_DIP_2							   D6
-#define PIN_DIP_1							   D5 // Highest
+#define PIN_DIP_8			D12 // Lowest
+#define PIN_DIP_7			D11
+#define PIN_DIP_6			D10
+#define PIN_DIP_5			D9
+#define PIN_DIP_4			D8
+#define PIN_DIP_3			D7
+#define PIN_DIP_2			D6
+#define PIN_DIP_1			D5 // Highest
 
-#define PIN_BUTTON_1						   D4 // L
-#define PIN_BUTTON_2						   D3 // M
-#define PIN_BUTTON_3						   D2 // R
+#define PIN_BUTTON_1		D4 // L
+#define PIN_BUTTON_2		D3 // M
+#define PIN_BUTTON_3		D2 // R
 
 #endif

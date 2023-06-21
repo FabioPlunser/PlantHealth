@@ -5,7 +5,7 @@ import { z } from "zod";
 import { logger } from "$helper/logger";
 import { toasts } from "$lib/stores/toastStore";
 
-let personId: string;
+let personId: string | undefined;
 let source: string | null;
 
 /**
@@ -69,7 +69,7 @@ export async function load(event) {
         });
       });
   } else {
-    permissions.forEach((permission) => {
+    permissions.forEach((permission: any) => {
       userPermissions[permission.toLowerCase()] = true;
     });
   }
@@ -156,6 +156,13 @@ export const actions = {
         }
       }
     });
+
+    // NOTE: Cancel submit if no role was selected
+    if (permissions.length < 1) {
+      toasts.addToast(event.locals.user?.personId, "error", "No role selected");
+      return;
+    }
+
     let username = String(formData.get("username"));
     let email = String(formData.get("email"));
     let password = String(formData.get("password"));
@@ -165,7 +172,7 @@ export const actions = {
       personId !== event.locals.user?.personId;
 
     let params = new URLSearchParams();
-    params.set("personId", personId);
+    params.set("personId", personId ?? ""); // NOTE: if personId is not present pass empty string to fail fetch
     params.set("username", username);
 
     if (canActiveUserChangeRoles) {
@@ -212,7 +219,6 @@ export const actions = {
           logger.info("Updated user: " + JSON.stringify(data.message));
         });
     } else {
-      console.log("FETCH USER" + parametersString);
       await fetch(`${BACKEND_URL}/update-settings` + parametersString, {
         method: "POST",
       })

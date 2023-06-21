@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import at.ac.uibk.plant_health.models.annotations.AuditLogAnnotation;
 import at.ac.uibk.plant_health.models.device.SensorStation;
 import at.ac.uibk.plant_health.models.exceptions.ServiceException;
 import at.ac.uibk.plant_health.models.plant.Sensor;
@@ -80,7 +81,6 @@ public class SensorStationService {
 				this.sensorStationRepository.findByBdAddress(bdAddress);
 		return maybeSensorStation.orElse(null);
 	}
-
 	public SensorStation save(SensorStation sensorStation) throws ServiceException {
 		try {
 			return sensorStationRepository.save(sensorStation);
@@ -96,7 +96,11 @@ public class SensorStationService {
 	 * @return
 	 * @throws ServiceException
 	 */
-	public void setUnlocked(boolean unlocked, UUID sensorStationId) throws ServiceException {
+	@AuditLogAnnotation(
+			successMessage = "Set Lock on Sensor Station {sensorStationId} to {unlocked}"
+	)
+	public void
+	setUnlocked(boolean unlocked, UUID sensorStationId) throws ServiceException {
 		SensorStation sensorStation = findById(sensorStationId);
 		sensorStation.setUnlocked(unlocked);
 		save(sensorStation);
@@ -108,10 +112,12 @@ public class SensorStationService {
 	 * @param sensorStation
 	 * @return
 	 */
-	@Transactional
-	public void setSensorLimits(
-			List<SensorLimits> sensorLimits, SensorStation sensorStation, Person person
-	) throws ServiceException {
+	@AuditLogAnnotation(
+			successMessage = "Set Sensor Limits on Sensor Station {sensorStation.deviceId}"
+	)
+	public void
+	setSensorLimits(List<SensorLimits> sensorLimits, SensorStation sensorStation, Person person)
+			throws ServiceException {
 		if (!sensorStation.isUnlocked()) throw new ServiceException("SensorStation is locked", 403);
 		if (sensorStation.isDeleted()) throw new ServiceException("SensorStation is deleted", 403);
 		for (SensorLimits limit : sensorLimits) {
@@ -122,7 +128,7 @@ public class SensorStationService {
 				);
 			Sensor sensor = maybeSensor.get();
 			SensorLimits newLimit = new SensorLimits(
-					LocalDateTime.now(), limit.getLowerLimit(), limit.getUpperLimit(),
+					LocalDateTime.now(), limit.getUpperLimit(), limit.getLowerLimit(),
 					limit.getThresholdDuration(), sensor, person, sensorStation
 			);
 			try {
@@ -138,9 +144,12 @@ public class SensorStationService {
 	 * @param sensorStation
 	 * @param name
 	 */
-	public void updateSensorStation(
-			SensorStation sensorStation, String name, Integer transferInterval
-	) {
+	@AuditLogAnnotation(
+			successMessage =
+					"Updated Sensor Station {sensorStation.deviceId}: {name} {transferInterval}"
+	)
+	public void
+	updateSensorStation(SensorStation sensorStation, String name, Integer transferInterval) {
 		if (!Objects.isNull(name)) {
 			sensorStation.setName(name);
 		}
@@ -150,14 +159,19 @@ public class SensorStationService {
 		save(sensorStation);
 	}
 
-	public void assignGardenerToSensorStation(
-			SensorStation sensorStation, UUID personId, boolean delete
-	) throws ServiceException {
+	@AuditLogAnnotation(
+			successMessage =
+					"Assigned Gardener {personId} to Sensor Station {sensorStation.deviceId}"
+	)
+	public void
+	assignGardenerToSensorStation(SensorStation sensorStation, UUID personId, boolean delete)
+			throws ServiceException {
 		if (delete) {
 			sensorStation.setGardener(null);
 			save(sensorStation);
 			return;
 		}
+		if (personId == null) throw new ServiceException("No personId was given", 404);
 		Optional<Person> maybePerson = personService.findById(personId);
 		if (maybePerson.isEmpty()) throw new ServiceException("Person does not exist", 404);
 		Person person = maybePerson.get();
@@ -269,7 +283,7 @@ public class SensorStationService {
 				new ArrayList<>(sensorStation.getSensorStationPictures());
 		try {
 			for (SensorStationPicture picture : pictures) {
-				savePicture(picture);
+				deletePicture(picture);
 
 				sensorStation.getSensorStationPictures().remove(picture);
 			}
@@ -279,7 +293,11 @@ public class SensorStationService {
 		}
 	}
 
-	private void savePicture(SensorStationPicture picture) {
+	/**
+	 * Save picture to database and delete it from server
+	 * @param picture
+	 */
+	private void deletePicture(SensorStationPicture picture) {
 		try {
 			Path path = Paths.get(picture.getPicturePath());
 			Files.delete(path);
@@ -290,6 +308,12 @@ public class SensorStationService {
 		}
 	}
 
+	/**
+	 * Add sensor data to sensor station
+	 * @param sensorStation
+	 * @param data
+	 * @throws ServiceException
+	 */
 	public void addSensorData(SensorStation sensorStation, SensorData data)
 			throws ServiceException {
 		if (data == null || sensorStation == null) throw new ServiceException("Invalid data", 400);
@@ -306,6 +330,12 @@ public class SensorStationService {
 		this.sensorDataRepository.save(data);
 	}
 
+	/**
+	 * Add multiple sensor data to sensor station
+	 * @param sensorStation
+	 * @param dataList
+	 * @throws ServiceException
+	 */
 	public void addSensorData(SensorStation sensorStation, List<SensorData> dataList)
 			throws ServiceException {
 		if (dataList == null || sensorStation == null)
@@ -320,6 +350,11 @@ public class SensorStationService {
 		}
 	}
 
+	/**
+	 * Check if sensor station is deleted
+	 * @param sensorStation
+	 * @throws ServiceException
+	 */
 	public void isDeleted(SensorStation sensorStation) throws ServiceException {
 		if (sensorStation.isDeleted()) {
 			throw new ServiceException("Sensor station is deleted", 400);
@@ -328,10 +363,10 @@ public class SensorStationService {
 
 	/**
 	 * Deletes a sensor station
-	 *
 	 * @param sensorStationId
 	 * @throws ServiceException
 	 */
+	@AuditLogAnnotation(successMessage = "Deleted Sensor Station {sensorStationId}")
 	public void deleteSensorStation(UUID sensorStationId) throws ServiceException {
 		Optional<SensorStation> maybeSensorStation =
 				sensorStationRepository.findById(sensorStationId);

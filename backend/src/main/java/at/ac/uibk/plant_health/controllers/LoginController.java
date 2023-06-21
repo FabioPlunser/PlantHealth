@@ -18,6 +18,10 @@ import at.ac.uibk.plant_health.models.rest_responses.MessageResponse;
 import at.ac.uibk.plant_health.models.rest_responses.RestResponseEntity;
 import at.ac.uibk.plant_health.models.user.Person;
 import at.ac.uibk.plant_health.service.PersonService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 /**
  * Controller handling the login-, and logout-process.
@@ -57,10 +61,16 @@ public class LoginController {
 	 * @return A Token if the user credentials are correct, otherwise an
 	 *     error.
 	 */
+	@Operation(summary = "Login")
+	@ApiResponse(
+			responseCode = "200", description = "Login successful",
+			content = @Content(schema = @Schema(implementation = LoginResponse.class))
+	)
 	@WriteOperation
 	@PublicEndpoint
 	@PostMapping(value = LOGIN_ENDPOINT)
-	public RestResponseEntity loginPost(
+	public RestResponseEntity
+	loginPost(
 			@RequestParam("username") final String username,
 			@RequestParam("password") final String password
 	) {

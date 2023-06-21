@@ -5,6 +5,10 @@
 
 #include <Arduino.h>
 
+/**
+ * A class for a notification with a priority and simple methods to get the
+ * priority and the type of the notification.
+ */
 class Notification {
 	public:
 		enum NotificationType {
@@ -35,6 +39,11 @@ class Notification {
 				   this->priority == other.priority;
 		}
 
+		/**
+		 * Compares two notifications. If the notification types are different
+		 * they are sorted by their notification type. If the notification types
+		 * are the same they are sorted by their priority.
+		 */
 		bool operator<(const Notification & other) const {
 			if (this == &other) {
 				return false;
@@ -55,7 +64,9 @@ class Notification {
 			}
 			return *this;
 		}
-
+		/**
+		 * Comparator struct for the priority queue to sort the notifications
+		 */
 		struct NotificationLessComparator {
 				bool
 				operator()(const Notification * fst, const Notification * snd) {

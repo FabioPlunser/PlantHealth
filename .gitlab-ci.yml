@@ -1,6 +1,7 @@
 stages: # List of stages for jobs, and their order of execution
   - pythonTests
   - pythonSonarCheck
+  - pythonDoc
   - javaTest
   - javaSonarCheck
 
@@ -53,6 +54,24 @@ pythonSonarCheck-job:
     - dev-access_point
     - dev
 
+pythonDoc-job:
+  stage: pythonDoc
+  image:
+    name: alpine:3.17
+  script:
+    - apk add --no-cache python3 py3-pip
+    - cd access_point
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - pip install wheel
+    - pip install -r requirements.txt
+    - sphinx-apidoc -o docs/source .
+    - cd docs
+    - sphinx-build -b html ./source ./build
+  artifacts:
+    paths:
+    - ./access_point/docs/build
+
 javaTest-job: # This job runs in the test stage.
   image: alpine:3.17
   extends: .before_script_template
@@ -77,7 +96,7 @@ javaSonarCheck-job:
     - echo "Installing node.js..."
     - apk add --update nodejs
     - echo Running sonar analysis for ${SONAR_PROJECT_KEY}
-    - cd backend && mvn -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.projectName="${CI_PROJECT_NAME} ${GITLAB_USER_NAME}" --fail-at-end verify sonar:sonar
+    - cd backend && mvn -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.projectName="${CI_PROJECT_NAME} ${GITLAB_USER_NAME}" -Dsonar.exclusions=**/DumpConfig.java --fail-at-end verify sonar:sonar
   allow_failure: true
   only:
     - dev-backend

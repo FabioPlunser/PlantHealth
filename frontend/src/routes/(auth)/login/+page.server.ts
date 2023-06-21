@@ -55,7 +55,7 @@ export const actions = {
 
     let data = await res.json();
     let username = formData.get("username") || "";
-    let newUser: User = {
+    let newUser = {
       personId: data.personId,
       username: username.toString(),
       permissions: data.permissions,

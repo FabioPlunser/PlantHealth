@@ -11,6 +11,8 @@ import at.ac.uibk.plant_health.config.jwt_authentication.authentication_types.Ac
 import at.ac.uibk.plant_health.config.jwt_authentication.authentication_types.SensorStationAuthentication;
 import at.ac.uibk.plant_health.config.jwt_authentication.authentication_types.TokenAuthentication;
 import at.ac.uibk.plant_health.config.jwt_authentication.authentication_types.UserAuthentication;
+import at.ac.uibk.plant_health.models.Log;
+import at.ac.uibk.plant_health.models.annotations.AuditLogAnnotation;
 import at.ac.uibk.plant_health.repositories.AccessPointRepository;
 import at.ac.uibk.plant_health.repositories.SensorStationRepository;
 
@@ -28,15 +30,17 @@ public class LoginService {
 	public Optional<UserDetails> login(TokenAuthentication token) {
 		Optional<UserDetails> retVal;
 		if (token instanceof UserAuthentication userAuthentication) {
-			retVal = personService.findByUsernameAndToken(
-					userAuthentication.getUsername(), userAuthentication.getToken()
-			).map(p -> p);
+			retVal = personService
+							 .findByUsernameAndToken(
+									 userAuthentication.getUsername(), userAuthentication.getToken()
+							 )
+							 .map(p -> p);
 		} else if (token instanceof AccessPointAuthentication accessPointAuthentication) {
 			retVal = accessPointRepository.findByAccessToken(accessPointAuthentication.getToken())
-					.map(a -> a);
+							 .map(a -> a);
 		} else if (token instanceof SensorStationAuthentication sensorStationAuthentication) {
 			retVal = sensorStationRepository.findById(sensorStationAuthentication.getToken())
-					.map(s -> s);
+							 .map(s -> s);
 		} else {
 			throw new InsufficientAuthenticationException("Internal Error!");
 		}

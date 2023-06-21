@@ -9,6 +9,7 @@ import {
   getAllSensorStations,
   getSensorStationData,
   getSensorStationPictures,
+  setDates,
 } from "$helper/sensorStation";
 
 /**
@@ -17,28 +18,7 @@ import {
  * @returns
  */
 export async function load(event) {
-  const { cookies, fetch } = event;
-
-  //---------------------------------------------------------------------
-  /**
-   * Check if any date is set if not set default to last 7 days
-   */
-  //---------------------------------------------------------------------
-  let cookieFrom = cookies.get("from") || "";
-  let cookieTo = cookies.get("to") || "";
-
-  let from: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  let to: Date = new Date(Date.now());
-
-  if (cookieFrom !== "" && cookieTo !== "") {
-    from = new Date(cookieFrom);
-    to = new Date(cookieTo);
-  }
-
-  let dates = {
-    from: from,
-    to: to,
-  };
+  const { fetch } = event;
   //---------------------------------------------------------------------
   // get all sensor stations in dashboard
   //---------------------------------------------------------------------
@@ -72,52 +52,37 @@ export async function load(event) {
       });
     });
 
-  async function getDashBoardSensorStations(): Promise<any> {
+  async function getDashBoardSensorStations(): Promise<Dashboard> {
     return new Promise(async (resolve, reject) => {
-      let sensorStations = await fetch(`${BACKEND_URL}/get-dashboard`).then(
-        async (res) => {
-          if (!res.ok) {
-            errorHandler(
-              String(event.locals.user?.personId),
-              "Error while fetching dashboard sensor stations",
-              await res.json()
-            );
-            reject(null);
-            throw error(res.status, {
-              message: "Error while fetching dashboard sensor stations",
-            });
-          }
-          let data = await res.json();
-          return data?.sensorStations;
-        }
-      );
-
-      for (let sensorStation of sensorStations) {
+      let res = await fetch(`${BACKEND_URL}/get-dashboard`);
+      if (!res.ok) {
+        errorHandler(
+          event.locals.user?.personId,
+          "Error while fetching dashboard sensor stations",
+          await res.json()
+        );
+      }
+      let data = await res.json();
+      let dashBoardSensorStations = data.sensorStations;
+      if (dashBoardSensorStations.length == 0) resolve({ sensorStations: [] });
+      for (let sensorStation of dashBoardSensorStations) {
         sensorStation.data = getSensorStationData(event, sensorStation, dates);
         sensorStation.pictures = await getSensorStationPictures(
           event,
           sensorStation
         );
       }
-      resolve(sensorStations);
-    }).catch((err) => {
-      errorHandler(
-        String(event.locals.user?.personId),
-        "Error while fetching dashboard sensor stations",
-        err
-      );
-      throw error(500, {
-        message: "Error while fetching dashboard sensor stations",
-      });
+      resolve({ sensorStations: dashBoardSensorStations });
     });
   }
 
+  let dates = setDates(event);
   return {
     dates,
     numbers,
     streamed: {
       allSensorStations: getAllSensorStations(event),
-      dashboardSensorStations: getDashBoardSensorStations(),
+      dashBoardSensorStations: getDashBoardSensorStations(),
     },
   };
 }
@@ -130,6 +95,7 @@ import {
   addToDashboard,
   removeFromDashboard,
   updateFromTo,
+  uploadPicture,
 } from "$helper/actions";
 
 export const actions = {
@@ -147,5 +113,11 @@ export const actions = {
   //---------------------------------------------------------------------
   updateFromTo: async (event) => {
     await updateFromTo(event);
+  },
+  //---------------------------------------------------------------------
+  //
+  //---------------------------------------------------------------------
+  uploadPicture: async (event) => {
+    await uploadPicture(event);
   },
 };
