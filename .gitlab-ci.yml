@@ -27,7 +27,7 @@ pythonTests-job:
     - coverage xml
   allow_failure: true
   only:
-    - dev-access_point
+    - main
     - dev
 
 pythonSonarCheck-job:
@@ -51,7 +51,7 @@ pythonSonarCheck-job:
       -Dsonar.python.coverage.reportPaths=access_point/coverage.xml
   allow_failure: true
   only:
-    - dev-access_point
+    - main
     - dev
 
 pythonDoc-job:
@@ -71,6 +71,9 @@ pythonDoc-job:
   artifacts:
     paths:
     - ./access_point/docs/build
+  only:
+    - main
+    - dev
 
 javaTest-job: # This job runs in the test stage.
   image: alpine:3.17
@@ -80,6 +83,9 @@ javaTest-job: # This job runs in the test stage.
     - echo "Running unit tests..."
     - cd backend && mvn test
   allow_failure: true
+  only:
+    - main
+    - dev
 
 javaSonarCheck-job:
   image: alpine:3.17
@@ -99,5 +105,5 @@ javaSonarCheck-job:
     - cd backend && mvn -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.projectName="${CI_PROJECT_NAME} ${GITLAB_USER_NAME}" -Dsonar.exclusions=**/DumpConfig.java --fail-at-end verify sonar:sonar
   allow_failure: true
   only:
-    - dev-backend
+    - main
     - dev
