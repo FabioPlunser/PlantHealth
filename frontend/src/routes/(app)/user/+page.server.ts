@@ -16,6 +16,7 @@ import {
 
 export async function load(event) {
   const { cookies, fetch } = event;
+  let dates = setDates(event);
 
   let data = await fetch(`${BACKEND_URL}/get-dashboard`)
     .then(async (res) => {
@@ -67,7 +68,6 @@ export async function load(event) {
     });
   }
 
-  let dates = setDates(event);
   return {
     dates,
     streamed: {
