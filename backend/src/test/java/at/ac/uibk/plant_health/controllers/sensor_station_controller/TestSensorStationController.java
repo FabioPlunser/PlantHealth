@@ -200,7 +200,7 @@ public class TestSensorStationController {
 		accessPointService.foundNewSensorStation(accessPoint, List.of(sensorStation));
 
 		Map<String, String> sensorMap = new HashMap<>();
-		sensorMap.put("TEMPERATURE", "°C");
+		sensorMap.put("TEMPERATURE", "C");
 		sensorMap.put("HUMIDITY", "%");
 		sensorMap.put("PRESSURE", "hPa");
 		sensorMap.put("SOILHUMIDITY", "%");
@@ -344,7 +344,7 @@ public class TestSensorStationController {
 
 		// precondition sensorStation has at least one sensor
 		Map<String, String> sensorMap = new HashMap<>();
-		sensorMap.put("TEMPERATURE", "°C");
+		sensorMap.put("TEMPERATURE", "C");
 		sensorMap.put("HUMIDITY", "%");
 		sensorMap.put("PRESSURE", "hPa");
 		sensorMap.put("SOILHUMIDITY", "%");
@@ -412,7 +412,7 @@ public class TestSensorStationController {
 
 		// precondition sensorStation has at least one sensor
 		Map<String, String> sensorMap = new HashMap<>();
-		sensorMap.put("TEMPERATURE", "°C");
+		sensorMap.put("TEMPERATURE", "C");
 		sensorMap.put("HUMIDITY", "%");
 		sensorMap.put("PRESSURE", "hPa");
 		sensorMap.put("SOILHUMIDITY", "%");
@@ -477,7 +477,7 @@ public class TestSensorStationController {
 		sensorStation = sensorStationService.findByBdAddress(bdAddress);
 
 		Map<String, String> sensorMap = new HashMap<>();
-		sensorMap.put("TEMPERATURE", "°C");
+		sensorMap.put("TEMPERATURE", "C");
 		sensorMap.put("HUMIDITY", "%");
 		sensorMap.put("PRESSURE", "hPa");
 		sensorMap.put("SOILHUMIDITY", "%");

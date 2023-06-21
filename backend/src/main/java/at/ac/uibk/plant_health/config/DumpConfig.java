@@ -104,7 +104,7 @@ public class DumpConfig {
 		accessPointRepository.saveAll(aps);
 
 		List<Pair<String, String>> sensorKeyValues =
-				List.of(Pair.of("Temperature", "°C"), Pair.of("Air Humidity", "%"),
+				List.of(Pair.of("Temperature", "C"), Pair.of("Air Humidity", "%"),
 						Pair.of("Air Pressure", "hPa"), Pair.of("Earth Humidity", "%"),
 						Pair.of("Light Intensity", "lm"), Pair.of("Air Quality", "%"),
 						Pair.of("Battery Level", "%"));

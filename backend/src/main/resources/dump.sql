@@ -154,10 +154,10 @@ CREATE TABLE `sensor` (
 
 INSERT INTO `sensor` (`sensor_id`, `sensor_type`, `sensor_unit`) VALUES
 ('19674144-cab7-46ca-9bab-413cdee85e25',	'LIGHTINTENSITY',	'lux'),
-('5b802f1f-01b3-4043-be12-f6048f6eea50',	'GASPRESSURE',	'°ppm'),
+('5b802f1f-01b3-4043-be12-f6048f6eea50',	'GASPRESSURE',	'ppm'),
 ('5d9e13e7-27d7-499e-825e-9ce4c93479c2',	'SOILHUMIDITY',	'%'),
 ('cbe99508-7740-4221-9490-a7ff1cfd00d9',	'PRESSURE',	'hPa'),
-('ef5f4d02-9e5b-4754-b05a-dcab5e2c9419',	'TEMPERATURE',	'°C'),
+('ef5f4d02-9e5b-4754-b05a-dcab5e2c9419',	'TEMPERATURE',	'C'),
 ('f6e41687-4af8-4a21-aaff-eb5619909737',	'HUMIDITY',	'%')
 ON DUPLICATE KEY UPDATE `sensor_id` = VALUES(`sensor_id`), `sensor_type` = VALUES(`sensor_type`), `sensor_unit` = VALUES(`sensor_unit`);
 
