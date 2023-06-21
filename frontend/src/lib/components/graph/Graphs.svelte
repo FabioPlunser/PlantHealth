@@ -73,7 +73,7 @@
       sensors.sort((a, b) => b.sensorType.localeCompare(a.sensorType));
       graphData = createGraphData(res.data);
       loading = false;
-    });
+    };
   }
 
   $: {
