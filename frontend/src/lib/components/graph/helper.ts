@@ -1,14 +1,4 @@
-
-/**
- * The function creates graph data from sensor data.
- * @param {any} data - The data parameter is an array of objects representing sensor data. Each object
- * contains information about the sensor type, unit, and an array of values with timestamps and
- * corresponding sensor readings.
- * @returns The function `createGraphData` returns an object containing graph data for each sensor in
- * the input data. The keys of the object are the sensor types and the values are objects containing
- * the labels and datasets for the graph.
- */
-export function createGraphData(data: any) {
+export function createGraphData(data: Responses.InnerSensors[]) {
   let graphData: any = {};
   for (let sensor of data) {
     let sensorType = sensor.sensorType;

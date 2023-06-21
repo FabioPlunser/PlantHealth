@@ -50,18 +50,19 @@
   }
   // ---------------------------------------------------
   // ---------------------------------------------------
-  /**
-   * The `addMissingSensors` function is an asynchronous function that takes an array of `dynamicSensors` 
-   * as an argument. It loops through each sensor in the `dynamicSensors` 
-   * array and checks if it already exists in the `sensors` array. 
-   * If it does not exist, it creates a new sensor object with the `sensorType`, 
-   * `sensorUnit`, `bootstrap`, and `google` properties and adds it to the `sensors` 
-   * array. This function ensures that all sensors in the `dynamicSensors` array are present in the `sensors` array.
-   */
-  async function addMissingSensors(dynamicSensors: any) {
-    for (let sensor of dynamicSensors) {
-      if (!sensors.some((s) => s.sensorType === sensor.sensorType)) {
-        let newSensor = {
+  let currentSensor: any = null;
+  let sensors: any[] = [];
+  let storedSensors = $sensorsStore;
+  let data = sensorStation.data;
+
+  if (data) {
+    data.then(async (res) => {
+      for (let sensor of res.data) {
+        let storedSensor = storedSensors.find(
+          (s) => s.sensorType === sensor.sensorType
+        );
+        let foundSensor = {
+          sensorId: sensor.sensorId,
           sensorType: sensor.sensorType,
           sensorUnit: sensor.sensorUnit,
           bootstrap:

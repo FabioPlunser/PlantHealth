@@ -70,7 +70,7 @@ pythonDoc-job:
     - sphinx-build -b html ./source ./build
   artifacts:
     paths:
-    - ./access_point/docs/build
+      - ./access_point/docs/build
   only:
     - main
     - dev

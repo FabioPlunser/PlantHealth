@@ -3,12 +3,6 @@ import { logger } from "../logger";
 import { toasts } from "$stores/toastStore";
 import { errorHandler } from "../errorHandler";
 
-/**
- * This function uploads a picture to a sensor station and handles any errors that may occur.
- * @param {any} event - The `event` parameter is an object that contains information about the event
- * that triggered the function. It includes a `request` object that contains information about the
- * incoming request, and a `fetch` function that can be used to make HTTP requests to external APIs.
- */
 export async function uploadPicture(event: any) {
   const { request, fetch } = event;
   let formData = await request.formData();
